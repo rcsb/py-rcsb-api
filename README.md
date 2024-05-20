@@ -1,2 +1,2 @@
-# py-rcsbdataapi
-Python interface for the RCSB PDB data API.
+# py-rcsb_api
+Python interface for RCSB PDB API services.
