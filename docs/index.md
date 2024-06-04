@@ -17,12 +17,12 @@ Get it from PyPI:
 
     pip install rcsb-api
 
-Or, download from [GitHub](https://github.com/rcsb/py-rcsb_api)
+Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
 
 ## License
 
 Code is licensed under the MIT license. See the
-[LICENSE](https://github.com/rcsb/py-rcsb_api/blob/master/LICENSE) for details.
+[LICENSE](https://github.com/rcsb/py-rcsb-api/blob/master/LICENSE) for details.
 
 ## Citing
 
@@ -30,6 +30,6 @@ Please cite the `rcsb-api` package by URL:
 
 > https://rcsbapi.readthedocs.io
 
-You should also cite the RCSB PDB API services this package utilizes:
+You should also cite the RCSB.org API services this package utilizes:
 
 > ...

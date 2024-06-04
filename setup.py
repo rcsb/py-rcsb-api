@@ -11,7 +11,7 @@ from setuptools import setup
 packages = []
 thisPackage = "rcsb-api"
 
-with open("rcsb/api/__init__.py", "r", encoding="utf-8") as fd:
+with open("rcsbapi/__init__.py", "r", encoding="utf-8") as fd:
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read(), re.MULTILINE).group(1)
 
 # Load packages from requirements*.txt
@@ -27,12 +27,12 @@ if not version:
 setup(
     name=thisPackage,
     version=version,
-    description="Python package interface for the RCSB PDB API services",
+    description="Python package interface for RCSB.org API services",
     long_description_content_type="text/markdown",
     long_description=longDescription,
     author="Dennis Piehl",
     author_email="dennis.piehl@rcsb.org",
-    url="https://github.com/rcsb/py-rcsb_api",
+    url="https://github.com/rcsb/py-rcsb-api",
     #
     license="MIT",
     classifiers=[
