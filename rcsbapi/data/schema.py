@@ -1,15 +1,34 @@
 import requests
 from typing import List, Dict
-import rustworkx as rx
-from rustworkx.visualization import mpl_draw
-from rustworkx.visualization import graphviz_draw
 import matplotlib.pyplot as plt
+use_networkx = False
+try:
+    import rustworkx as rx
+    from rustworkx.visualization import mpl_draw
+    from rustworkx.visualization import graphviz_draw
+except ImportError:
+    use_networkx = True
+    try:
+        import networkx as nx
+        from scipy.io import wavfile
+        import scipy.io.wavfile
+        from PIL import Image
+        import pygraphviz as pgv
+        from networkx.drawing.nx_agraph import write_dot, graphviz_layout, to_agraph
+    except ImportError:
+        print("Error: Neither rustworkx nor networkx is installed.")
+        exit(1)
 
-pdb_url = 'https://data.rcsb.org/graphql'
+
+pdb_url = "https://data.rcsb.org/graphql"
 node_index_dict: Dict[str, int] = {}  # keys are names, values are indices
 edge_index_dict: Dict[str,int] = {}
 type_fields_dict: Dict[str, Dict[str, str]] = {}
-schema_graph: rx.PyDiGraph = rx.PyDiGraph()
+root_dict: Dict[str, List[Dict[str, str]]] = {}
+if use_networkx:
+  schema_graph = nx.DiGraph()
+else:
+    schema_graph: rx.PyDiGraph = rx.PyDiGraph()
 
 
 class FieldNode:
@@ -45,25 +64,70 @@ class TypeNode:
         self.field_list = field_list
 
 
-root_query = '''
-query IntrospectionQuery{
-  __schema{
-    queryType{
-      fields{
-        name
-        args{
-          name
-          type{
-            ofType{
+if use_networkx:
+  def constructRootDict(url: str) -> Dict[str, str]:
+      get_root_query = """
+      query IntrospectionQuery{
+        __schema{
+          queryType{
+            fields{
               name
-              kind
-              ofType{
-                kind
+              args{
                 name
-                ofType{
-                  name
-                  kind
+                type{
+                  ofType{
+                    name
+                    kind
+                    ofType{
+                      kind
+                      name
+                      ofType{
+                        name
+                        kind
+                      }
+                    }
+                  }
                 }
+              }
+            }
+          }
+        }
+      }
+      """
+      response = requests.post(headers={"Content-Type": "application/graphql"}, data=get_root_query, url=url).json()
+      root_fields_list = response["data"]["__schema"]["queryType"]["fields"]
+      for name_arg_dict in root_fields_list:
+          root_name = name_arg_dict["name"]
+          arg_dict_list = name_arg_dict["args"]
+          for arg_dict in arg_dict_list:
+              arg_name = arg_dict["name"]
+              arg_kind = arg_dict["type"]["ofType"]["kind"]
+              arg_type = find_type_name(arg_dict["type"]["ofType"])
+              if root_name not in root_dict.keys():
+                  root_dict[root_name] = []
+              root_dict[root_name].append({"name": arg_name, "kind": arg_kind, "type": arg_type})
+      return root_dict
+else:
+  root_query = """
+  query IntrospectionQuery{
+    __schema{
+      queryType{
+        fields{
+          name
+          args{
+            name
+            type{
+              ofType{
+                name
+                kind
+                ofType{
+                  kind
+                  name
+                  ofType{
+                    name
+                    kind
+                  }
+                }pyth
               }
             }
           }
@@ -71,12 +135,10 @@ query IntrospectionQuery{
       }
     }
   }
-}
-'''
+  """
 
-
-def fetch_schema(url) -> Dict[str, str]:
-    query = '''
+def fetch_schema(url: str) -> Dict[str, str]:
+    query = """
         query IntrospectionQuery {
           __schema {
 
@@ -171,22 +233,22 @@ def fetch_schema(url) -> Dict[str, str]:
             }
           }
         }
-    '''
+    """
     schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url)
     return schema_response.json()
 
 
 def constructTypeDict(schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
-    all_types_dict = schema['data']['__schema']['types']
+    all_types_dict = schema["data"]["__schema"]["types"]
     for each_type_dict in all_types_dict:
-        type_name = str(each_type_dict['name'])
-        fields = each_type_dict['fields']
+        type_name = str(each_type_dict["name"])
+        fields = each_type_dict["fields"]
         field_dict = {}
         if fields is None:
             continue
         else:
             for field in fields:
-                field_dict[str(field['name'])] = dict(field['type'])
+                field_dict[str(field["name"])] = dict(field["type"])
         type_fields_dict[type_name] = field_dict
     return type_fields_dict
 
@@ -204,60 +266,73 @@ def makeTypeSubgraph(type_name) -> TypeNode:
 
 
 def recurseBuildSchema(schema_graph, type_name):
-    type_node = makeTypeSubgraph(type_name)  # use a better name
+    type_node = makeTypeSubgraph(type_name)
     for field_node in type_node.field_list:
-        if field_node.kind == 'SCALAR' or field_node.of_kind == 'SCALAR':
-            # print(f"{field_node.name} is SCALAR, LIST, or NON_NULL")
+        if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
             continue
         else:
             type_name = field_node.type
             if type_name in node_index_dict.keys():
                 type_index = node_index_dict[type_name]
-                schema_graph.add_edge(parent=field_node.index, child=type_index, edge='draw')
-                # print(f"{field_node.name}: {type_name} is already in node_index_dict")
+                if not use_networkx:
+                    schema_graph.add_edge(parent=field_node.index, child=type_index, edge='draw')
             else:
-                # print(f"recurse on {field_node.name} of kind {field_node.kind}, type {type_name}")
                 recurseBuildSchema(schema_graph, type_name)
                 type_index = node_index_dict[type_name]
-                schema_graph.add_edge(parent=field_node.index, child=type_index, edge='draw')  # TODO: change edge value to None
+                if use_networkx:
+                    schema_graph.add_edge(field_node.index, type_index)
+                else: 
+                    schema_graph.add_edge(parent=field_node.index, child=type_index, edge='draw')  # TODO: change edge value to None
 
 
 def makeTypeNode(type_name: str) -> TypeNode:
     type_node = TypeNode(type_name)
-    index = schema_graph.add_node(type_node)
+    if use_networkx: 
+        index = len(schema_graph.nodes)
+        schema_graph.add_node(index, type_node=type_node)
+    else: 
+        index = schema_graph.add_node(type_node)
     node_index_dict[type_name] = index
     type_node.setIndex(index)
     return type_node
 
 
 def find_kind(field_dict: Dict):
-    if field_dict['name'] is not None:
-        return field_dict['kind']
+    if field_dict["name"] is not None:
+        return field_dict["kind"]
     else:
-        return find_kind(field_dict['ofType'])
+        return find_kind(field_dict["ofType"])
 
 
 def find_type_name(field_dict: Dict):
-    if field_dict['name'] is not None:
-        return field_dict['name']
+    if field_dict["name"] is not None:
+        return field_dict["name"]
     else:
-        return find_type_name(field_dict['ofType'])
+        return find_type_name(field_dict["ofType"])
 
 
 def makeFieldNode(parent_type: str, field_name: str) -> FieldNode:
-    kind = type_fields_dict[parent_type][field_name]['kind']
-    field_type_dict: Dict = type_fields_dict[parent_type][field_name]  # TODO: Mypy is angry
+    kind = type_fields_dict[parent_type][field_name]["kind"]
+    if use_networkx:
+        field_type_dict: Dict[any, any] = type_fields_dict[parent_type][field_name]
+    else: 
+        field_type_dict: Dict = type_fields_dict[parent_type][field_name]  # TODO: Mypy is angry
     return_type = find_type_name(field_type_dict)
     field_node = FieldNode(kind, return_type, field_name)
-    assert field_node.type is not None  # maybe delete later
-    if kind == 'LIST' or kind == 'NON_NULL':  
+    assert field_node.type is not None
+    if kind == "LIST" or kind == "NON_NULL":
         of_kind = find_kind(field_type_dict)
         field_node.setofKind(of_kind)
     parent_type_index = node_index_dict[parent_type]
-    if field_node.kind == 'SCALAR' or field_node.of_kind == 'SCALAR':
-        index = schema_graph.add_child(parent_type_index, field_node, None)
-    else:
-        index = schema_graph.add_child(parent_type_index, field_node, 'draw')
+    if use_networkx:
+        index = len(schema_graph.nodes)
+        schema_graph.add_node(index, field_node=field_node)
+        schema_graph.add_edge(parent_type_index, index)
+    else: 
+        if field_node.kind == 'SCALAR' or field_node.of_kind == 'SCALAR':
+            index = schema_graph.add_child(parent_type_index, field_node, None)
+        else:
+            index = schema_graph.add_child(parent_type_index, field_node, 'draw')
     node_index_dict[field_name] = index
     field_node.setIndex(index)
     return field_node
@@ -293,26 +368,58 @@ def makeFieldNode(parent_type: str, field_name: str) -> FieldNode:
 
 # VISUALIZATION ONLY
 def node_attr(node):
+  if use_networkx:
+    if isinstance(node, TypeNode):
+        return {"color": "blue", "label": f"{node.name}"}
+    if isinstance(node, FieldNode) and ((node.kind == "OBJECT") or (node.of_kind == "OBJECT")):
+        return {"color": "red", "label": f"{node.name}"}
+    else:
+        return {"style": "invis"}
+  else: 
     if type(node) is TypeNode:
         return {'color': 'blue', 'fixedsize': 'True', 'height': '0.2', 'width':'0.2', 'label': f'{node.name}'}
     if type(node) is FieldNode and ((node.kind == 'OBJECT') or (node.of_kind == 'OBJECT')):
         return {'color': 'red', 'fixedsize': 'True', 'height': '0.2', 'width':'0.2', 'label': f'{node.name}'}
-    else:
-        return {'style': 'invis'}
 
 
 def edge_attr(edge):
     if edge is None:
-        return {'style': 'invis'}
+        return {"style": "invis"}
     else:
         return {}
 
 def main():
     schema = fetch_schema(pdb_url)
+    if use_networkx:
+        constructRootDict(pdb_url)
     constructTypeDict(schema, type_fields_dict)
-    # buildSchema(type_fields_dict, node_index_dict)
-    recurseBuildSchema(schema_graph, 'Query')
-    # mpl_draw(schema_graph, with_labels=True, labels=lambda node: node.name)
-    # plt.show()
-    # graphviz_draw(schema_graph, filename='graph.png', method='twopi', node_attr_fn=node_attr, edge_attr_fn=edge_attr)
+    recurseBuildSchema(schema_graph, "Query")
+    # if use_networkx:
+    #   # Convert to AGraph for Graphviz
+    #   A = to_agraph(schema_graph)
+
+    #   # Apply node attributes
+    #   for node in schema_graph.nodes(data=True):
+    #       n = A.get_node(node[0])
+    #       attrs = node_attr(node[1].get("type_node", node[1].get("field_node")))
+    #       for attr, value in attrs.items():
+    #           n.attr[attr] = value
+
+    #   # Apply edge attributes
+    #   for edge in A.edges():
+    #       attrs = edge_attr(edge)
+    #       for attr, value in attrs.items():
+    #           edge.attr[attr] = value
+
+    #   A.draw("graph.png", prog="dot")
+
+    #   img = Image.open("graph.png")
+    #   img.show()
+    # else: 
+        # buildSchema(type_fields_dict, node_index_dict)
+        # mpl_draw(schema_graph, with_labels=True, labels=lambda node: node.name)
+        # plt.show()
+        # graphviz_draw(schema_graph, filename='graph.png', method='twopi', node_attr_fn=node_attr, edge_attr_fn=edge_attr)
+
+
 main()
