@@ -444,30 +444,30 @@ def construct_query(input_ids, input_type, return_data_list):
                     field_names[target_node_name].append(field_node_name)
     # print(field_names)
 
-    def create_final_query(final_fields, field_names):
-        final_query = {}
-        for key in field_names:
-            if key in final_fields:
-                # Find the first matching value in field_names
-                for value in field_names[key]:
-                    if value == key:
-                        final_query[key] = field_names[key][: field_names[key].index(key)] + [{key: final_fields[key]}] + field_names[key][field_names[key].index(key) + 1 :]
-                        break
-                else:
-                    final_query[key] = field_names[key]
-            else:
-                final_query[key] = field_names[key]
-        return final_query
+    # def create_final_query(final_fields, field_names):
+    #     final_query = {}
+    #     for key in field_names:
+    #         if key in final_fields:
+    #             # Find the first matching value in field_names
+    #             for value in field_names[key]:
+    #                 if value == key:
+    #                     final_query[key] = field_names[key][: field_names[key].index(key)] + [{key: final_fields[key]}] + field_names[key][field_names[key].index(key) + 1 :]
+    #                     break
+    #             else:
+    #                 final_query[key] = field_names[key]
+    #         else:
+    #             final_query[key] = field_names[key]
+    #     return final_query
 
-    final_query = create_final_query(final_fields, field_names)
-    print(final_query)
+    # final_query = create_final_query(final_fields, field_names)
+    # print(final_query)
     # with open('final_query_prettified.txt', 'w') as f:
     #     json.dump(final_query, f, indent=4)
 
     # root query
     query = "{ " + input_type + "(" + input_type + '_ids: ["' + '", "'.join(input_ids) + '"]) {\n'
 
-    for field in return_data_list:
+    for field in field_names:
         if field in field_names:
             query += "  " + field_names[field][0] + " {\n"
             for subfield in field_names[field][1:]:
@@ -476,6 +476,16 @@ def construct_query(input_ids, input_type, return_data_list):
                 else:
                     query += "    " + subfield + " {\n"
                     break
+            if field in final_fields:
+                for final_field in final_fields[field]:
+                    if isinstance(final_field, dict):
+                        for key, value in final_field.items():
+                            query += "      " + key + " {\n"
+                            for v in value:
+                                query += "        " + v + "\n"
+                            query += "      }\n"
+                    else:
+                        query += "      " + final_field + "\n"
             query += "  }\n"
         else:
             query += "  " + field + " {\n"
@@ -492,7 +502,7 @@ def main():
         constructRootDict(pdb_url)
     constructTypeDict(schema, type_fields_dict)
     recurseBuildSchema(schema_graph, "Query")
-    input_ids = ["4HHB"]
+    input_ids = ["4HHB", "4HHB"]
     input_type = "entry"
     return_data_list = ["exptl", "rcsb_polymer_instance_annotation"]
 
