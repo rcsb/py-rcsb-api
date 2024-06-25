@@ -505,26 +505,30 @@ class Schema:
                 query += ", "
         query += ") {\n"
 
+        
         for field, field_info in field_names.items():
             if field in field_info:
-                query += "  " + field_info[0] + " {\n"
-                for subfield in field_info[1:]:
-                    if subfield != field:
-                        query += "    " + subfield + " {\n"
-                    else:
-                        query += "    " + subfield + " {\n"
-                        break
-                if field in final_fields:
-                    for final_field in final_fields[field]:
-                        if isinstance(final_field, dict):
-                            for key, value in final_field.items():
-                                query += "      " + key + " {\n"
-                                for v in value:
-                                    query += "        " + v + "\n"
-                                query += "      }\n"
+                print(field_info)
+                query += "  " + field_info[0] + "\n "
+                if field_info[1:]:
+                    query += " {\n"
+                    for subfield in field_info[1:]:
+                        if subfield != field:
+                            query += "    " + subfield + " {\n"
                         else:
-                            query += "      " + final_field + "\n"
-                query += "  }\n"
+                            query += "    " + subfield + " {\n"
+                            break
+                    if field in final_fields:
+                        for final_field in final_fields[field]:
+                            if isinstance(final_field, dict):
+                                for key, value in final_field.items():
+                                    query += "      " + key + " {\n"
+                                    for v in value:
+                                        query += "        " + v + "\n"
+                                    query += "      }\n"
+                            else:
+                                query += "      " + final_field + "\n"
+                    query += "  }\n"
             else:
                 query += "  " + field + " {\n"
                 query += "  }\n"
