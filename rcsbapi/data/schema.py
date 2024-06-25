@@ -19,7 +19,7 @@ except ImportError:
     except ImportError:
         print("Error: Neither rustworkx nor networkx is installed.")
         exit(1)
-
+pdb_url = "https://data.rcsb.org/graphql"
 
 class FieldNode:
 
@@ -63,7 +63,7 @@ class Schema:
         self.edge_index_dict = {}
         self.type_fields_dict = {}
         self.root_dict = {}
-        self.schema = self.fetch_schema("https://data.rcsb.org/graphql")
+        self.schema = self.fetch_schema(self.pdb_url)
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
@@ -73,7 +73,7 @@ class Schema:
         self.constructRootDict(self.pdb_url)
         self.constructTypeDict(self.schema, self.type_fields_dict)
         self.recurseBuildSchema(self.schema_graph, "Query")
-
+    
     def constructRootDict(self, url: str) -> Dict[str, str]:
         root_query = """
         query IntrospectionQuery{
