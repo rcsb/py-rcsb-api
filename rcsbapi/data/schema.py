@@ -19,12 +19,15 @@ except ImportError:
     except ImportError:
         print("Error: Neither rustworkx nor networkx is installed.")
         exit(1)
+
 pdb_url = "https://data.rcsb.org/graphql"
+
 
 class FieldNode:
 
     def __init__(self, kind, type, name):
         self.name = name
+        self.redundant = False
         self.kind = kind
         self.of_kind = None
         self.type = type
@@ -33,10 +36,10 @@ class FieldNode:
     def __str__(self):
         return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}"
 
-    def setIndex(self, index: int):
+    def set_index(self, index: int):
         self.index = index
 
-    def setofKind(self, of_kind: str):
+    def set_of_kind(self, of_kind: str):
         self.of_kind = of_kind
 
 
@@ -47,10 +50,10 @@ class TypeNode:
         self.index = None
         self.field_list = None
 
-    def setIndex(self, index: int):
+    def set_index(self, index: int):
         self.index = index
 
-    def setFieldList(self, field_list: List[FieldNode]):
+    def set_field_list(self, field_list: List[FieldNode]):
         self.field_list = field_list
 
 
@@ -62,6 +65,7 @@ class Schema:
         self.node_index_dict = {}
         self.edge_index_dict = {}
         self.type_fields_dict = {}
+        self.field_names_list = []
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
 
@@ -70,11 +74,12 @@ class Schema:
         else:
             self.schema_graph = rx.PyDiGraph()
 
-        self.constructRootDict(self.pdb_url)
-        self.constructTypeDict(self.schema, self.type_fields_dict)
-        self.recurseBuildSchema(self.schema_graph, "Query")
-    
-    def constructRootDict(self, url: str) -> Dict[str, str]:
+        self.construct_root_dict(self.pdb_url)
+        self.construct_type_dict(self.schema, self.type_fields_dict)
+        self.construct_name_list()
+        self.recurse_build_schema(self.schema_graph, "Query")
+
+    def construct_root_dict(self, url: str) -> Dict[str, str]:
         root_query = """
         query IntrospectionQuery{
         __schema{
@@ -217,7 +222,7 @@ class Schema:
         schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url)
         return schema_response.json()
 
-    def constructTypeDict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
         for each_type_dict in all_types_dict:
             type_name = str(each_type_dict["name"])
@@ -231,19 +236,25 @@ class Schema:
             type_fields_dict[type_name] = field_dict
         return type_fields_dict
 
-    def makeTypeSubgraph(self, type_name) -> TypeNode:
+    def construct_name_list(self):
+        for type_name, field_dict in self.type_fields_dict.items():
+            if '__' not in type_name:  # doesn't look through dunder methods because those are not added to the schema
+                for field_name in self.type_fields_dict[type_name].keys():
+                    self.field_names_list.append(field_name)
+
+    def make_type_subgraph(self, type_name) -> TypeNode:
         field_name_list = self.type_fields_dict[type_name].keys()
         field_node_list = []
-        type_node = self.makeTypeNode(type_name)
+        type_node = self.make_type_node(type_name)
         for field_name in field_name_list:
             parent_type_name = type_name
-            field_node = self.makeFieldNode(parent_type_name, field_name)
+            field_node = self.make_field_node(parent_type_name, field_name)
             field_node_list.append(field_node)
-        type_node.setFieldList(field_node_list)
+        type_node.set_field_list(field_node_list)
         return type_node
 
-    def recurseBuildSchema(self, schema_graph, type_name):
-        type_node = self.makeTypeSubgraph(type_name)
+    def recurse_build_schema(self, schema_graph, type_name):
+        type_node = self.make_type_subgraph(type_name)
         for field_node in type_node.field_list:
             if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
                 continue
@@ -256,14 +267,14 @@ class Schema:
                     else:
                         schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
                 else:
-                    self.recurseBuildSchema(schema_graph, type_name)
+                    self.recurse_build_schema(schema_graph, type_name)
                     type_index = self.node_index_dict[type_name]
                     if self.use_networkx:
                         schema_graph.add_edge(field_node.index, type_index)
                     else:
                         schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")  # TODO: change edge value to None
 
-    def makeTypeNode(self, type_name: str) -> TypeNode:
+    def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
         if self.use_networkx:
             index = len(self.schema_graph.nodes)
@@ -271,7 +282,7 @@ class Schema:
         else:
             index = self.schema_graph.add_node(type_node)
         self.node_index_dict[type_name] = index
-        type_node.setIndex(index)
+        type_node.set_index(index)
         return type_node
 
     def find_kind(self, field_dict: Dict):
@@ -286,7 +297,7 @@ class Schema:
         else:
             return self.find_type_name(field_dict["ofType"])
 
-    def makeFieldNode(self, parent_type: str, field_name: str) -> FieldNode:
+    def make_field_node(self, parent_type: str, field_name: str) -> FieldNode:
         kind = self.type_fields_dict[parent_type][field_name]["kind"]
         field_type_dict: Dict = self.type_fields_dict[parent_type][field_name]  # TODO: Mypy is angry
         return_type = self.find_type_name(field_type_dict)
@@ -294,7 +305,7 @@ class Schema:
         assert field_node.type is not None
         if kind == "LIST" or kind == "NON_NULL":
             of_kind = self.find_kind(field_type_dict)
-            field_node.setofKind(of_kind)
+            field_node.set_of_kind(of_kind)
         parent_type_index = self.node_index_dict[parent_type]
         if self.use_networkx:
             index = len(self.schema_graph.nodes)
@@ -306,38 +317,37 @@ class Schema:
             else:
                 index = self.schema_graph.add_child(parent_type_index, field_node, "draw")
         self.node_index_dict[field_name] = index
-        field_node.setIndex(index)
+        field_node.set_index(index)
         return field_node
 
+    def verify_unique_field(self, return_data_name):
+        split_data_name = return_data_name.split('.')
+        if len(split_data_name) == 1:
+            field_name = split_data_name[0]
+        else:
+            field_name = split_data_name[1]      
+        name_count = self.field_names_list.count(field_name)
+        if name_count == 1:
+            return True
+        if name_count > 1:
+            return False
+        if name_count == 0:  # TODO: if count == 0, what to do? Do I want to throw an error here? it should be caught at other points 
+            return None
 
-    # # maybe make this more performant
-    # def buildSchema(type_fields_dict, node_index_dict):  # iteratively
-    #     all_type_names = type_fields_dict.keys()
-    #     for type_name in all_type_names:
-    #         # print(type_name)
-    #         field_list = type_fields_dict[type_name].keys()
-    #         # if the node is already in the graph, retrieve the node. Else, make the node
-    #         if type_name not in node_index_dict.keys():
-    #             makeTypeNode(type_name)
-    #         # type_node_index = type_node.index
-    #         for field_name in field_list:
-    #             return_type = type_fields_dict[type_name][field_name]['kind'].upper()
-    #             # makeFieldNode(type_name, field_name)
-    #             if return_type == 'SCALAR':
-    #                 pass
-    #                 # field_type_name = type_fields_dict[type_name][field_name]['name'] #get the name of scalar type?
-    #             if return_type == 'OBJECT':
-    #                 makeFieldNode(type_name, field_name)  # TODO: comment out and uncomment above later
-    #                 field_type_name = type_fields_dict[type_name][field_name]['name']
-    #                 if field_type_name not in node_index_dict.keys():
-    #                     makeTypeNode(field_type_name)
-    #                 field_type_index = node_index_dict[field_type_name]
-    #                 field_index = node_index_dict[field_name]
-    #                 schema_graph.add_edge(field_index, field_type_index, None)
-    #             if return_type == 'LIST' or return_type == 'NON_NULL':
-    #                 makeFieldNode(type_name, field_name)   # TODO: comment out and uncomment above later
-    #                 field_type_name = type_fields_dict[type_name][field_name]['name']
+    def check_input_format(self, return_data_input):
+        if isinstance(return_data_input, str):
+            pass
+        if isinstance(return_data_input, list):
+            pass
 
+    def get_redundant_field(self, return_data_name) -> List[str]:
+        valid_field_list: List[str] = []
+        for name, idx in self.node_index_dict.items():
+            if isinstance(self.schema_graph[idx], FieldNode):
+                if self.schema_graph[idx].redundant is True:
+                    if name.split('.')[1] == return_data_name:
+                        valid_field_list.append(name)
+        return valid_field_list
 
     # VISUALIZATION ONLY
     def node_attr(self, node):
@@ -354,13 +364,11 @@ class Schema:
             if type(node) is FieldNode and ((node.kind == "OBJECT") or (node.of_kind == "OBJECT")):
                 return {"color": "red", "fixedsize": "True", "height": "0.2", "width": "0.2", "label": f"{node.name}"}
 
-
     def edge_attr(self, edge):
         if edge is None:
             return {"style": "invis"}
         else:
             return {}
-
 
     def construct_query(self, input_ids, input_type, return_data_list):
         if use_networkx:
@@ -368,14 +376,44 @@ class Schema:
         else:
             return self.___construct_query_rustworkx(input_ids, input_type, return_data_list)
 
-    def ___construct_query_networkx(self, input_ids, input_type, return_data_list): #incomplete function
+    def get_descendant_fields(self, schema_graph, node, visited=None):
+        if visited is None:
+            visited = set()
+
+        result = []
+        children = list(schema_graph.neighbors(node))
+
+        for child in children:
+            if child in visited:
+                continue
+            visited.add(child)
+
+            child_data = schema_graph[child]
+            if isinstance(child_data, FieldNode):
+                child_descendants = self.get_descendant_fields(schema_graph, child, visited)
+                if child_descendants:
+                    result.append({child_data.name: child_descendants})
+                else:
+                    result.append(child_data.name)
+            elif isinstance(child_data, TypeNode):
+                type_descendants = self.get_descendant_fields(schema_graph, child, visited)
+                if type_descendants:
+                    result.extend(type_descendants)
+                else:
+                    result.append(child_data.name)
+
+        if len(result) == 1:
+            return result[0]
+        return result
+
+    def __construct_query_networkx(self, input_ids, input_type, return_data_list):  # incomplete function
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
 
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         query_name = input_type
         attr_list = self.root_dict[input_type]
-        attr_name = attr_name = [id["name"] for id in attr_list]  
+        attr_name = [id["name"] for id in attr_list]
         field_names = {}
         start_node_index = None
         for node in self.schema_graph.nodes():
@@ -395,14 +433,14 @@ class Schema:
         query = "query"
         return query
 
-    def ___construct_query_rustworkx(self, input_ids, input_type, return_data_list):
+    def __construct_query_rustworkx(self, input_ids, input_type, return_data_list):
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
 
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         query_name = input_type
         attr_list = self.root_dict[input_type]
-        attr_name = attr_name = [id["name"] for id in attr_list]  
+        attr_name = [id["name"] for id in attr_list]  
         field_names = {}
 
         start_node_index = None
@@ -427,40 +465,10 @@ class Schema:
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
         final_fields = {}
 
-        def get_descendant_fields(schema_graph, node, visited=None):
-            if visited is None:
-                visited = set()
-
-            result = []
-            children = list(schema_graph.neighbors(node))
-
-            for child in children:
-                if child in visited:
-                    continue
-                visited.add(child)
-
-                child_data = schema_graph[child]
-                if isinstance(child_data, FieldNode):
-                    child_descendants = get_descendant_fields(schema_graph, child, visited)
-                    if child_descendants:
-                        result.append({child_data.name: child_descendants})
-                    else:
-                        result.append(child_data.name)
-                elif isinstance(child_data, TypeNode):
-                    type_descendants = get_descendant_fields(schema_graph, child, visited)
-                    if type_descendants:
-                        result.extend(type_descendants)
-                    else:
-                        result.append(child_data.name)
-
-            if len(result) == 1:
-                return result[0]
-            return result
-
         for target_node in target_node_indices:
             target_data = self.schema_graph[target_node]
             if isinstance(target_data, FieldNode):
-                final_fields[target_data.name] = get_descendant_fields(self.schema_graph, target_node)
+                final_fields[target_data.name] = self.get_descendant_fields(self.schema_graph, target_node)
 
         # print(final_fields)
 
@@ -475,29 +483,6 @@ class Schema:
                     if isinstance(node_data, FieldNode) and node_data.name != input_type:
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
-        # print(field_names)
-
-        # def create_final_query(final_fields, field_names):
-        #     final_query = {}
-        #     for key in field_names:
-        #         if key in final_fields:
-        #             # Find the first matching value in field_names
-        #             for value in field_names[key]:
-        #                 if value == key:
-        #                     final_query[key] = field_names[key][: field_names[key].index(key)] + [{key: final_fields[key]}] + field_names[key][field_names[key].index(key) + 1 :]
-        #                     break
-        #             else:
-        #                 final_query[key] = field_names[key]
-        #         else:
-        #             final_query[key] = field_names[key]
-        #     return final_query
-
-        # final_query = create_final_query(final_fields, field_names)
-        # print(final_query)
-        # with open('final_query_prettified.txt', 'w') as f:
-        #     json.dump(final_query, f, indent=4)
-
-        # root query
         query = "{ " + input_type + "("
         for i, attr in enumerate(attr_name):
             query += attr + ": [\"" + "\", \"".join(input_ids) + "\"]"
@@ -505,7 +490,6 @@ class Schema:
                 query += ", "
         query += ") {\n"
 
-        
         for field, field_info in field_names.items():
             if field in field_info:
                 query += "  " + field_info[0] + " {\n"
@@ -534,13 +518,12 @@ class Schema:
 
         return query
 
-
 # def main():
 #     schema = fetch_schema(pdb_url)
 #     if use_networkx:
-#         constructRootDict(pdb_url)
-#     constructTypeDict(schema, type_fields_dict)
-#     recurseBuildSchema(schema_graph, "Query")
+#         construct_root_dict(pdb_url)
+#     construct_type_dict(schema, type_fields_dict)
+#     recurse_build_schema(schema_graph, "Query")
 #     input_ids = ["4HHB", "4HHB"]
 #     input_type = "entry"
 #     return_data_list = ["exptl", "rcsb_polymer_instance_annotation"]
