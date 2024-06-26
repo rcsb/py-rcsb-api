@@ -335,8 +335,6 @@ class Schema:
             return None
 
     def check_input_format(self, return_data_input):
-        if isinstance(return_data_input, str):
-            pass
         if isinstance(return_data_input, list):
             pass
 
