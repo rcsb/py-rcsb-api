@@ -497,8 +497,10 @@ class Schema:
 
         for field, field_info in field_names.items():
             if field in field_info:
-                query += "  " + field_info[0] + " {\n"
-                opened_brackets += 1
+                query += "  " + field_info[0] 
+                if final_fields[field]:
+                    query += " {\n"
+                    opened_brackets += 1
                 for subfield in field_info[1:]:
                     if subfield != field:
                         query += "    " + subfield + " {\n"
@@ -508,6 +510,7 @@ class Schema:
                         opened_brackets += 1
                         break
                 if field in final_fields:
+                    print(final_fields)
                     for final_field in final_fields[field]:
                         if isinstance(final_field, dict):
                             for key, value in final_field.items():
@@ -518,9 +521,10 @@ class Schema:
                                 query += "      }\n"
                                 closed_brackets += 1
                         else:
-                            query += "      " + final_field + "\n"
-                query += "  }\n"
-                closed_brackets += 1
+                            query += "     " + final_field + "\n"
+                if final_fields[field]: 
+                    query += "  }\n"
+                    closed_brackets += 1
             else:
                 query += "  " + field + " {\n"
                 opened_brackets += 1
