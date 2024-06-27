@@ -1,6 +1,6 @@
 import requests
 from typing import List, Dict
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 use_networkx = False
 try:
