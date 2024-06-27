@@ -482,6 +482,9 @@ class Schema:
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
         query = "{ " + input_type + "("
+        opened_brackets = 1
+        closed_brackets = 0
+
         for i, attr in enumerate(attr_name):
             if isinstance(input_ids, str):
                 query += attr + ": \"" + input_ids + "\""
@@ -490,32 +493,43 @@ class Schema:
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
+        opened_brackets += 1
 
         for field, field_info in field_names.items():
             if field in field_info:
                 query += "  " + field_info[0] + " {\n"
+                opened_brackets += 1
                 for subfield in field_info[1:]:
                     if subfield != field:
                         query += "    " + subfield + " {\n"
+                        opened_brackets += 1
                     else:
                         query += "    " + subfield + " {\n"
+                        opened_brackets += 1
                         break
                 if field in final_fields:
                     for final_field in final_fields[field]:
                         if isinstance(final_field, dict):
                             for key, value in final_field.items():
                                 query += "      " + key + " {\n"
+                                opened_brackets += 1
                                 for v in value:
                                     query += "        " + v + "\n"
                                 query += "      }\n"
+                                closed_brackets += 1
                         else:
                             query += "      " + final_field + "\n"
                 query += "  }\n"
+                closed_brackets += 1
             else:
                 query += "  " + field + " {\n"
+                opened_brackets += 1
                 query += "  }\n"
+                closed_brackets += 1
 
-        query += "}}"
+        while opened_brackets > closed_brackets:
+            query += "}"
+            closed_brackets += 1
 
         return query
 
