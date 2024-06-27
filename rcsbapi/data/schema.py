@@ -435,8 +435,6 @@ class Schema:
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
 
-        input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
-        query_name = input_type
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]  
         field_names = {}
@@ -461,6 +459,8 @@ class Schema:
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
+        if any(not value for value in all_paths.values()):
+            raise ValueError(f"The return data requested does not match the input type {input_type}")
         final_fields = {}
 
         for target_node in target_node_indices:
@@ -482,37 +482,57 @@ class Schema:
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
         query = "{ " + input_type + "("
+        opened_brackets = 1
+        closed_brackets = 0
+
         for i, attr in enumerate(attr_name):
-            query += attr + ": [\"" + "\", \"".join(input_ids) + "\"]"
+            if isinstance(input_ids, str):
+                query += attr + ": \"" + input_ids + "\""
+            else:
+                query += attr + ": [\"" + "\", \"".join(input_ids) + "\"]"
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
+        opened_brackets += 1
 
         for field, field_info in field_names.items():
             if field in field_info:
-                query += "  " + field_info[0] + " {\n"
+                query += "  " + field_info[0] 
+                if final_fields[field]:
+                    query += " {\n"
+                    opened_brackets += 1
                 for subfield in field_info[1:]:
                     if subfield != field:
                         query += "    " + subfield + " {\n"
+                        opened_brackets += 1
                     else:
                         query += "    " + subfield + " {\n"
+                        opened_brackets += 1
                         break
                 if field in final_fields:
                     for final_field in final_fields[field]:
                         if isinstance(final_field, dict):
                             for key, value in final_field.items():
                                 query += "      " + key + " {\n"
+                                opened_brackets += 1
                                 for v in value:
                                     query += "        " + v + "\n"
                                 query += "      }\n"
+                                closed_brackets += 1
                         else:
-                            query += "      " + final_field + "\n"
-                query += "  }\n"
+                            query += "     " + final_field + "\n"
+                if final_fields[field]: 
+                    query += "  }\n"
+                    closed_brackets += 1
             else:
                 query += "  " + field + " {\n"
+                opened_brackets += 1
                 query += "  }\n"
+                closed_brackets += 1
 
-        query += "}}"
+        while opened_brackets > closed_brackets:
+            query += "}"
+            closed_brackets += 1
 
         return query
 
