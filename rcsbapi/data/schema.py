@@ -66,6 +66,7 @@ class Schema:
         self.edge_index_dict = {}
         self.type_fields_dict = {}
         self.field_names_list = []
+        self.root_introspection = self.request_root_types(pdb_url)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
 
@@ -79,7 +80,7 @@ class Schema:
         self.construct_name_list()
         self.recurse_build_schema(self.schema_graph, "Query")
 
-    def construct_root_dict(self, url: str) -> Dict[str, str]:
+    def request_root_types(self, pdb_url) -> Dict:
         root_query = """
         query IntrospectionQuery{
         __schema{
@@ -108,7 +109,11 @@ class Schema:
         }
         }
         """
-        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=url).json()
+        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=pdb_url)
+        return response.json()
+
+    def construct_root_dict(self, url: str) -> Dict[str, str]:
+        response = self.root_introspection
         root_fields_list = response["data"]["__schema"]["queryType"]["fields"]
         for name_arg_dict in root_fields_list:
             root_name = name_arg_dict["name"]
@@ -228,9 +233,7 @@ class Schema:
             type_name = str(each_type_dict["name"])
             fields = each_type_dict["fields"]
             field_dict = {}
-            if fields is None:
-                continue
-            else:
+            if fields is not None:
                 for field in fields:
                     field_dict[str(field["name"])] = dict(field["type"])
             type_fields_dict[type_name] = field_dict
@@ -316,7 +319,11 @@ class Schema:
                 index = self.schema_graph.add_child(parent_type_index, field_node, None)
             else:
                 index = self.schema_graph.add_child(parent_type_index, field_node, "draw")
-        self.node_index_dict[field_name] = index
+        if self.field_names_list.count(field_name) > 1:
+            field_node.redundant = True
+            self.node_index_dict[f"{parent_type}.{field_name}"] = index
+        else:
+            self.node_index_dict[field_name] = index
         field_node.set_index(index)
         return field_node
 
@@ -334,10 +341,6 @@ class Schema:
         if name_count == 0:  # TODO: if count == 0, what to do? Do I want to throw an error here? it should be caught at other points 
             return None
 
-    def check_input_format(self, return_data_input):
-        if isinstance(return_data_input, list):
-            pass
-
     def get_redundant_field(self, return_data_name) -> List[str]:
         valid_field_list: List[str] = []
         for name, idx in self.node_index_dict.items():
@@ -347,28 +350,14 @@ class Schema:
                         valid_field_list.append(name)
         return valid_field_list
 
-    # VISUALIZATION ONLY
-    def node_attr(self, node):
-        if self.use_networkx:
-            if isinstance(node, TypeNode):
-                return {"color": "blue", "label": f"{node.name}"}
-            if isinstance(node, FieldNode) and ((node.kind == "OBJECT") or (node.of_kind == "OBJECT")):
-                return {"color": "red", "label": f"{node.name}"}
-            else:
-                return {"style": "invis"}
-        else:
-            if type(node) is TypeNode:
-                return {"color": "blue", "fixedsize": "True", "height": "0.2", "width": "0.2", "label": f"{node.name}"}
-            if type(node) is FieldNode and ((node.kind == "OBJECT") or (node.of_kind == "OBJECT")):
-                return {"color": "red", "fixedsize": "True", "height": "0.2", "width": "0.2", "label": f"{node.name}"}
-
-    def edge_attr(self, edge):
-        if edge is None:
-            return {"style": "invis"}
-        else:
-            return {}
-
     def construct_query(self, input_ids, input_type, return_data_list):
+        for return_field in return_data_list:
+            if self.verify_unique_field(return_field) is True:
+                continue
+            if self.verify_unique_field(return_field) is False:
+                raise ValueError("Not a unique field, must specify further. To find valid fields with this name, run ___({return_field})") # TODO: write this function
+        if input_type not in self.root_dict.keys():
+            raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
             return self.___construct_query_networkx(input_ids, input_type, return_data_list)
         else:
@@ -405,9 +394,6 @@ class Schema:
         return result
 
     def __construct_query_networkx(self, input_ids, input_type, return_data_list):  # incomplete function
-        if input_type not in self.root_dict.keys():
-            raise ValueError(f"Unknown input type: {input_type}")
-
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         query_name = input_type
         attr_list = self.root_dict[input_type]
