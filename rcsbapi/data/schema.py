@@ -510,7 +510,6 @@ class Schema:
                         opened_brackets += 1
                         break
                 if field in final_fields:
-                    print(final_fields)
                     for final_field in final_fields[field]:
                         if isinstance(final_field, dict):
                             for key, value in final_field.items():
