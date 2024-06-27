@@ -75,11 +75,11 @@ class SchemaTests(unittest.TestCase):
 
     def testConstructQueryRustworkX(self):
         with self.subTest(msg="1.  singular input_type (entry)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids="4HHB", input_type="entry", return_data_list=["exptl"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="2. plural input_type (entries)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids=["4HHB", "1IYE"], input_type="entries", return_data_list=["exptl"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids= {"entry_ids": ["4HHB", "1IYE"]}, input_type="entries", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="3. two arguments (polymer_entity_instance)"): #TODO: do I have to test mult arg + plural?
@@ -87,21 +87,21 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="4. three arguments (interface)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["rcsb_id"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["CoreInterface.rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="5. request multiple return fields"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids="4HHB", input_type="entry", return_data_list=["exptl","rcsb_polymer_instance_annotation"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl","rcsb_polymer_instance_annotation"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="6. request scalar field"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids="4HHB", input_type="entry", return_data_list=["rcsb_id"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         # Test error handling
         with self.subTest(msg="7. too many input ids passed in"):
             with self.assertRaises(Exception):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids=["4HHB","1IYE"], input_type="entry", return_data_list=["rcsb_id"])
+                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": ["4HHB","1IYE"]}, input_type="entry", return_data_list=["Entry.rcsb_id"])
         with self.subTest(msg="too few inputs keys provided"):
             with self.assertRaises(Exception):
                 SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
@@ -113,7 +113,7 @@ class SchemaTests(unittest.TestCase):
                 SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["exptl"])
         with self.subTest(msg="11. return data not specific enough"):
             with self.assertRaises(Exception):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids="4HHB", input_type="entry", return_data_list=["id"])
+                SCHEMA._Schema__construct_query_rustworkx(input_ids="4HHB", input_type="entry", return_data_list=["Entry.id"])
 
 
 def buildSchema():
