@@ -1,1 +1,2 @@
 requests >= 2.0.0
+setuptools == 67.1.0
