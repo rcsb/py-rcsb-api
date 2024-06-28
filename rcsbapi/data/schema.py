@@ -422,8 +422,21 @@ class Schema:
         return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
+        attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
+
         if not all(key in attr_name for key in input_ids.keys()):
-            raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")  
+                raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
+
+        for key, value in input_ids.items():
+            if attr_kind[key] == "SCALAR":
+                if not isinstance(value, str):
+                    raise ValueError(f"Input ID for {key} should be a single string")
+            elif attr_kind[key] == "LIST":
+                if not isinstance(value, list):
+                    raise ValueError(f"Input ID for {key} should be a list of strings")
+                if not all(isinstance(item, str) for item in value):
+                    raise ValueError(f"Input ID for {key} should be a list of strings") 
+
         field_names = {}
 
         start_node_index = None
