@@ -419,12 +419,25 @@ class Schema:
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_ids, input_type, return_data_list):
-        if input_type not in self.root_dict.keys():
-            raise ValueError(f"Unknown input type: {input_type}")
-
+    def __construct_query_rustworkx(self, input_ids: Dict[str, str], input_type, return_data_list):
+        return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
-        attr_name = [id["name"] for id in attr_list]  
+        attr_name = [id["name"] for id in attr_list]
+        attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
+
+        if not all(key in attr_name for key in input_ids.keys()):
+                raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
+
+        for key, value in input_ids.items():
+            if attr_kind[key] == "SCALAR":
+                if not isinstance(value, str):
+                    raise ValueError(f"Input ID for {key} should be a single string")
+            elif attr_kind[key] == "LIST":
+                if not isinstance(value, list):
+                    raise ValueError(f"Input ID for {key} should be a list of strings")
+                if not all(isinstance(item, str) for item in value):
+                    raise ValueError(f"Input ID for {key} should be a list of strings") 
+
         field_names = {}
 
         start_node_index = None
@@ -437,13 +450,21 @@ class Schema:
                 break
 
         target_node_indices = []
-        for return_data in return_data_list:
-            for node in self.schema_graph.node_indices():
-                node_data = self.schema_graph[node]
-                if isinstance(node_data, FieldNode) and node_data.name == return_data:
-                    target_node_indices.append(node_data.index)
-                    break
-        # print(target_node_indices)
+        if all('.' not in rd for rd in return_data_list):
+            for return_data in return_data_list:
+                for node in self.schema_graph.node_indices():
+                    node_data = self.schema_graph[node]
+                    if isinstance(node_data, FieldNode) and node_data.name == return_data:
+                        target_node_indices.append(node_data.index)
+                        break
+        else:
+            for return_data in return_data_list:
+                if return_data in self.node_index_dict.keys():
+                    node_index = self.node_index_dict[return_data]
+                    node_data = self.schema_graph[node_index]
+                    if isinstance(node_data, FieldNode):
+                        target_node_indices.append(node_data.index)
+                        break
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
@@ -464,9 +485,13 @@ class Schema:
                 target_node_name = node_data.name
                 field_names[target_node_name] = []
             for each_path in all_paths[target_node]:
+                skip_first = True
                 for node in each_path:
                     node_data = self.schema_graph[node]
-                    if isinstance(node_data, FieldNode) and node_data.name != input_type:
+                    if isinstance(node_data, FieldNode):
+                        if skip_first:
+                            skip_first = False
+                            continue
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
         query = "{ " + input_type + "("
@@ -474,10 +499,10 @@ class Schema:
         closed_brackets = 0
 
         for i, attr in enumerate(attr_name):
-            if isinstance(input_ids, str):
-                query += attr + ": \"" + input_ids + "\""
+            if isinstance(input_ids[attr], list):
+                query += attr + ": [\"" + "\", \"".join(input_ids[attr]) + "\"]"
             else:
-                query += attr + ": [\"" + "\", \"".join(input_ids) + "\"]"
+                query += attr + ": \"" + input_ids[attr] + "\""
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
@@ -486,7 +511,7 @@ class Schema:
         for field, field_info in field_names.items():
             if field in field_info:
                 query += "  " + field_info[0] 
-                if final_fields[field]:
+                if len(field_info) > 1 or final_fields[field]:
                     query += " {\n"
                     opened_brackets += 1
                 for subfield in field_info[1:]:
@@ -494,8 +519,10 @@ class Schema:
                         query += "    " + subfield + " {\n"
                         opened_brackets += 1
                     else:
-                        query += "    " + subfield + " {\n"
-                        opened_brackets += 1
+                        query += "    " + subfield 
+                        if final_fields[subfield]:
+                            query += " {\n"
+                            opened_brackets += 1
                         break
                 if field in final_fields:
                     for final_field in final_fields[field]:
