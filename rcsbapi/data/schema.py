@@ -426,7 +426,10 @@ class Schema:
         attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
 
         if not all(key in attr_name for key in input_ids.keys()):
-                raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
+            raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
+
+        if not all(item in self.node_index_dict.keys() for item in return_data_list):
+            raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict.keys()])}")
 
         for key, value in input_ids.items():
             if attr_kind[key] == "SCALAR":
@@ -450,21 +453,11 @@ class Schema:
                 break
 
         target_node_indices = []
-        if all('.' not in rd for rd in return_data_list):
-            for return_data in return_data_list:
-                for node in self.schema_graph.node_indices():
-                    node_data = self.schema_graph[node]
-                    if isinstance(node_data, FieldNode) and node_data.name == return_data:
-                        target_node_indices.append(node_data.index)
-                        break
-        else:
-            for return_data in return_data_list:
-                if return_data in self.node_index_dict.keys():
-                    node_index = self.node_index_dict[return_data]
-                    node_data = self.schema_graph[node_index]
-                    if isinstance(node_data, FieldNode):
-                        target_node_indices.append(node_data.index)
-                        break
+        for return_data in return_data_list:
+            node_index = self.node_index_dict[return_data]
+            node_data = self.schema_graph[node_index]
+            if isinstance(node_data, FieldNode):
+                target_node_indices.append(node_data.index)
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
