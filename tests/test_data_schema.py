@@ -114,11 +114,11 @@ class SchemaTests(unittest.TestCase):
 
     def testConstructQueryRustworkX(self):
         with self.subTest(msg="1.  singular input_type (entry)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids="4HHB", input_type="entry", return_data_list=["exptl"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="2. plural input_type (entries)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids=["4HHB", "1IYE"], input_type="entries", return_data_list=["exptl"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_ids": ["4HHB", "1IYE"]}, input_type="entries", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="3. two arguments (polymer_entity_instance)"): #TODO: do I have to test mult arg + plural?
