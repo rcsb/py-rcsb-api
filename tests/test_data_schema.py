@@ -26,10 +26,10 @@ import requests
 import rustworkx as rx
 import networkx as nx
 
-import schema
-from schema import Schema
-from schema import use_networkx
-from schema import pdb_url
+from rcsbapi.data import schema
+from rcsbapi.data.schema import Schema
+from rcsbapi.data.schema import use_networkx
+from rcsbapi.data.schema import pdb_url
 
 SCHEMA = Schema(pdb_url)
 
@@ -95,14 +95,19 @@ class SchemaTests(unittest.TestCase):
         self.assertEqual(len(type_dict_list), len(SCHEMA.type_fields_dict.keys()))
 
     def testRecurseBuildSchema(self):
-        original_networkx_flag = use_networkx
-        use_networkx = False
-        SCHEMA.recurse_build_schema
+        original_networkx_flag = schema.use_networkx
+        schema.use_networkx = False
+        SCHEMA = Schema(pdb_url)
+        SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
         self.assertIsInstance(SCHEMA.schema_graph, rx.PyDiGraph)
-        use_networkx = False
-        SCHEMA.recurse_build_schema
+        schema.use_networkx = True
+        SCHEMA = Schema(pdb_url)
+        SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
         self.assertIsInstance(SCHEMA.schema_graph, nx.classes.digraph.DiGraph)
-        use_networkx = original_networkx_flag
+        # reset to original
+        schema.use_networkx = original_networkx_flag
+        SCHEMA = Schema(pdb_url)
+        SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
 
     def testConstructQueryRustworkX(self):
         with self.subTest(msg="1.  singular input_type (entry)"):
