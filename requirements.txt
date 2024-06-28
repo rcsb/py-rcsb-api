@@ -1,1 +1,6 @@
 requests >= 2.0.0
+rustworkx
+networkx
+# matplotlib
+# scipy
+# pygraphviz

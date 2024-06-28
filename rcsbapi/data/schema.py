@@ -1,9 +1,9 @@
 import requests
 from typing import List, Dict
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
+use_networkx = False
 try:
-    use_networkx = False
     import rustworkx as rx
     from rustworkx.visualization import mpl_draw
     from rustworkx.visualization import graphviz_draw
@@ -12,16 +12,17 @@ except ImportError:
     try:
         import networkx as nx
         from scipy.io import wavfile
-        import scipy.io.wavfile
-        from PIL import Image
-        import pygraphviz as pgv
-        from networkx.drawing.nx_agraph import write_dot, graphviz_layout, to_agraph
+        # import scipy.io.wavfile
+        # from PIL import Image
+        # import pygraphviz as pgv
+        # from networkx.drawing.nx_agraph import write_dot, graphviz_layout, to_agraph
     except ImportError:
         print("Error: Neither rustworkx nor networkx is installed.")
         exit(1)
 
 pdb_url = "https://data.rcsb.org/graphql"
-
+# use_networkx = True
+# import networkx as nx
 
 class FieldNode:
 
@@ -240,7 +241,7 @@ class Schema:
         return type_fields_dict
 
     def construct_name_list(self):
-        for type_name, field_dict in self.type_fields_dict.items():
+        for type_name in self.type_fields_dict.keys():
             if '__' not in type_name:  # doesn't look through dunder methods because those are not added to the schema
                 for field_name in self.type_fields_dict[type_name].keys():
                     self.field_names_list.append(field_name)
@@ -302,7 +303,7 @@ class Schema:
 
     def make_field_node(self, parent_type: str, field_name: str) -> FieldNode:
         kind = self.type_fields_dict[parent_type][field_name]["kind"]
-        field_type_dict: Dict = self.type_fields_dict[parent_type][field_name]  # TODO: Mypy is angry
+        field_type_dict: Dict = self.type_fields_dict[parent_type][field_name] 
         return_type = self.find_type_name(field_type_dict)
         field_node = FieldNode(kind, return_type, field_name)
         assert field_node.type is not None
@@ -328,17 +329,18 @@ class Schema:
         return field_node
 
     def verify_unique_field(self, return_data_name):
+        node_index_names = list(self.node_index_dict.keys())
         split_data_name = return_data_name.split('.')
         if len(split_data_name) == 1:
             field_name = split_data_name[0]
-        else:
-            field_name = split_data_name[1]      
-        name_count = self.field_names_list.count(field_name)
+            name_count = self.field_names_list.count(field_name)
+        else: 
+            name_count = node_index_names.count(return_data_name)
         if name_count == 1:
             return True
         if name_count > 1:
             return False
-        if name_count == 0:  # TODO: if count == 0, what to do? Do I want to throw an error here? it should be caught at other points 
+        if name_count == 0:
             return None
 
     def get_redundant_field(self, return_data_name) -> List[str]:
