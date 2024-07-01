@@ -18,6 +18,7 @@ __email__ = ""
 __license__ = ""
 
 import logging
+import importlib
 # import platform
 # import resource
 import time
@@ -94,20 +95,22 @@ class SchemaTests(unittest.TestCase):
         self.assertEqual(entry_dict_from_func, entry_dict)
         self.assertEqual(len(type_dict_list), len(SCHEMA.type_fields_dict.keys()))
 
-    def testRecurseBuildSchema(self):
+    def testRecurseBuildSchema(self):  # doesn't work right now
         original_networkx_flag = schema.use_networkx
         schema.use_networkx = False
+        importlib.reload(schema)
         SCHEMA = Schema(pdb_url)
         SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
         self.assertIsInstance(SCHEMA.schema_graph, rx.PyDiGraph)
         schema.use_networkx = True
+        importlib.reload(schema)
         SCHEMA = Schema(pdb_url)
         SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
         self.assertIsInstance(SCHEMA.schema_graph, nx.classes.digraph.DiGraph)
         # reset to original
         schema.use_networkx = original_networkx_flag
+        importlib.reload(schema)
         SCHEMA = Schema(pdb_url)
-        SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
 
     def testConstructQueryRustworkX(self):
         with self.subTest(msg="1.  singular input_type (entry)"):
@@ -147,7 +150,12 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="10. no path exists"):
             with self.assertRaises(ValueError):
                 SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["exptl"])
-        with self.subTest(msg="11. return data not specific enough"):
+         with self.subTest(msg="11. field doesn't exist"):
+            with self.assertRaises(ValueError):
+                SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["aaa"])
+        
+    def testConstructQuery(self):
+        with self.subTest(msg="1. return data not specific enough"):
             with self.assertRaises(ValueError):
                 SCHEMA.construct_query(input_ids="4HHB", input_type="entry", return_data_list=["id"])
 
@@ -171,6 +179,7 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("testConstructRootDict"))
     suiteSelect.addTest(SchemaTests("testConstructTypeDict"))
     # suiteSelect.addTest(SchemaTests("testRecurseBuildSchema"))
+    suiteSelect.addTest(SchemaTests("testConstructQuery"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
     suiteSelect.addTest(SchemaTests("testVerifyUniqueField"))
     return suiteSelect
