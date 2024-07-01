@@ -1,29 +1,28 @@
 import requests
 from typing import List, Dict
+<<<<<<< HEAD
 import re
 # import matplotlib.pyplot as plt
+=======
+import logging
+>>>>>>> 3ef5129 (minor changes to schema, tests. Added query class and empty test file)
 
 use_networkx = False
 try:
-    import rustworkx as rx
-    from rustworkx.visualization import mpl_draw
-    from rustworkx.visualization import graphviz_draw
+    import rustworkx as rx  
+    logging.info("Using  rustworkx")
 except ImportError:
     use_networkx = True
+
+if use_networkx is True:
     try:
         import networkx as nx
-        from scipy.io import wavfile
-        # import scipy.io.wavfile
-        # from PIL import Image
-        # import pygraphviz as pgv
-        # from networkx.drawing.nx_agraph import write_dot, graphviz_layout, to_agraph
+        logging.info("Using  networkx")
     except ImportError:
         print("Error: Neither rustworkx nor networkx is installed.")
         exit(1)
 
 pdb_url = "https://data.rcsb.org/graphql"
-# use_networkx = True
-# import networkx as nx
 
 class FieldNode:
 
@@ -268,14 +267,14 @@ class Schema:
                 if type_name in self.node_index_dict.keys():
                     type_index = self.node_index_dict[type_name]
                     if use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index)
+                        schema_graph.add_edge(field_node.index, type_index, "")
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
+                        schema_graph.add_edge(parent=field_node.index, child= type_index, edge="draw")
                 else:
                     self.recurse_build_schema(schema_graph, type_name)
                     type_index = self.node_index_dict[type_name]
                     if self.use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index)
+                        schema_graph.add_edge(field_node.index, type_index,"")
                     else:
                         schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")  # TODO: change edge value to None
 
@@ -344,7 +343,7 @@ class Schema:
         if name_count == 0:
             return None
 
-    def get_redundant_field(self, return_data_name) -> List[str]:
+    def get_unique_fields(self, return_data_name) -> List[str]:
         valid_field_list: List[str] = []
         for name, idx in self.node_index_dict.items():
             if isinstance(self.schema_graph[idx], FieldNode):
@@ -358,13 +357,19 @@ class Schema:
             if self.verify_unique_field(return_field) is True:
                 continue
             if self.verify_unique_field(return_field) is False:
-                raise ValueError("Not a unique field, must specify further. To find valid fields with this name, run ___({return_field})") # TODO: write this function
+                raise ValueError(f"Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields({return_field})") # TODO: write this function
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
+<<<<<<< HEAD
             return self.___construct_query_networkx(input_type, return_data_list, input_ids)
         else:
             return self.___construct_query_rustworkx(input_type, return_data_list, input_ids)
+=======
+            return self.__construct_query_networkx(input_ids, input_type, return_data_list)
+        else:
+            return self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+>>>>>>> 3ef5129 (minor changes to schema, tests. Added query class and empty test file)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:

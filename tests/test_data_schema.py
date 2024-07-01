@@ -53,7 +53,7 @@ class SchemaTests(unittest.TestCase):
 
     def testFetch(self): 
         fetched_schema = SCHEMA.fetch_schema(pdb_url)
-        self.assertNotIn('errors', fetched_schema.keys())
+        self.assertNotIn("errors", fetched_schema.keys())
 
     def testConstructRootDict(self):
         with self.subTest(msg="1. root dict for singular type (interface)"):
@@ -116,27 +116,32 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="1.  singular input_type (entry)"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
-            self.assertNotIn('errors', response_json.keys())
+            self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="2. plural input_type (entries)"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids= {"entry_ids": ["4HHB", "1IYE"]}, input_type="entries", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
+<<<<<<< HEAD
             self.assertNotIn('errors', response_json.keys())
         with self.subTest(msg="3. two arguments (polymer_entity_instance)"): 
+=======
+            self.assertNotIn("errors", response_json.keys())
+        with self.subTest(msg="3. two arguments (polymer_entity_instance)"): #TODO: do I have to test mult arg + plural?
+>>>>>>> 3ef5129 (minor changes to schema, tests. Added query class and empty test file)
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'asym_id': "A", "entry_id": "4HHB"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
-            self.assertNotIn('errors', response_json.keys())
+            self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. three arguments (interface)"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["CoreInterface.rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
-            self.assertNotIn('errors', response_json.keys())
+            self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="5. request multiple return fields"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl","rcsb_polymer_instance_annotation"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
-            self.assertNotIn('errors', response_json.keys())
+            self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="6. request scalar field"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["CoreEntry.rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
-            self.assertNotIn('errors', response_json.keys())
+            self.assertNotIn("errors", response_json.keys())
         # Test error handling
         with self.subTest(msg="7. too many input ids passed in"):
             with self.assertRaises(Exception):
