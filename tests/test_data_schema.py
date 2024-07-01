@@ -147,9 +147,7 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="10. no path exists"):
             with self.assertRaises(ValueError):
                 SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["exptl"])
-        
-    def testConstructQuery(self):
-        with self.subTest(msg="1. return data not specific enough"):
+        with self.subTest(msg="11. return data not specific enough"):
             with self.assertRaises(ValueError):
                 SCHEMA.construct_query(input_ids="4HHB", input_type="entry", return_data_list=["id"])
 
@@ -175,7 +173,6 @@ def buildSchema():
     # suiteSelect.addTest(SchemaTests("testRecurseBuildSchema"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
     suiteSelect.addTest(SchemaTests("testVerifyUniqueField"))
-    suiteSelect.addTest(SchemaTests("testConstructQuery"))
     return suiteSelect
 
 
