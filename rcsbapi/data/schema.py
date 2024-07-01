@@ -267,14 +267,14 @@ class Schema:
                 if type_name in self.node_index_dict.keys():
                     type_index = self.node_index_dict[type_name]
                     if use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index, "")
+                        schema_graph.add_edge(field_node.index, type_index)
                     else:
                         schema_graph.add_edge(parent=field_node.index, child= type_index, edge="draw")
                 else:
                     self.recurse_build_schema(schema_graph, type_name)
                     type_index = self.node_index_dict[type_name]
                     if self.use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index,"")
+                        schema_graph.add_edge(field_node.index, type_index)
                     else:
                         schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")  # TODO: change edge value to None
 
