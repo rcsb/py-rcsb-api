@@ -121,7 +121,7 @@ class SchemaTests(unittest.TestCase):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids= {"entry_ids": ["4HHB", "1IYE"]}, input_type="entries", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
-        with self.subTest(msg="3. two arguments (polymer_entity_instance)"): #TODO: do I have to test mult arg + plural?
+        with self.subTest(msg="3. two arguments (polymer_entity_instance)"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'asym_id': "A", "entry_id": "4HHB"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn('errors', response_json.keys())
@@ -150,10 +150,13 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="10. no path exists"):
             with self.assertRaises(ValueError):
                 SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["exptl"])
-         with self.subTest(msg="11. field doesn't exist"):
+        with self.subTest(msg="11. field doesn't exist"):
             with self.assertRaises(ValueError):
                 SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["aaa"])
-        
+        with self.subTest(msg="12. two arguments (polymer_entity_instances)"):
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'instance_ids': ["4HHB.A", "4HHB.C"]}, input_type="polymer_entity_instances", return_data_list=["rcsb_polymer_instance_annotation"])
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
+            self.assertNotIn('errors', response_json.keys())
     def testConstructQuery(self):
         with self.subTest(msg="1. return data not specific enough"):
             with self.assertRaises(ValueError):
