@@ -353,7 +353,7 @@ class Schema:
                         valid_field_list.append(name)
         return valid_field_list
 
-    def construct_query(self, input_ids, input_type, return_data_list):
+    def construct_query(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
@@ -362,9 +362,9 @@ class Schema:
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
-            return self.___construct_query_networkx(input_ids, input_type, return_data_list)
+            return self.___construct_query_networkx(input_type, return_data_list, input_ids)
         else:
-            return self.___construct_query_rustworkx(input_ids, input_type, return_data_list)
+            return self.___construct_query_rustworkx(input_type, return_data_list, input_ids)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
@@ -396,7 +396,7 @@ class Schema:
             return result[0]
         return result
 
-    def __construct_query_networkx(self, input_ids, input_type, return_data_list):  # incomplete function
+    def __construct_query_networkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         query_name = input_type
         attr_list = self.root_dict[input_type]
@@ -452,19 +452,38 @@ class Schema:
 
             input_ids = {}
             for id in id_list:
-                if re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]: 
+                if (re.match(r'^(MA|AF)_.*_[0-9]+$', id) and 
+                    input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif re.match(r'[1-9][A-Z]{3}+$', id) and input_type == "entries": 
+                elif (re.match(r'^(MA|AF)_.*$', id) and 
+                    input_type == "entries"):
                     attr_name = [id["name"] for id in attr_list]
-                elif re.match(r'[1-9][A-Z]{3}\.[A-Z]$', id) and input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]: 
+                elif (re.match(r'^(MA|AF)_.*\.[A-Z]$', id) and 
+                    input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif re.match(r'^[1-9][A-Z]{3}-[0-9]+$', id) and input_type == "assemblies":
+                elif (re.match(r'^(MA|AF)_.*-[0-9]+$', id) and 
+                    input_type == "assemblies"):
                     attr_name = [id["name"] for id in attr_list]
-                elif re.match(r'^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$', id) and input_type == "interfaces": 
+                elif (re.match(r'^(MA|AF)_.*-[0-9]+\.[0-9]+$', id) and 
+                    input_type == "interfaces"):
+                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and 
+                    input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
+                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r'^[1-9][A-Z]{3}$', id) and 
+                    input_type == "entries"):
+                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r'^[1-9][A-Z]{3}\.[A-Z]$', id) and 
+                    input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
+                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+$', id) and 
+                    input_type == "assemblies"):
+                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$', id) and 
+                    input_type == "interfaces"):
                     attr_name = [id["name"] for id in attr_list]
                 else:
                     raise ValueError(f"Invalid ID format: {id}")
-                
                 for attr in attr_name:
                     if attr not in input_ids:
                         input_ids[attr] = []
