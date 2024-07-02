@@ -1,8 +1,9 @@
-import schema
+from rcsbapi.data import schema
 import requests
 import logging
-from typing import Union, List, Dict
-from pprint import pprint
+import time
+import urllib.parse
+from typing import Any, Union, List, Dict
 
 PDB_URL = "https://data.rcsb.org/graphql"
 SCHEMA = schema.Schema(PDB_URL)
@@ -11,19 +12,21 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 
 class Query:
 
-    def __init__(self, input_ids: Union[List[str],str,Dict], input_type: str, return_data_list: List[str]):  # TODO: will edit when dicts and strings for input are supported
+    def __init__(self, input_ids: Union[str,List[str],Dict[Any, Any]], input_type: str, return_data_list: List[str]):  # TODO: will edit when dicts and strings for input are supported
         if len(input_ids) > 300:
-            raise ValueError("Too many input_ids. Reduce to less than 200.")
+            raise ValueError("Too many input_ids. Reduce to less than 300.")
         self.input_ids = input_ids
         self.input_type = input_type
         self.return_data_list = return_data_list
         self.query = SCHEMA.construct_query(input_ids, input_type, return_data_list)
-        self.response = self.post_query()  # TODO: should this be upon initialization or must be called explicitly?
-        self.plural = False
-        self.input_ids_list = None
+        self.plural_input = False
         if SCHEMA.root_dict[self.input_type][0]["kind"] == "LIST":
-            self.plural = True
-            self.input_ids_list = input_ids[SCHEMA.root_dict[self.input_type][0]["name"]]
+            self.plural_input = True
+            if isinstance(input_ids, dict):
+                self.input_ids_list: List[str] = input_ids[SCHEMA.root_dict[self.input_type][0]["name"]]
+            if isinstance(input_ids, list):
+                self.input_ids_list = input_ids
+        self.response = self.post_query()  # TODO: should this be upon initialization or must be called explicitly?
 
     def get_input_ids(self):
         return self.input_ids
@@ -37,19 +40,21 @@ class Query:
     def get_query(self):
         return self.query
 
+    def get_editor_link(self):
+        editor_base_link = PDB_URL + "/index.html?query="
+        return editor_base_link + urllib.parse.quote(self.query)
+
     def post_query(self):
-        #split queries of input length > batch size into smaller queries
         batch_size = 50
-        if (self.plural is True) and (len(self.input_ids_list) > batch_size):  # TODO: change isinstance
+        if (self.plural_input is True) and (len(self.input_ids_list) > batch_size):
             batched_ids = self.batch_ids(batch_size)
             response_json = {}
-            print("ids batched")
+            count = 0
             for id_batch in batched_ids:
-                print("querying in batchs")
-                query = SCHEMA.construct_query(id_batch, self.input_type, self.return_data_list)  #could be more efficient by subbing just id_batch
+                query = SCHEMA.construct_query(id_batch, self.input_type, self.return_data_list)  #could be more efficient by subbing in just id_batch
                 part_response =  requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL).json()
-                print(query)
                 self.parse_gql_error(part_response)
+                time.sleep(0.2)
                 if not response_json:
                     response_json = part_response
                 else:
@@ -64,7 +69,7 @@ class Query:
             if isinstance(query_response, list):
                 if len(query_response) == 0:
                    logging.warning("Input produced no results. Check that input ids are valid")        
-        # return response_json
+        return response_json
             # parse_response(response_json)
             # fields_list = 
 
@@ -76,17 +81,18 @@ class Query:
                 combined_error_msg = ""
                 for i in range(len(error_msg_list)):
                     combined_error_msg += f"{i+1}. {error_msg_list[i]}"
-                    raise ValueError(f"{combined_error_msg}.\n Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")  # TODO: is ValueError appropriate
+                    raise ValueError(f"{combined_error_msg}.\n Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
-    #TODO: change to use list pf input ids
+    #TODO: change to use list of input ids?
     def batch_ids(self, batch_size) -> List[Dict[str, List[str]]]: # assumes that plural types have only one arg, which is true right now
+        id_name = SCHEMA.root_dict[self.input_type][0]["name"]
         batched_ids: List[Dict[str, List[str]]] = []
         i = 0
-        while i < len(self.input_ids):
+        while i < len(self.input_ids_list):
             count = 0
-            batch_list: Dict[str, List[str]] = {SCHEMA.root_dict[self.input_type][0]["name"]: []}
-            while count < batch_size and i < len(self.input_ids):
-                SCHEMA.root_dict[self.input_type]["name"].append(self.input_ids[i])
+            batch_list: Dict[str, List[str]] = {id_name: []}
+            while count < batch_size and i < len(self.input_ids_list):
+                batch_list[id_name].append(self.input_ids_list[i])
                 count += 1
                 i += 1
             if len(batch_list) > 0:
@@ -95,18 +101,13 @@ class Query:
 
     def merge_response(self, merge_into_response, to_merge_response):
         combined_response = merge_into_response
-        combined_response["data"][self.input_type] + to_merge_response["data"][self.input_type]
+        combined_response["data"][self.input_type] += to_merge_response["data"][self.input_type]
         return combined_response
         
-
-class Response:
-
-    def __init__(self):
+    def get(self, key: str):
         pass
 
-
-input_ids = []
-for i in range(299):
-    input_ids.append("4HHB")
-query_obj = Query({"entry_ids": input_ids}, "entries",["exptl"])
-query_obj.post_query()
+def editor_to_query(url:str):
+    editor_base_link = PDB_URL + "/index.html?query="
+    str_query = urllib.parse.unquote(url.replace(editor_base_link, ""))
+    return str_query    
