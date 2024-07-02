@@ -1,5 +1,6 @@
 import requests
 from typing import List, Dict
+import re
 # import matplotlib.pyplot as plt
 
 use_networkx = False
@@ -419,28 +420,55 @@ class Schema:
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_ids: Dict[str, str], input_type, return_data_list):
+    def __construct_query_rustworkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):
+        if input_ids is None and id_list is None:
+            raise ValueError("Either input_ids or id_list must be provided as an argument.")
         return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
         attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
 
-        if not all(key in attr_name for key in input_ids.keys()):
-            raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
-
         if not all(item in self.node_index_dict.keys() for item in return_data_list):
             raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict.keys()])}")
+        
+        if input_ids is not None:
+            if not all(key in attr_name for key in input_ids.keys()):
+                raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
 
-        for key, value in input_ids.items():
-            if attr_kind[key] == "SCALAR":
-                if not isinstance(value, str):
-                    raise ValueError(f"Input ID for {key} should be a single string")
-            elif attr_kind[key] == "LIST":
-                if not isinstance(value, list):
-                    raise ValueError(f"Input ID for {key} should be a list of strings")
-                if not all(isinstance(item, str) for item in value):
-                    raise ValueError(f"Input ID for {key} should be a list of strings") 
+            for key, value in input_ids.items():
+                if attr_kind[key] == "SCALAR":
+                    if not isinstance(value, str):
+                        raise ValueError(f"Input ID for {key} should be a single string")
+                elif attr_kind[key] == "LIST":
+                    if not isinstance(value, list):
+                        raise ValueError(f"Input ID for {key} should be a list of strings")
+                    if not all(isinstance(item, str) for item in value):
+                        raise ValueError(f"Input ID for {key} should be a list of strings") 
+ 
+        if id_list is not None:
+            plural_types = ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances", "nonpolymer_entities", "polymer_entities", "branched_entities", "assemblies", "entries", "interfaces"]
+            if input_type not in plural_types:
+                raise ValueError(f"The input type '{input_type}' is not a plural type. Please use one of the following types: {', '.join(plural_types)}")
 
+            input_ids = {}
+            for id in id_list:
+                if re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]: 
+                    attr_name = [id["name"] for id in attr_list]
+                elif re.match(r'[1-9][A-Z]{3}+$', id) and input_type == "entries": 
+                    attr_name = [id["name"] for id in attr_list]
+                elif re.match(r'[1-9][A-Z]{3}\.[A-Z]$', id) and input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]: 
+                    attr_name = [id["name"] for id in attr_list]
+                elif re.match(r'^[1-9][A-Z]{3}-[0-9]+$', id) and input_type == "assemblies":
+                    attr_name = [id["name"] for id in attr_list]
+                elif re.match(r'^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$', id) and input_type == "interfaces": 
+                    attr_name = [id["name"] for id in attr_list]
+                else:
+                    raise ValueError(f"Invalid ID format: {id}")
+                
+                for attr in attr_name:
+                    if attr not in input_ids:
+                        input_ids[attr] = []
+                    input_ids[attr].append(id)
         field_names = {}
 
         start_node_index = None
