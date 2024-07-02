@@ -344,11 +344,12 @@ class Schema:
             return None
 
     def get_unique_fields(self, return_data_name) -> List[str]:
+        return_data_name = return_data_name.lower()
         valid_field_list: List[str] = []
         for name, idx in self.node_index_dict.items():
             if isinstance(self.schema_graph[idx], FieldNode):
                 if self.schema_graph[idx].redundant is True:
-                    if name.split('.')[1] == return_data_name:
+                    if name.split('.')[1].lower() == return_data_name:
                         valid_field_list.append(name)
         return valid_field_list
 
