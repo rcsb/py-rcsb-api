@@ -1,12 +1,7 @@
 import requests
 from typing import List, Dict
-<<<<<<< HEAD
-import re
-# import matplotlib.pyplot as plt
-=======
 import logging
->>>>>>> 3ef5129 (minor changes to schema, tests. Added query class and empty test file)
-
+import re
 use_networkx = False
 try:
     import rustworkx as rx  
@@ -267,16 +262,16 @@ class Schema:
                 if type_name in self.node_index_dict.keys():
                     type_index = self.node_index_dict[type_name]
                     if use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index)
+                        schema_graph.add_edge(field_node.index, type_index, "")
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
+                        schema_graph.add_edge(parent=field_node.index, child= type_index, edge="draw")
                 else:
                     self.recurse_build_schema(schema_graph, type_name)
                     type_index = self.node_index_dict[type_name]
                     if self.use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index)
+                        schema_graph.add_edge(field_node.index, type_index, "")
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")  # TODO: change edge value to None
+                        schema_graph.add_edge(parent=field_node.index, child= type_index, edge="draw")  # TODO: change edge value to None
 
     def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
@@ -362,16 +357,9 @@ class Schema:
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
-<<<<<<< HEAD
             return self.___construct_query_networkx(input_type, return_data_list, input_ids)
         else:
             return self.___construct_query_rustworkx(input_type, return_data_list, input_ids)
-=======
-            return self.__construct_query_networkx(input_ids, input_type, return_data_list)
-        else:
-            return self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
->>>>>>> 3ef5129 (minor changes to schema, tests. Added query class and empty test file)
-
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
             visited = set()
@@ -461,32 +449,23 @@ class Schema:
                 if (re.match(r'^(MA|AF)_.*_[0-9]+$', id) and 
                     input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*$', id) and 
-                    input_type == "entries"):
+                elif (re.match(r'^(MA|AF)_.*$', id) and input_type == "entries"):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*\.[A-Z]$', id) and 
-                    input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
+                elif (re.match(r'^(MA|AF)_.*\.[A-Z]$', id) and input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*-[0-9]+$', id) and 
-                    input_type == "assemblies"):
+                elif (re.match(r'^(MA|AF)_.*-[0-9]+$', id) and input_type == "assemblies"):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*-[0-9]+\.[0-9]+$', id) and 
-                    input_type == "interfaces"):
+                elif (re.match(r'^(MA|AF)_.*-[0-9]+\.[0-9]+$', id) and input_type == "interfaces"):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and 
-                    input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
+                elif (re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}$', id) and 
-                    input_type == "entries"):
+                elif (re.match(r'^[1-9][A-Z]{3}$', id) and input_type == "entries"):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}\.[A-Z]$', id) and 
-                    input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
+                elif (re.match(r'^[1-9][A-Z]{3}\.[A-Z]$', id) and input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+$', id) and 
-                    input_type == "assemblies"):
+                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+$', id) and input_type == "assemblies"):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$', id) and 
-                    input_type == "interfaces"):
+                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$', id) and input_type == "interfaces"):
                     attr_name = [id["name"] for id in attr_list]
                 else:
                     raise ValueError(f"Invalid ID format: {id}")
