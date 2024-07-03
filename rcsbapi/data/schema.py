@@ -350,6 +350,8 @@ class Schema:
         return valid_field_list
 
     def construct_query(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):
+        if input_ids is not None and id_list is not None:
+            raise ValueError("Provide only one argument either input_ids or id_list.")
         if input_ids is None and id_list is None:
             raise ValueError("Either input_ids or id_list must be provided as an argument.")
         for return_field in return_data_list:
