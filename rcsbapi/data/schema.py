@@ -1,7 +1,11 @@
 import requests
 from typing import List, Dict
 import logging
+
 import re
+
+
+
 use_networkx = False
 try:
     import rustworkx as rx  
@@ -357,9 +361,11 @@ class Schema:
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
+
             return self.___construct_query_networkx(input_type, return_data_list, input_ids)
         else:
             return self.___construct_query_rustworkx(input_type, return_data_list, input_ids)
+
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
             visited = set()
