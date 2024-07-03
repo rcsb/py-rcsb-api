@@ -3,6 +3,7 @@ import requests
 import logging
 import time
 import urllib.parse
+import re
 from typing import Any, Union, List, Dict
 
 PDB_URL = "https://data.rcsb.org/graphql"
@@ -13,8 +14,9 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 class Query:
 
     def __init__(self, input_ids: Union[str,List[str],Dict[Any, Any]], input_type: str, return_data_list: List[str]):  # TODO: will edit when dicts and strings for input are supported
-        if len(input_ids) > 300:
-            raise ValueError("Too many input_ids. Reduce to less than 300.")
+        input_id_limit = 300
+        if len(input_ids) > input_id_limit:
+            raise ValueError(f"Too many input_ids. Reduce to less than {input_id_limit}.")
         self.input_ids = input_ids
         self.input_type = input_type
         self.return_data_list = return_data_list
@@ -51,7 +53,7 @@ class Query:
             response_json = {}
             count = 0
             for id_batch in batched_ids:
-                query = SCHEMA.construct_query(id_batch, self.input_type, self.return_data_list)  #could be more efficient by subbing in just id_batch
+                query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("\'","\""), self.query)
                 part_response =  requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL).json()
                 self.parse_gql_error(part_response)
                 time.sleep(0.2)
@@ -103,9 +105,6 @@ class Query:
         combined_response = merge_into_response
         combined_response["data"][self.input_type] += to_merge_response["data"][self.input_type]
         return combined_response
-        
-    def get(self, key: str):
-        pass
 
 def editor_to_query(url:str):
     editor_base_link = PDB_URL + "/index.html?query="
