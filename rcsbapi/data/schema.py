@@ -445,7 +445,9 @@ class Schema:
                         raise ValueError(f"Input ID for {key} should be a list of strings") 
  
         if id_list is not None:
-            plural_types = ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances", "nonpolymer_entities", "polymer_entities", "branched_entities", "assemblies", "entries", "interfaces"]
+            plural_types = [key for key, value in self.root_dict.items() 
+                for item in value 
+                    if item['kind'] == 'LIST']
             if input_type not in plural_types:
                 raise ValueError(f"The input type '{input_type}' is not a plural type. Please use one of the following types: {', '.join(plural_types)}")
 
