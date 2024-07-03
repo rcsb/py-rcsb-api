@@ -451,13 +451,13 @@ class Schema:
                 if (re.match(r'^(MA|AF)_.*_[0-9]+$', id) and 
                     input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*$', id) and input_type == "entries"):
-                    attr_name = [id["name"] for id in attr_list]
                 elif (re.match(r'^(MA|AF)_.*\.[A-Z]$', id) and input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
                     attr_name = [id["name"] for id in attr_list]
                 elif (re.match(r'^(MA|AF)_.*-[0-9]+$', id) and input_type == "assemblies"):
                     attr_name = [id["name"] for id in attr_list]
                 elif (re.match(r'^(MA|AF)_.*-[0-9]+\.[0-9]+$', id) and input_type == "interfaces"):
+                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r'^(MA|AF)_.*$', id) and input_type == "entries"):
                     attr_name = [id["name"] for id in attr_list]
                 elif (re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
                     attr_name = [id["name"] for id in attr_list]
