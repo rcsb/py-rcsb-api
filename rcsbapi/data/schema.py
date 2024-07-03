@@ -449,7 +449,7 @@ class Schema:
                 for item in value 
                     if item['kind'] == 'LIST']
             if input_type not in plural_types:
-                raise ValueError(f"The input type '{input_type}' is not a plural type. Please use one of the following types: {', '.join(plural_types)}")
+                raise ValueError(f"The input type '{input_type}' is not a plural type. Please use one of the following types: {', '.join(plural_types)}. If you want to use the input type '{input_type}', please input id as a dictionary")
 
             input_ids = {}
             for id in id_list:
