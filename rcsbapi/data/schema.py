@@ -1,10 +1,7 @@
 import requests
 from typing import List, Dict
 import logging
-
 import re
-
-
 
 use_networkx = False
 try:
