@@ -1,5 +1,5 @@
 import requests
-from typing import List, Dict
+from typing import List, Dict, Union
 import logging
 import re
 
@@ -349,11 +349,7 @@ class Schema:
                         valid_field_list.append(name)
         return valid_field_list
 
-    def construct_query(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):
-        if input_ids is not None and id_list is not None:
-            raise ValueError("Provide only one argument either input_ids or id_list.")
-        if input_ids is None and id_list is None:
-            raise ValueError("Either input_ids or id_list must be provided as an argument.")
+    def construct_query(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
@@ -421,7 +417,7 @@ class Schema:
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):
+    def __construct_query_rustworkx(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
         return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
@@ -430,7 +426,7 @@ class Schema:
         if not all(item in self.node_index_dict.keys() for item in return_data_list):
             raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict.keys()])}")
         
-        if input_ids is not None:
+        if isinstance(input_ids, Dict):
             if not all(key in attr_name for key in input_ids.keys()):
                 raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
 
@@ -444,15 +440,14 @@ class Schema:
                     if not all(isinstance(item, str) for item in value):
                         raise ValueError(f"Input ID for {key} should be a list of strings") 
  
-        if id_list is not None:
+        if isinstance(input_ids, List):
             plural_types = [key for key, value in self.root_dict.items() 
                 for item in value 
                     if item['kind'] == 'LIST']
             if input_type not in plural_types:
                 raise ValueError(f"The input type '{input_type}' is not a plural type. Please use one of the following types: {', '.join(plural_types)}. If you want to use the input type '{input_type}', please input id as a dictionary")
 
-            input_ids = {}
-            for id in id_list:
+            for id in input_ids:
                 if (re.match(r'^(MA|AF)_.*_[0-9]+$', id) and 
                     input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
                     attr_name = [id["name"] for id in attr_list]
@@ -476,6 +471,7 @@ class Schema:
                     attr_name = [id["name"] for id in attr_list]
                 else:
                     raise ValueError(f"Invalid ID format: {id}")
+                input_ids = {}
                 for attr in attr_name:
                     if attr not in input_ids:
                         input_ids[attr] = []
