@@ -350,6 +350,8 @@ class Schema:
         return valid_field_list
 
     def construct_query(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):
+        if input_ids is None and id_list is None:
+            raise ValueError("Either input_ids or id_list must be provided as an argument.")
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
@@ -418,8 +420,6 @@ class Schema:
         return query
 
     def __construct_query_rustworkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):
-        if input_ids is None and id_list is None:
-            raise ValueError("Either input_ids or id_list must be provided as an argument.")
         return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
