@@ -1,7 +1,7 @@
-import requests
-from typing import List, Dict, Union
-import logging
 import re
+import logging
+from typing import List, Dict, Union
+import requests 
 
 use_networkx = False
 try:
@@ -398,17 +398,17 @@ class Schema:
 
     def __construct_query_networkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
-        query_name = input_type
-        attr_list = self.root_dict[input_type]
-        attr_name = [id["name"] for id in attr_list]
-        field_names = {}
-        start_node_index = None
+        # query_name = input_type
+        # attr_list = self.root_dict[input_type]
+        # attr_name = [id["name"] for id in attr_list]
+        # field_names = {}
+        # start_node_index = None
         for node in self.schema_graph.nodes():
             node_data = self.schema_graph.nodes[node]
             if node_data.get("name") == input_type:
-                start_node_index = node_data.get("index")
-                start_node_name = node_data.get("name")
-                start_node_type = node_data.get("type")
+                # start_node_index = node_data.get("index")
+                # start_node_name = node_data.get("name")
+                # start_node_type = node_data.get("type")
                 break
         target_node_indices = []
         for return_data in return_data_list:
@@ -416,7 +416,7 @@ class Schema:
                 if isinstance(node_data, dict) and node_data.get("name") == return_data:
                     target_node_indices.append(node_data.get("index"))
                     break
-        all_paths = {target_node: nx.shortest_path(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
+        # all_paths = {target_node: nx.shortest_path(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
         query = "query"
         return query
 
@@ -424,15 +424,15 @@ class Schema:
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
-        if not all(item in self.node_index_dict.keys() for item in return_data_list):
-            raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict.keys()])}")
-        input_dict = {}
+        if not all(item in self.node_index_dict for item in return_data_list):
+            raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict])}")
+        inputDict = {}
         if isinstance(input_ids, Dict):
-            input_dict = input_ids
-            if not all(key in attr_name for key in input_dict.keys()):
-                raise ValueError(f"Input IDs keys do not match attribute names: {input_dict.keys()} vs {attr_name}")
+            inputDict = input_ids
+            if not all(key in attr_name for key in inputDict.keys()):
+                raise ValueError(f"Input IDs keys do not match attribute names: {inputDict.keys()} vs {attr_name}")
             attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
-            for key, value in input_dict.items():
+            for key, value in inputDict.items():
                 if attr_kind[key] == "SCALAR":
                     if not isinstance(value, str):
                         raise ValueError(f"Input ID for {key} should be a single string")
@@ -459,41 +459,41 @@ class Schema:
                 if re.match(r"^(MA|AF)_.*_[0-9]+$", id) and input_type in entities:
                     attr_name = [id["name"] for id in attr_list]
                     if len(input_ids) == 1:
-                        input_dict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
-                        input_dict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
+                        inputDict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
+                        inputDict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
                 elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", id)) and input_type in instances:
                     attr_name = [id["name"] for id in attr_list]
                     if len(input_ids) == 1:
-                        input_dict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
-                        input_dict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
+                        inputDict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
+                        inputDict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
                 elif (re.match(r"^(MA|AF)_.*-[0-9]+$", id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", id)) and input_type in ["assemblies", "assembly"]:
                     attr_name = [id["name"] for id in attr_list]
                     if len(input_ids) == 1:
-                        input_dict["entry_id"] = str(re.findall(r"[^-]*", input_ids[0])[0])
-                        input_dict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
+                        inputDict["entry_id"] = str(re.findall(r"[^-]*", input_ids[0])[0])
+                        inputDict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
                 elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", id)) and input_type in ["interfaces", "interface"]:
                     attr_name = [id["name"] for id in attr_list]
                     if len(input_ids) == 1:
-                        input_dict["entry_id"] = str(re.findall(r"[^-]*", input_ids[0])[0])
-                        input_dict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
-                        input_dict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
+                        inputDict["entry_id"] = str(re.findall(r"[^-]*", input_ids[0])[0])
+                        inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
+                        inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
                 elif (re.match(r"^(MA|AF)_.*$", id) or re.match(r"^[1-9][A-Z]{3}$", id)) and input_type in ["entries", "entry"]:
                     attr_name = [id["name"] for id in attr_list]
                     if len(input_ids) == 1:
-                        input_dict["entry_id"] = str(input_ids[0])
+                        inputDict["entry_id"] = str(input_ids[0])
                 elif re.match(r"^[1-9][A-Z]{3}_[0-9]+$", id) and input_type in entities:
                     attr_name = [id["name"] for id in attr_list]
                     if len(input_ids) == 1:
-                        input_dict["entry_id"] = str(re.findall(r"[^_]*", input_ids[0])[0])
-                        input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
+                        inputDict["entry_id"] = str(re.findall(r"[^_]*", input_ids[0])[0])
+                        inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
                 else:
                     raise ValueError(f"Invalid ID format: {id}")
                 for attr in attr_name:
                     # print("attr: ", attr)
-                    if attr not in input_dict:
-                        input_dict[attr] = []
+                    if attr not in inputDict:
+                        inputDict[attr] = []
                     if input_type in plural_types:
-                        input_dict[attr].append(id)
+                        inputDict[attr].append(id)
         field_names = {}
 
         start_node_index = None
@@ -541,59 +541,59 @@ class Schema:
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
         query = "{ " + input_type + "("
-        opened_brackets = 1
-        closed_brackets = 0
+        openedBrackets = 1
+        closedBrackets = 0
 
         for i, attr in enumerate(attr_name):
-            if isinstance(input_dict[attr], list):
-                query += attr + ': ["' + '", "'.join(input_dict[attr]) + '"]'
+            if isinstance(inputDict[attr], list):
+                query += attr + ': ["' + '", "'.join(inputDict[attr]) + '"]'
             else:
-                query += attr + ': "' + input_dict[attr] + '"'
+                query += attr + ': "' + inputDict[attr] + '"'
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
-        opened_brackets += 1
+        openedBrackets += 1
 
         for field, field_info in field_names.items():
             if field in field_info:
                 query += "  " + field_info[0]
                 if len(field_info) > 1 or final_fields[field]:
                     query += " {\n"
-                    opened_brackets += 1
+                    openedBrackets += 1
                 for subfield in field_info[1:]:
                     if subfield != field:
                         query += "    " + subfield + " {\n"
-                        opened_brackets += 1
+                        openedBrackets += 1
                     else:
                         query += "    " + subfield
                         if final_fields[subfield]:
                             query += " {\n"
-                            opened_brackets += 1
+                            openedBrackets += 1
                         break
                 if field in final_fields:
                     for final_field in final_fields[field]:
                         if isinstance(final_field, dict):
                             for key, value in final_field.items():
                                 query += "      " + key + " {\n"
-                                opened_brackets += 1
+                                openedBrackets += 1
                                 for v in value:
                                     query += "        " + v + "\n"
                                 query += "      }\n"
-                                closed_brackets += 1
+                                closedBrackets += 1
                         else:
                             query += "     " + final_field + "\n"
                 if final_fields[field]:
                     query += "  }\n"
-                    closed_brackets += 1
+                    closedBrackets += 1
             else:
                 query += "  " + field + " {\n"
-                opened_brackets += 1
+                openedBrackets += 1
                 query += "  }\n"
-                closed_brackets += 1
+                closedBrackets += 1
 
-        while opened_brackets > closed_brackets:
+        while openedBrackets > closedBrackets:
             query += "}"
-            closed_brackets += 1
+            closedBrackets += 1
 
         return query
 
