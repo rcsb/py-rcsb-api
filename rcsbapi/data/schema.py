@@ -20,17 +20,17 @@ if use_networkx is True:
         print("Error: Neither rustworkx nor networkx is installed.")
         exit(1)
 
-pdb_url = "https://data.rcsb.org/graphql"
+pdbUrl = "https://data.rcsb.org/graphql"
 
 
 class FieldNode:
 
-    def __init__(self, kind, type, name):
+    def __init__(self, kind, node_type, name):
         self.name = name
         self.redundant = False
         self.kind = kind
         self.of_kind = None
-        self.type = type
+        self.type = node_type
         self.index = None
 
     def __str__(self):
@@ -109,7 +109,7 @@ class Schema:
         }
         }
         """
-        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=pdb_url)
+        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=pdb_url, timeout=10)
         return response.json()
 
     def construct_root_dict(self, url: str) -> Dict[str, str]:
@@ -224,7 +224,7 @@ class Schema:
             }
             }
         """
-        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url)
+        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url, timeout=10)
         return schema_response.json()
 
     def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
@@ -275,7 +275,7 @@ class Schema:
                     if self.use_networkx:
                         schema_graph.add_edge(field_node.index, type_index)
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")  # TODO: change edge value to None
+                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
 
     def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
@@ -357,7 +357,7 @@ class Schema:
             if self.verify_unique_field(return_field) is True:
                 continue
             if self.verify_unique_field(return_field) is False:
-                raise ValueError(f"Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields({return_field})")  # TODO: write this function
+                raise ValueError(f"Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields({return_field})")
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
@@ -455,45 +455,45 @@ class Schema:
                 "branched_entity_instance"
             ]
 
-            for id in input_ids:
-                if re.match(r"^(MA|AF)_.*_[0-9]+$", id) and input_type in entities:
-                    attr_name = [id["name"] for id in attr_list]
+            for single_id in input_ids:
+                if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
+                    attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
                         inputDict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", id)) and input_type in instances:
-                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
+                    attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
                         inputDict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*-[0-9]+$", id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", id)) and input_type in ["assemblies", "assembly"]:
-                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
+                    attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"[^-]*", input_ids[0])[0])
                         inputDict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", id)) and input_type in ["interfaces", "interface"]:
-                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
+                    attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"[^-]*", input_ids[0])[0])
                         inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
                         inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*$", id) or re.match(r"^[1-9][A-Z]{3}$", id)) and input_type in ["entries", "entry"]:
-                    attr_name = [id["name"] for id in attr_list]
+                elif (re.match(r"^(MA|AF)_.*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
+                    attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(input_ids[0])
-                elif re.match(r"^[1-9][A-Z]{3}_[0-9]+$", id) and input_type in entities:
-                    attr_name = [id["name"] for id in attr_list]
+                elif re.match(r"^[1-9][A-Z]{3}_[0-9]+$", single_id) and input_type in entities:
+                    attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"[^_]*", input_ids[0])[0])
                         inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
                 else:
-                    raise ValueError(f"Invalid ID format: {id}")
+                    raise ValueError(f"Invalid ID format: {single_id}")
                 for attr in attr_name:
                     # print("attr: ", attr)
                     if attr not in inputDict:
                         inputDict[attr] = []
                     if input_type in plural_types:
-                        inputDict[attr].append(id)
+                        inputDict[attr].append(single_id)
         field_names = {}
 
         start_node_index = None
