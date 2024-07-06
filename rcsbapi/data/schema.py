@@ -421,16 +421,15 @@ class Schema:
         return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
-        attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
-
         if not all(item in self.node_index_dict.keys() for item in return_data_list):
             raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict.keys()])}")
-        
+        input_dict = {}
         if isinstance(input_ids, Dict):
-            if not all(key in attr_name for key in input_ids.keys()):
-                raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
-
-            for key, value in input_ids.items():
+            input_dict = input_ids
+            if not all(key in attr_name for key in input_dict.keys()):
+                raise ValueError(f"Input IDs keys do not match attribute names: {input_dict.keys()} vs {attr_name}")
+            attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
+            for key, value in input_dict.items():
                 if attr_kind[key] == "SCALAR":
                     if not isinstance(value, str):
                         raise ValueError(f"Input ID for {key} should be a single string")
@@ -438,44 +437,55 @@ class Schema:
                     if not isinstance(value, list):
                         raise ValueError(f"Input ID for {key} should be a list of strings")
                     if not all(isinstance(item, str) for item in value):
-                        raise ValueError(f"Input ID for {key} should be a list of strings") 
+                        raise ValueError(f"Input ID for {key} should be a list of strings")
  
         if isinstance(input_ids, List):
             plural_types = [key for key, value in self.root_dict.items() 
                 for item in value 
                     if item['kind'] == 'LIST']
-            if input_type not in plural_types:
-                raise ValueError(f"The input type '{input_type}' is not a plural type. Please use one of the following types: {', '.join(plural_types)}. If you want to use the input type '{input_type}', please input id as a dictionary")
+            
+            entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
+            instances = ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances", "polymer_entity_instance","nonpolymer_entity_instance", "branched_entity_instance"]
 
             for id in input_ids:
-                if (re.match(r'^(MA|AF)_.*_[0-9]+$', id) and 
-                    input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
+                if (re.match(r'^(MA|AF)_.*_[0-9]+$', id) and input_type in entities):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*\.[A-Z]$', id) and input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
+                    if len(input_ids) == 1: 
+                        input_dict["entry_id"] = str(re.findall(r'^[^_]*_[^_]*', input_ids[0])[0])
+                        input_dict["entity_id"] = str(re.findall(r'^(?:[^_]*_){2}(.*)', input_ids[0])[0])
+                elif ((re.match(r'^(MA|AF)_.*\.[A-Z]$', id) or re.match(r'^[1-9][A-Z]{3}\.[A-Z]$', id)) and input_type in instances):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*-[0-9]+$', id) and input_type == "assemblies"):
+                    if len(input_ids) == 1: 
+                        input_dict["entry_id"] = str(re.findall(r'^[^.]+', input_ids[0])[0])
+                        input_dict["asym_id"] = str(re.findall(r'(?<=\.).*', input_ids[0])[0])
+                elif ((re.match(r'^(MA|AF)_.*-[0-9]+$', id) or re.match(r'^[1-9][A-Z]{3}-[0-9]+$', id)) and input_type in ["assemblies", "assembly"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*-[0-9]+\.[0-9]+$', id) and input_type == "interfaces"):
+                    if len(input_ids) == 1: 
+                        input_dict["entry_id"] = str(re.findall( r'[^-]*', input_ids[0])[0])
+                        input_dict["assembly_id"] = str(re.findall(r'[^-]+$', input_ids[0])[0])
+                elif ((re.match(r'^(MA|AF)_.*-[0-9]+\.[0-9]+$', id) or re.match(r'^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$', id)) and input_type in ["interfaces", "interface"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^(MA|AF)_.*$', id) and input_type == "entries"):
+                    if len(input_ids) == 1: 
+                        input_dict["entry_id"] = str(re.findall( r'[^-]*', input_ids[0])[0])
+                        input_dict["assembly_id"] = str(re.findall(r'-(.*)\.', input_ids[0])[0])
+                        input_dict["interface_id"] = str(re.findall(r'[^.]+$', input_ids[0])[0])
+                elif ((re.match(r'^(MA|AF)_.*$', id) or re.match(r'^[1-9][A-Z]{3}$', id)) and input_type in ["entries", "entry"]):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and input_type in ["polymer_entities", "branched_entities", "nonpolymer_entities"]):
+                    if len(input_ids) == 1:
+                        input_dict["entry_id"] = str(input_ids[0])
+                elif (re.match(r'^[1-9][A-Z]{3}_[0-9]+$', id) and input_type in entities):
                     attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}$', id) and input_type == "entries"):
-                    attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}\.[A-Z]$', id) and input_type in ["polymer_entity_instances", "branched_entity_instances", "nonpolymer_entity_instances"]):
-                    attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+$', id) and input_type == "assemblies"):
-                    attr_name = [id["name"] for id in attr_list]
-                elif (re.match(r'^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$', id) and input_type == "interfaces"):
-                    attr_name = [id["name"] for id in attr_list]
+                    if len(input_ids) == 1:
+                        input_dict["entry_id"] = str(re.findall( r'[^_]*', input_ids[0])[0])
+                        input_dict["entity_id"] = str(re.findall(r'[^_]+$', input_ids[0])[0])
                 else:
                     raise ValueError(f"Invalid ID format: {id}")
-                input_ids = {}
                 for attr in attr_name:
-                    if attr not in input_ids:
-                        input_ids[attr] = []
-                    input_ids[attr].append(id)
+                    # print("attr: ", attr)
+                    if attr not in input_dict:
+                        input_dict[attr] = []
+                    if input_type in plural_types:
+                        input_dict[attr].append(id)
         field_names = {}
 
         start_node_index = None
@@ -527,10 +537,10 @@ class Schema:
         closed_brackets = 0
 
         for i, attr in enumerate(attr_name):
-            if isinstance(input_ids[attr], list):
-                query += attr + ": [\"" + "\", \"".join(input_ids[attr]) + "\"]"
+            if isinstance(input_dict[attr], list):
+                query += attr + ": [\"" + "\", \"".join(input_dict[attr]) + "\"]"
             else:
-                query += attr + ": \"" + input_ids[attr] + "\""
+                query += attr + ": \"" + input_dict[attr] + "\""
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"

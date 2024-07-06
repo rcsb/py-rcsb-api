@@ -181,8 +181,8 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdb_url).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="19. using id_list with a singular type"):
-            with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["exptl"], input_ids=["4HHB"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["exptl"], input_ids=["4HHB"])
+            self.assertNotIn("errors", response_json.keys())
 
     def testConstructQuery(self):
         with self.subTest(msg="1. return data not specific enough"):
