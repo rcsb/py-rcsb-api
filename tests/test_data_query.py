@@ -69,7 +69,6 @@ class QueryTests(unittest.TestCase):
         for i in range(165):
             input_ids.append("4HHB")
         query_obj = Query({"entry_ids": input_ids}, "entries", ["exptl"])
-        query_obj = Query({"entry_ids": input_ids}, "entries", ["exptl"])
         batch_size = 50
         batched_ids = query_obj.batch_ids(batch_size)
         total_ids = 0
