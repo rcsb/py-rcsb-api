@@ -21,7 +21,7 @@ class Query:
         self.input_ids = input_ids
         self.input_type = input_type
         self.return_data_list = return_data_list
-        self.query = SCHEMA.construct_query(input_type, return_data_list,input_ids)
+        self.query = SCHEMA.construct_query(input_ids, input_type, return_data_list)
         self.plural_input = False
         if SCHEMA.root_dict[self.input_type][0]["kind"] == "LIST":
             self.plural_input = True
