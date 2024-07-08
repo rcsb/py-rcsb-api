@@ -85,9 +85,9 @@ class Query:
             for error_dict in response_json["errors"]:
                 error_msg_list.append(error_dict["message"])
                 combined_error_msg = ""
-                for i in range(len(error_msg_list)):
-                    combined_error_msg += f"{i+1}. {error_msg_list[i]}"
-                    raise ValueError(f"{combined_error_msg}.\n Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
+                for i, error_msg in enumerate(error_msg_list):
+                    combined_error_msg += f"{i+1}. {error_msg}\n"
+                raise ValueError(f"{combined_error_msg}. Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
     def batch_ids(self, batch_size) -> List[Dict[str, List[str]]]:  # assumes that plural types have only one arg, which is true right now
         id_name = SCHEMA.root_dict[self.input_type][0]["name"]
@@ -106,5 +106,4 @@ class Query:
 
     def merge_response(self, merge_into_response, to_merge_response):
         combined_response = merge_into_response
-        combined_response["data"][self.input_type] += to_merge_response["data"][self.input_type]
         return combined_response
