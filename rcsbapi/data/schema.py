@@ -481,7 +481,7 @@ class Schema:
                     attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(input_ids[0])
-                elif re.match(r"^[1-9][A-Z]{3}_[0-9]+$", single_id) and input_type in entities:
+                elif re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) and input_type in entities:
                     attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
