@@ -1,10 +1,12 @@
-import requests
-from typing import List, Dict
+import re
 import logging
+from typing import List, Dict, Union
+import requests 
 
 use_networkx = False
 try:
-    import rustworkx as rx  
+    import rustworkx as rx
+
     logging.info("Using  rustworkx")
 except ImportError:
     use_networkx = True
@@ -12,21 +14,23 @@ except ImportError:
 if use_networkx is True:
     try:
         import networkx as nx
+
         logging.info("Using  networkx")
     except ImportError:
         print("Error: Neither rustworkx nor networkx is installed.")
         exit(1)
 
-pdb_url = "https://data.rcsb.org/graphql"
+pdbUrl = "https://data.rcsb.org/graphql"
+
 
 class FieldNode:
 
-    def __init__(self, kind, type, name):
+    def __init__(self, kind, node_type, name):
         self.name = name
         self.redundant = False
         self.kind = kind
         self.of_kind = None
-        self.type = type
+        self.type = node_type
         self.index = None
 
     def __str__(self):
@@ -105,7 +109,7 @@ class Schema:
         }
         }
         """
-        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=pdb_url)
+        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=pdb_url, timeout=10)
         return response.json()
 
     def construct_root_dict(self, url: str) -> Dict[str, str]:
@@ -220,7 +224,7 @@ class Schema:
             }
             }
         """
-        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url)
+        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url, timeout=10)
         return schema_response.json()
 
     def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
@@ -237,7 +241,7 @@ class Schema:
 
     def construct_name_list(self):
         for type_name in self.type_fields_dict.keys():
-            if '__' not in type_name:  # doesn't look through dunder methods because those are not added to the schema
+            if "__" not in type_name:  # doesn't look through dunder methods because those are not added to the schema
                 for field_name in self.type_fields_dict[type_name].keys():
                     self.field_names_list.append(field_name)
 
@@ -271,7 +275,7 @@ class Schema:
                     if self.use_networkx:
                         schema_graph.add_edge(field_node.index, type_index)
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")  # TODO: change edge value to None
+                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
 
     def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
@@ -298,7 +302,7 @@ class Schema:
 
     def make_field_node(self, parent_type: str, field_name: str) -> FieldNode:
         kind = self.type_fields_dict[parent_type][field_name]["kind"]
-        field_type_dict: Dict = self.type_fields_dict[parent_type][field_name] 
+        field_type_dict: Dict = self.type_fields_dict[parent_type][field_name]
         return_type = self.find_type_name(field_type_dict)
         field_node = FieldNode(kind, return_type, field_name)
         assert field_node.type is not None
@@ -325,11 +329,11 @@ class Schema:
 
     def verify_unique_field(self, return_data_name):
         node_index_names = list(self.node_index_dict.keys())
-        split_data_name = return_data_name.split('.')
+        split_data_name = return_data_name.split(".")
         if len(split_data_name) == 1:
             field_name = split_data_name[0]
             name_count = self.field_names_list.count(field_name)
-        else: 
+        else:
             name_count = node_index_names.count(return_data_name)
         if name_count == 1:
             return True
@@ -344,22 +348,23 @@ class Schema:
         for name, idx in self.node_index_dict.items():
             if isinstance(self.schema_graph[idx], FieldNode):
                 if self.schema_graph[idx].redundant is True:
-                    if name.split('.')[1].lower() == return_data_name:
+                    if name.split(".")[1].lower() == return_data_name:
                         valid_field_list.append(name)
         return valid_field_list
 
-    def construct_query(self, input_ids, input_type, return_data_list):
+    def construct_query(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
             if self.verify_unique_field(return_field) is False:
-                raise ValueError(f"Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields({return_field})") # TODO: write this function
+                raise ValueError(f"Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields({return_field})")
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
-            return self.__construct_query_networkx(input_ids, input_type, return_data_list)
+
+            return self.___construct_query_networkx(input_type, return_data_list, input_ids)
         else:
-            return self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+            return self.___construct_query_rustworkx(input_type, return_data_list, input_ids)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
@@ -391,52 +396,104 @@ class Schema:
             return result[0]
         return result
 
-    def __construct_query_networkx(self, input_ids, input_type, return_data_list):  # incomplete function
+    def __construct_query_networkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
-        query_name = input_type
-        attr_list = self.root_dict[input_type]
-        attr_name = [id["name"] for id in attr_list]
-        field_names = {}
-        start_node_index = None
+        # query_name = input_type
+        # attr_list = self.root_dict[input_type]
+        # attr_name = [id["name"] for id in attr_list]
+        # field_names = {}
+        # start_node_index = None
         for node in self.schema_graph.nodes():
-                node_data = self.schema_graph.nodes[node]
-                if node_data.get('name') == input_type:
-                    start_node_index = node_data.get('index')
-                    start_node_name = node_data.get('name')
-                    start_node_type = node_data.get('type')
-                    break
+            node_data = self.schema_graph.nodes[node]
+            if node_data.get("name") == input_type:
+                # start_node_index = node_data.get("index")
+                # start_node_name = node_data.get("name")
+                # start_node_type = node_data.get("type")
+                break
         target_node_indices = []
         for return_data in return_data_list:
-                for node, node_data in self.schema_graph.nodes(data=True):
-                    if isinstance(node_data, dict) and node_data.get('name') == return_data:
-                        target_node_indices.append(node_data.get('index'))
-                        break
-        all_paths = {target_node: nx.shortest_path(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
+            for node, node_data in self.schema_graph.nodes(data=True):
+                if isinstance(node_data, dict) and node_data.get("name") == return_data:
+                    target_node_indices.append(node_data.get("index"))
+                    break
+        # all_paths = {target_node: nx.shortest_path(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_ids: Dict[str, str], input_type, return_data_list):
-        return_data_name = [name.split('.')[-1] for name in return_data_list]
+    def __construct_query_rustworkx(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
+        # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
-        attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
+        if not all(item in self.node_index_dict for item in return_data_list):
+            raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict])}")
+        inputDict = {}
+        if isinstance(input_ids, Dict):
+            inputDict = input_ids
+            if not all(key in attr_name for key in inputDict.keys()):
+                raise ValueError(f"Input IDs keys do not match attribute names: {inputDict.keys()} vs {attr_name}")
+            attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
+            for key, value in inputDict.items():
+                if attr_kind[key] == "SCALAR":
+                    if not isinstance(value, str):
+                        raise ValueError(f"Input ID for {key} should be a single string")
+                elif attr_kind[key] == "LIST":
+                    if not isinstance(value, list):
+                        raise ValueError(f"Input ID for {key} should be a list of strings")
+                    if not all(isinstance(item, str) for item in value):
+                        raise ValueError(f"Input ID for {key} should be a list of strings")
 
-        if not all(key in attr_name for key in input_ids.keys()):
-            raise ValueError(f"Input IDs keys do not match attribute names: {input_ids.keys()} vs {attr_name}")
+        if isinstance(input_ids, List):
+            plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
 
-        if not all(item in self.node_index_dict.keys() for item in return_data_list):
-            raise ValueError(f"Unknown item in return_data_list: {', '.join([str(item) for item in return_data_list if item not in self.node_index_dict.keys()])}")
+            entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
+            instances = [
+                "polymer_entity_instances",
+                "branched_entity_instances",
+                "nonpolymer_entity_instances",
+                "polymer_entity_instance",
+                "nonpolymer_entity_instance",
+                "branched_entity_instance"
+            ]
 
-        for key, value in input_ids.items():
-            if attr_kind[key] == "SCALAR":
-                if not isinstance(value, str):
-                    raise ValueError(f"Input ID for {key} should be a single string")
-            elif attr_kind[key] == "LIST":
-                if not isinstance(value, list):
-                    raise ValueError(f"Input ID for {key} should be a list of strings")
-                if not all(isinstance(item, str) for item in value):
-                    raise ValueError(f"Input ID for {key} should be a list of strings") 
-
+            for single_id in input_ids:
+                if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
+                    attr_name = [single_id["name"] for single_id in attr_list]
+                    if len(input_ids) == 1:
+                        inputDict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
+                        inputDict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
+                elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
+                    attr_name = [single_id["name"] for single_id in attr_list]
+                    if len(input_ids) == 1:
+                        inputDict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
+                        inputDict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
+                elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
+                    attr_name = [single_id["name"] for single_id in attr_list]
+                    if len(input_ids) == 1:
+                        inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
+                        inputDict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
+                elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
+                    attr_name = [single_id["name"] for single_id in attr_list]
+                    if len(input_ids) == 1:
+                        inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
+                        inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
+                        inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
+                elif (re.match(r"^(MA|AF)_.*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
+                    attr_name = [single_id["name"] for single_id in attr_list]
+                    if len(input_ids) == 1:
+                        inputDict["entry_id"] = str(input_ids[0])
+                elif re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) and input_type in entities:
+                    attr_name = [single_id["name"] for single_id in attr_list]
+                    if len(input_ids) == 1:
+                        inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                        inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
+                else:
+                    raise ValueError(f"Invalid ID format: {single_id}")
+                for attr in attr_name:
+                    # print("attr: ", attr)
+                    if attr not in inputDict:
+                        inputDict[attr] = []
+                    if input_type in plural_types:
+                        inputDict[attr].append(single_id)
         field_names = {}
 
         start_node_index = None
@@ -444,8 +501,8 @@ class Schema:
             node_data = self.schema_graph[node]
             if node_data.name == input_type:
                 start_node_index = node_data.index
-                start_node_name = node_data.name
-                sart_node_type = node_data.type
+                # start_node_name = node_data.name
+                # sart_node_type = node_data.type
                 break
 
         target_node_indices = []
@@ -484,61 +541,62 @@ class Schema:
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
         query = "{ " + input_type + "("
-        opened_brackets = 1
-        closed_brackets = 0
+        openedBrackets = 1
+        closedBrackets = 0
 
         for i, attr in enumerate(attr_name):
-            if isinstance(input_ids[attr], list):
-                query += attr + ": [\"" + "\", \"".join(input_ids[attr]) + "\"]"
+            if isinstance(inputDict[attr], list):
+                query += attr + ': ["' + '", "'.join(inputDict[attr]) + '"]'
             else:
-                query += attr + ": \"" + input_ids[attr] + "\""
+                query += attr + ': "' + inputDict[attr] + '"'
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
-        opened_brackets += 1
+        openedBrackets += 1
 
         for field, field_info in field_names.items():
             if field in field_info:
-                query += "  " + field_info[0] 
+                query += "  " + field_info[0]
                 if len(field_info) > 1 or final_fields[field]:
                     query += " {\n"
-                    opened_brackets += 1
+                    openedBrackets += 1
                 for subfield in field_info[1:]:
                     if subfield != field:
                         query += "    " + subfield + " {\n"
-                        opened_brackets += 1
+                        openedBrackets += 1
                     else:
-                        query += "    " + subfield 
+                        query += "    " + subfield
                         if final_fields[subfield]:
                             query += " {\n"
-                            opened_brackets += 1
+                            openedBrackets += 1
                         break
                 if field in final_fields:
                     for final_field in final_fields[field]:
                         if isinstance(final_field, dict):
                             for key, value in final_field.items():
                                 query += "      " + key + " {\n"
-                                opened_brackets += 1
+                                openedBrackets += 1
                                 for v in value:
                                     query += "        " + v + "\n"
                                 query += "      }\n"
-                                closed_brackets += 1
+                                closedBrackets += 1
                         else:
                             query += "     " + final_field + "\n"
-                if final_fields[field]: 
+                if final_fields[field]:
                     query += "  }\n"
-                    closed_brackets += 1
+                    closedBrackets += 1
             else:
                 query += "  " + field + " {\n"
-                opened_brackets += 1
+                openedBrackets += 1
                 query += "  }\n"
-                closed_brackets += 1
+                closedBrackets += 1
 
-        while opened_brackets > closed_brackets:
+        while openedBrackets > closedBrackets:
             query += "}"
-            closed_brackets += 1
+            closedBrackets += 1
 
         return query
+
 
 # def main():
 #     schema = fetch_schema(pdb_url)
