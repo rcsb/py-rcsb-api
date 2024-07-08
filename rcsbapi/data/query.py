@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 
 class Query:
 
-    def __init__(self, input_ids: Union[str,List[str],Dict[Any, Any]], input_type: str, return_data_list: List[str]):  # TODO: will edit when dicts and strings for input are supported
+    def __init__(self, input_ids: Union[List[str],Dict[Any, Any]], input_type: str, return_data_list: List[str]):  # TODO: will edit when dicts and strings for input are supported
         input_id_limit = 300
         if len(input_ids) > input_id_limit:
             raise ValueError(f"Too many input_ids. Reduce to less than {input_id_limit}.")
@@ -40,7 +40,10 @@ class Query:
         return self.return_data_list
 
     def get_query(self):
-        return self.query
+        print(self.query)
+
+    def set_query(self, new_query):
+        self.query = new_query
 
     def get_editor_link(self):
         editor_base_link = PDB_URL + "/index.html?query="
@@ -104,9 +107,4 @@ class Query:
     def merge_response(self, merge_into_response, to_merge_response):
         combined_response = merge_into_response
         combined_response["data"][self.input_type] += to_merge_response["data"][self.input_type]
-        return combined_response
-
-def editor_to_query(url:str):
-    editor_base_link = PDB_URL + "/index.html?query="
-    str_query = urllib.parse.unquote(url.replace(editor_base_link, ""))
-    return str_query    
+        return combined_response  

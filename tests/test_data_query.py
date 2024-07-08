@@ -50,7 +50,7 @@ class QueryTests(unittest.TestCase):
         url = query_obj.get_editor_link()
         response_json = requests.GET(url)
         self.assertEqual(response_json.status_code, 200)
-        
+
 
     def testPostQuery(self):
         with self.subTest("1. Batching into requests with fewer Ids"):
@@ -84,6 +84,7 @@ class QueryTests(unittest.TestCase):
 
     def testEditortoQuery(self):
         pass
+
 
 def buildQuery():
     suiteSelect = unittest.TestSuite()
