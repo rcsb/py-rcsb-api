@@ -353,8 +353,6 @@ class Schema:
         return valid_field_list
 
     def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
-        print("input_type:", input_type)
-        print("type: ", type(input_type))
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
@@ -483,7 +481,7 @@ class Schema:
                     attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(input_ids[0])
-                elif re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) and input_type in entities:
+                elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
                     attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
