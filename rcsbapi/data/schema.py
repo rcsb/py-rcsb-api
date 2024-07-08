@@ -352,7 +352,9 @@ class Schema:
                         valid_field_list.append(name)
         return valid_field_list
 
-    def construct_query(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
+    def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
+        print("input_type:", input_type)
+        print("type: ", type(input_type))
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
@@ -362,9 +364,9 @@ class Schema:
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
 
-            return self.___construct_query_networkx(input_type, return_data_list, input_ids)
+            return self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
-            return self.___construct_query_rustworkx(input_type, return_data_list, input_ids)
+            return self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
@@ -396,7 +398,7 @@ class Schema:
             return result[0]
         return result
 
-    def __construct_query_networkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):  # incomplete function
+    def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         # query_name = input_type
         # attr_list = self.root_dict[input_type]
@@ -420,7 +422,7 @@ class Schema:
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
+    def __construct_query_rustworkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
