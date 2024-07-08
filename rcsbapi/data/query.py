@@ -74,7 +74,7 @@ class Query:
                 logging.warning("Input produced no results. Check that input ids are valid")
             if isinstance(query_response, list):
                 if len(query_response) == 0:
-                    logging.warning("Input produced no results. Check that input ids are valid")        
+                    logging.warning("Input produced no results. Check that input ids are valid")
         return response_json
         # parse_response(response_json)
         # fields_list=
@@ -90,7 +90,7 @@ class Query:
                 raise ValueError(f"{combined_error_msg}. Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
     # TODO: change to use list of input ids?
-    def batch_ids(self, batch_size) -> List[List[str]]: # assumes that plural types have only one arg, which is true right now
+    def batch_ids(self, batch_size) -> List[List[str]]:  # assumes that plural types have only one arg, which is true right now
         batched_ids: List[List[str]] = []
         i = 0
         while i < len(self.input_ids_list):
