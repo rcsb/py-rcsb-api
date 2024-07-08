@@ -352,7 +352,7 @@ class Schema:
                         valid_field_list.append(name)
         return valid_field_list
 
-    def construct_query(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
+    def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
@@ -362,9 +362,9 @@ class Schema:
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
 
-            return self.___construct_query_networkx(input_type, return_data_list, input_ids)
+            return self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
-            return self.___construct_query_rustworkx(input_type, return_data_list, input_ids)
+            return self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
@@ -396,7 +396,7 @@ class Schema:
             return result[0]
         return result
 
-    def __construct_query_networkx(self, input_type, return_data_list, input_ids: Dict[str, str] = None, id_list=None):  # incomplete function
+    def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         # query_name = input_type
         # attr_list = self.root_dict[input_type]
@@ -420,7 +420,7 @@ class Schema:
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_type, return_data_list, input_ids: Union[Dict[str, str], List[str]]):
+    def __construct_query_rustworkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
@@ -481,7 +481,7 @@ class Schema:
                     attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(input_ids[0])
-                elif re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) and input_type in entities:
+                elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
                     attr_name = [single_id["name"] for single_id in attr_list]
                     if len(input_ids) == 1:
                         inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
