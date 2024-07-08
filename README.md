@@ -18,7 +18,7 @@ The RCSB PDB Data API supports requests using [GraphQL](https://graphql.org/), a
 
 GraphQL is built on "types" and their associated "fields". All types and their fields are defined in a "schema". An example of a type in our schema is "CoreEntry" and a field under CoreEntry is "exptl" (experimental). Upon initialization, the data API package fetches the schema from the RCSB PDB website (See [Implementation Details](#implementation-details)). 
 
-In GraphQL, you must begin your query at specific fields. These are fields like entry, polymer_entity, and polymer_entity_instance (see full list [here](#input_types)). Each field can return a scalar (e.g. string, integer) or a type. Every query must ultimately request scalar value(s), which can be seen in the example query below. As shown in the example, only fields are explicitly included while types are implicit. Types are named in CamelCase (CoreEntry) while fields are in snake case (exptl or audit_author).
+In GraphQL, you must begin your query at specific fields. These are fields like entry, polymer_entity, and polymer_entity_instance (see full list [here](#input_types)). Each field can return a scalar (e.g. string, integer) or a type. Every query must ultimately request scalar value(s), which can be seen in the example query below. As shown in the example, only fields are explicitly included in queries while types are implicit. Types are named in CamelCase (CoreEntry) while fields are in snake case (exptl or audit_author).
 
 This is a query in GraphQL syntax requesting the experimental method of a structure with PDB ID 4HHB (Hemoglobin).
 ```
@@ -126,7 +126,46 @@ input_types are designated points where you can begin querying. This includes en
 </details>
 
 ### return_data_list
-These are the data that you are requesting (or "fields"). In GraphQL, the final requested data must be a "scalar" type (string, integer, boolean). However, if you request non-scalar data, the package will auto-populate the query to include all fields under the specified data until scalars are reached. Once you receive the query response and understand what specific data you would like to request, you can further refine your query by requesting more specific fields.
+These are the data that you are requesting (or "fields").
+
+In GraphQL, the final requested data must be a "scalar" type (string, integer, boolean). However, if you request non-scalar data, the package will auto-populate the query to include all fields under the specified data until scalars are reached. Once you receive the query response and understand what specific data you would like to request, you can refine your query by requesting more specific fields.
+
+```python
+Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
+```
+```json
+{
+  "data": {
+    "entry": {
+      "exptl": [
+        {
+          "details": null,
+          "crystals_number": null,
+          "method_details": null,
+          "method": "X-RAY DIFFRACTION"
+        }
+      ]
+    }
+  }
+}
+```
+This query can be made more concise by specifying a field. In this case, the field name "method" is redundant because it appears under other types and must be further specified using dot notation. For more details see [ValueError: Not a unique field](#valueerror-not-a-unique-field)
+```python
+Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
+```
+```json
+{
+  "data": {
+    "entry": {
+      "exptl": [
+        {
+          "method": "X-RAY DIFFRACTION"
+        }
+      ]
+    }
+  }
+}
+```
 
 ## Implementation Details
 ### Parsing Schema
@@ -136,10 +175,7 @@ These are the data that you are requesting (or "fields"). In GraphQL, the final 
 
 ## Trouble-shooting
 ### ValueError: Not a unique field
-Some fields are redundant within our GraphQL data API. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<parent type>.<field name>`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is redundant. You can then use `get_unique_fields("<field name>")` to find notation that would specify a unique field for the given name.
-
-<details>
-  <summary>Example</summary>
+Some fields are redundant within our GraphQL data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<type>.<field name>`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is redundant. You can then use `get_unique_fields("<field name>")` to find notation that would specify a unique field for the given name.
 
 ```python
 # querying a redundant field
@@ -158,13 +194,16 @@ print(get_unique_fields("id"))
 > ['PdbxStructSpecialSymmetry.id',
 > 'ChemComp.id',
 > 'RcsbBirdCitation.id',
+> 'Entry.id',
 > ...
 > 'RcsbUniprotKeyword.id',
 > 'RcsbPolymerInstanceAnnotationAnnotationLineage.id',
 > 'RcsbPolymerStructConn.id']
 ```
-</details>
-
+```python
+# valid Query
+Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Entry.id"])
+```
 
 ## Error Handling
 In GraphQL, all requests return HTTP status code 200 and instead errors appear in the JSON that is returned. The package will parse these errors, throwing a ValueError and displaying the corresponding error message or messages. To access the full query and return JSON in an interactive editor, you can use the `get_editor_link` method on the Query object. 

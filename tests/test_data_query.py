@@ -59,6 +59,7 @@ class QueryTests(unittest.TestCase):
             query_obj = Query({"entry_ids": input_ids}, "entries", ["exptl"])
             query_obj.post_query()
             # assert that the batch and merge functions are called
+            # assert len of results is same as num of input ids
 
     def testParseGQLError(self):
         pass
@@ -68,11 +69,12 @@ class QueryTests(unittest.TestCase):
         for i in range(165):
             input_ids.append("4HHB")
         query_obj = Query({"entry_ids": input_ids}, "entries", ["exptl"])
+        query_obj = Query({"entry_ids": input_ids}, "entries", ["exptl"])
         batch_size = 50
         batched_ids = query_obj.batch_ids(batch_size)
         total_ids = 0
         for batch in batched_ids:
-            len_id_batch = len(batch["entry_ids"])
+            len_id_batch = len(batch)
             self.assertLessEqual(len_id_batch, batch_size)
             total_ids += len_id_batch
         self.assertEqual(len(query_obj.input_ids_list), total_ids)
