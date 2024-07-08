@@ -20,7 +20,7 @@ class Query:
         self.input_ids = input_ids
         self.input_type = input_type
         self.return_data_list = return_data_list
-        self.query = SCHEMA.construct_query(input_ids, input_type, return_data_list)
+        self.query = SCHEMA.construct_query(input_type, return_data_list,input_ids)
         self.plural_input = False
         if SCHEMA.root_dict[self.input_type][0]["kind"] == "LIST":
             self.plural_input = True
@@ -89,15 +89,14 @@ class Query:
                 raise ValueError(f"{combined_error_msg}. Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
     # TODO: change to use list of input ids?
-    def batch_ids(self, batch_size) -> List[Dict[str, List[str]]]: # assumes that plural types have only one arg, which is true right now
-        id_name = SCHEMA.root_dict[self.input_type][0]["name"]
-        batched_ids: List[Dict[str, List[str]]] = []
+    def batch_ids(self, batch_size) -> List[List[str]]: # assumes that plural types have only one arg, which is true right now
+        batched_ids: List[List[str]] = []
         i = 0
         while i < len(self.input_ids_list):
             count = 0
-            batch_list: Dict[str, List[str]] = {id_name: []}
+            batch_list: List[str] = []
             while count < batch_size and i < len(self.input_ids_list):
-                batch_list[id_name].append(self.input_ids_list[i])
+                batch_list.append(self.input_ids_list[i])
                 count += 1
                 i += 1
             if len(batch_list) > 0:
