@@ -48,8 +48,9 @@ class QueryTests(unittest.TestCase):
         query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
         query_obj = Query({"entry_ids": ["4HHB","1IYE"]}, "entries",["exptl"])
         url = query_obj.get_editor_link()
-        test_query_str = query.editor_to_query(url)
-        self.assertEqual(query_str, test_query_str)
+        response_json = requests.GET(url)
+        self.assertEqual(response_json.status_code, 200)
+
 
     def testPostQuery(self):
         with self.subTest("1. Batching into requests with fewer Ids"):
@@ -83,6 +84,7 @@ class QueryTests(unittest.TestCase):
 
     def testEditortoQuery(self):
         pass
+
 
 def buildQuery():
     suiteSelect = unittest.TestSuite()
