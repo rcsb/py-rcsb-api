@@ -48,7 +48,7 @@ class QueryTests(unittest.TestCase):
         # query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
         query_obj = Query({"entry_ids": ["4HHB","1IYE"]}, "entries",["exptl"])
         url = query_obj.get_editor_link()
-        response_json = requests.GET(url)
+        response_json = requests.get(url)
         self.assertEqual(response_json.status_code, 200)
 
     def testPostQuery(self):

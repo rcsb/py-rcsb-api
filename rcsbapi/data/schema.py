@@ -1,7 +1,7 @@
 import re
 import logging
 from typing import List, Dict, Union
-import requests 
+import requests
 
 use_networkx = False
 try:
