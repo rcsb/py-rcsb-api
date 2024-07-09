@@ -2,23 +2,14 @@ import re
 import logging
 from typing import List, Dict, Union
 import requests
+import networkx as nx
 
 use_networkx = False
 try:
     import rustworkx as rx
-
     logging.info("Using  rustworkx")
 except ImportError:
     use_networkx = True
-
-if use_networkx is True:
-    try:
-        import networkx as nx
-
-        logging.info("Using  networkx")
-    except ImportError:
-        print("Error: Neither rustworkx nor networkx is installed.")
-        exit(1)
 
 pdbUrl = "https://data.rcsb.org/graphql"
 
