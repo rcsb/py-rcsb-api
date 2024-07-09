@@ -415,6 +415,59 @@ class Schema:
             return result[0]
         return result
 
+    def regex_checks(self, inputDict, input_ids, attr_list, input_type):
+        plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
+        entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
+        instances = [
+            "polymer_entity_instances",
+            "branched_entity_instances",
+            "nonpolymer_entity_instances",
+            "polymer_entity_instance",
+            "nonpolymer_entity_instance",
+            "branched_entity_instance"
+        ]
+
+        for single_id in input_ids:
+            if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
+                    inputDict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
+                    inputDict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
+                    inputDict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
+                    inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
+                    inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_.*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(input_ids[0])
+            elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                    inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
+            else:
+                raise ValueError(f"Invalid ID format: {single_id}")
+            for attr in attr_name:
+                # print("attr: ", attr)
+                if attr not in inputDict:
+                    inputDict[attr] = []
+                if input_type in plural_types:
+                    inputDict[attr].append(single_id)
+        return inputDict
+
     def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         # query_name = input_type
@@ -462,57 +515,8 @@ class Schema:
                         raise ValueError(f"Input ID for {key} should be a list of strings")
 
         if isinstance(input_ids, List):
-            plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
+            inputDict = self.regex_checks(inputDict, input_ids, attr_list, input_type)
 
-            entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
-            instances = [
-                "polymer_entity_instances",
-                "branched_entity_instances",
-                "nonpolymer_entity_instances",
-                "polymer_entity_instance",
-                "nonpolymer_entity_instance",
-                "branched_entity_instance"
-            ]
-
-            for single_id in input_ids:
-                if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
-                        inputDict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
-                        inputDict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
-                        inputDict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
-                        inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
-                        inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(input_ids[0])
-                elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-                        inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
-                else:
-                    raise ValueError(f"Invalid ID format: {single_id}")
-                for attr in attr_name:
-                    # print("attr: ", attr)
-                    if attr not in inputDict:
-                        inputDict[attr] = []
-                    if input_type in plural_types:
-                        inputDict[attr].append(single_id)
         field_names = {}
 
         start_node_index = None
