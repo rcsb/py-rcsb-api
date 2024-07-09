@@ -353,7 +353,7 @@ class Schema:
                     if name.split(".")[1].lower() == return_data_name:
                         valid_field_list.append(name)
         return valid_field_list
-    
+
     def recurse_fields(self, fields, field_map, indent=2):
         query_str = ""
         for field, value in fields.items():
@@ -379,7 +379,7 @@ class Schema:
                     query_str += " " * indent + "}\n"
                     self.closed_brackets += 1
         return query_str
-    
+
     def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
