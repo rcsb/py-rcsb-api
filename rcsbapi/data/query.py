@@ -89,7 +89,6 @@ class Query:
                     combined_error_msg += f"{i+1}. {error_msg}\n"
                 raise ValueError(f"{combined_error_msg}. Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
-    # TODO: change to use list of input ids?
     def batch_ids(self, batch_size) -> List[List[str]]:  # assumes that plural types have only one arg, which is true right now
         batched_ids: List[List[str]] = []
         i = 0
