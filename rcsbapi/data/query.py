@@ -46,6 +46,10 @@ class Query:
         return self.return_data_list
 
     def get_query(self):
+<<<<<<< HEAD
+=======
+        print(self.query)
+>>>>>>> 94bc30f (Documentation and jupyter notebooks added. Minor changes to schema and query)
         return self.query
 
     def get_editor_link(self):
