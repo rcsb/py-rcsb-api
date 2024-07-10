@@ -29,7 +29,12 @@ class Query:
                 self.input_ids_list: List[str] = input_ids[SCHEMA.root_dict[self.input_type][0]["name"]]
             if isinstance(input_ids, list):
                 self.input_ids_list = input_ids
-        self.response = self.post_query()
+        try:
+            self.response = self.post_query()
+        except ValueError as error:
+            self.response = None
+            logging.warning("Was not able to post query due to the following error.")
+            print(str(error))
 
     def get_input_ids(self):
         return self.input_ids
@@ -42,9 +47,7 @@ class Query:
 
     def get_query(self):
         print(self.query)
-
-    def set_query(self, new_query):
-        self.query = new_query
+        return self.query
 
     def get_editor_link(self):
         editor_base_link = PDB_URL + "/index.html?query="
