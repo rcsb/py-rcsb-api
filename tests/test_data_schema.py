@@ -137,6 +137,7 @@ class SchemaTests(unittest.TestCase):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["CoreEntry.rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdbUrl).json()
             self.assertNotIn("errors", response_json.keys())
+        # Test multiple scalars under the same field
         # Test error handling
         with self.subTest(msg="7. too many input ids passed in"):
             with self.assertRaises(Exception):
