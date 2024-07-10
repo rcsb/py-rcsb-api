@@ -449,7 +449,7 @@ class Schema:
                     inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
                     inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
+            elif (re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     inputDict["entry_id"] = str(input_ids[0])
