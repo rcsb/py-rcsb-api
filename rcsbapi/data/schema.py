@@ -386,7 +386,7 @@ class Schema:
             if self.verify_unique_field(return_field) is True:
                 continue
             if self.verify_unique_field(return_field) is False:
-                raise ValueError(f"Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
+                raise ValueError(f"\"{return_field}\" is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
         if use_networkx:
