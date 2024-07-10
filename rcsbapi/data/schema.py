@@ -459,7 +459,7 @@ class Schema:
                     inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
             else:
-                raise ValueError(f"Invalid ID format: {single_id}")
+                raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
             for attr in attr_name:
                 # print("attr: ", attr)
                 if attr not in inputDict:
