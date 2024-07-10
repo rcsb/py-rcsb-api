@@ -59,8 +59,6 @@ class Schema:
         self.field_names_list = []
         self.root_introspection = self.request_root_types(pdb_url)
         self.root_dict = {}
-        self.opened_brackets = 0
-        self.closed_brackets = 0
         self.schema = self.fetch_schema(self.pdb_url)
 
         if use_networkx:
@@ -354,7 +352,6 @@ class Schema:
                 query_str += " " * indent + subfield
                 if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
                     query_str += "{\n"
-                    self.opened_brackets += 1
                 indent += 2 if idx == 0 else 0
             if isinstance(value, list):
                 if value:  # Only recurse if the list is not empty
@@ -368,7 +365,6 @@ class Schema:
             for idx, subfield in enumerate(mapped_path):
                 if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
                     query_str += " " * indent + "}\n"
-                    self.closed_brackets += 1
         return query_str
 
     def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
@@ -565,8 +561,6 @@ class Schema:
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
         query = "{ " + input_type + "("
-        self.opened_brackets = 1
-        self.closed_brackets = 0
 
         for i, attr in enumerate(attr_name):
             if isinstance(inputDict[attr], list):
@@ -576,11 +570,8 @@ class Schema:
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
-        self.opened_brackets += 1
-
         query += self.recurse_fields(final_fields, field_names)
-        query += " " * (self.opened_brackets - self.closed_brackets) + "}\n" * (self.opened_brackets - self.closed_brackets)
-
+        query += " " + "}\n}\n"
         return query
 
 
