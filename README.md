@@ -223,6 +223,7 @@ Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Entry
 
 ## Implementation Details
 ### Parsing Schema
+Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the python package parses the schema and creates a graph object to represent it. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/)
 
 ### Constructing queries
 
