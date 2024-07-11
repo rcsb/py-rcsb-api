@@ -195,7 +195,6 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="20. wrong entry id for entry type"):
             with self.assertRaises(ValueError):
                 SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["Exptl.method", "Exptl.details"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1"])
-            
 
     def testConstructQuery(self):
         with self.subTest(msg="1. return data not specific enough"):

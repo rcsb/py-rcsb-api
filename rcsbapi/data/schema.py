@@ -352,6 +352,8 @@ class Schema:
                 query_str += " " * indent + subfield
                 if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
                     query_str += "{\n"
+                else:
+                    query_str += "\n"
                 indent += 2 if idx == 0 else 0
             if isinstance(value, list):
                 if value:  # Only recurse if the list is not empty
@@ -572,6 +574,7 @@ class Schema:
         query += ") {\n"
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
+        print(query)
         return query
 
 
