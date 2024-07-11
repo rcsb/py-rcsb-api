@@ -47,9 +47,12 @@ class Query:
 
     def get_query(self):
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         print(self.query)
 >>>>>>> 94bc30f (Documentation and jupyter notebooks added. Minor changes to schema and query)
+=======
+>>>>>>> 2dde64c (adding documentation, minor changes to error messages in schema)
         return self.query
 
     def get_editor_link(self):
