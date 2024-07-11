@@ -46,7 +46,6 @@ class Query:
         return self.return_data_list
 
     def get_query(self):
-        print(self.query)
         return self.query
 
     def get_editor_link(self):
