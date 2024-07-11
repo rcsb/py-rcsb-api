@@ -182,7 +182,19 @@ class SchemaTests(unittest.TestCase):
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="19. using id_list with a singular type"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["exptl"], input_ids=["4HHB"])
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdbUrl).json()
             self.assertNotIn("errors", response_json.keys())
+        with self.subTest(msg="20. nested query"):
+            query = SCHEMA._Schema__construct_query_rustworkx(input_type="interfaces", return_data_list=["rcsb_interface_partner"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"])
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdbUrl).json()
+            self.assertNotIn("errors", response_json.keys())
+        with self.subTest(msg="20. requesting scalars under same field"):
+            query = SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["Exptl.method", "Exptl.details"], input_ids=["4HHB"])
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=pdbUrl).json()
+            self.assertNotIn("errors", response_json.keys())
+        with self.subTest(msg="20. wrong entry id for entry type"):
+            with self.assertRaises(ValueError):
+                SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["Exptl.method", "Exptl.details"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1"])
 
     def testConstructQuery(self):
         with self.subTest(msg="1. return data not specific enough"):

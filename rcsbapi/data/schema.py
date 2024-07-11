@@ -2,23 +2,14 @@ import re
 import logging
 from typing import List, Dict, Union
 import requests
+import networkx as nx
 
 use_networkx = False
 try:
     import rustworkx as rx
-
     logging.info("Using  rustworkx")
 except ImportError:
     use_networkx = True
-
-if use_networkx is True:
-    try:
-        import networkx as nx
-
-        logging.info("Using  networkx")
-    except ImportError:
-        print("Error: Neither rustworkx nor networkx is installed.")
-        exit(1)
 
 pdbUrl = "https://data.rcsb.org/graphql"
 
@@ -352,6 +343,32 @@ class Schema:
                         valid_field_list.append(name)
         return valid_field_list
 
+    def recurse_fields(self, fields, field_map, indent=2):
+        query_str = ""
+        for field, value in fields.items():
+            mapped_path = field_map.get(field, [field])
+            mapped_path = mapped_path[:mapped_path.index(field) + 1]  # Only take the path up to the field itself
+            for idx, subfield in enumerate(mapped_path):
+                query_str += " " * indent + subfield
+                if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
+                    query_str += "{\n"
+                else:
+                    query_str += "\n"
+                indent += 2 if idx == 0 else 0
+            if isinstance(value, list):
+                if value:  # Only recurse if the list is not empty
+                    for item in value:
+                        if isinstance(item, dict):
+                            query_str += self.recurse_fields(item, field_map, indent + 2)
+                        else:
+                            query_str += " " * (indent + 2) + item + "\n"
+            else:
+                query_str += " " * (indent + 2) + value + "\n"
+            for idx, subfield in enumerate(mapped_path):
+                if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
+                    query_str += " " * indent + "}\n"
+        return query_str
+
     def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
@@ -395,6 +412,59 @@ class Schema:
         if len(result) == 1:
             return result[0]
         return result
+
+    def regex_checks(self, inputDict, input_ids, attr_list, input_type):
+        plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
+        entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
+        instances = [
+            "polymer_entity_instances",
+            "branched_entity_instances",
+            "nonpolymer_entity_instances",
+            "polymer_entity_instance",
+            "nonpolymer_entity_instance",
+            "branched_entity_instance"
+        ]
+
+        for single_id in input_ids:
+            if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
+                    inputDict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
+                    inputDict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
+                    inputDict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
+                    inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
+                    inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
+            elif (re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(input_ids[0])
+            elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
+                attr_name = [single_id["name"] for single_id in attr_list]
+                if len(input_ids) == 1:
+                    inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                    inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
+            else:
+                raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
+            for attr in attr_name:
+                # print("attr: ", attr)
+                if attr not in inputDict:
+                    inputDict[attr] = []
+                if input_type in plural_types:
+                    inputDict[attr].append(single_id)
+        return inputDict
 
     def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
@@ -443,57 +513,8 @@ class Schema:
                         raise ValueError(f"Input ID for {key} should be a list of strings")
 
         if isinstance(input_ids, List):
-            plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
+            inputDict = self.regex_checks(inputDict, input_ids, attr_list, input_type)
 
-            entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
-            instances = [
-                "polymer_entity_instances",
-                "branched_entity_instances",
-                "nonpolymer_entity_instances",
-                "polymer_entity_instance",
-                "nonpolymer_entity_instance",
-                "branched_entity_instance"
-            ]
-
-            for single_id in input_ids:
-                if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
-                        inputDict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
-                        inputDict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
-                        inputDict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
-                        inputDict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
-                        inputDict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
-                elif (re.match(r"^(MA|AF)_.*$", single_id) or re.match(r"^[1-9][A-Z]{3}$", single_id)) and input_type in ["entries", "entry"]:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(input_ids[0])
-                elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
-                    attr_name = [single_id["name"] for single_id in attr_list]
-                    if len(input_ids) == 1:
-                        inputDict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-                        inputDict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
-                else:
-                    raise ValueError(f"Invalid ID format: {single_id}")
-                for attr in attr_name:
-                    # print("attr: ", attr)
-                    if attr not in inputDict:
-                        inputDict[attr] = []
-                    if input_type in plural_types:
-                        inputDict[attr].append(single_id)
         field_names = {}
 
         start_node_index = None
@@ -514,8 +535,9 @@ class Schema:
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
-        if any(not value for value in all_paths.values()):
-            raise ValueError(f"The return data requested does not match the input type {input_type}")
+        for return_data in return_data_list:
+            if any(not value for value in all_paths.values()):
+                raise ValueError(f"You can't access {return_data} from input type {input_type}")
         final_fields = {}
 
         for target_node in target_node_indices:
@@ -541,8 +563,6 @@ class Schema:
                         field_node_name = node_data.name
                         field_names[target_node_name].append(field_node_name)
         query = "{ " + input_type + "("
-        openedBrackets = 1
-        closedBrackets = 0
 
         for i, attr in enumerate(attr_name):
             if isinstance(inputDict[attr], list):
@@ -552,49 +572,9 @@ class Schema:
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
-        openedBrackets += 1
-
-        for field, field_info in field_names.items():
-            if field in field_info:
-                query += "  " + field_info[0]
-                if len(field_info) > 1 or final_fields[field]:
-                    query += " {\n"
-                    openedBrackets += 1
-                for subfield in field_info[1:]:
-                    if subfield != field:
-                        query += "    " + subfield + " {\n"
-                        openedBrackets += 1
-                    else:
-                        query += "    " + subfield
-                        if final_fields[subfield]:
-                            query += " {\n"
-                            openedBrackets += 1
-                        break
-                if field in final_fields:
-                    for final_field in final_fields[field]:
-                        if isinstance(final_field, dict):
-                            for key, value in final_field.items():
-                                query += "      " + key + " {\n"
-                                openedBrackets += 1
-                                for v in value:
-                                    query += "        " + v + "\n"
-                                query += "      }\n"
-                                closedBrackets += 1
-                        else:
-                            query += "     " + final_field + "\n"
-                if final_fields[field]:
-                    query += "  }\n"
-                    closedBrackets += 1
-            else:
-                query += "  " + field + " {\n"
-                openedBrackets += 1
-                query += "  }\n"
-                closedBrackets += 1
-
-        while openedBrackets > closedBrackets:
-            query += "}"
-            closedBrackets += 1
-
+        query += self.recurse_fields(final_fields, field_names)
+        query += " " + "}\n}\n"
+        print(query)
         return query
 
 
