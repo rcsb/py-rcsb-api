@@ -472,8 +472,30 @@ class Schema:
             return result[0]
         return result
     
+    seen_names = set()
+    def extract_name_description(self, schema_part, parent_name=""):
+        if isinstance(schema_part, dict):
+            if 'name' in schema_part and 'description' in schema_part:
+                name = schema_part['name']
+                description = schema_part['description']
+                # Check for redundancy and handle it
+                if name in self.seen_names:
+                    if parent_name:
+                        name = f"{parent_name}.{name}"
+                else:
+                    self.seen_names.add(name)
+                self.name_description_dict[name] = description
+            for key, value in schema_part.items():
+                new_parent_name = schema_part['name'] if key == 'fields' else parent_name
+                self.extract_name_description(value, new_parent_name)
+        elif isinstance(schema_part, list):
+            for item in schema_part:
+                self.extract_name_description(item, parent_name)
+
     def find_field_names(self, search_string):
-        return [key for key in self.node_index_dict if search_string.lower() in key.lower()]
+        field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
+        name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
+        return name_description
 
 <<<<<<< HEAD
     def extract_name_description(self, schema_part, parent_name=""):
