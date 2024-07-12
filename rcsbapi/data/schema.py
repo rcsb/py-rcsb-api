@@ -359,7 +359,7 @@ class Schema:
                     if name.split(".")[1].lower() == return_data_name:
                         valid_field_list.append(name)
         return valid_field_list
-    
+
     def get_input_id_dict(self, input_type):
         if input_type not in self.root_dict.keys():
             raise ValueError("Not a valid input_type, no available input_id dictionary")
