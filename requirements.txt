@@ -1,6 +1,7 @@
 requests >= 2.0.0
 rustworkx
 networkx
+rcsbsearchapi
 # matplotlib
 # scipy
 # pygraphviz
