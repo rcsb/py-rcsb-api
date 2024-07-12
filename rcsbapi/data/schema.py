@@ -269,9 +269,9 @@ class Schema:
                         schema_graph.add_edge(field_node.index, type_index)
                     else:
                         schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
-    
-    def apply_weight():
 
+    def apply_weight(self):
+        pass
 
     def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
