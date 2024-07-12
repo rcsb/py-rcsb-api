@@ -281,6 +281,9 @@ class Schema:
                         schema_graph.add_edge(field_node.index, type_index)
                     else:
                         schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
+    
+    def apply_weight():
+
 
     def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
@@ -407,6 +410,7 @@ class Schema:
             if self.verify_unique_field(return_field) is False:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 raise ValueError(f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
 <<<<<<< HEAD
 =======
@@ -419,6 +423,10 @@ class Schema:
             raise ValueError(f"Unknown input type: {input_type}")
 =======
 >>>>>>> 3fb022d (error handling, edits to documentation, added tests for docuumentation)
+=======
+                raise ValueError(
+                    f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
+>>>>>>> e4310be (fixed linting)
         if use_networkx:
 
             return self.__construct_query_networkx(input_ids, input_type, return_data_list)
@@ -650,45 +658,3 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
-
-
-# def main():
-#     schema = fetch_schema(pdb_url)
-#     if use_networkx:
-#         construct_root_dict(pdb_url)
-#     construct_type_dict(schema, type_fields_dict)
-#     recurse_build_schema(schema_graph, "Query")
-#     input_ids = ["4HHB", "4HHB"]
-#     input_type = "entry"
-#     return_data_list = ["exptl", "rcsb_polymer_instance_annotation"]
-
-#     query = construct_query(input_ids, input_type, return_data_list)
-#     print("Constructed Query:")
-#     print(query)
-#     # if use_networkx:
-#     #   # Convert to AGraph for Graphviz
-#     #   A = to_agraph(schema_graph)
-
-#     #   # Apply node attributes
-#     #   for node in schema_graph.nodes(data=True):
-#     #       n = A.get_node(node[0])
-#     #       attrs = node_attr(node[1].get("type_node", node[1].get("field_node")))
-#     #       for attr, value in attrs.items():
-#     #           n.attr[attr] = value
-
-#     #   # Apply edge attributes
-#     #   for edge in A.edges():
-#     #       attrs = edge_attr(edge)
-#     #       for attr, value in attrs.items():
-#     #           edge.attr[attr] = value
-
-#     #   A.draw("graph.png", prog="dot")
-
-#     #   img = Image.open("graph.png")
-#     #   img.show()
-#     # else:
-#     # buildSchema(type_fields_dict, node_index_dict)
-#     # mpl_draw(schema_graph, with_labels=True, labels=lambda node: node.name)
-#     # plt.show()
-#     # graphviz_draw(schema_graph, filename='graph.png', method='twopi', node_attr_fn=node_attr, edge_attr_fn=edge_attr)
-# main()
