@@ -415,13 +415,11 @@ class Schema:
             return result[0]
         return result
     
-    seen_names = set()
     def extract_name_description(self, schema_part, parent_name=""):
         if isinstance(schema_part, dict):
             if 'name' in schema_part and 'description' in schema_part:
                 name = schema_part['name']
                 description = schema_part['description']
-                # Check for redundancy and handle it
                 if name in self.seen_names:
                     if parent_name:
                         name = f"{parent_name}.{name}"
