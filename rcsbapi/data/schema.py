@@ -412,6 +412,9 @@ class Schema:
         if len(result) == 1:
             return result[0]
         return result
+    
+    def find_field_names(self, search_string):
+        return [key for key in self.node_index_dict if search_string.lower() in key.lower()]
 
     def regex_checks(self, inputDict, input_ids, attr_list, input_type):
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
