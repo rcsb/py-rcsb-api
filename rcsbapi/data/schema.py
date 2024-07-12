@@ -415,7 +415,7 @@ class Schema:
         if len(result) == 1:
             return result[0]
         return result
-    
+
     def extract_name_description(self, schema_part, parent_name=""):
         if isinstance(schema_part, dict):
             if 'name' in schema_part and 'description' in schema_part:
