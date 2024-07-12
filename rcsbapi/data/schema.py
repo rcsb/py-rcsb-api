@@ -3,6 +3,7 @@ import logging
 from typing import List, Dict, Union
 import requests
 import networkx as nx
+import json
 
 use_networkx = False
 try:
@@ -435,6 +436,8 @@ class Schema:
 
     def find_field_names(self, search_string):
         field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
+        if not field_names:
+            raise ValueError(f"No fields found matching '{search_string}'")
         name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
         return name_description
 

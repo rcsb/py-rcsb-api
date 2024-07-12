@@ -215,6 +215,20 @@ class SchemaTests(unittest.TestCase):
             field = "foo"
             self.assertIsNone(SCHEMA.verify_unique_field(field))
 
+    def testExtractNameDescription(self):
+        SCHEMA.extract_name_description(SCHEMA.schema)
+        self.assertIn('nonpolymer_comp', SCHEMA.name_description_dict)
+        self.assertEqual(SCHEMA.name_description_dict.get('nonpolymer_comp'), 'Get a non-polymer chemical components described in this molecular entity.')
+
+    def testFindFieldNames(self):
+        with self.subTest(msg="1. search for rcsb"):
+            result = SCHEMA.find_field_names("rcsb")
+            self.assertIn("CoreChemComp.rcsb_id", result)
+        with self.subTest(msg="1. search for nonexistent field"):
+            with self.assertRaises(ValueError):
+                SCHEMA.find_field_names("foo")
+
+
 def buildSchema():
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaTests("testFetch"))
@@ -224,6 +238,8 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("testConstructQuery"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
     suiteSelect.addTest(SchemaTests("testVerifyUniqueField"))
+    suiteSelect.addTest(SchemaTests("testExtractNameDescription"))
+    suiteSelect.addTest(SchemaTests("testFindFieldNames"))
     return suiteSelect
 
 
