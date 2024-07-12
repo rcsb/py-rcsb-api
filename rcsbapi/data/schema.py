@@ -471,6 +471,9 @@ class Schema:
         if len(result) == 1:
             return result[0]
         return result
+    
+    def find_field_names(self, search_string):
+        return [key for key in self.node_index_dict if search_string.lower() in key.lower()]
 
 <<<<<<< HEAD
     def extract_name_description(self, schema_part, parent_name=""):
