@@ -1,10 +1,10 @@
-import requests
-from rcsbapi.data import schema
 import logging
-import time
 import urllib.parse
 import re
+import time
 from typing import Any, Union, List, Dict
+import requests
+from rcsbapi.data import schema
 
 PDB_URL = "https://data.rcsb.org/graphql"
 SCHEMA = schema.Schema(PDB_URL)
@@ -15,9 +15,14 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 class Query:
 
     def __init__(self, input_ids: Union[List[str], Dict[Any, Any]], input_type: str, return_data_list: List[str]):
-        input_id_limit = 300
-        if len(input_ids) > input_id_limit:
-            raise ValueError(f"Too many input_ids. Reduce to less than {input_id_limit}.")
+        input_id_limit = 200
+        if isinstance(input_ids, list):
+            if len(input_ids) > input_id_limit:
+                logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+        if isinstance(input_ids,dict):
+            for value in input_ids.values():
+                if len(value) > input_id_limit:
+                    logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
         self.input_ids = input_ids
         self.input_type = input_type
         self.return_data_list = return_data_list
@@ -107,4 +112,5 @@ class Query:
 
     def merge_response(self, merge_into_response, to_merge_response):
         combined_response = merge_into_response
+        combined_response["data"][self.input_type] += to_merge_response["data"][self.input_type]
         return combined_response

@@ -10,14 +10,16 @@ Get it from PyPI:
 Or, download from [GitHub](https://github.com/rcsb/py-rcsbsearchapi)
 
 ## Jupyter Notebooks
-A quick-start Jupyter notebook briefly summarizing the README is available in [notebooks/quickstart.ipynb](), or can be run online using binder:
+A notebook briefly summarizing the README is available in [notebooks/quickstart.ipynb](notebooks/quickstart.ipynb), or can be run online using binder:
 [![Binder](https://mybinder.org/badge_logo.svg)]()
-<!-- Jupyter Notebook 2--> 
+
+Another notebook using both Search and Data API packages for a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](notebooks/search_data_workflow.ipynb), or can be run online using binder:
+[![Binder](https://mybinder.org/badge_logo.svg)]()
 
 ## Background
 The [RCSB PDB Data API](https://data.rcsb.org/#data-organization) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
 
-GraphQL is built on "types" and their associated "fields". All types and their fields are defined in a "schema". An example of a type in our schema is "CoreEntry" and a field under CoreEntry is "exptl" (experimental). Upon initialization, the data API package fetches the schema from the RCSB PDB website (See [Implementation Details](#implementation-details) for more). 
+GraphQL is built on "types" and their associated "fields". All types and their fields are defined in a "schema". An example of a type in our schema is "CoreEntry" and a field under CoreEntry is "exptl" (experimental). Upon initialization, the Data API package fetches the schema from the RCSB PDB website (See [Implementation Details](#implementation-details) for more). 
 
 In GraphQL, you must begin your query at specific fields. These are fields like entry, polymer_entity, and polymer_entity_instance (see full list [here](#input_types)). Each field can return a scalar (e.g. string, integer) or a type. Every query must ultimately request scalar value(s), which can be seen in the example query below. As shown in the example, only fields are explicitly included in queries while types are implicit. Types are named in CamelCase (CoreEntry) while fields are in snake case (exptl or audit_author).
 
@@ -47,28 +49,32 @@ Data is returned in JSON format
 }
 ```
 
-To generate and POST the same query in this package, you would create a Query object. From the object, you can access the response, get an interactive editor link, or access the arguments used to create the query.
+To generate the same query in this package, you would create a Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 ```python
 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
 ```
 
-One way this package simplifies making requests is by auto-populating corresponding fields that return scalars even if you request a field that returns a type.
+One way this package simplifies making requests is by auto-populating fields that return scalars if you request a field that returns a type.
 ```python
 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
 ```
 This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose (see [return_data_list](#return_data_list))
 
 ## Query Objects
-Constructing a query object requires three inputs.
+Constructing a query object requires three inputs. The JSON response to a query is stored in the `response` attribute of a Query object.
 ```python
+# constructing the Query object
 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
+
+# accessing the response
+print(query.response)
 ```
 
 ### input_ids
 
 Specifies which entry, entity, etc you would like to request data for.
 
-This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the arguments required in the GraphQL schema and viewable in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. <!--#TODO: You can also check what keys are required for a given type by running `get_input_keys(type name)`.--> Lists must be passed in PDB identifier format. 
+This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the arguments required in the GraphQL schema and viewable in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu or by the running the `get_input_id_dict(input_type)` method (see [Helpful Methods](#get_input_id_dict)). Lists must be passed in PDB identifier format. 
 
 |Type|Format|Example|
 |---|---|---|
@@ -80,10 +86,12 @@ This can be a dictionary or a list. Dictionaries must be passed with specific ke
 Dictionaries and Lists will be treated equivalently for the input_ids argument. For example, these input_ids arguments are equivalent.
 
 ```python
+# input_type is polymer_entity_instance
 input_ids=["4HHB.A"]
-input_ids={"entry_id":"4HHB", "asym_id": "A"}
+input_ids={"entry_id":"4HHB", "asym_id":"A"}
 ```
 ```python
+# input_type is polymer_entity_instances (plural)
 input_ids=["4HHB.A","4HHB.B"]
 input_ids={"entry_ids":["4HHB.A","4HHB.B"]}
 ```
@@ -132,7 +140,7 @@ These are the data that you are requesting (or "fields").
 In GraphQL syntax, the final requested data must be a "scalar" type (string, integer, boolean). However, if you request non-scalar data, the package will auto-populate the query to include all fields under the specified data until scalars are reached. Once you receive the query response and understand what specific data you would like to request, you can refine your query by requesting more specific fields.
 
 ```python
-Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
+Query(input_ids={"entry_id":"4HHB"}, input_type="entry", return_data_list=["exptl"])
 ```
 ```json
 {
@@ -150,7 +158,7 @@ Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl
   }
 }
 ```
-This query can be made more concise by specifying a field. In this case, the field name "method" is redundant because it appears under other types and must be further specified using dot notation. For more details see [ValueError: Not a unique field](#valueerror-not-a-unique-field)
+This query can be made more concise by specifying a field, like `"method"`. In this case, the field name "method" is redundant because it appears under other types and must be further specified using dot notation. For more details see [ValueError: Not a unique field](#valueerror-not-a-unique-field)
 ```python
 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
 ```
@@ -168,11 +176,11 @@ Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl
 }
 ```
 
-## Helpful methods
+## Helpful Methods
 There are several methods included to make working with query objects easier. These methods can also help you further understand the GraphQL syntax and refine your queries to request exactly and only what you want.
 
 ### get_editor_link()
-This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index.html) window with the query. From the window, you can use the user interface to explore other fields and refine your query.
+This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index.html) window with the query. From the window, you can use the user interface to explore other fields and refine your query. Method of Query class.
 
 ```python
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
@@ -180,18 +188,23 @@ print(query.get_editor_link())
 ```
 
 ### get_unique_fields() <!--Should this be moved outside the schema method?-->
-Given a redundant field, this method returns a list of matching fields in dot notation. You can look through the list to identify your intended field.
+Given a redundant field, this method returns a list of matching fields in dot notation. You can look through the list to identify your intended field. Method of Schema class.
 
 ```python
-print(SCHEMA.get_unique_fields("id"))
+SCHEMA.get_unique_fields("id")
 ```
 
 <!--TODO: add partial string match-->
-<!--TODO: add finding input_type keys-->
+
+### get_input_id_dict()
+Given a valid input_type, returns a dictionary with the corresponding keys and descriptions of each key. Method of Schema class.
+```python
+SCHEMA.get_input_id_dict("polymer_entity_instance")
+```
 
 ## Trouble-shooting
 ### ValueError: Not a unique field
-Some fields are redundant within our GraphQL data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<type>.<field name>`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is redundant. You can then use `get_unique_fields("<field name>")` to find notation that would specify a unique field for the given name.
+Some fields are redundant within our GraphQL Data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<type>.<field name>`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is redundant. You can then use `get_unique_fields("<field name>")` to find notation that would specify a unique field for the given name.
 
 ```python
 # querying a redundant field
@@ -223,17 +236,14 @@ Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Entry
 
 ## Implementation Details
 ### Parsing Schema
-Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the python package parses the schema and creates a graph object to represent it. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/)
+Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the python package parses the schema and creates a graph object to represent it within the package. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/), but if an `ImportError` is encountered, a `NetworkX` directed graph is created instead.
 
 ### Constructing queries
+Queries are constructed by finding the shortest path from an `input_type` to each item in the `return_data_list`. The name of each field in the path is found and used to construct a GraphQL query. Currently, constructing queries is not implemented using Networkx and only rustworkx is supported.
 
 ### Error Handling
-In GraphQL, all requests return HTTP status code 200 and instead errors appear in the JSON that is returned. The package will parse these errors, throwing a ValueError and displaying the corresponding error message or messages. To access the full query and return JSON in an interactive editor, you can use the `get_editor_link()` method on the Query object. 
+In GraphQL, all requests return HTTP status code 200 and instead errors appear in the JSON that is returned. The package will parse these errors, throwing a ValueError and displaying the corresponding error message or messages. To access the full query and return JSON in an interactive editor, you can use the `get_editor_link()` method on the Query object. (see [Helpful Methods](#get_editor_link))
 
-```python
-query_obj = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
-query_obj.get_editor_link()
-```
 ## Additional examples
 Examples come from [RCSB PDB Data API documentation](https://data.rcsb.org/#examples)
 
