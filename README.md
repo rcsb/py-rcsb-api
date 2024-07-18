@@ -58,16 +58,16 @@ One way this package simplifies making requests is by auto-populating fields tha
 ```python
 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
 ```
-This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose (see [return_data_list](#return_data_list))
+This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose (see [return_data_list](#return_data_list)).
 
 ## Query Objects
-Constructing a query object requires three inputs. The JSON response to a query is stored in the `response` attribute of a Query object.
+Constructing a query object requires three inputs. The JSON response to a query is stored in the `response` attribute of a Query object and can be accessed using the `get_response()` method.
 ```python
 # constructing the Query object
 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
 
 # accessing the response
-print(query.response)
+print(query.get_response())
 ```
 
 ### input_ids
@@ -211,7 +211,7 @@ Some fields are redundant within our GraphQL Data API schema. For example, "id" 
 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["id"])
 ```
 ```
-> ValueError: Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(id)
+ValueError: Not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(id)
 ```
 
 ```python
@@ -220,14 +220,14 @@ print(get_unique_fields("id"))
 ```
 
 ```
-> ['PdbxStructSpecialSymmetry.id',
-> 'ChemComp.id',
-> 'RcsbBirdCitation.id',
-> 'Entry.id',
-> ...
-> 'RcsbUniprotKeyword.id',
-> 'RcsbPolymerInstanceAnnotationAnnotationLineage.id',
-> 'RcsbPolymerStructConn.id']
+['PdbxStructSpecialSymmetry.id',
+'RcsbBirdCitation.id',
+'ChemComp.id',
+'Entry.id',
+...
+'RcsbUniprotKeyword.id',
+'RcsbPolymerInstanceAnnotationAnnotationLineage.id',
+'RcsbPolymerStructConn.id']
 ```
 ```python
 # valid Query
@@ -236,7 +236,7 @@ Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Entry
 
 ## Implementation Details
 ### Parsing Schema
-Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the python package parses the schema and creates a graph object to represent it within the package. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/), but if an `ImportError` is encountered, a `NetworkX` directed graph is created instead.
+Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the Python package parses the schema and creates a graph object to represent it within the package. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/), but if an `ImportError` is encountered, a `NetworkX` directed graph is created instead.
 
 ### Constructing queries
 Queries are constructed by finding the shortest path from an `input_type` to each item in the `return_data_list`. The name of each field in the path is found and used to construct a GraphQL query. Currently, constructing queries is not implemented using Networkx and only rustworkx is supported.
