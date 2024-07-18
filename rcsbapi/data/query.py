@@ -62,10 +62,10 @@ class Query:
         return self.query
 =======
         return self.__query
-    
+
     def get_input_ids_list(self):
         return self.__input_ids_list
-    
+
     def get_response(self):
         return self.__response
 >>>>>>> ca6acff (readme changes, adding readme examples into test file, adding weights to schema graph)
