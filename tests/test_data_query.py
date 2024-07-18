@@ -76,7 +76,7 @@ class QueryTests(unittest.TestCase):
             len_id_batch = len(batch)
             self.assertLessEqual(len_id_batch, batch_size)
             total_ids += len_id_batch
-        self.assertEqual(len(query_obj.input_ids_list), total_ids)
+        self.assertEqual(len(query_obj.get_input_ids_list()), total_ids)
 
     def testMergeResponse(self):
         # assert that the lengths are combined and all ids are present?
@@ -255,7 +255,7 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="3. Parse result"):
             try:
-                json = data_query.response["data"]["entries"]
+                json = data_query.get_response()["data"]["entries"]
                 json[0]["rcsb_id"]
                 json[0]["nonpolymer_entities"]
                 json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]

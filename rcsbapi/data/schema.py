@@ -75,6 +75,7 @@ class Schema:
         self.construct_type_dict(self.schema, self.type_fields_dict)
         self.construct_name_list()
         self.recurse_build_schema(self.schema_graph, "Query")
+        self.apply_weights(["CoreAssembly"], 2)
 
     def request_root_types(self, pdb_url) -> Dict:
         root_query = """
@@ -271,19 +272,27 @@ class Schema:
                 if type_name in self.node_index_dict.keys():
                     type_index = self.node_index_dict[type_name]
                     if use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index)
+                        schema_graph.add_edge(field_node.index, type_index, weight=1)
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
+                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge=1)
                 else:
                     self.recurse_build_schema(schema_graph, type_name)
                     type_index = self.node_index_dict[type_name]
                     if self.use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index)
+                        schema_graph.add_edge(field_node.index, type_index, weight=1)
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge="draw")
+                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge=1)
 
-    def apply_weight(self):
-        pass
+    def apply_weights(self, root_type_list, weight):  # applies weight in all edges from a root TypeNode to FieldNodes
+        for root_type in root_type_list:
+            node_idx = self.node_index_dict[root_type]
+            if use_networkx is False:
+                out_edge_list = self.schema_graph.incident_edges(node_idx)
+                for edge_idx in out_edge_list:
+                    self.schema_graph.update_edge_by_index(edge_idx, weight)
+            else:
+                out_edge_list = self.schema_graph.edges(node_idx)
+                nx.set_edge_attributes(self.schema_graph, {edge_tuple:{"weight":weight} for edge_tuple in out_edge_list})
 
     def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
@@ -321,12 +330,12 @@ class Schema:
         if self.use_networkx:
             index = len(self.schema_graph.nodes)
             self.schema_graph.add_node(index, field_node=field_node)
-            self.schema_graph.add_edge(parent_type_index, index)
+            self.schema_graph.add_edge(parent_type_index, index, weight=1)
         else:
             if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
-                index = self.schema_graph.add_child(parent_type_index, field_node, None)
+                index = self.schema_graph.add_child(parent_type_index, field_node, 1)
             else:
-                index = self.schema_graph.add_child(parent_type_index, field_node, "draw")
+                index = self.schema_graph.add_child(parent_type_index, field_node, 1)
         if self.field_names_list.count(field_name) > 1:
             field_node.redundant = True
             self.node_index_dict[f"{parent_type}.{field_name}"] = index
@@ -617,7 +626,7 @@ class Schema:
                 target_node_indices.append(node_data.index)
 
         # Get all shortest paths from the start node to each target node
-        all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
+        all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node,weight_fn=lambda edge: edge) for target_node in target_node_indices}
         for return_data in return_data_list:
             if any(not value for value in all_paths.values()):
                 raise ValueError(f"You can't access {return_data} from input type {input_type}")
