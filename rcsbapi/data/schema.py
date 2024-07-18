@@ -4,6 +4,7 @@ from typing import List, Dict, Union
 import requests
 import networkx as nx
 import json
+import os
 
 use_networkx = False
 try:
@@ -219,7 +220,11 @@ class Schema:
             }
         """
         schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url, timeout=10)
-        return schema_response.json()
+        if schema_response.status_code == 200:
+            return schema_response.json()
+        else:
+            with open(os.path.join(os.path.dirname(__file__), 'data_api_schema.json'), 'r') as schema_file:
+                return json.load(schema_file)
 
     def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
