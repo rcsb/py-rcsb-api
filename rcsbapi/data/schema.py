@@ -227,8 +227,8 @@ class Schema:
             logging.info("Loading data schema from file")
             current_dir = os.path.dirname(os.path.abspath(__file__))
             json_file_path = os.path.join(current_dir, '../', 'resources', 'data_api_schema.json')
-            with open(json_file_path, 'r') as schema_file:
-                return json.load(schema_file)       
+            with open(json_file_path, 'r', encoding="utf-8") as schema_file:
+                return json.load(schema_file)
 
     def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
