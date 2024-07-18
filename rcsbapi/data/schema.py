@@ -280,7 +280,7 @@ class Schema:
                     self.schema_graph.update_edge_by_index(edge_idx, weight)
             else:
                 out_edge_list = self.schema_graph.edges(node_idx)
-                nx.set_edge_attributes(self.schema_graph, {edge_tuple:{"weight":weight} for edge_tuple in out_edge_list})
+                nx.set_edge_attributes(self.schema_graph, {edge_tuple: {"weight": weight} for edge_tuple in out_edge_list})
 
     def make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
@@ -568,7 +568,7 @@ class Schema:
                 target_node_indices.append(node_data.index)
 
         # Get all shortest paths from the start node to each target node
-        all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node,weight_fn=lambda edge: edge) for target_node in target_node_indices}
+        all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
         for return_data in return_data_list:
             if any(not value for value in all_paths.values()):
                 raise ValueError(f"You can't access {return_data} from input type {input_type}")

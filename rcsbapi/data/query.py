@@ -52,10 +52,10 @@ class Query:
 
     def get_query(self):
         return self.__query
-    
+
     def get_input_ids_list(self):
         return self.__input_ids_list
-    
+
     def get_response(self):
         return self.__response
 
