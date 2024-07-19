@@ -194,7 +194,12 @@ Given a redundant field, this method returns a list of matching fields in dot no
 SCHEMA.get_unique_fields("id")
 ```
 
-<!--TODO: add partial string match-->
+### find_field_names()
+Given a string, this method will return all fields containing that string, along with a description of each field.
+
+```python
+SCHEMA.find_field_names("exptl")
+```
 
 ### get_input_id_dict()
 Given a valid input_type, returns a dictionary with the corresponding keys and descriptions of each key. Method of Schema class.
