@@ -51,16 +51,8 @@ class Query:
         return self.__return_data_list
 
     def get_query(self):
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        print(self.query)
->>>>>>> 94bc30f (Documentation and jupyter notebooks added. Minor changes to schema and query)
-=======
->>>>>>> 2dde64c (adding documentation, minor changes to error messages in schema)
         return self.query
-=======
+
         return self.__query
 
     def get_input_ids_list(self):
@@ -68,7 +60,6 @@ class Query:
 
     def get_response(self):
         return self.__response
->>>>>>> ca6acff (readme changes, adding readme examples into test file, adding weights to schema graph)
 
     def get_editor_link(self):
         editor_base_link = PDB_URL + "/index.html?query="

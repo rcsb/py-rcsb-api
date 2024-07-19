@@ -241,22 +241,7 @@ Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Entry
 
 ## Implementation Details
 ### Parsing Schema
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the python package parses the schema and creates a graph object to represent it. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/)
-=======
->>>>>>> 94bc30f (Documentation and jupyter notebooks added. Minor changes to schema and query)
-=======
-Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the python package parses the schema and creates a graph object to represent it. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/)
->>>>>>> 2dde64c (adding documentation, minor changes to error messages in schema)
-=======
-Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the python package parses the schema and creates a graph object to represent it within the package. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/), but if an `ImportError` is encountered, a `NetworkX` directed graph is created instead.
->>>>>>> 3fb022d (error handling, edits to documentation, added tests for docuumentation)
-=======
 Upon initialization of the package, the GraphQL schema is fetched from the RCSB PDB website. After fetching the file, the Python package parses the schema and creates a graph object to represent it within the package. This graph representation of how fields and types connect is key to how queries are automatically constructed using a shortest path algoritm. By default the graph is constructed as a directed graph in [rustworkx](https://www.rustworkx.org/), but if an `ImportError` is encountered, a `NetworkX` directed graph is created instead.
->>>>>>> ca6acff (readme changes, adding readme examples into test file, adding weights to schema graph)
 
 ### Constructing queries
 Queries are constructed by finding the shortest path from an `input_type` to each item in the `return_data_list`. The name of each field in the path is found and used to construct a GraphQL query. Currently, constructing queries is not implemented using Networkx and only rustworkx is supported.
