@@ -230,13 +230,8 @@ class Schema:
             logging.info("Loading data schema from file")
             current_dir = os.path.dirname(os.path.abspath(__file__))
             json_file_path = os.path.join(current_dir, '../', 'resources', 'data_api_schema.json')
-<<<<<<< HEAD
             with open(json_file_path, 'r', encoding="utf-8") as schema_file:
-                return json.load(schema_file)
-=======
-            with open(json_file_path, 'r') as schema_file:
                 return json.load(schema_file)       
->>>>>>> cdb64fc (moved schema file to resources dirc)
 
     def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
@@ -422,25 +417,8 @@ class Schema:
             if self.verify_unique_field(return_field) is True:
                 continue
             if self.verify_unique_field(return_field) is False:
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-                raise ValueError(f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
-<<<<<<< HEAD
-=======
-                raise ValueError(f"\"{return_field}\" is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
->>>>>>> 94bc30f (Documentation and jupyter notebooks added. Minor changes to schema and query)
-=======
-                raise ValueError(f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
->>>>>>> 2dde64c (adding documentation, minor changes to error messages in schema)
-        if input_type not in self.root_dict.keys():
-            raise ValueError(f"Unknown input type: {input_type}")
-=======
->>>>>>> 3fb022d (error handling, edits to documentation, added tests for docuumentation)
-=======
                 raise ValueError(
                     f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
->>>>>>> e4310be (fixed linting)
         if use_networkx:
 
             return self.__construct_query_networkx(input_ids, input_type, return_data_list)
@@ -476,33 +454,7 @@ class Schema:
         if len(result) == 1:
             return result[0]
         return result
-    
-    seen_names = set()
-    def extract_name_description(self, schema_part, parent_name=""):
-        if isinstance(schema_part, dict):
-            if 'name' in schema_part and 'description' in schema_part:
-                name = schema_part['name']
-                description = schema_part['description']
-                # Check for redundancy and handle it
-                if name in self.seen_names:
-                    if parent_name:
-                        name = f"{parent_name}.{name}"
-                else:
-                    self.seen_names.add(name)
-                self.name_description_dict[name] = description
-            for key, value in schema_part.items():
-                new_parent_name = schema_part['name'] if key == 'fields' else parent_name
-                self.extract_name_description(value, new_parent_name)
-        elif isinstance(schema_part, list):
-            for item in schema_part:
-                self.extract_name_description(item, parent_name)
 
-    def find_field_names(self, search_string):
-        field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
-        name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
-        return name_description
-
-<<<<<<< HEAD
     def extract_name_description(self, schema_part, parent_name=""):
         if isinstance(schema_part, dict):
             if 'name' in schema_part and 'description' in schema_part:
@@ -528,10 +480,7 @@ class Schema:
         name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
         return name_description
 
-    def regex_checks(self, inputDict, input_ids, attr_list, input_type):
-=======
     def regex_checks(self, input_dict, input_ids, attr_list, input_type):
->>>>>>> 3fb022d (error handling, edits to documentation, added tests for docuumentation)
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
         entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
         instances = [
