@@ -479,7 +479,6 @@ class Schema:
         name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
         return name_description
 
-
     def regex_checks(self, input_dict, input_ids, attr_list, input_type):
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
         entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
