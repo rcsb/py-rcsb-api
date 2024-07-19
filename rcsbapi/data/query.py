@@ -51,8 +51,6 @@ class Query:
         return self.__return_data_list
 
     def get_query(self):
-        return self.query
-
         return self.__query
 
     def get_input_ids_list(self):
