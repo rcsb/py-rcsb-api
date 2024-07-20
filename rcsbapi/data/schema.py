@@ -3,6 +3,8 @@ import logging
 from typing import List, Dict, Union
 import requests
 import networkx as nx
+import json
+import os
 
 use_networkx = False
 try:
@@ -56,10 +58,13 @@ class Schema:
         self.node_index_dict = {}
         self.edge_index_dict = {}
         self.type_fields_dict = {}
+        self.seen_names = set()
+        self.name_description_dict = {}
         self.field_names_list = []
         self.root_introspection = self.request_root_types(pdb_url)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
+        self.extract_name_description(self.schema)
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
@@ -219,7 +224,14 @@ class Schema:
             }
         """
         schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url, timeout=10)
-        return schema_response.json()
+        if schema_response.status_code == 200:
+            return schema_response.json()
+        else:
+            logging.info("Loading data schema from file")
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            json_file_path = os.path.join(current_dir, '../', 'resources', 'data_api_schema.json')
+            with open(json_file_path, 'r', encoding="utf-8") as schema_file:
+                return json.load(schema_file)
 
     def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
@@ -442,6 +454,33 @@ class Schema:
         if len(result) == 1:
             return result[0]
         return result
+
+    def extract_name_description(self, schema_part, parent_name=""):
+        if isinstance(schema_part, dict):
+            if 'name' in schema_part and 'description' in schema_part:
+                name = schema_part['name']
+                description = schema_part['description']
+                if name in self.seen_names:
+                    if parent_name:
+                        name = f"{parent_name}.{name}"
+                else:
+                    self.seen_names.add(name)
+                self.name_description_dict[name] = description
+            for key, value in schema_part.items():
+                new_parent_name = schema_part['name'] if key == 'fields' else parent_name
+                self.extract_name_description(value, new_parent_name)
+        elif isinstance(schema_part, list):
+            for item in schema_part:
+                self.extract_name_description(item, parent_name)
+
+    def find_field_names(self, search_string):
+        if not isinstance(search_string, str):
+            raise ValueError(f"Please input a string instead of {type(search_string)}")
+        field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
+        if not field_names:
+            raise ValueError(f"No fields found matching '{search_string}'")
+        name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
+        return name_description
 
     def regex_checks(self, input_dict, input_ids, attr_list, input_type):
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
