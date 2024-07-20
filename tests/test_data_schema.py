@@ -220,7 +220,9 @@ class SchemaTests(unittest.TestCase):
     def testExtractNameDescription(self):
         SCHEMA.extract_name_description(SCHEMA.schema)
         self.assertIn('nonpolymer_comp', SCHEMA.name_description_dict)
-        self.assertEqual(SCHEMA.name_description_dict.get('nonpolymer_comp'), 'Get a non-polymer chemical components described in this molecular entity.')
+        description = SCHEMA.name_description_dict.get('nonpolymer_comp')
+        logger.info("Description for 'nonpolymer_comp': %s", description)
+        self.assertEqual(description, 'Get a non-polymer chemical components described in this molecular entity.')
 
     def testFindFieldNames(self):
         with self.subTest(msg="1. search for rcsb"):
