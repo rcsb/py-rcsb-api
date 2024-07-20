@@ -474,6 +474,8 @@ class Schema:
                 self.extract_name_description(item, parent_name)
 
     def find_field_names(self, search_string):
+        if not isinstance(search_string, str):
+            raise ValueError(f"Please input a string instead of {type(search_string)}")
         field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
         if not field_names:
             raise ValueError(f"No fields found matching '{search_string}'")

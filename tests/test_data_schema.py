@@ -231,6 +231,9 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="1. search for nonexistent field"):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names("foo")
+        with self.subTest(msg="2. search for field list"):
+            with self.assertRaises(ValueError):
+                SCHEMA.find_field_names(["rcsb", "exptl"])
 
 
 def buildSchema():
