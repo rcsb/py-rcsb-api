@@ -58,12 +58,13 @@ class Schema:
         self.node_index_dict = {}
         self.edge_index_dict = {}
         self.type_fields_dict = {}
-        self.name_description_dict = {}
         self.seen_names = set()
+        self.name_description_dict = {}
         self.field_names_list = []
         self.root_introspection = self.request_root_types(pdb_url)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
+        self.extract_name_description(self.schema)
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
