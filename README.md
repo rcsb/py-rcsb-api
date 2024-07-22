@@ -5,7 +5,7 @@ Python interface for RCSB PDB API services at RCSB.org.
 
 Get it from PyPI:
 
-    pip install rcsbapi
+    pip install rcsb-api
 
 Or, download from [GitHub](https://github.com/rcsb/py-rcsbsearchapi)
 
