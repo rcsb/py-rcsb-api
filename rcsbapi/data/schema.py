@@ -65,13 +65,14 @@ class Schema:
         self.root_introspection = self.request_root_types(pdb_url)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
-        self.extract_name_description(self.schema)
+        self.client_schema = build_client_schema(self.schema['data'])
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
         else:
             self.schema_graph = rx.PyDiGraph()
-
+        
+        self.extract_name_description(self.schema)
         self.construct_root_dict(self.pdb_url)
         self.construct_type_dict(self.schema, self.type_fields_dict)
         self.construct_name_list()
@@ -420,21 +421,15 @@ class Schema:
             if self.verify_unique_field(return_field) is False:
                 raise ValueError(
                     f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
-        schema = build_client_schema(self.schema['data'])
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
-            validation = validate(schema, parse(query))
-            if not validation:
-                return query
-            else:
-                raise ValueError(validation)
         else:
             query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
-            validation = validate(schema, parse(query))
-            if not validation:
-                return query
-            else:
-                raise ValueError(validation)
+        validation = validate(self.client_schema, parse(query))
+        if not validation:
+            return query
+        else:
+            raise ValueError(validation)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
