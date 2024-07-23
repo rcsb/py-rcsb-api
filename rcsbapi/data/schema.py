@@ -71,7 +71,7 @@ class Schema:
             self.schema_graph = nx.DiGraph()
         else:
             self.schema_graph = rx.PyDiGraph()
-        
+
         self.extract_name_description(self.schema)
         self.construct_root_dict(self.pdb_url)
         self.construct_type_dict(self.schema, self.type_fields_dict)
