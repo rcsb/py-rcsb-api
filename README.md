@@ -7,7 +7,14 @@ Get it from PyPI:
 
     pip install rcsb-api
 
-Or, download from [GitHub](https://github.com/rcsb/py-rcsbsearchapi)
+Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
+
+<!--
+To import into a file use:
+
+    from rcsbapi.data import query
+    from rcsbapi.data.schema import SCHEMA
+-->
 
 ## Jupyter Notebooks
 A notebook briefly summarizing the README is available in [notebooks/quickstart.ipynb](notebooks/quickstart.ipynb), or can be run online using binder:
