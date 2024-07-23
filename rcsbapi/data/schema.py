@@ -6,6 +6,7 @@ import networkx as nx
 import json
 import os
 from graphql import validate, parse, build_client_schema
+from graphql import validate, parse, build_client_schema
 
 use_networkx = False
 try:
@@ -65,7 +66,6 @@ class Schema:
         self.root_introspection = self.request_root_types(pdb_url)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
-        self.client_schema = build_client_schema(self.schema['data'])
         self.client_schema = build_client_schema(self.schema['data'])
 
         if use_networkx:
