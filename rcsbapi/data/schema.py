@@ -5,6 +5,7 @@ import requests
 import networkx as nx
 import json
 import os
+from graphql import validate, parse
 
 use_networkx = False
 try:
@@ -420,10 +421,19 @@ class Schema:
                 raise ValueError(
                     f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
         if use_networkx:
-
-            return self.__construct_query_networkx(input_ids, input_type, return_data_list)
+            query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
+            validation = validate(self.schema, parse(query))
+            if not validation:
+                return query
+            else:
+                raise ValueError(validation)
         else:
-            return self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+            query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+            validation = validate(self.schema, parse(query))
+            if not validation:
+                return query
+            else:
+                raise ValueError(validation)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
