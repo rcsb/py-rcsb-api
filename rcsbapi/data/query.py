@@ -4,10 +4,9 @@ import re
 import time
 from typing import Any, Union, List, Dict
 import requests
-from rcsbapi.data import schema
+from rcsbapi.data.schema import SCHEMA
 
 PDB_URL = "https://data.rcsb.org/graphql"
-SCHEMA = schema.Schema(PDB_URL)
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 
@@ -34,12 +33,7 @@ class Query:
                 self.__input_ids_list: List[str] = input_ids[SCHEMA.root_dict[input_type][0]["name"]]
             if isinstance(input_ids, list):
                 self.__input_ids_list = input_ids
-        try:
-            self.__response = self.post_query()
-        except ValueError as error:
-            self.__response = None
-            logging.warning("Was not able to post query due to the following error.")
-            print(str(error))
+        self.__response = None
 
     def get_input_ids(self):
         return self.__input_ids
@@ -63,7 +57,7 @@ class Query:
         editor_base_link = PDB_URL + "/index.html?query="
         return editor_base_link + urllib.parse.quote(self.__query)
 
-    def post_query(self):
+    def exec(self):
         batch_size = 50
         if (self.__plural_input is True) and (len(self.__input_ids_list) > batch_size):
             batched_ids = self.batch_ids(batch_size)
@@ -88,9 +82,8 @@ class Query:
             if isinstance(query_response, list):
                 if len(query_response) == 0:
                     logging.warning("Input produced no results. Check that input ids are valid")
+        self.__response = response_json
         return response_json
-        # parse_response(response_json)
-        # fields_list=
 
     def parse_gql_error(self, response_json):
         if "errors" in response_json.keys():

@@ -15,7 +15,7 @@ try:
 except ImportError:
     use_networkx = True
 
-pdbUrl = "https://data.rcsb.org/graphql"
+PDB_URL = "https://data.rcsb.org/graphql"
 
 
 class FieldNode:
@@ -655,3 +655,5 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
+
+SCHEMA = Schema(PDB_URL)
