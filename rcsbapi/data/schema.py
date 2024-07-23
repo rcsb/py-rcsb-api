@@ -421,6 +421,7 @@ class Schema:
             if self.verify_unique_field(return_field) is False:
                 raise ValueError(
                     f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
+        schema = build_client_schema(self.schema['data'])
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
