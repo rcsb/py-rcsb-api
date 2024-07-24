@@ -6,7 +6,6 @@ import networkx as nx
 import json
 import os
 from graphql import validate, parse, build_client_schema
-from graphql import validate, parse, build_client_schema
 
 use_networkx = False
 try:
