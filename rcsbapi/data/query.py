@@ -4,7 +4,7 @@ import re
 import time
 from typing import Any, Union, List, Dict
 import requests
-from rcsbapi.data.schema import SCHEMA
+from rcsbapi.data import SCHEMA
 
 PDB_URL = "https://data.rcsb.org/graphql"
 logger = logging.getLogger()

@@ -26,12 +26,9 @@ import requests
 # import rustworkx as rx
 # import networkx as nx
 
-from rcsbapi.data import schema
-from rcsbapi.data.schema import Schema
-# from rcsbapi.data.schema import use_networkx
+from rcsbapi.data import Schema, Query
+from rcsbapi.data import SCHEMA
 from rcsbapi.data.schema import PDB_URL
-
-SCHEMA = Schema(PDB_URL)
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
@@ -43,12 +40,10 @@ class SchemaTests(unittest.TestCase):
     def setUp(self):
         self.__startTime = time.time()
         logger.info("Starting %s at %s", self.id().split('.')[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
-        self.original_networkx_flag = schema.use_networkx
 
     def tearDown(self) -> None:
         endTime = time.time()
         logger.info("Completed %s at %s (%.4f seconds)", self.id().split('.')[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
-        schema.use_networkx = self.original_networkx_flag
 
     def testFetch(self): 
         fetched_schema = SCHEMA.fetch_schema(PDB_URL)

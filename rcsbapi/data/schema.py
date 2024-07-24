@@ -53,8 +53,8 @@ class TypeNode:
 
 
 class Schema:
-    def __init__(self, pdb_url):
-        self.pdb_url = pdb_url
+    def __init__(self):
+        self.pdb_url = PDB_URL
         self.use_networkx = use_networkx
         self.schema_graph = None
         self.node_index_dict = {}
@@ -63,7 +63,7 @@ class Schema:
         self.seen_names = set()
         self.name_description_dict = {}
         self.field_names_list = []
-        self.root_introspection = self.request_root_types(pdb_url)
+        self.root_introspection = self.request_root_types(PDB_URL)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
         self.client_schema = build_client_schema(self.schema['data'])
@@ -655,5 +655,3 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
-
-SCHEMA = Schema(PDB_URL)
