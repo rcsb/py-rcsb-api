@@ -5,6 +5,6 @@ from .schema import Schema
 
 SCHEMA = Schema()
 
-from .query import Query  # nopep8:E402
+from .query import Query  # noqa:E402
 
 __all__ = ["Query", "Schema"]
