@@ -425,11 +425,11 @@ class Schema:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
             query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
-        validation = validate(self.client_schema, parse(query))
-        if not validation:
+        validation_error_list = validate(self.client_schema, parse(query))
+        if not validation_error_list:
             return query
         else:
-            raise ValueError(validation)
+            raise ValueError(validation_error_list)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
