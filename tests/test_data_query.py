@@ -50,13 +50,13 @@ class QueryTests(unittest.TestCase):
         response_json = requests.get(url, timeout=10)
         self.assertEqual(response_json.status_code, 200)
 
-    def testPostQuery(self):
+    def testExec(self):
         with self.subTest("1. Batching into requests with fewer Ids"):
             input_ids = []
             for _ in range(165):
                 input_ids.append("4HHB")
             query_obj = Query({"entry_ids": input_ids}, "entries", ["exptl"])
-            query_obj.post_query()
+            query_obj.exec()
             # assert that the batch and merge functions are called
             # assert len of results is same as num of input ids
 
