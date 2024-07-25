@@ -5,6 +5,7 @@ import requests
 import networkx as nx
 import json
 import os
+from graphql import validate, parse, build_client_schema
 
 use_networkx = False
 try:
@@ -13,7 +14,7 @@ try:
 except ImportError:
     use_networkx = True
 
-pdbUrl = "https://data.rcsb.org/graphql"
+PDB_URL = "https://data.rcsb.org/graphql"
 
 
 class FieldNode:
@@ -51,8 +52,8 @@ class TypeNode:
 
 
 class Schema:
-    def __init__(self, pdb_url):
-        self.pdb_url = pdb_url
+    def __init__(self):
+        self.pdb_url = PDB_URL
         self.use_networkx = use_networkx
         self.schema_graph = None
         self.node_index_dict = {}
@@ -61,16 +62,17 @@ class Schema:
         self.seen_names = set()
         self.name_description_dict = {}
         self.field_names_list = []
-        self.root_introspection = self.request_root_types(pdb_url)
+        self.root_introspection = self.request_root_types(PDB_URL)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
-        self.extract_name_description(self.schema)
+        self.client_schema = build_client_schema(self.schema['data'])
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
         else:
             self.schema_graph = rx.PyDiGraph()
 
+        self.extract_name_description(self.schema)
         self.construct_root_dict(self.pdb_url)
         self.construct_type_dict(self.schema, self.type_fields_dict)
         self.construct_name_list()
@@ -420,10 +422,14 @@ class Schema:
                 raise ValueError(
                     f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
         if use_networkx:
-
-            return self.__construct_query_networkx(input_ids, input_type, return_data_list)
+            query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
-            return self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+            query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+        validation_error_list = validate(self.client_schema, parse(query))
+        if not validation_error_list:
+            return query
+        else:
+            raise ValueError(validation_error_list)
 
     def get_descendant_fields(self, schema_graph, node, visited=None):
         if visited is None:
