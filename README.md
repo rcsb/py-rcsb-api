@@ -1,5 +1,10 @@
-# py-rcsb-api
+[![PyPi Release](https://img.shields.io/pypi/v/rcsb-api.svg)](https://pypi.org/project/rcsb-api/)
+[![Build Status](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_apis/build/status/rcsb.py-rcsb-api?branchName=master)](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master)
+
+# rcsb-api
 Python interface for RCSB PDB API services at RCSB.org.
+
+This package requires Python 3.7 or later.
 
 ## Installation
 
@@ -9,9 +14,9 @@ Get it from PyPI:
 
 Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
 
-To import this package use:
+To import this package, use:
 ```python
-    from rcsbapi.data import Schema, Query
+from rcsbapi.data import Schema, Query
 ```
 
 ## Jupyter Notebooks
@@ -21,7 +26,7 @@ A notebook briefly summarizing the README is available in [notebooks/quickstart.
 Another notebook using both Search and Data API packages in a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](notebooks/search_data_workflow.ipynb), or can be run online using binder:
 [![Binder](https://mybinder.org/badge_logo.svg)]()
 
-## Background
+## Introduction
 The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
 
 GraphQL is built on "types" and their associated "fields". All types and their fields are defined in a "schema". An example of a type in our schema is "CoreEntry" and a field under CoreEntry is "exptl" (experimental). Upon initialization, the Data API package fetches the schema from the RCSB PDB website (See [Implementation Details](#implementation-details) for more). 
@@ -56,12 +61,14 @@ Data is returned in JSON format
 
 To generate the same query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
 query.exec()
 ```
 
 One way this package simplifies making requests is by adding fields that return scalars into the generated query if you request a field that returns a type.
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
 query.exec()
 ```
@@ -70,6 +77,8 @@ This creates a valid query even though "exptl" doesn't return a scalar. However,
 ## Query Objects
 Constructing a query object requires three inputs. The JSON response to a query is stored in the `response` attribute of a Query object and can be accessed using the `get_response()` method.
 ```python
+from rcsbapi.data import Query
+
 # constructing the Query object
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
 
@@ -150,6 +159,7 @@ These are the data that you are requesting (or "fields").
 In GraphQL syntax, the final requested data must be a "scalar" type (string, integer, boolean). However, if you request non-scalar data, the package will auto-populate the query to include all fields under the specified data until scalars are reached. Once you receive the query response and understand what specific data you would like to request, you can refine your query by requesting more specific fields.
 
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_id":"4HHB"}, input_type="entry", return_data_list=["exptl"])
 query.exec()
 ```
@@ -171,6 +181,7 @@ query.exec()
 ```
 This query can be made more concise by specifying a field, like "method". In this case, the field name "method" is redundant because it appears under other types and must be further specified using dot notation. For more details see [ValueError: Not a unique field](#valueerror-not-a-unique-field)
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
 query.exec()
 ```
@@ -195,6 +206,7 @@ There are several methods included to make working with query objects easier. Th
 This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index.html) window with the query. From the window, you can use the user interface to explore other fields and refine your query. Method of Query class.
 
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
 print(query.get_editor_link())
 ```
@@ -203,6 +215,7 @@ print(query.get_editor_link())
 Given a redundant field, this method returns a list of matching fields in dot notation. You can look through the list to identify your intended field. Method of Schema class.
 
 ```python
+from rcsbapi.data import Schema
 schema = Schema()
 schema.get_unique_fields("id")
 ```
@@ -211,6 +224,7 @@ schema.get_unique_fields("id")
 Given a string, this method will return all fields containing that string, along with a description of each field.
 
 ```python
+from rcsbapi.data import Schema
 schema = Schema()
 schema.find_field_names("exptl")
 ```
@@ -218,6 +232,7 @@ schema.find_field_names("exptl")
 ### get_input_id_dict()
 Given an input_type, returns a dictionary with the corresponding keys and descriptions of each key. Method of Schema class.
 ```python
+from rcsbapi.data import Schema
 schema = Schema()
 schema.get_input_id_dict("polymer_entity_instance")
 ```
@@ -227,6 +242,8 @@ schema.get_input_id_dict("polymer_entity_instance")
 Some fields are redundant within our GraphQL Data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<type>.<field name>`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is redundant. You can then use `get_unique_fields("<field name>")` to find notation that would specify a unique field for the given name.
 
 ```python
+from rcsbapi.data import Query
+
 # querying a redundant field
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["id"])
 query.exec()
@@ -236,6 +253,8 @@ query.exec()
 ```
 
 ```python
+from rcsbapi.data import Schema
+
 # Run get_unique_field("<field name>")
 schema = Schema()
 print(schema.get_unique_fields("id"))
@@ -252,6 +271,8 @@ print(schema.get_unique_fields("id"))
 'RcsbPolymerStructConn.id']
 ```
 ```python
+from rcsbapi.data import Query
+
 # valid Query
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Entry.id"])
 query.exec()
@@ -286,6 +307,7 @@ Fetch information about structure title and experimental method for PDB entries:
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},input_type="entries", return_data_list=["CoreEntry.rcsb_id", "Struct.title", "Exptl.method"])
 query.exec()
 ```
@@ -312,6 +334,7 @@ Fetch primary citation information (structure authors, PubMed ID, DOI) and relea
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},input_type="entries", return_data_list=["CoreEntry.rcsb_id", "RcsbAccessionInfo.initial_release_date", "AuditAuthor.name", "RcsbPrimaryCitation.pdbx_database_id_PubMed", "RcsbPrimaryCitation.pdbx_database_id_DOI"])
 query.exec()
 ```
@@ -335,6 +358,7 @@ Fetch taxonomy information and information about membership in the sequence clus
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entity_ids":["2CPK_1","3WHM_1","2D5Z_1"]},input_type="polymer_entities", return_data_list=["CorePolymerEntity.rcsb_id", "RcsbEntitySourceOrganism.ncbi_taxonomy_id", "RcsbEntitySourceOrganism.ncbi_scientific_name", "cluster_id", "identity"])
 query.exec()
 ```
@@ -355,6 +379,7 @@ Fetch information about the domain assignments for polymer entity instances:
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"instance_ids":["4HHB.A", "12CA.A", "3PQR.A"]},input_type="polymer_entity_instances", return_data_list=["CorePolymerEntityInstance.rcsb_id", "RcsbPolymerInstanceAnnotation.annotation_id", "RcsbPolymerInstanceAnnotation.name", "RcsbPolymerInstanceAnnotation.type"])
 query.exec()
 ```
@@ -376,6 +401,7 @@ Query branched entities (sugars or oligosaccharides) for commonly used linear de
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entity_ids":["5FMB_2", "6L63_3"]},input_type="branched_entities", return_data_list=["PdbxEntityBranch.type","PdbxEntityBranchDescriptor.type","PdbxEntityBranchDescriptor.descriptor"])
 query.exec()
 ```
@@ -401,6 +427,7 @@ This example queries 'polymer_entity_instances' positional features. The query r
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"instance_ids":["1NDO.A"]},input_type="polymer_entity_instances", return_data_list=["CorePolymerEntityInstance.rcsb_id", "RcsbPolymerInstanceFeature.type", "RcsbPolymerInstanceFeatureFeaturePositions.beg_seq_id", "RcsbPolymerInstanceFeatureFeaturePositions.end_seq_id"])
 query.exec()
 ```
@@ -423,6 +450,7 @@ This example shows how to access identifiers related to entries (cross-reference
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_ids": ["7NHM", "5L2G"]}, input_type="entries", return_data_list=["CoreEntry.rcsb_id", "RcsbPolymerEntityContainerIdentifiersReferenceSequenceIdentifiers.database_accession", "RcsbPolymerEntityContainerIdentifiersReferenceSequenceIdentifiers.database_name"])
 query.exec()
 ```
@@ -447,6 +475,7 @@ Query for specific items in the chemical component dictionary based on a given l
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"comp_ids":["NAG", "EBW"]}, input_type="chem_comps", return_data_list=["CoreChemComp.rcsb_id","ChemComp.type","ChemComp.formula_weight","ChemComp.name","ChemComp.formula","RcsbChemCompInfo.initial_release_date"])
 query.exec()
 ```
@@ -467,6 +496,7 @@ This example shows how to get a list of global Model Quality Assessment metrics 
 }
 ```
 ```python
+from rcsbapi.data import Query
 query = Query(input_ids={"entry_ids": ["AF_AFP68871F1"]}, input_type="entries", return_data_list=["RcsbMaQaMetricGlobalMaQaMetricGlobal.type", "RcsbMaQaMetricGlobalMaQaMetricGlobal.value"])
 query.exec()
 ```
