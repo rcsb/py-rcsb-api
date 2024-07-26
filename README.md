@@ -56,7 +56,7 @@ Data is returned in JSON format
 
 To generate the same query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 ```python
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
+query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
 query.exec()
 ```
 
@@ -71,7 +71,7 @@ This creates a valid query even though "exptl" doesn't return a scalar. However,
 Constructing a query object requires three inputs. The JSON response to a query is stored in the `response` attribute of a Query object and can be accessed using the `get_response()` method.
 ```python
 # constructing the Query object
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
+query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
 
 # executing the query
 query.exec()
@@ -91,7 +91,7 @@ This can be a dictionary or a list. Dictionaries must be passed with specific ke
 |polymer, branched, or non-polymer entities|[entry_id]_[entity_id]|4HHB_1|
 |polymer, branched, or non-polymer entity instances|[entry_id].[asym_id]|4HHB.A|
 |biological assemblies|[entry_id]-[assembly_id]|4HHB-1|
-|interface|[entry_id]-[assembly_id].[interface_id]|4HHB-1.1
+|interface|[entry_id]-[assembly_id].[interface_id]|4HHB-1.1|
 
 Dictionaries and Lists will be treated equivalently for the input_ids argument. For example, these input_ids arguments are equivalent.
 
@@ -171,7 +171,7 @@ query.exec()
 ```
 This query can be made more concise by specifying a field, like "method". In this case, the field name "method" is redundant because it appears under other types and must be further specified using dot notation. For more details see [ValueError: Not a unique field](#valueerror-not-a-unique-field)
 ```python
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["Exptl.method"])
+query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
 query.exec()
 ```
 ```json

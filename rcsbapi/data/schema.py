@@ -1,20 +1,20 @@
 import re
 import logging
-from typing import List, Dict, Union
-import requests
-import networkx as nx
+from typing import List, Dict, Union, Any
 import json
 import os
+import requests
+import networkx as nx
 from graphql import validate, parse, build_client_schema
 
-use_networkx = False
+use_networkx: bool = False
 try:
     import rustworkx as rx
     logging.info("Using  rustworkx")
 except ImportError:
     use_networkx = True
 
-PDB_URL = "https://data.rcsb.org/graphql"
+PDB_URL: str = "https://data.rcsb.org/graphql"
 
 
 class FieldNode:
@@ -47,7 +47,7 @@ class TypeNode:
     def set_index(self, index):
         self.index = index
 
-    def set_field_list(self, field_list: List[FieldNode]):
+    def set_field_list(self, field_list: Union[None,List[FieldNode]]):
         self.field_list = field_list
 
 
@@ -56,7 +56,8 @@ class Schema:
         self.pdb_url = PDB_URL
         self.use_networkx = use_networkx
         self.schema_graph = None
-        self.node_index_dict = {}
+        self.type_to_idx_dict = {}
+        self.field_to_idx_dict = {}
         self.edge_index_dict = {}
         self.type_fields_dict = {}
         self.seen_names = set()
@@ -77,6 +78,7 @@ class Schema:
         self.construct_type_dict(self.schema, self.type_fields_dict)
         self.construct_name_list()
         self.recurse_build_schema(self.schema_graph, "Query")
+        self.make_field_to_idx()
         self.apply_weights(["CoreAssembly"], 2)
 
     def request_root_types(self, pdb_url) -> Dict:
@@ -235,7 +237,7 @@ class Schema:
             with open(json_file_path, 'r', encoding="utf-8") as schema_file:
                 return json.load(schema_file)
 
-    def construct_type_dict(self, schema, type_fields_dict) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def construct_type_dict(self, schema:Dict, type_fields_dict:Dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
         for each_type_dict in all_types_dict:
             type_name = str(each_type_dict["name"])
@@ -247,7 +249,7 @@ class Schema:
             type_fields_dict[type_name] = field_dict
         return type_fields_dict
 
-    def construct_name_list(self):
+    def construct_name_list(self) -> None:
         for type_name in self.type_fields_dict.keys():
             if "__" not in type_name:  # doesn't look through dunder methods because those are not added to the schema
                 for field_name in self.type_fields_dict[type_name].keys():
@@ -264,30 +266,30 @@ class Schema:
         type_node.set_field_list(field_node_list)
         return type_node
 
-    def recurse_build_schema(self, schema_graph, type_name):
+    def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name:str) -> None:
         type_node = self.make_type_subgraph(type_name)
         for field_node in type_node.field_list:
             if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
                 continue
             else:
                 type_name = field_node.type
-                if type_name in self.node_index_dict.keys():
-                    type_index = self.node_index_dict[type_name]
+                if type_name in self.type_to_idx_dict.keys():
+                    type_index = self.type_to_idx_dict[type_name]
                     if use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index, weight=1)
+                        schema_graph.add_edge(field_node.index, type_index, 1)
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge=1)
+                        schema_graph.add_edge(field_node.index, type_index, 1)
                 else:
                     self.recurse_build_schema(schema_graph, type_name)
-                    type_index = self.node_index_dict[type_name]
+                    type_index = self.type_to_idx_dict[type_name]
                     if self.use_networkx:
-                        schema_graph.add_edge(field_node.index, type_index, weight=1)
+                        schema_graph.add_edge(field_node.index, type_index, 1)
                     else:
-                        schema_graph.add_edge(parent=field_node.index, child=type_index, edge=1)
+                        schema_graph.add_edge(field_node.index, type_index, 1)
 
-    def apply_weights(self, root_type_list, weight):  # applies weight in all edges from a root TypeNode to FieldNodes
+    def apply_weights(self, root_type_list: List[str], weight: int) -> None:  # applies weight in all edges from a root TypeNode to FieldNodes
         for root_type in root_type_list:
-            node_idx = self.node_index_dict[root_type]
+            node_idx = self.type_to_idx_dict[root_type]
             if use_networkx is False:
                 out_edge_list = self.schema_graph.incident_edges(node_idx)
                 for edge_idx in out_edge_list:
@@ -303,17 +305,17 @@ class Schema:
             self.schema_graph.add_node(index, type_node=type_node)
         else:
             index = self.schema_graph.add_node(type_node)
-        self.node_index_dict[type_name] = index
+        self.type_to_idx_dict[type_name] = index
         type_node.set_index(index)
         return type_node
 
-    def find_kind(self, field_dict: Dict):
+    def find_kind(self, field_dict: Dict) -> str:
         if field_dict["name"] is not None:
             return field_dict["kind"]
         else:
             return self.find_kind(field_dict["ofType"])
 
-    def find_type_name(self, field_dict: Dict):
+    def find_type_name(self, field_dict: Dict) -> str:
         if field_dict["name"] is not None:
             return field_dict["name"]
         else:
@@ -328,7 +330,7 @@ class Schema:
         if kind == "LIST" or kind == "NON_NULL":
             of_kind = self.find_kind(field_type_dict)
             field_node.set_of_kind(of_kind)
-        parent_type_index = self.node_index_dict[parent_type]
+        parent_type_index = self.type_to_idx_dict[parent_type]
         if self.use_networkx:
             index = len(self.schema_graph.nodes)
             self.schema_graph.add_node(index, field_node=field_node)
@@ -340,14 +342,27 @@ class Schema:
                 index = self.schema_graph.add_child(parent_type_index, field_node, 1)
         if self.field_names_list.count(field_name) > 1:
             field_node.redundant = True
-            self.node_index_dict[f"{parent_type}.{field_name}"] = index
-        else:
-            self.node_index_dict[field_name] = index
         field_node.set_index(index)
         return field_node
 
-    def verify_unique_field(self, return_data_name):
-        node_index_names = list(self.node_index_dict.keys())
+    def make_field_to_idx(self) -> None:
+        for node in self.schema_graph.nodes():
+            if isinstance(node, FieldNode):
+                if node.redundant == True:
+                    parent_list = list(self.schema_graph.predecessor_indices(node.index))
+                    assert len(parent_list) == 1
+                    parent_type_index = parent_list[0]
+                    predecessor_fields = self.schema_graph.predecessors(parent_type_index)
+                    for pred_field in predecessor_fields:
+                        if f"{pred_field.name}.{node.name}" not in self.field_to_idx_dict.keys():
+                            self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
+                else:
+                    self.field_to_idx_dict[node.name] = node.index
+            else:
+                self.field_to_idx_dict[node.name] = node.index
+
+    def verify_unique_field(self, return_data_name: str) -> Union[bool, None]:
+        node_index_names = list(self.field_to_idx_dict.keys())
         split_data_name = return_data_name.split(".")
         if len(split_data_name) == 1:
             field_name = split_data_name[0]
@@ -358,20 +373,19 @@ class Schema:
             return True
         if name_count > 1:
             return False
-        if name_count == 0:
-            return None
+        return None
 
-    def get_unique_fields(self, return_data_name) -> List[str]:
+    def get_unique_fields(self, return_data_name: str) -> List[str]:
         return_data_name = return_data_name.lower()
         valid_field_list: List[str] = []
-        for name, idx in self.node_index_dict.items():
+        for name, idx in self.field_to_idx_dict.items():
             if isinstance(self.schema_graph[idx], FieldNode):
                 if self.schema_graph[idx].redundant is True:
                     if name.split(".")[1].lower() == return_data_name:
                         valid_field_list.append(name)
         return valid_field_list
 
-    def get_input_id_dict(self, input_type):
+    def get_input_id_dict(self, input_type: str) -> Dict[str, str]:
         if input_type not in self.root_dict.keys():
             raise ValueError("Not a valid input_type, no available input_id dictionary")
         root_dict_entry = self.root_dict[input_type]
@@ -384,7 +398,7 @@ class Schema:
             input_dict[name] = description
         return input_dict
 
-    def recurse_fields(self, fields, field_map, indent=2):
+    def recurse_fields(self, fields:Dict[Any, Any], field_map:Dict[Any, Any], indent=2) -> None:
         query_str = ""
         for field, value in fields.items():
             mapped_path = field_map.get(field, [field])
@@ -410,7 +424,7 @@ class Schema:
                     query_str += " " * indent + "}\n"
         return query_str
 
-    def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
+    def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
@@ -431,11 +445,11 @@ class Schema:
         else:
             raise ValueError(validation)
 
-    def get_descendant_fields(self, schema_graph, node, visited=None):
+    def get_descendant_fields(self, schema_graph:Union[nx.DiGraph,rx.PyDiGraph], node:int, visited=None) ->  Union[List[Union[str, Dict]],Union[str, Dict]]:
         if visited is None:
             visited = set()
 
-        result = []
+        result: List[Union[str, Dict]] = []
         children = list(schema_graph.neighbors(node))
 
         for child in children:
@@ -461,7 +475,7 @@ class Schema:
             return result[0]
         return result
 
-    def extract_name_description(self, schema_part, parent_name=""):
+    def extract_name_description(self, schema_part:Dict, parent_name="") -> None:
         if isinstance(schema_part, dict):
             if 'name' in schema_part and 'description' in schema_part:
                 name = schema_part['name']
@@ -479,7 +493,7 @@ class Schema:
             for item in schema_part:
                 self.extract_name_description(item, parent_name)
 
-    def find_field_names(self, search_string):
+    def find_field_names(self, search_string:str) -> Dict[str,str]:
         if not isinstance(search_string, str):
             raise ValueError(f"Please input a string instead of {type(search_string)}")
         field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
@@ -488,7 +502,7 @@ class Schema:
         name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
         return name_description
 
-    def regex_checks(self, input_dict, input_ids, attr_list, input_type):
+    def regex_checks(self, input_dict: Dict, input_ids:List[str], attr_list:List[Dict], input_type:str) -> Union[Dict[str,str]]:
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
         entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
         instances = [
@@ -541,7 +555,7 @@ class Schema:
                     input_dict[attr].append(single_id)
         return input_dict
 
-    def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):  # incomplete function
+    def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         # query_name = input_type
         # attr_list = self.root_dict[input_type]
@@ -565,11 +579,11 @@ class Schema:
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]):
+    def __construct_query_rustworkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
-        unknown_return_list = [item for item in return_data_list if item not in self.node_index_dict]
+        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
         if unknown_return_list:
             raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         input_dict = {}
@@ -594,7 +608,7 @@ class Schema:
         if isinstance(input_ids, List):
             input_dict = self.regex_checks(input_dict, input_ids, attr_list, input_type)
 
-        field_names = {}
+        field_names: Dict[Any, Any] = {}
 
         start_node_index = None
         for node in self.schema_graph.node_indices():
@@ -607,10 +621,11 @@ class Schema:
 
         target_node_indices = []
         for return_data in return_data_list:
-            node_index = self.node_index_dict[return_data]
+            node_index = self.field_to_idx_dict[return_data]
             node_data = self.schema_graph[node_index]
             if isinstance(node_data, FieldNode):
                 target_node_indices.append(node_data.index)
+            #TODO: add else
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
@@ -623,8 +638,6 @@ class Schema:
             target_data = self.schema_graph[target_node]
             if isinstance(target_data, FieldNode):
                 final_fields[target_data.name] = self.get_descendant_fields(self.schema_graph, target_node)
-
-        # print(final_fields)
 
         for target_node in target_node_indices:
             node_data = self.schema_graph[target_node]
@@ -654,3 +667,38 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
+    
+    # def find_redundant_node_idx(self, redundant_name: str) -> int:
+    #     path_list = redundant_name.split('.')
+    #     for node_name in path_list:
+    #         if node_name in self.node_index_dict.keys():
+    #             node_idx = self.node_index_dict[node_name]
+    #             type_node = self.schema_graph[idx].neighbors()
+    #     return node_idx
+
+schema = Schema()
+# all_nodes = schema.schema_graph.nodes()
+# all_names_dict = {}
+# all_names = []
+# for node in all_nodes:
+#     if isinstance(node, FieldNode):
+#         if node.redundant == True:
+#             index = node.index
+#             parent = list(schema.schema_graph.predecessor_indices(index))
+#             assert len(parent) == 1
+#             pred = schema.schema_graph.predecessors(parent[0])
+#             if len(pred) > 1:
+#                 redund_names = []
+#                 for pred_node in pred:
+#                     dot_not = f"{pred_node.name}.{node.name}"
+#                     redund_names.append(dot_not)
+#                     if dot_not in all_names:
+#                         if all_names_dict[dot_not] != schema.schema_graph[parent[0]].name:
+#                             print(f"{schema.schema_graph[parent[0]].name}: {dot_not}")
+#                             # for name in all_names:
+#                             #     para_path = []
+#                             #     if name == dot_not:
+#                             #         para_path.append()
+#                             print(f"{all_names_dict[dot_not]}: {dot_not}")
+#                     all_names_dict[dot_not] = schema.schema_graph[parent[0]].name
+#                     all_names += redund_names
