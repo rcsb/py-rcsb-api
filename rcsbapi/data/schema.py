@@ -62,7 +62,6 @@ class Schema:
         self.type_fields_dict = {}
         self.seen_names = set()
         self.name_description_dict = {}
-        self.field_names_list = []
         self.root_introspection = self.request_root_types(PDB_URL)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
@@ -73,10 +72,10 @@ class Schema:
         else:
             self.schema_graph = rx.PyDiGraph()
 
+        self.construct_type_dict(self.schema, self.type_fields_dict)
+        self.field_names_list = self.construct_name_list()
         self.extract_name_description(self.schema)
         self.construct_root_dict(self.pdb_url)
-        self.construct_type_dict(self.schema, self.type_fields_dict)
-        self.construct_name_list()
         self.recurse_build_schema(self.schema_graph, "Query")
         self.make_field_to_idx()
         self.apply_weights(["CoreAssembly"], 2)
@@ -250,10 +249,12 @@ class Schema:
         return type_fields_dict
 
     def construct_name_list(self) -> None:
+        field_names_list = []
         for type_name in self.type_fields_dict.keys():
             if "__" not in type_name:  # doesn't look through dunder methods because those are not added to the schema
                 for field_name in self.type_fields_dict[type_name].keys():
-                    self.field_names_list.append(field_name)
+                    field_names_list.append(field_name)
+        return field_names_list
 
     def make_type_subgraph(self, type_name) -> TypeNode:
         field_name_list = self.type_fields_dict[type_name].keys()
@@ -445,7 +446,7 @@ class Schema:
         else:
             raise ValueError(validation)
 
-    def get_descendant_fields(self, schema_graph:Union[nx.DiGraph,rx.PyDiGraph], node:int, visited=None) ->  Union[List[Union[str, Dict]],Union[str, Dict]]:
+    def get_descendant_fields(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], node: int, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
         if visited is None:
             visited = set()
 
@@ -475,16 +476,15 @@ class Schema:
             return result[0]
         return result
 
-    def extract_name_description(self, schema_part:Dict, parent_name="") -> None:
+    def extract_name_description(self, schema_part: Union[List, Dict], parent_name="") -> None:
         if isinstance(schema_part, dict):
             if 'name' in schema_part and 'description' in schema_part:
                 name = schema_part['name']
                 description = schema_part['description']
-                if name in self.seen_names:
+                field_names_list = self.construct_name_list()
+                if field_names_list.count(name) > 1:
                     if parent_name:
                         name = f"{parent_name}.{name}"
-                else:
-                    self.seen_names.add(name)
                 self.name_description_dict[name] = description
             for key, value in schema_part.items():
                 new_parent_name = schema_part['name'] if key == 'fields' else parent_name
@@ -493,7 +493,7 @@ class Schema:
             for item in schema_part:
                 self.extract_name_description(item, parent_name)
 
-    def find_field_names(self, search_string:str) -> Dict[str,str]:
+    def find_field_names(self, search_string: str) -> Dict[str, str]:
         if not isinstance(search_string, str):
             raise ValueError(f"Please input a string instead of {type(search_string)}")
         field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]

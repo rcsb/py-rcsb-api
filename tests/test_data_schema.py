@@ -229,16 +229,20 @@ class SchemaTests(unittest.TestCase):
             self.assertIsNone(SCHEMA.verify_unique_field(field))
 
     def testExtractNameDescription(self):
-        SCHEMA.extract_name_description(SCHEMA.schema)
-        self.assertIn('nonpolymer_comp', SCHEMA.name_description_dict)
-        description = SCHEMA.name_description_dict.get('nonpolymer_comp')
-        logger.info("Description for 'nonpolymer_comp': %s", description)
-        self.assertEqual(description, 'Get a non-polymer chemical components described in this molecular entity.')
+        with self.subTest(msg="1. check nonpolymer_comp description"):
+            SCHEMA.extract_name_description(SCHEMA.schema)
+            self.assertIn('nonpolymer_comp', SCHEMA.name_description_dict)
+            description = SCHEMA.name_description_dict.get('nonpolymer_comp')
+            logger.info("Description for 'nonpolymer_comp': %s", description)
+            self.assertEqual(description, 'Get a non-polymer chemical components described in this molecular entity.')
+        with self.subTest(msg="2. check `rcsb_id` not in dict"):
+            SCHEMA.extract_name_description(SCHEMA.schema)
+            self.assertNotIn('rcsb_id', SCHEMA.name_description_dict)
 
     def testFindFieldNames(self):
         with self.subTest(msg="1. search for rcsb"):
             result = SCHEMA.find_field_names("rcsb")
-            self.assertIn("CoreChemComp.rcsb_id", result)
+            self.assertIn("CurrentEntry.rcsb_id", result)
         with self.subTest(msg="1. search for nonexistent field"):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names("foo")
