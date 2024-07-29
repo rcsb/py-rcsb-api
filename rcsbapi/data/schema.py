@@ -667,38 +667,3 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
-    
-    # def find_redundant_node_idx(self, redundant_name: str) -> int:
-    #     path_list = redundant_name.split('.')
-    #     for node_name in path_list:
-    #         if node_name in self.node_index_dict.keys():
-    #             node_idx = self.node_index_dict[node_name]
-    #             type_node = self.schema_graph[idx].neighbors()
-    #     return node_idx
-
-schema = Schema()
-# all_nodes = schema.schema_graph.nodes()
-# all_names_dict = {}
-# all_names = []
-# for node in all_nodes:
-#     if isinstance(node, FieldNode):
-#         if node.redundant == True:
-#             index = node.index
-#             parent = list(schema.schema_graph.predecessor_indices(index))
-#             assert len(parent) == 1
-#             pred = schema.schema_graph.predecessors(parent[0])
-#             if len(pred) > 1:
-#                 redund_names = []
-#                 for pred_node in pred:
-#                     dot_not = f"{pred_node.name}.{node.name}"
-#                     redund_names.append(dot_not)
-#                     if dot_not in all_names:
-#                         if all_names_dict[dot_not] != schema.schema_graph[parent[0]].name:
-#                             print(f"{schema.schema_graph[parent[0]].name}: {dot_not}")
-#                             # for name in all_names:
-#                             #     para_path = []
-#                             #     if name == dot_not:
-#                             #         para_path.append()
-#                             print(f"{all_names_dict[dot_not]}: {dot_not}")
-#                     all_names_dict[dot_not] = schema.schema_graph[parent[0]].name
-#                     all_names += redund_names
