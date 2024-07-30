@@ -10,6 +10,7 @@ from graphql import validate, parse, build_client_schema
 use_networkx: bool = False
 try:
     import rustworkx as rx
+
     logging.info("Using  rustworkx")
 except ImportError:
     use_networkx = True
@@ -47,7 +48,7 @@ class TypeNode:
     def set_index(self, index):
         self.index = index
 
-    def set_field_list(self, field_list: Union[None,List[FieldNode]]):
+    def set_field_list(self, field_list: Union[None, List[FieldNode]]):
         self.field_list = field_list
 
 
@@ -65,7 +66,7 @@ class Schema:
         self.root_introspection = self.request_root_types(PDB_URL)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
-        self.client_schema = build_client_schema(self.schema['data'])
+        self.client_schema = build_client_schema(self.schema["data"])
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
@@ -232,11 +233,11 @@ class Schema:
         else:
             logging.info("Loading data schema from file")
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            json_file_path = os.path.join(current_dir, '../', 'resources', 'data_api_schema.json')
-            with open(json_file_path, 'r', encoding="utf-8") as schema_file:
+            json_file_path = os.path.join(current_dir, "../", "resources", "data_api_schema.json")
+            with open(json_file_path, "r", encoding="utf-8") as schema_file:
                 return json.load(schema_file)
 
-    def construct_type_dict(self, schema:Dict, type_fields_dict:Dict) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def construct_type_dict(self, schema: Dict, type_fields_dict: Dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
         for each_type_dict in all_types_dict:
             type_name = str(each_type_dict["name"])
@@ -267,7 +268,7 @@ class Schema:
         type_node.set_field_list(field_node_list)
         return type_node
 
-    def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name:str) -> None:
+    def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name: str) -> None:
         type_node = self.make_type_subgraph(type_name)
         for field_node in type_node.field_list:
             if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
@@ -401,7 +402,7 @@ class Schema:
         query_str = ""
         for field, value in fields.items():
             mapped_path = field_map.get(field, [field])
-            mapped_path = mapped_path[:mapped_path.index(field) + 1]  # Only take the path up to the field itself
+            mapped_path = mapped_path[: mapped_path.index(field) + 1]  # Only take the path up to the field itself
             for idx, subfield in enumerate(mapped_path):
                 query_str += " " * indent + subfield
                 if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
@@ -433,7 +434,8 @@ class Schema:
                 continue
             if self.verify_unique_field(return_field) is False:
                 raise ValueError(
-                    f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
+                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")'
+                )
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
@@ -476,16 +478,16 @@ class Schema:
 
     def extract_name_description(self, schema_part: Union[List, Dict], parent_name="") -> None:
         if isinstance(schema_part, dict):
-            if 'name' in schema_part and 'description' in schema_part:
-                name = schema_part['name']
-                description = schema_part['description']
+            if "name" in schema_part and "description" in schema_part:
+                name = schema_part["name"]
+                description = schema_part["description"]
                 field_names_list = self.construct_name_list()
                 if field_names_list.count(name) > 1:
                     if parent_name:
                         name = f"{parent_name}.{name}"
                 self.name_description_dict[name] = description
             for key, value in schema_part.items():
-                new_parent_name = schema_part['name'] if key == 'fields' else parent_name
+                new_parent_name = schema_part["name"] if key == "fields" else parent_name
                 self.extract_name_description(value, new_parent_name)
         elif isinstance(schema_part, list):
             for item in schema_part:
@@ -509,7 +511,7 @@ class Schema:
             "nonpolymer_entity_instances",
             "polymer_entity_instance",
             "nonpolymer_entity_instance",
-            "branched_entity_instance"
+            "branched_entity_instance",
         ]
 
         for single_id in input_ids:
@@ -538,7 +540,7 @@ class Schema:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(input_ids[0])
-            elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
+            elif re.match(r"^[A-Z0-9]{4}}_[0-9]+$", single_id) and input_type in entities:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
@@ -591,7 +593,7 @@ class Schema:
                 raise ValueError(f"Input IDs keys do not match attribute names: {input_dict.keys()} vs {attr_name}")
             missing_keys = [key_arg for key_arg in attr_name if key_arg not in input_dict]
             if len(missing_keys) > 0:
-                raise ValueError(f"Missing input_id dictionary keys: {missing_keys}. Find input_id keys and descriptions by running SCHEMA.get_input_id_dict(\"{input_type}\")")
+                raise ValueError(f'Missing input_id dictionary keys: {missing_keys}. Find input_id keys and descriptions by running SCHEMA.get_input_id_dict("{input_type}")')
             attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
             for key, value in input_dict.items():
                 if attr_kind[key] == "SCALAR":
@@ -624,7 +626,7 @@ class Schema:
             node_data = self.schema_graph[node_index]
             if isinstance(node_data, FieldNode):
                 target_node_indices.append(node_data.index)
-            #TODO: add else
+            # TODO: add else
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
@@ -670,6 +672,7 @@ class Schema:
         query += " " + "}\n}\n"
         return query
 
+
 schema = Schema()
-with open("field_to_idx_dict.json", 'w') as file:
+with open("field_to_idx_dict.json", "w") as file:
     json.dump(schema.field_to_idx_dict, file, indent=4)
