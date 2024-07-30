@@ -359,8 +359,6 @@ class Schema:
                             self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
                 else:
                     self.field_to_idx_dict[node.name] = node.index
-            else:
-                self.field_to_idx_dict[node.name] = node.index
 
     def verify_unique_field(self, return_data_name: str) -> Union[bool, None]:
         node_index_names = list(self.field_to_idx_dict.keys())
@@ -399,7 +397,7 @@ class Schema:
             input_dict[name] = description
         return input_dict
 
-    def recurse_fields(self, fields:Dict[Any, Any], field_map:Dict[Any, Any], indent=2) -> None:
+    def recurse_fields(self, fields: Dict[Any, Any], field_map: Dict[Any, Any], indent=2) -> None:
         query_str = ""
         for field, value in fields.items():
             mapped_path = field_map.get(field, [field])
@@ -502,7 +500,7 @@ class Schema:
         name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
         return name_description
 
-    def regex_checks(self, input_dict: Dict, input_ids:List[str], attr_list:List[Dict], input_type:str) -> Union[Dict[str,str]]:
+    def regex_checks(self, input_dict: Dict, input_ids: List[str], attr_list: List[Dict], input_type: str) -> Union[Dict[str, str]]:
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
         entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
         instances = [
@@ -609,6 +607,7 @@ class Schema:
             input_dict = self.regex_checks(input_dict, input_ids, attr_list, input_type)
 
         field_names: Dict[Any, Any] = {}
+        paths: Dict[Any, Any] = {}
 
         start_node_index = None
         for node in self.schema_graph.node_indices():
@@ -644,8 +643,11 @@ class Schema:
             if isinstance(node_data, FieldNode):
                 target_node_name = node_data.name
                 field_names[target_node_name] = []
+                paths[target_node_name] = []
             for each_path in all_paths[target_node]:
                 skip_first = True
+                path = [self.schema_graph[node].name for node in each_path if isinstance(self.schema_graph[node], FieldNode)][1:]
+                paths[target_node_name].append(path)
                 for node in each_path:
                     node_data = self.schema_graph[node]
                     if isinstance(node_data, FieldNode):
@@ -667,3 +669,7 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
+
+schema = Schema()
+with open("field_to_idx_dict.json", 'w') as file:
+    json.dump(schema.field_to_idx_dict, file, indent=4)
