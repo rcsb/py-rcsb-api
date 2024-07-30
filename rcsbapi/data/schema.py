@@ -20,8 +20,9 @@ PDB_URL: str = "https://data.rcsb.org/graphql"
 
 class FieldNode:
 
-    def __init__(self, kind, node_type, name):
+    def __init__(self, kind, node_type, name, description):
         self.name = name
+        self.description = description
         self.redundant = False
         self.kind = kind
         self.of_kind = None
@@ -29,7 +30,7 @@ class FieldNode:
         self.index = None
 
     def __str__(self):
-        return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}"
+        return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
     def set_index(self, index: int):
         self.index = index
@@ -61,7 +62,7 @@ class Schema:
         self.field_to_idx_dict = {}
         self.edge_index_dict = {}
         self.type_fields_dict = {}
-        self.seen_names = set()
+        self.field_description_dict = {}
         self.name_description_dict = {}
         self.root_introspection = self.request_root_types(PDB_URL)
         self.root_dict = {}
@@ -75,9 +76,9 @@ class Schema:
 
         self.construct_type_dict(self.schema, self.type_fields_dict)
         self.field_names_list = self.construct_name_list()
-        self.extract_name_description(self.schema)
         self.construct_root_dict(self.pdb_url)
         self.recurse_build_schema(self.schema_graph, "Query")
+        self.create_description_dict()
         self.make_field_to_idx()
         self.apply_weights(["CoreAssembly"], 2)
 
@@ -323,11 +324,20 @@ class Schema:
         else:
             return self.find_type_name(field_dict["ofType"])
 
+    def find_description(self, type_name: str, field_name: str) -> str:
+        for type_dict in self.schema["data"]["__schema"]["types"]:
+            if type_dict["name"] == type_name:
+                for field in type_dict["fields"]:
+                    if field["name"] == field_name:
+                        return field["description"]
+        return ""
+
     def make_field_node(self, parent_type: str, field_name: str) -> FieldNode:
         kind = self.type_fields_dict[parent_type][field_name]["kind"]
         field_type_dict: Dict = self.type_fields_dict[parent_type][field_name]
         return_type = self.find_type_name(field_type_dict)
-        field_node = FieldNode(kind, return_type, field_name)
+        description = self.find_description(parent_type, field_name)
+        field_node = FieldNode(kind, return_type, field_name, description)
         assert field_node.type is not None
         if kind == "LIST" or kind == "NON_NULL":
             of_kind = self.find_kind(field_type_dict)
@@ -479,30 +489,19 @@ class Schema:
             return result[0]
         return result
 
-    def extract_name_description(self, schema_part: Union[List, Dict], parent_name="") -> None:
-        if isinstance(schema_part, dict):
-            if "name" in schema_part and "description" in schema_part:
-                name = schema_part["name"]
-                description = schema_part["description"]
-                field_names_list = self.construct_name_list()
-                if field_names_list.count(name) > 1:
-                    if parent_name:
-                        name = f"{parent_name}.{name}"
-                self.name_description_dict[name] = description
-            for key, value in schema_part.items():
-                new_parent_name = schema_part["name"] if key == "fields" else parent_name
-                self.extract_name_description(value, new_parent_name)
-        elif isinstance(schema_part, list):
-            for item in schema_part:
-                self.extract_name_description(item, parent_name)
+    def create_description_dict(self):
+        for field_name, field_index in self.field_to_idx_dict.items():
+            field_node = self.schema_graph[field_index]
+            if isinstance(field_node, FieldNode):
+                self.field_description_dict[field_name] = field_node.description
 
     def find_field_names(self, search_string: str) -> Dict[str, str]:
         if not isinstance(search_string, str):
             raise ValueError(f"Please input a string instead of {type(search_string)}")
-        field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
+        field_names = [key for key in self.field_description_dict if search_string.lower() in key.lower()]
         if not field_names:
             raise ValueError(f"No fields found matching '{search_string}'")
-        name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
+        name_description = {name: self.field_description_dict[name] for name in field_names if name in self.field_description_dict}
         return name_description
 
     def regex_checks(self, input_dict: Dict, input_ids: List[str], attr_list: List[Dict], input_type: str) -> Union[Dict[str, str]]:
@@ -671,8 +670,3 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
-
-
-# schema = Schema()
-# with open("field_to_idx_dict.json", "w") as file:
-#     json.dump(schema.field_to_idx_dict, file, indent=4)

@@ -30,7 +30,6 @@ import requests
 # import rustworkx as rx
 # import networkx as nx
 
-from rcsbapi.data import Schema, Query
 from rcsbapi.data import SCHEMA
 from rcsbapi.data.schema import PDB_URL
 
@@ -244,21 +243,21 @@ class SchemaTests(unittest.TestCase):
             field = "foo"
             self.assertIsNone(SCHEMA.verify_unique_field(field))
 
-    def testExtractNameDescription(self):
+    def testDescriptionDict(self):
         with self.subTest(msg="1. check nonpolymer_comp description"):
-            SCHEMA.extract_name_description(SCHEMA.schema)
-            self.assertIn("nonpolymer_comp", SCHEMA.name_description_dict)
-            description = SCHEMA.name_description_dict.get("nonpolymer_comp")
+            SCHEMA.create_description_dict()
+            self.assertIn("nonpolymer_comp", SCHEMA.field_description_dict)
+            description = SCHEMA.field_description_dict.get("nonpolymer_comp")
             logger.info("Description for 'nonpolymer_comp': %s", description)
             self.assertEqual(description, "Get a non-polymer chemical components described in this molecular entity.")
         with self.subTest(msg="2. check `rcsb_id` not in dict"):
-            SCHEMA.extract_name_description(SCHEMA.schema)
-            self.assertNotIn("rcsb_id", SCHEMA.name_description_dict)
+            SCHEMA.create_description_dict()
+            self.assertNotIn("rcsb_id", SCHEMA.field_description_dict)
 
     def testFindFieldNames(self):
         with self.subTest(msg="1. search for rcsb"):
             result = SCHEMA.find_field_names("rcsb")
-            self.assertIn("CurrentEntry.rcsb_id", result)
+            self.assertIn("entry.rcsb_id", result)
         with self.subTest(msg="1. search for nonexistent field"):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names("foo")
@@ -278,7 +277,7 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("testConstructQuery"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
     suiteSelect.addTest(SchemaTests("testVerifyUniqueField"))
-    suiteSelect.addTest(SchemaTests("testExtractNameDescription"))
+    suiteSelect.addTest(SchemaTests("testDescriptionDict"))
     suiteSelect.addTest(SchemaTests("testFindFieldNames"))
     return suiteSelect
 
