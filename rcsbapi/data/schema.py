@@ -425,6 +425,9 @@ class Schema:
         return query_str
 
     def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
+        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
+        if unknown_return_list:
+            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
@@ -583,9 +586,6 @@ class Schema:
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
-        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
-        if unknown_return_list:
-            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         input_dict = {}
         if isinstance(input_ids, Dict):
             input_dict = input_ids
@@ -673,6 +673,6 @@ class Schema:
         return query
 
 
-schema = Schema()
-with open("field_to_idx_dict.json", "w") as file:
-    json.dump(schema.field_to_idx_dict, file, indent=4)
+# schema = Schema()
+# with open("field_to_idx_dict.json", "w") as file:
+#     json.dump(schema.field_to_idx_dict, file, indent=4)
