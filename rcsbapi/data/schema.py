@@ -542,7 +542,7 @@ class Schema:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(input_ids[0])
-            elif re.match(r"^[A-Z0-9]{4}}_[0-9]+$", single_id) and input_type in entities:
+            elif re.match(r"^[A-Z0-9]{4}_[0-9]+$", single_id) and input_type in entities:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
@@ -585,6 +585,9 @@ class Schema:
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
+        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
+        if unknown_return_list:
+            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         input_dict = {}
         if isinstance(input_ids, Dict):
             input_dict = input_ids
