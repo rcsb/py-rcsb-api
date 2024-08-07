@@ -360,7 +360,7 @@ class Schema:
     def make_field_to_idx(self) -> None:
         for node in self.schema_graph.nodes():
             if isinstance(node, FieldNode):
-                if node.redundant == True:
+                if node.redundant is True:
                     parent_list = list(self.schema_graph.predecessor_indices(node.index))
                     assert len(parent_list) == 1
                     parent_type_index = parent_list[0]
@@ -625,7 +625,6 @@ class Schema:
             node_data = self.schema_graph[node_index]
             if isinstance(node_data, FieldNode):
                 target_node_indices.append(node_data.index)
-            # TODO: add else
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
