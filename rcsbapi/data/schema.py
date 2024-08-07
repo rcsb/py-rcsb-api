@@ -58,8 +58,8 @@ class Schema:
         self.schema_graph = None
         self.type_to_idx_dict = {}
         self.field_to_idx_dict = {}
-        self.edge_index_dict = {}
         self.type_fields_dict = {}
+        self.temp = {}
         self.seen_names = set()
         self.name_description_dict = {}
         self.field_names_list = []
@@ -343,6 +343,12 @@ class Schema:
         if self.field_names_list.count(field_name) > 1:
             field_node.redundant = True
         field_node.set_index(index)
+
+        if field_name not in self.temp.keys():
+            self.temp[field_name] = [field_node.index]
+        else:
+            self.temp[field_name].append(field_node.index)
+
         return field_node
 
     def make_field_to_idx(self) -> None:
@@ -358,8 +364,6 @@ class Schema:
                             self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
                 else:
                     self.field_to_idx_dict[node.name] = node.index
-            else:
-                self.field_to_idx_dict[node.name] = node.index
 
     def verify_unique_field(self, return_data_name: str) -> Union[bool, None]:
         node_index_names = list(self.field_to_idx_dict.keys())
@@ -583,9 +587,6 @@ class Schema:
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
-        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
-        if unknown_return_list:
-            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         input_dict = {}
         if isinstance(input_ids, Dict):
             input_dict = input_ids
@@ -624,8 +625,8 @@ class Schema:
             node_index = self.field_to_idx_dict[return_data]
             node_data = self.schema_graph[node_index]
             if isinstance(node_data, FieldNode):
+                # TODO: Add case where there is dot notation
                 target_node_indices.append(node_data.index)
-            #TODO: add else
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
@@ -667,38 +668,67 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
-    
-    # def find_redundant_node_idx(self, redundant_name: str) -> int:
-    #     path_list = redundant_name.split('.')
-    #     for node_name in path_list:
-    #         if node_name in self.node_index_dict.keys():
-    #             node_idx = self.node_index_dict[node_name]
-    #             type_node = self.schema_graph[idx].neighbors()
-    #     return node_idx
 
-schema = Schema()
-# all_nodes = schema.schema_graph.nodes()
-# all_names_dict = {}
-# all_names = []
-# for node in all_nodes:
-#     if isinstance(node, FieldNode):
-#         if node.redundant == True:
-#             index = node.index
-#             parent = list(schema.schema_graph.predecessor_indices(index))
-#             assert len(parent) == 1
-#             pred = schema.schema_graph.predecessors(parent[0])
-#             if len(pred) > 1:
-#                 redund_names = []
-#                 for pred_node in pred:
-#                     dot_not = f"{pred_node.name}.{node.name}"
-#                     redund_names.append(dot_not)
-#                     if dot_not in all_names:
-#                         if all_names_dict[dot_not] != schema.schema_graph[parent[0]].name:
-#                             print(f"{schema.schema_graph[parent[0]].name}: {dot_not}")
-#                             # for name in all_names:
-#                             #     para_path = []
-#                             #     if name == dot_not:
-#                             #         para_path.append()
-#                             print(f"{all_names_dict[dot_not]}: {dot_not}")
-#                     all_names_dict[dot_not] = schema.schema_graph[parent[0]].name
-#                     all_names += redund_names
+    # def parse_dot_path(self, dot_path:str) -> List[int]:
+    #     path: List[int] = []
+    #     path_list = dot_path.split(".")
+    #     if len(path_list) == 1:
+    #         if path_list[0] in self.temp.keys():
+    #             possible_idxs = self.temp[path_list[0]]
+    #             if len(possible_idxs) == 1:
+    #                 path = possible_idxs
+    #             if len(possible_idxs) > 1:
+    #                 raise ValueError(
+    #                 f"PARSEDOT: \"{path_list[0]}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{path_list[0]}\")")
+    #         else:
+    #             raise ValueError(f"\"{path_list[0]}\" not found. To search for valid fields, run find_field_names(<search term>)")
+    #     else:
+    #         for i, node_name in enumerate(path_list):
+    #             node_matches = temp[node_name]
+    #             potential_path = []
+    #             for node_idx in node_matches:
+    #                 type_node = schema.schema_graph.successor_indices(node_idx)[0]
+    #                 field_nodes = schema.schema_graph.successor_indices(type_node)
+    #                 for field_idx in field_nodes:
+    #                     if self.schema_graph[field_idx].name == node_name:
+    #                         type_node = schema.schema_graph.successor_indices(node_idx)[0]
+    #                         field_nodes = schema.schema_graph.successor_indices(type_node)
+    #     return path
+    
+    def find_match_path(self, dot_path: List[str], idx_list: List[int], node_idx: int):
+        print(node_idx)
+        if len(dot_path) == 0:
+            return idx_list
+        if (self.schema_graph[node_idx].kind == 'SCALAR') or (self.schema_graph[node_idx].of_kind == 'SCALAR'):
+            pass
+            print(f"{self.schema_graph[node_idx].name}: scalar branch")
+        else:
+            print(f"{self.schema_graph[node_idx].name}: object branch")
+            type_node = list(self.schema_graph.successor_indices(node_idx))[0]
+            field_nodes = self.schema_graph.successor_indices(type_node)
+            print(field_nodes)
+
+        for field_idx in field_nodes:
+            # print(f"{self.schema_graph[field_idx].name} == {dot_path[0]}")
+            if self.schema_graph[field_idx].name == dot_path[0]:
+                print(f"match: {self.schema_graph[field_idx].name} and {dot_path[0]}")
+                idx_list.append(field_idx)
+                if len(dot_path) >= 1:
+                    print(f"call on dot path: {dot_path[1:]}, idx_list: {idx_list}, field_idx: {field_idx}")
+                    return self.find_match_path(dot_path[1:], idx_list, field_idx)
+            else:
+                continue
+
+    def parse_dot_path(self, dot_path: str):
+        path_list = dot_path.split(".")
+        node_matches = self.temp[path_list[0]]
+        print(node_matches)
+        idx_list = []
+        for node_idx in node_matches:
+            found_path = [node_idx]
+            found_path += self.find_match_path(path_list[1:], found_path, node_idx))
+            print(f"found_path:{found_path}, path_list: {path_list}")
+            print(f"{found_path[3]}")
+            if len(found_path) == len(path_list):
+                idx_list.append(found_path)
+        print(idx_list)

@@ -239,7 +239,7 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="7. return_data_list, corrected query with non-redundant field"):
             try:
-                query = Query(input_ids={"entry_id": "4HHB"},input_type="entry", return_data_list=["nonpolymer_bound_components", "RcsbEntryInfo.polymer_composition"])
+                query = Query(input_ids={"entry_id": "4HHB"},input_type="entry", return_data_list=["nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
@@ -251,7 +251,7 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="8. More complex queries, multiple return data"):
             try:
-                query = Query(input_ids={"entry_id": "4HHB"},input_type="entry", return_data_list=["Citation.title", "nonpolymer_bound_components", "RcsbEntryInfo.polymer_composition", ])
+                query = Query(input_ids={"entry_id": "4HHB"},input_type="entry", return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition", ])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")

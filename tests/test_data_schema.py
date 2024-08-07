@@ -121,7 +121,7 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. three arguments (interface)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["CoreInterface.rcsb_id"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={'assembly_id': "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["interface.rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="5. request multiple return fields"):
@@ -129,7 +129,7 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="6. request scalar field"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["CoreEntry.rcsb_id"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["entry.rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="12. two arguments (polymer_entity_instances)"):
@@ -141,7 +141,7 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="20. requesting scalars under same field"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["Exptl.method", "Exptl.details"], input_ids=["4HHB"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["exptl.method", "exptl.details"], input_ids=["4HHB"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         # Test error handling
@@ -167,7 +167,7 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="2. regex for _entities"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_type="polymer_entities", return_data_list=["rcsb_polymer_entity_feature", "CorePolymerEntity.rcsb_id"], input_ids=["AF_AFA0A009IHW8F1_1", "4HHB_1"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_type="polymer_entities", return_data_list=["rcsb_polymer_entity_feature", "polymer_entity.rcsb_id"], input_ids=["AF_AFA0A009IHW8F1_1", "4HHB_1"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="3. regex for entries"):
@@ -179,7 +179,7 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="5. regex for interfaces"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_type="interfaces", return_data_list=["RcsbInterfaceContainerIdentifiers.assembly_id"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"])
+            query = SCHEMA._Schema__construct_query_rustworkx(input_type="interfaces", return_data_list=["rcsb_interface_container_identifiers.assembly_id"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="6. regex with a singular type"):
