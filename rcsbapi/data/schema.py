@@ -557,8 +557,7 @@ class Schema:
             if input_type in plural_types:
                 input_dict = {}
                 attr = attr_list[0]["name"]
-                input_dict[attr] = []
-                input_dict[attr].append(single_id)
+                input_dict[attr] = input_ids
         return input_dict
 
     def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function
