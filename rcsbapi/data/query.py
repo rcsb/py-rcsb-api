@@ -35,7 +35,7 @@ class Query:
                 self.__input_ids_list = input_ids
         self.__response = None
 
-    def get_input_ids(self) -> Union[List[str], Dict[str,List[str]], Dict[str,str]]:
+    def get_input_ids(self) -> Union[List[str], Dict[str, List[str]], Dict[str, str]]:
         return self.__input_ids
 
     def get_input_type(self) -> str:
