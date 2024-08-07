@@ -360,14 +360,16 @@ class Schema:
     def make_field_to_idx(self) -> None:
         for node in self.schema_graph.nodes():
             if isinstance(node, FieldNode):
+                parent_list = list(self.schema_graph.predecessor_indices(node.index))
+                assert len(parent_list) == 1
+                parent_type_index = parent_list[0]
+                if self.schema_graph[parent_type_index].name == "Query":
+                    self.field_to_idx_dict[f"Query.{node.name}"] = node.index
                 if node.redundant is True:
-                    parent_list = list(self.schema_graph.predecessor_indices(node.index))
-                    assert len(parent_list) == 1
-                    parent_type_index = parent_list[0]
-                    predecessor_fields = self.schema_graph.predecessors(parent_type_index)
-                    for pred_field in predecessor_fields:
-                        if f"{pred_field.name}.{node.name}" not in self.field_to_idx_dict.keys():
-                            self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
+                        predecessor_fields = self.schema_graph.predecessors(parent_type_index)
+                        for pred_field in predecessor_fields:
+                            if f"{pred_field.name}.{node.name}" not in self.field_to_idx_dict.keys():
+                                self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
                 else:
                     self.field_to_idx_dict[node.name] = node.index
 
@@ -412,7 +414,7 @@ class Schema:
         query_str = ""
         for field, value in fields.items():
             mapped_path = field_map.get(field, [field])
-            mapped_path = mapped_path[: mapped_path.index(field) + 1]  # Only take the path up to the field itself
+            mapped_path = mapped_path[:mapped_path.index(field) + 1]  # Only take the path up to the field itself
             for idx, subfield in enumerate(mapped_path):
                 query_str += " " * indent + subfield
                 if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
@@ -435,20 +437,23 @@ class Schema:
         return query_str
 
     def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
-        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
-        if unknown_return_list:
-            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
+        input_type_idx: int = self.field_to_idx_dict[f"Query.{input_type}"]
+        if isinstance(input_ids, List) and (len(input_ids) > 1):
+            if self.schema_graph[input_type_idx].kind == "OBJECT":
+                raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
+        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
+        if unknown_return_list:
+            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
             if self.verify_unique_field(return_field) is False:
                 raise ValueError(
-                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")'
-                )
+                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")')
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
@@ -504,7 +509,7 @@ class Schema:
         name_description = {name: self.field_description_dict[name] for name in field_names if name in self.field_description_dict}
         return name_description
 
-    def regex_checks(self, input_dict: Dict, input_ids: List[str], attr_list: List[Dict], input_type: str) -> Union[Dict[str, str]]:
+    def regex_checks(self, input_dict: Dict, input_ids: List[str], attr_list: List[Dict], input_type: str) -> Union[Dict[str,str], Dict[str, List[str]]]:
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
         entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
         instances = [
@@ -522,17 +527,17 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
+            elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[A-Z0-9]{4}\.[A-Z]$", single_id)) and input_type in instances:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
                     input_dict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     input_dict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
                 attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
@@ -549,12 +554,11 @@ class Schema:
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
             else:
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
-            for attr in attr_name:
-                # print("attr: ", attr)
-                if attr not in input_dict:
-                    input_dict[attr] = []
-                if input_type in plural_types:
-                    input_dict[attr].append(single_id)
+            if input_type in plural_types:
+                input_dict = {}
+                attr = attr_list[0]["name"]
+                input_dict[attr] = []
+                input_dict[attr].append(single_id)
         return input_dict
 
     def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function

@@ -227,7 +227,10 @@ class SchemaTests(unittest.TestCase):
     def testConstructQuery(self):
         with self.subTest(msg="1. return data not specific enough"):
             with self.assertRaises(ValueError):
-                SCHEMA.construct_query(input_ids="4HHB", input_type="entry", return_data_list=["id"])
+                SCHEMA.construct_query(input_ids=["4HHB"], input_type="entry", return_data_list=["id"])
+        with self.subTest(msg="1. multiple ids, but entered singular input_type"):
+            with self.assertRaises(ValueError):
+                SCHEMA.construct_query(input_ids=["4HHB", "1IYE"], input_type="entry", return_data_list=["id"])
 
     def testVerifyUniqueField(self):
         with self.subTest(msg="1. unique field with dot notation"):
