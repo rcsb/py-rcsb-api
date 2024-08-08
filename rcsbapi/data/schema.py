@@ -480,34 +480,36 @@ class Schema:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
             query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
-        validation_error_list = validate(self.client_schema, parse(query))
-        if not validation_error_list:
-            return query
-        else:
-            raise ValueError(validation_error_list)
-
+        #TODO: remove comment
+        # validation_error_list = validate(self.client_schema, parse(query))
+        # if not validation_error_list:
+        #     return query
+        # else:
+        #     raise ValueError(validation_error_list)
+        return query
+    
     def get_descendant_fields(self, schema_graph:Union[nx.DiGraph,rx.PyDiGraph], node:int, visited=None) ->  Union[List[Union[str, Dict]], Union[str, Dict]]:
         if visited is None:
             visited = set()
 
         result: List[Union[str, Dict]] = []
         result: List[Union[str, Dict]] = []
-        children = list(schema_graph.neighbors(node))
+        children_idx = list(schema_graph.neighbors(node))
 
-        for child in children:
-            if child in visited:
+        for idx in children_idx:
+            if idx in visited:
                 continue
-            visited.add(child)
+            visited.add(idx)
 
-            child_data = schema_graph[child]
+            child_data = schema_graph[idx]
             if isinstance(child_data, FieldNode):
-                child_descendants = self.get_descendant_fields(schema_graph, child, visited)
+                child_descendants = self.get_descendant_fields(schema_graph, idx, visited)
                 if child_descendants:
                     result.append({child_data.name: child_descendants})
                 else:
                     result.append(child_data.name)
             elif isinstance(child_data, TypeNode):
-                type_descendants = self.get_descendant_fields(schema_graph, child, visited)
+                type_descendants = self.get_descendant_fields(schema_graph, idx, visited)
                 if type_descendants:
                     result.extend(type_descendants)
                 else:
@@ -515,6 +517,7 @@ class Schema:
 
         if len(result) == 1:
             return result[0]
+        print(f"get_descendant_fields: {result}")
         return result
 
     def extract_name_description(self, schema_part:Dict, parent_name="") -> None:
@@ -662,7 +665,6 @@ class Schema:
         target_node_indices = []
         for return_data in return_data_list:
             node_index = self.field_to_idx_dict[return_data]
-            node_index = self.field_to_idx_dict[return_data]
             node_data = self.schema_graph[node_index]
             if isinstance(node_data, FieldNode):
                 # TODO: Add case where there is dot notation
@@ -671,15 +673,17 @@ class Schema:
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
+        print(f"all_paths: {all_paths}")
         for return_data in return_data_list:
             if any(not value for value in all_paths.values()):
                 raise ValueError(f"You can't access {return_data} from input type {input_type}")
-        final_fields = {}
 
+        final_fields = {}
         for target_node in target_node_indices:
             target_data = self.schema_graph[target_node]
             if isinstance(target_data, FieldNode):
                 final_fields[target_data.name] = self.get_descendant_fields(self.schema_graph, target_node)
+        print(f"final fields: {final_fields}")
 
         for target_node in target_node_indices:
             node_data = self.schema_graph[target_node]
@@ -709,67 +713,43 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
-
-    # def parse_dot_path(self, dot_path:str) -> List[int]:
-    #     path: List[int] = []
-    #     path_list = dot_path.split(".")
-    #     if len(path_list) == 1:
-    #         if path_list[0] in self.temp.keys():
-    #             possible_idxs = self.temp[path_list[0]]
-    #             if len(possible_idxs) == 1:
-    #                 path = possible_idxs
-    #             if len(possible_idxs) > 1:
-    #                 raise ValueError(
-    #                 f"PARSEDOT: \"{path_list[0]}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{path_list[0]}\")")
-    #         else:
-    #             raise ValueError(f"\"{path_list[0]}\" not found. To search for valid fields, run find_field_names(<search term>)")
-    #     else:
-    #         for i, node_name in enumerate(path_list):
-    #             node_matches = temp[node_name]
-    #             potential_path = []
-    #             for node_idx in node_matches:
-    #                 type_node = schema.schema_graph.successor_indices(node_idx)[0]
-    #                 field_nodes = schema.schema_graph.successor_indices(type_node)
-    #                 for field_idx in field_nodes:
-    #                     if self.schema_graph[field_idx].name == node_name:
-    #                         type_node = schema.schema_graph.successor_indices(node_idx)[0]
-    #                         field_nodes = schema.schema_graph.successor_indices(type_node)
-    #     return path
     
     def find_match_path(self, dot_path: List[str], idx_list: List[int], node_idx: int):
-        print(node_idx)
         if len(dot_path) == 0:
+            idx_list.append(node_idx)
             return idx_list
         if (self.schema_graph[node_idx].kind == 'SCALAR') or (self.schema_graph[node_idx].of_kind == 'SCALAR'):
-            pass
-            print(f"{self.schema_graph[node_idx].name}: scalar branch")
+            print("SCALAR")
+            print(f"call on dot path: {dot_path[1:]}, idx_list: {idx_list}, field_idx: {node_idx}")
+            return self.find_match_path(dot_path[1:], idx_list, node_idx)
         else:
-            print(f"{self.schema_graph[node_idx].name}: object branch")
             type_node = list(self.schema_graph.successor_indices(node_idx))[0]
             field_nodes = self.schema_graph.successor_indices(type_node)
-            print(field_nodes)
-
-        for field_idx in field_nodes:
-            # print(f"{self.schema_graph[field_idx].name} == {dot_path[0]}")
-            if self.schema_graph[field_idx].name == dot_path[0]:
-                print(f"match: {self.schema_graph[field_idx].name} and {dot_path[0]}")
-                idx_list.append(field_idx)
-                if len(dot_path) >= 1:
+            for field_idx in field_nodes:
+                if self.schema_graph[field_idx].name == dot_path[0]:
+                    idx_list.append(node_idx)
                     print(f"call on dot path: {dot_path[1:]}, idx_list: {idx_list}, field_idx: {field_idx}")
                     return self.find_match_path(dot_path[1:], idx_list, field_idx)
-            else:
-                continue
+                else:
+                    continue
+            return []
 
-    def parse_dot_path(self, dot_path: str):
+    def parse_dot_path(self, dot_path: str) -> List[List[int]]:
         path_list = dot_path.split(".")
-        node_matches = self.temp[path_list[0]]
-        print(node_matches)
-        idx_list = []
+        unknown_fields: List[str] = [field for field in path_list if field not in self.temp.keys()]
+        if len(unknown_fields) > 0:
+            raise ValueError(f"Unknown fields in return_data_list: {unknown_fields}")
+        node_matches: List[int] = self.temp[path_list[0]]
+        idx_list: List[List[int]] = []
         for node_idx in node_matches:
-            found_path = [node_idx]
-            found_path += self.find_match_path(path_list[1:], found_path, node_idx)
-            print(f"found_path:{found_path}, path_list: {path_list}")
-            print(f"{found_path[3]}")
+            found_path: List[int] = []
+            found_path = self.find_match_path(path_list[1:], found_path, node_idx)
+            print(f"found_path:{found_path}")
             if len(found_path) == len(path_list):
                 idx_list.append(found_path)
-        print(idx_list)
+        if len(idx_list) == 0:
+            raise ValueError(f'return_data_list path is not valid: {dot_path}')
+        return idx_list
+
+    def idx_to_name(self, idx:int) -> str:
+        return self.schema_graph[idx].name
