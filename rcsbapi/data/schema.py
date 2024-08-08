@@ -14,6 +14,7 @@ use_networkx: bool = False
 use_networkx: bool = False
 try:
     import rustworkx as rx
+
     logging.info("Using  rustworkx")
 except ImportError:
     use_networkx = True
@@ -24,8 +25,9 @@ PDB_URL: str = "https://data.rcsb.org/graphql"
 
 class FieldNode:
 
-    def __init__(self, kind, node_type, name):
+    def __init__(self, kind, node_type, name, description):
         self.name = name
+        self.description = description
         self.redundant = False
         self.kind = kind
         self.of_kind = None
@@ -33,7 +35,7 @@ class FieldNode:
         self.index = None
 
     def __str__(self):
-        return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}"
+        return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
     def set_index(self, index: int):
         self.index = index
@@ -52,7 +54,7 @@ class TypeNode:
     def set_index(self, index):
         self.index = index
 
-    def set_field_list(self, field_list: Union[None,List[FieldNode]]):
+    def set_field_list(self, field_list: Union[None, List[FieldNode]]):
         self.field_list = field_list
 
 
@@ -67,23 +69,23 @@ class Schema:
         self.type_fields_dict = {}
         self.temp = {}
         self.seen_names = set()
-        self.name_description_dict = {}
-        self.field_names_list = []
+        self.field_description_dict = {}
+]        self.name_description_dict = {}
         self.root_introspection = self.request_root_types(PDB_URL)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
-        self.client_schema = build_client_schema(self.schema['data'])
+        self.client_schema = build_client_schema(self.schema["data"])
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
         else:
             self.schema_graph = rx.PyDiGraph()
 
-        self.extract_name_description(self.schema)
-        self.construct_root_dict(self.pdb_url)
         self.construct_type_dict(self.schema, self.type_fields_dict)
-        self.construct_name_list()
+        self.field_names_list = self.construct_name_list()
+        self.construct_root_dict(self.pdb_url)
         self.recurse_build_schema(self.schema_graph, "Query")
+        self.create_description_dict()
         self.make_field_to_idx()
         self.make_field_to_idx()
         self.apply_weights(["CoreAssembly"], 2)
@@ -240,11 +242,11 @@ class Schema:
         else:
             logging.info("Loading data schema from file")
             current_dir = os.path.dirname(os.path.abspath(__file__))
-            json_file_path = os.path.join(current_dir, '../', 'resources', 'data_api_schema.json')
-            with open(json_file_path, 'r', encoding="utf-8") as schema_file:
+            json_file_path = os.path.join(current_dir, "../", "resources", "data_api_schema.json")
+            with open(json_file_path, "r", encoding="utf-8") as schema_file:
                 return json.load(schema_file)
 
-    def construct_type_dict(self, schema:Dict, type_fields_dict:Dict) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def construct_type_dict(self, schema: Dict, type_fields_dict: Dict) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict = schema["data"]["__schema"]["types"]
         for each_type_dict in all_types_dict:
             type_name = str(each_type_dict["name"])
@@ -257,10 +259,12 @@ class Schema:
         return type_fields_dict
 
     def construct_name_list(self) -> None:
+        field_names_list = []
         for type_name in self.type_fields_dict.keys():
             if "__" not in type_name:  # doesn't look through dunder methods because those are not added to the schema
                 for field_name in self.type_fields_dict[type_name].keys():
-                    self.field_names_list.append(field_name)
+                    field_names_list.append(field_name)
+        return field_names_list
 
     def make_type_subgraph(self, type_name) -> TypeNode:
         field_name_list = self.type_fields_dict[type_name].keys()
@@ -273,7 +277,7 @@ class Schema:
         type_node.set_field_list(field_node_list)
         return type_node
 
-    def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name:str) -> None:
+    def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name: str) -> None:
         type_node = self.make_type_subgraph(type_name)
         for field_node in type_node.field_list:
             if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
@@ -337,11 +341,20 @@ class Schema:
         else:
             return self.find_type_name(field_dict["ofType"])
 
+    def find_description(self, type_name: str, field_name: str) -> str:
+        for type_dict in self.schema["data"]["__schema"]["types"]:
+            if type_dict["name"] == type_name:
+                for field in type_dict["fields"]:
+                    if field["name"] == field_name:
+                        return field["description"]
+        return ""
+
     def make_field_node(self, parent_type: str, field_name: str) -> FieldNode:
         kind = self.type_fields_dict[parent_type][field_name]["kind"]
         field_type_dict: Dict = self.type_fields_dict[parent_type][field_name]
         return_type = self.find_type_name(field_type_dict)
-        field_node = FieldNode(kind, return_type, field_name)
+        description = self.find_description(parent_type, field_name)
+        field_node = FieldNode(kind, return_type, field_name, description)
         assert field_node.type is not None
         if kind == "LIST" or kind == "NON_NULL":
             of_kind = self.find_kind(field_type_dict)
@@ -371,19 +384,18 @@ class Schema:
     def make_field_to_idx(self) -> None:
         for node in self.schema_graph.nodes():
             if isinstance(node, FieldNode):
-                if node.redundant == True:
-                    parent_list = list(self.schema_graph.predecessor_indices(node.index))
-                    assert len(parent_list) == 1
-                    parent_type_index = parent_list[0]
+                parent_list = list(self.schema_graph.predecessor_indices(node.index))
+                assert len(parent_list) == 1
+                parent_type_index = parent_list[0]
+                if self.schema_graph[parent_type_index].name == "Query":
+                    self.field_to_idx_dict[f"Query.{node.name}"] = node.index
+                if node.redundant is True:
                     predecessor_fields = self.schema_graph.predecessors(parent_type_index)
                     for pred_field in predecessor_fields:
                         if f"{pred_field.name}.{node.name}" not in self.field_to_idx_dict.keys():
                             self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
                 else:
                     self.field_to_idx_dict[node.name] = node.index
-
-    def verify_unique_field(self, return_data_name: str) -> Union[bool, None]:
-        node_index_names = list(self.field_to_idx_dict.keys())
 
     def make_field_to_idx(self) -> None:
         for node in self.schema_graph.nodes():
@@ -439,7 +451,7 @@ class Schema:
             input_dict[name] = description
         return input_dict
 
-    def recurse_fields(self, fields:Dict[Any, Any], field_map:Dict[Any, Any], indent=2) -> None:
+    def recurse_fields(self, fields: Dict[Any, Any], field_map: Dict[Any, Any], indent=2) -> None:
         query_str = ""
         for field, value in fields.items():
             mapped_path = field_map.get(field, [field])
@@ -470,12 +482,19 @@ class Schema:
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
+        input_type_idx: int = self.field_to_idx_dict[f"Query.{input_type}"]
+        if isinstance(input_ids, List) and (len(input_ids) > 1):
+            if self.schema_graph[input_type_idx].kind == "OBJECT":
+                raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
+        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
+        if unknown_return_list:
+            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         for return_field in return_data_list:
             if self.verify_unique_field(return_field) is True:
                 continue
             if self.verify_unique_field(return_field) is False:
                 raise ValueError(
-                    f"\"{return_field}\" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields(\"{return_field}\")")
+                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")')
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
@@ -487,8 +506,8 @@ class Schema:
         # else:
         #     raise ValueError(validation_error_list)
         return query
-    
-    def get_descendant_fields(self, schema_graph:Union[nx.DiGraph,rx.PyDiGraph], node:int, visited=None) ->  Union[List[Union[str, Dict]], Union[str, Dict]]:
+
+    def get_descendant_fields(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], node: int, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
         if visited is None:
             visited = set()
 
@@ -520,34 +539,22 @@ class Schema:
         print(f"get_descendant_fields: {result}")
         return result
 
-    def extract_name_description(self, schema_part:Dict, parent_name="") -> None:
-        if isinstance(schema_part, dict):
-            if 'name' in schema_part and 'description' in schema_part:
-                name = schema_part['name']
-                description = schema_part['description']
-                if name in self.seen_names:
-                    if parent_name:
-                        name = f"{parent_name}.{name}"
-                else:
-                    self.seen_names.add(name)
-                self.name_description_dict[name] = description
-            for key, value in schema_part.items():
-                new_parent_name = schema_part['name'] if key == 'fields' else parent_name
-                self.extract_name_description(value, new_parent_name)
-        elif isinstance(schema_part, list):
-            for item in schema_part:
-                self.extract_name_description(item, parent_name)
+    def create_description_dict(self):
+        for field_name, field_index in self.field_to_idx_dict.items():
+            field_node = self.schema_graph[field_index]
+            if isinstance(field_node, FieldNode):
+                self.field_description_dict[field_name] = field_node.description
 
-    def find_field_names(self, search_string:str) -> Dict[str,str]:
+    def find_field_names(self, search_string: str) -> Dict[str, str]:
         if not isinstance(search_string, str):
             raise ValueError(f"Please input a string instead of {type(search_string)}")
-        field_names = [key for key in self.name_description_dict if search_string.lower() in key.lower()]
+        field_names = [key for key in self.field_description_dict if search_string.lower() in key.lower()]
         if not field_names:
             raise ValueError(f"No fields found matching '{search_string}'")
-        name_description = {name: self.name_description_dict[name] for name in field_names if name in self.name_description_dict}
+        name_description = {name: self.field_description_dict[name] for name in field_names if name in self.field_description_dict}
         return name_description
 
-    def regex_checks(self, input_dict: Dict, input_ids:List[str], attr_list:List[Dict], input_type:str) -> Union[Dict[str,str]]:
+    def regex_checks(self, input_dict: Dict, input_ids: List[str], attr_list: List[Dict], input_type: str) -> Union[Dict[str, str], Dict[str, List[str]]]:
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
         entities = ["polymer_entities", "branched_entities", "nonpolymer_entities", "nonpolymer_entity", "polymer_entity", "branched_entity"]
         instances = [
@@ -556,48 +563,40 @@ class Schema:
             "nonpolymer_entity_instances",
             "polymer_entity_instance",
             "nonpolymer_entity_instance",
-            "branched_entity_instance"
+            "branched_entity_instance",
         ]
 
         for single_id in input_ids:
             if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
-                attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[1-9][A-Z]{3}\.[A-Z]$", single_id)) and input_type in instances:
-                attr_name = [single_id["name"] for single_id in attr_list]
+            elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[A-Z0-9]{4}\.[A-Z]$", single_id)) and input_type in instances:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
                     input_dict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
-                attr_name = [single_id["name"] for single_id in attr_list]
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     input_dict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[1-9][A-Z]{3}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
-                attr_name = [single_id["name"] for single_id in attr_list]
+            elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     input_dict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
                     input_dict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
             elif (re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) or re.match(r"^[A-Z0-9]{4}$", single_id)) and input_type in ["entries", "entry"]:
-                attr_name = [single_id["name"] for single_id in attr_list]
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(input_ids[0])
-            elif re.match(r"^\d{1}[A-Za-z]{3}_\d{1}$", single_id) and input_type in entities:
-                attr_name = [single_id["name"] for single_id in attr_list]
+            elif re.match(r"^[A-Z0-9]{4}_[0-9]+$", single_id) and input_type in entities:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
             else:
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
-            for attr in attr_name:
-                # print("attr: ", attr)
-                if attr not in input_dict:
-                    input_dict[attr] = []
-                if input_type in plural_types:
-                    input_dict[attr].append(single_id)
+            if input_type in plural_types:
+                input_dict = {}
+                attr = attr_list[0]["name"]
+                input_dict[attr] = input_ids
         return input_dict
 
     def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function
@@ -635,7 +634,7 @@ class Schema:
                 raise ValueError(f"Input IDs keys do not match attribute names: {input_dict.keys()} vs {attr_name}")
             missing_keys = [key_arg for key_arg in attr_name if key_arg not in input_dict]
             if len(missing_keys) > 0:
-                raise ValueError(f"Missing input_id dictionary keys: {missing_keys}. Find input_id keys and descriptions by running SCHEMA.get_input_id_dict(\"{input_type}\")")
+                raise ValueError(f'Missing input_id dictionary keys: {missing_keys}. Find input_id keys and descriptions by running SCHEMA.get_input_id_dict("{input_type}")')
             attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
             for key, value in input_dict.items():
                 if attr_kind[key] == "SCALAR":
@@ -651,7 +650,7 @@ class Schema:
             input_dict = self.regex_checks(input_dict, input_ids, attr_list, input_type)
 
         field_names: Dict[Any, Any] = {}
-        field_names: Dict[Any, Any] = {}
+        paths: Dict[Any, Any] = {}
 
         start_node_index = None
         for node in self.schema_graph.node_indices():
@@ -669,7 +668,6 @@ class Schema:
             if isinstance(node_data, FieldNode):
                 # TODO: Add case where there is dot notation
                 target_node_indices.append(node_data.index)
-            #TODO: add else
 
         # Get all shortest paths from the start node to each target node
         all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
@@ -690,8 +688,11 @@ class Schema:
             if isinstance(node_data, FieldNode):
                 target_node_name = node_data.name
                 field_names[target_node_name] = []
+                paths[target_node_name] = []
             for each_path in all_paths[target_node]:
                 skip_first = True
+                path = [self.schema_graph[node].name for node in each_path if isinstance(self.schema_graph[node], FieldNode)][1:]
+                paths[target_node_name].append(path)
                 for node in each_path:
                     node_data = self.schema_graph[node]
                     if isinstance(node_data, FieldNode):
