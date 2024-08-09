@@ -9,6 +9,7 @@ import os
 import requests
 import networkx as nx
 from graphql import validate, parse, build_client_schema
+from pprint import pprint
 
 use_networkx: bool = False
 use_networkx: bool = False
@@ -70,7 +71,7 @@ class Schema:
         self.temp = {}
         self.seen_names = set()
         self.field_description_dict = {}
-]        self.name_description_dict = {}
+        self.name_description_dict = {}
         self.root_introspection = self.request_root_types(PDB_URL)
         self.root_dict = {}
         self.schema = self.fetch_schema(self.pdb_url)
@@ -86,7 +87,6 @@ class Schema:
         self.construct_root_dict(self.pdb_url)
         self.recurse_build_schema(self.schema_graph, "Query")
         self.create_description_dict()
-        self.make_field_to_idx()
         self.make_field_to_idx()
         self.apply_weights(["CoreAssembly"], 2)
 
@@ -397,37 +397,6 @@ class Schema:
                 else:
                     self.field_to_idx_dict[node.name] = node.index
 
-    def make_field_to_idx(self) -> None:
-        for node in self.schema_graph.nodes():
-            if isinstance(node, FieldNode):
-                if node.redundant == True:
-                    parent_list = list(self.schema_graph.predecessor_indices(node.index))
-                    assert len(parent_list) == 1
-                    parent_type_index = parent_list[0]
-                    predecessor_fields = self.schema_graph.predecessors(parent_type_index)
-                    for pred_field in predecessor_fields:
-                        if f"{pred_field.name}.{node.name}" not in self.field_to_idx_dict.keys():
-                            self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
-                else:
-                    self.field_to_idx_dict[node.name] = node.index
-            else:
-                self.field_to_idx_dict[node.name] = node.index
-
-    def verify_unique_field(self, return_data_name: str) -> Union[bool, None]:
-        node_index_names = list(self.field_to_idx_dict.keys())
-        split_data_name = return_data_name.split(".")
-        if len(split_data_name) == 1:
-            field_name = split_data_name[0]
-            name_count = self.field_names_list.count(field_name)
-        else:
-            name_count = node_index_names.count(return_data_name)
-        if name_count == 1:
-            return True
-        if name_count > 1:
-            return False
-        return None
-        return None
-
     def get_unique_fields(self, return_data_name: str) -> List[str]:
         return_data_name = return_data_name.lower()
         valid_field_list: List[str] = []
@@ -452,28 +421,32 @@ class Schema:
         return input_dict
 
     def recurse_fields(self, fields: Dict[Any, Any], field_map: Dict[Any, Any], indent=2) -> None:
+        print(f"fields: {fields}")
+        print(f"field_map: {field_map}")
         query_str = ""
-        for field, value in fields.items():
-            mapped_path = field_map.get(field, [field])
-            mapped_path = mapped_path[:mapped_path.index(field) + 1]  # Only take the path up to the field itself
+        for target_idx, idx_path in fields.items():
+            print(f"idx_path: {idx_path}")
+            mapped_path = field_map.get(target_idx, [target_idx])
+            mapped_path = mapped_path[:mapped_path.index(target_idx) + 1]  # Only take the path up to the field itself
             for idx, subfield in enumerate(mapped_path):
-                query_str += " " * indent + subfield
-                if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
+                query_str += " " * indent + self.idx_to_name(subfield)
+                if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
                     query_str += "{\n"
                 else:
                     query_str += "\n"
                 indent += 2 if idx == 0 else 0
-            if isinstance(value, list):
-                if value:  # Only recurse if the list is not empty
-                    for item in value:
+            if isinstance(idx_path, list):
+                if idx_path:  # Only recurse if the list is not empty
+                    for item in idx_path:
                         if isinstance(item, dict):
                             query_str += self.recurse_fields(item, field_map, indent + 2)
                         else:
-                            query_str += " " * (indent + 2) + item + "\n"
+                            query_str += " " * (indent + 2) + self.idx_to_name(item) + "\n"
             else:
-                query_str += " " * (indent + 2) + value + "\n"
+                print(f"add idx_path: {idx_path}")
+                query_str += " " * (indent + 2) + idx_path + "\n"
             for idx, subfield in enumerate(mapped_path):
-                if idx < len(mapped_path) - 1 or (isinstance(value, list) and value):
+                if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
                     query_str += " " * indent + "}\n"
         return query_str
 
@@ -486,57 +459,57 @@ class Schema:
         if isinstance(input_ids, List) and (len(input_ids) > 1):
             if self.schema_graph[input_type_idx].kind == "OBJECT":
                 raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
-        unknown_return_list = [item for item in return_data_list if item not in self.field_to_idx_dict]
+        unknown_return_list: List[str]= []
+        for field in return_data_list:
+            if "." in field:
+                separate_fields = field.split(".")
+                for sep_field in separate_fields:
+                    if sep_field not in self.field_names_list:
+                        unknown_return_list.append(sep_field)
+            else:
+                if field not in self.field_names_list:
+                    unknown_return_list.append(field)
         if unknown_return_list:
             raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         for return_field in return_data_list:
-            if self.verify_unique_field(return_field) is True:
-                continue
-            if self.verify_unique_field(return_field) is False:
-                raise ValueError(
-                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")')
+            if ("." not in field) and (self.field_names_list.count(field) > 1):
+                raise ValueError(f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")')
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
             query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
-        #TODO: remove comment
-        # validation_error_list = validate(self.client_schema, parse(query))
-        # if not validation_error_list:
-        #     return query
-        # else:
-        #     raise ValueError(validation_error_list)
-        return query
+        validation_error_list = validate(self.client_schema, parse(query))
+        if not validation_error_list:
+            return query
+        else:
+            raise ValueError(validation_error_list)
 
-    def get_descendant_fields(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], node: int, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
+    def get_descendant_fields(self, node_idx: int, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
         if visited is None:
             visited = set()
 
         result: List[Union[str, Dict]] = []
-        result: List[Union[str, Dict]] = []
-        children_idx = list(schema_graph.neighbors(node))
+        children_idx = list(self.schema_graph.neighbors(node_idx))
 
         for idx in children_idx:
             if idx in visited:
                 continue
             visited.add(idx)
 
-            child_data = schema_graph[idx]
+            child_data = self.schema_graph[idx]
             if isinstance(child_data, FieldNode):
-                child_descendants = self.get_descendant_fields(schema_graph, idx, visited)
+                child_descendants = self.get_descendant_fields(idx, visited)
                 if child_descendants:
-                    result.append({child_data.name: child_descendants})
+                    result.append({child_data.index: child_descendants})
                 else:
-                    result.append(child_data.name)
+                    result.append(child_data.index)
             elif isinstance(child_data, TypeNode):
-                type_descendants = self.get_descendant_fields(schema_graph, idx, visited)
+                type_descendants = self.get_descendant_fields( idx, visited)
                 if type_descendants:
                     result.extend(type_descendants)
                 else:
-                    result.append(child_data.name)
-
-        if len(result) == 1:
-            return result[0]
-        print(f"get_descendant_fields: {result}")
+                    result.append(child_data.index)
+        # print(f"get_descendant_fields: {result}")
         return result
 
     def create_description_dict(self):
@@ -649,58 +622,62 @@ class Schema:
         if isinstance(input_ids, List):
             input_dict = self.regex_checks(input_dict, input_ids, attr_list, input_type)
 
+        start_node_index = self.field_to_idx_dict[f"Query.{input_type}"]
+
+        all_paths: Dict[int, List[List[input_type]]] = {}
+        for field in return_data_list:
+            if "." in field:
+                possible_paths = self.parse_dot_path(field)
+                shortest_paths = self.compare_paths(start_node_index, possible_paths)
+                assert len(shortest_paths) > 0  # TODO: remove after testing?
+                if len(shortest_paths) > 1:
+                    shortest_name_paths = [".".join([self.idx_to_name(idx) for idx in path if isinstance(self.schema_graph[idx], FieldNode)]) for path in shortest_paths]
+                    shortest_name_paths.sort()
+                    path_choice_msg = ""
+                    for name_path in shortest_name_paths:
+                        path_choice_msg += name_path + "\n"
+                    raise ValueError(f"Given path not specific enough. Use one or more of these paths in return_data_list argument:\n{path_choice_msg}")
+                else:
+                    node_idx = shortest_paths[0][-1]
+                    all_paths[node_idx] = shortest_paths
+            else:
+                node_idx = self.field_to_idx_dict[field]
+                paths = rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, node_idx, weight_fn=lambda edge: edge)
+                # TODO: determine whether to keep this or whether there are other reasons for duplicate paths
+                unique_paths = {tuple(path) for path in paths}
+                unique_paths_list: List[List[int]] = [list(unique_path) for unique_path in unique_paths]
+                all_paths[node_idx] = unique_paths_list
+        pprint(f"all_paths: {all_paths}")
+        for return_data in return_data_list:
+            if any(not value for value in all_paths.values()):
+                raise ValueError(f"You can't access \"{return_data}\" from input type {input_type}")
+
+        final_fields = {}
+        for target_idx in all_paths.keys():
+            final_fields[target_idx] = self.get_descendant_fields(target_idx)
+        print(f"final fields: {final_fields}")
+
         field_names: Dict[Any, Any] = {}
         paths: Dict[Any, Any] = {}
 
-        start_node_index = None
-        for node in self.schema_graph.node_indices():
-            node_data = self.schema_graph[node]
-            if node_data.name == input_type:
-                start_node_index = node_data.index
-                # start_node_name = node_data.name
-                # sart_node_type = node_data.type
-                break
-
-        target_node_indices = []
-        for return_data in return_data_list:
-            node_index = self.field_to_idx_dict[return_data]
-            node_data = self.schema_graph[node_index]
+        for target_idx in all_paths.keys():
+            node_data = self.schema_graph[target_idx]
             if isinstance(node_data, FieldNode):
-                # TODO: Add case where there is dot notation
-                target_node_indices.append(node_data.index)
-
-        # Get all shortest paths from the start node to each target node
-        all_paths = {target_node: rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, target_node, weight_fn=lambda edge: edge) for target_node in target_node_indices}
-        print(f"all_paths: {all_paths}")
-        for return_data in return_data_list:
-            if any(not value for value in all_paths.values()):
-                raise ValueError(f"You can't access {return_data} from input type {input_type}")
-
-        final_fields = {}
-        for target_node in target_node_indices:
-            target_data = self.schema_graph[target_node]
-            if isinstance(target_data, FieldNode):
-                final_fields[target_data.name] = self.get_descendant_fields(self.schema_graph, target_node)
-        print(f"final fields: {final_fields}")
-
-        for target_node in target_node_indices:
-            node_data = self.schema_graph[target_node]
-            if isinstance(node_data, FieldNode):
-                target_node_name = node_data.name
-                field_names[target_node_name] = []
-                paths[target_node_name] = []
-            for each_path in all_paths[target_node]:
+                field_names[target_idx] = []
+                paths[target_idx] = []
+            for each_path in all_paths[target_idx]:
                 skip_first = True
-                path = [self.schema_graph[node].name for node in each_path if isinstance(self.schema_graph[node], FieldNode)][1:]
-                paths[target_node_name].append(path)
-                for node in each_path:
-                    node_data = self.schema_graph[node]
+                path = [node_idx for node_idx in each_path if isinstance(self.schema_graph[node_idx], FieldNode)][1:]
+                paths[target_idx].append(path)
+                for node_idx in each_path:
+                    node_data = self.schema_graph[node_idx]
                     if isinstance(node_data, FieldNode):
                         if skip_first:
                             skip_first = False
                             continue
-                        field_node_name = node_data.name
-                        field_names[target_node_name].append(field_node_name)
+                        field_names[target_idx].append(node_idx)
+        print(f"paths: {paths}")
+        print(f"field_names: {field_names}")
         query = "{ " + input_type + "("
 
         for i, attr in enumerate(attr_name):
@@ -721,7 +698,6 @@ class Schema:
             return idx_list
         if (self.schema_graph[node_idx].kind == 'SCALAR') or (self.schema_graph[node_idx].of_kind == 'SCALAR'):
             print("SCALAR")
-            print(f"call on dot path: {dot_path[1:]}, idx_list: {idx_list}, field_idx: {node_idx}")
             return self.find_match_path(dot_path[1:], idx_list, node_idx)
         else:
             type_node = list(self.schema_graph.successor_indices(node_idx))[0]
@@ -729,7 +705,6 @@ class Schema:
             for field_idx in field_nodes:
                 if self.schema_graph[field_idx].name == dot_path[0]:
                     idx_list.append(node_idx)
-                    print(f"call on dot path: {dot_path[1:]}, idx_list: {idx_list}, field_idx: {field_idx}")
                     return self.find_match_path(dot_path[1:], idx_list, field_idx)
                 else:
                     continue
@@ -737,20 +712,40 @@ class Schema:
 
     def parse_dot_path(self, dot_path: str) -> List[List[int]]:
         path_list = dot_path.split(".")
-        unknown_fields: List[str] = [field for field in path_list if field not in self.temp.keys()]
-        if len(unknown_fields) > 0:
-            raise ValueError(f"Unknown fields in return_data_list: {unknown_fields}")
         node_matches: List[int] = self.temp[path_list[0]]
         idx_list: List[List[int]] = []
         for node_idx in node_matches:
             found_path: List[int] = []
             found_path = self.find_match_path(path_list[1:], found_path, node_idx)
-            print(f"found_path:{found_path}")
             if len(found_path) == len(path_list):
                 idx_list.append(found_path)
         if len(idx_list) == 0:
             raise ValueError(f'return_data_list path is not valid: {dot_path}')
         return idx_list
 
+    def compare_paths(self, start_node_index: int, dot_paths: List[List[int]]) -> List[List[int]]:
+        all_paths: List[List[int]] = []
+        for path in dot_paths:
+            first_path_idx = path[0]
+            if start_node_index == first_path_idx:
+                unique_paths_list: List[List[int]] = [path]
+            else:
+                paths = rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, first_path_idx, weight_fn=lambda edge: edge)
+                # TODO: maybe delete this, if can eliminate duplicate paths
+                unique_paths = {tuple(path) for path in paths}
+                unique_paths_list = [list(unique_path) for unique_path in unique_paths]
+                if len(unique_paths_list) == 0:
+                    unique_paths_list = []
+                else:
+                    for unique_path in unique_paths_list:
+                        unique_path += path[1:]
+            all_paths.extend(unique_paths_list)
+        if len(all_paths) == 0:
+            raise ValueError(f"You can't access \"{'.'.join([self.idx_to_name(idx) for idx in dot_paths[0]])}\" from given input_type {self.schema_graph[start_node_index].name}")
+        else:
+            shortest_path_len = len(min(all_paths, key=len))
+            shortest_paths = [path for path in all_paths if len(path) == shortest_path_len]
+        return shortest_paths
+    
     def idx_to_name(self, idx:int) -> str:
         return self.schema_graph[idx].name
