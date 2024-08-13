@@ -180,9 +180,9 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="10. no path exists"):
             with self.assertRaises(ValueError):
                 SCHEMA._Schema__construct_query_rustworkx(input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["exptl"])
-        with self.subTest(msg="11. field doesn't exist"):
-            with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["aaa"])
+        # with self.subTest(msg="11. field doesn't exist"):  # TODO move this test to testQuery
+        #     with self.assertRaises(ValueError):
+        #         SCHEMA._Schema__construct_query_rustworkx(input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["aaa"])
 
     def regexChecks(self):
         with self.subTest(msg="1. regex for _entity_instances"):
@@ -232,20 +232,6 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA.construct_query(input_ids=["4HHB", "1IYE"], input_type="entry", return_data_list=["id"])
 
-    def testVerifyUniqueField(self):
-        with self.subTest(msg="1. unique field with dot notation"):
-            field = "entry.id"
-            self.assertTrue(SCHEMA.verify_unique_field(field))
-        with self.subTest(msg="2. unique field no dot notation"):
-            field = "rcsb_polymer_instance_annotation"
-            self.assertTrue(SCHEMA.verify_unique_field(field))
-        with self.subTest(msg="3. redundant field"):
-            field = "id"
-            self.assertFalse(SCHEMA.verify_unique_field(field))
-        with self.subTest(msg="4. field doesn't exists"):
-            field = "foo"
-            self.assertIsNone(SCHEMA.verify_unique_field(field))
-
     def testDescriptionDict(self):
         with self.subTest(msg="1. check nonpolymer_comp description"):
             SCHEMA.create_description_dict()
@@ -279,7 +265,6 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("regexChecks"))
     suiteSelect.addTest(SchemaTests("testConstructQuery"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
-    suiteSelect.addTest(SchemaTests("testVerifyUniqueField"))
     suiteSelect.addTest(SchemaTests("testDescriptionDict"))
     suiteSelect.addTest(SchemaTests("testFindFieldNames"))
     return suiteSelect
