@@ -3,15 +3,11 @@ import logging
 from typing import List, Dict, Union, Any
 import json
 import os
-from typing import List, Dict, Union, Any
-import json
-import os
 import requests
 import networkx as nx
 from graphql import validate, parse, build_client_schema
 from pprint import pprint
 
-use_networkx: bool = False
 use_networkx: bool = False
 try:
     import rustworkx as rx
@@ -21,8 +17,6 @@ except ImportError:
     use_networkx = True
 
 PDB_URL: str = "https://data.rcsb.org/graphql"
-PDB_URL: str = "https://data.rcsb.org/graphql"
-
 
 class FieldNode:
 
@@ -290,24 +284,18 @@ class Schema:
                     type_index = self.type_to_idx_dict[type_name]
                     if use_networkx:
                         schema_graph.add_edge(field_node.index, type_index, 1)
-                        schema_graph.add_edge(field_node.index, type_index, 1)
                     else:
-                        schema_graph.add_edge(field_node.index, type_index, 1)
                         schema_graph.add_edge(field_node.index, type_index, 1)
                 else:
                     self.recurse_build_schema(schema_graph, type_name)
                     type_index = self.type_to_idx_dict[type_name]
-                    type_index = self.type_to_idx_dict[type_name]
                     if self.use_networkx:
                         schema_graph.add_edge(field_node.index, type_index, 1)
-                        schema_graph.add_edge(field_node.index, type_index, 1)
                     else:
-                        schema_graph.add_edge(field_node.index, type_index, 1)
                         schema_graph.add_edge(field_node.index, type_index, 1)
 
     def apply_weights(self, root_type_list: List[str], weight: int) -> None:  # applies weight in all edges from a root TypeNode to FieldNodes
         for root_type in root_type_list:
-            node_idx = self.type_to_idx_dict[root_type]
             node_idx = self.type_to_idx_dict[root_type]
             if use_networkx is False:
                 out_edge_list = self.schema_graph.incident_edges(node_idx)
@@ -324,7 +312,6 @@ class Schema:
             self.schema_graph.add_node(index, type_node=type_node)
         else:
             index = self.schema_graph.add_node(type_node)
-        self.type_to_idx_dict[type_name] = index
         self.type_to_idx_dict[type_name] = index
         type_node.set_index(index)
         return type_node
@@ -359,7 +346,6 @@ class Schema:
         if kind == "LIST" or kind == "NON_NULL":
             of_kind = self.find_kind(field_type_dict)
             field_node.set_of_kind(of_kind)
-        parent_type_index = self.type_to_idx_dict[parent_type]
         parent_type_index = self.type_to_idx_dict[parent_type]
         if self.use_networkx:
             index = len(self.schema_graph.nodes)

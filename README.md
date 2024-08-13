@@ -81,7 +81,6 @@ from rcsbapi.data import Query
 
 # constructing the Query object
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
 
 # executing the query
 query.exec()
@@ -101,7 +100,6 @@ This can be a dictionary or a list. Dictionaries must be passed with specific ke
 |polymer, branched, or non-polymer entities|[entry_id]_[entity_id]|4HHB_1|
 |polymer, branched, or non-polymer entity instances|[entry_id].[asym_id]|4HHB.A|
 |biological assemblies|[entry_id]-[assembly_id]|4HHB-1|
-|interface|[entry_id]-[assembly_id].[interface_id]|4HHB-1.1|
 |interface|[entry_id]-[assembly_id].[interface_id]|4HHB-1.1|
 
 Dictionaries and Lists will be treated equivalently for the input_ids argument. For example, these input_ids arguments are equivalent.
