@@ -13,9 +13,10 @@ from rcsbapi.data import Schema, Query
 ```
 
 ## Jupyter Notebooks
-A notebook briefly summarizing the README is available in [notebooks/quickstart.ipynb](notebooks/quickstart.ipynb).
+Two Jupyter notebooks are available if the package is downloaded from [GitHub](https://github.com/rcsb/py-rcsb-api)
 
-Another notebook using both Search and Data API packages in a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](notebooks/search_data_workflow.ipynb).
+A notebook briefly summarizing the README is available in [notebooks/quickstart.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/quickstart.ipynb).
+Another notebook using both Search and Data API packages in a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/search_data_workflow.ipynb).
 
 ## Background
 The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
