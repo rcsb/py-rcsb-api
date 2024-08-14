@@ -21,7 +21,7 @@ from rcsbapi.data import Query
 query = Query(input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},input_type="entries", return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"])
 query.exec()
 ```
-To find more about the return_data_list dot notation, see [ValueError: Not a unique field](#valueerror-not-a-unique-field)
+To find more about the return_data_list dot notation, see [ValueError: Not a unique field](query_construction.md#valueerror-not-a-unique-field)
 
 ### Primary Citation
 Fetch primary citation information (structure authors, PubMed ID, DOI) and release date for PDB entries:
