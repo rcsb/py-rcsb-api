@@ -678,19 +678,19 @@ class Schema:
         query += " " + "}\n}\n"
         return query
     
-    def find_match_path(self, dot_path: List[str], idx_list: List[int], node_idx: int):
+    def find_idx_path(self, dot_path: List[str], idx_list: List[int], node_idx: int) -> List[int]:
         if len(dot_path) == 0:
             idx_list.append(node_idx)
             return idx_list
         if (self.schema_graph[node_idx].kind == 'SCALAR') or (self.schema_graph[node_idx].of_kind == 'SCALAR'):
-            return self.find_match_path(dot_path[1:], idx_list, node_idx)
+            return self.find_idx_path(dot_path[1:], idx_list, node_idx)
         else:
             type_node = list(self.schema_graph.successor_indices(node_idx))[0]
             field_nodes = self.schema_graph.successor_indices(type_node)
             for field_idx in field_nodes:
                 if self.schema_graph[field_idx].name == dot_path[0]:
                     idx_list.append(node_idx)
-                    return self.find_match_path(dot_path[1:], idx_list, field_idx)
+                    return self.find_idx_path(dot_path[1:], idx_list, field_idx)
                 else:
                     continue
             return []
@@ -698,15 +698,15 @@ class Schema:
     def parse_dot_path(self, dot_path: str) -> List[List[int]]:
         path_list = dot_path.split(".")
         node_matches: List[int] = self.field_to_idx_dict[path_list[0]]
-        idx_list: List[List[int]] = []
+        idx_path_list: List[List[int]] = []
         for node_idx in node_matches:
             found_path: List[int] = []
-            found_path = self.find_match_path(path_list[1:], found_path, node_idx)
-            if len(found_path) == len(path_list):
-                idx_list.append(found_path)
-        if len(idx_list) == 0:
+            found_path = self.find_idx_path(path_list[1:], found_path, node_idx)
+            if len(found_path) == len(idx_path_list):
+                idx_path_list.append(found_path)
+        if len(idx_path_list) == 0:
             raise ValueError(f'return_data_list path is not valid: {dot_path}')
-        return idx_list
+        return idx_path_list
 
     def compare_paths(self, start_node_index: int, dot_paths: List[List[int]]) -> List[List[int]]:
         all_paths: List[List[int]] = []
