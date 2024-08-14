@@ -66,5 +66,5 @@ from rcsbapi.data import Query
 query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
 query.exec()
 ```
-This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose, requesting all scalar fields under "exptl" (see [return_data_list](query_construction.md#return_data_list)).
+This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose, requesting all scalar fields under "exptl" (see [return_data_list](query_construction.html#return_data_list)).
 
