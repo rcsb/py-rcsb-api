@@ -45,7 +45,7 @@ Specifies which field you are starting your query from.
 
 input_types, also called "root fields", are designated points where you can begin querying. This includes entry, polymer_entity, polymer_entity_instance, etc. For the full list see below:  
 
-<details>
+<details open>
   <summary>Full list of input_types</summary>
 
 - entry
