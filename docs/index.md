@@ -8,7 +8,10 @@ caption: Contents
 maxdepth: 2
 ---
 quickstart.md
-api.rst
+<!-- api.rst -->
+query_construction.md
+implementation_details.md
+additional_examples.md
 ```
 
 ## Availability
