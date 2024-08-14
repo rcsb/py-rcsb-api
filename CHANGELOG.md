@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.0 (2024-07-25)
+
+- Updates to Query methods
+- Added GraphQL query validation
+- Updates to documentation
+
 ## v0.1.0 (2024-07-22)
 
 - First release!

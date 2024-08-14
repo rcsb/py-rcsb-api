@@ -14,7 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
-import rcsb.api  # noqa: E402
+import rcsbapi  # noqa: E402
 
 # -- Project information -----------------------------------------------------
 
@@ -27,9 +27,9 @@ author = "RCSB PDB"
 # built documents.
 #
 # The short X.Y version.
-version = rcsb.api.__version__.split("-")[0]
+version = rcsbapi.__version__.split("-")[0]
 # The full version, including alpha/beta/rc tags
-release = rcsb.api.__version__
+release = rcsbapi.__version__
 
 
 # -- General configuration ---------------------------------------------------

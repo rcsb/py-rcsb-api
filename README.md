@@ -1,5 +1,10 @@
-# py-rcsb-api
+[![PyPi Release](https://img.shields.io/pypi/v/rcsb-api.svg)](https://pypi.org/project/rcsb-api/)
+[![Build Status](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_apis/build/status/rcsb.py-rcsb-api?branchName=master)](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master)
+
+# rcsb-api
 Python interface for RCSB PDB API services at RCSB.org.
+
+This package requires Python 3.7 or later.
 
 ## Installation
 Get it from PyPI:
@@ -52,6 +57,7 @@ Data is returned in JSON format
 }
 ```
 
+To generate the same query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 To generate the same query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 ```python
 from rcsbapi.data import Query
