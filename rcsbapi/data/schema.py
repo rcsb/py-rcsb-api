@@ -623,11 +623,11 @@ class Schema:
                     path_choice_msg = ""
                     for name_path in shortest_name_paths:
                         path_choice_msg += name_path + "\n"
-                    raise ValueError(
-                        f"""Given path not specific enough. Use one or more of these paths in return_data_list argument:
-                                     \n{path_choice_msg}\n\n
-                        Some paths may not be in suggestion list.
-                        If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"""
+                    raise ValueError("Given path not specific enough. Use one or more of these paths in return_data_list argument:\n"\
+                    f"{path_choice_msg}\n\n"\
+
+                    "Some paths may not be in suggestion list. "\
+                    "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
                     )
                 else:
                     node_idx = shortest_paths[0][-1]

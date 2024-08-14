@@ -232,6 +232,37 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA.construct_query(input_ids=["4HHB", "1IYE"], input_type="entry", return_data_list=["id"])
 
+    def testDotNotation(self):
+        with self.subTest(msg="1. dot notation on deeply nested path"):
+            try:
+                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=[
+                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.group_provenance.rcsb_group_provenance_container_identifiers.group_provenance_id"
+                ])
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="2. query that loops back to input type"):
+            try:
+                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=[
+                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_instances.polymer_entity.entry.rcsb_id"
+                ])
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="3. request same field at many levels"):
+            try:
+                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=[
+                    "entry.rcsb_id",
+                    "entry.assemblies.rcsb_id",
+                    "entry.assemblies.polymer_entity_instances.rcsb_id",
+                    "entry.assemblies.polymer_entity_instances.polymer_entity.rcsb_id",
+                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.rcsb_id",
+                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.group_provenance.rcsb_id"
+                ])
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="4. throw error when multiple paths are available"):
+            with self.assertRaises(ValueError):
+                SCHEMA._Schema__construct_query_rustworkx(input_ids=["4HHB"], input_type="entry", return_data_list=["chem_comp.id"])
+
     def testDescriptionDict(self):
         with self.subTest(msg="1. check nonpolymer_comp description"):
             SCHEMA.create_description_dict()
@@ -254,13 +285,6 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names(["rcsb", "exptl"])
 
-    def testDotNotation(self):
-        with self.subTest(msg="1. use dot notation to specify full path"):
-            try:
-                Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["entry.id"])
-            except Exception as error:
-                self.fail(f"Failed unexpectedly: {error}")
-
 
 def buildSchema():
     suiteSelect = unittest.TestSuite()
@@ -271,6 +295,7 @@ def buildSchema():
     # suiteSelect.addTest(SchemaTests("testRecurseBuildSchema"))
     suiteSelect.addTest(SchemaTests("regexChecks"))
     suiteSelect.addTest(SchemaTests("testConstructQuery"))
+    suiteSelect.addTest(SchemaTests("testDotNotation"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
     suiteSelect.addTest(SchemaTests("testDescriptionDict"))
     suiteSelect.addTest(SchemaTests("testFindFieldNames"))
