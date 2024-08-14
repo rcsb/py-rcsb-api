@@ -116,7 +116,7 @@ class QueryTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["id"])
             try:
-                Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["entry.id"])
+                Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["entry.rcsb_ma_qa_metric_global.ma_qa_metric_global.type", "entry.rcsb_ma_qa_metric_global.ma_qa_metric_global.value"])
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 

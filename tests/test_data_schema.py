@@ -254,6 +254,13 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names(["rcsb", "exptl"])
 
+    def testDotNotation(self):
+        with self.subTest(msg="1. use dot notation to specify full path"):
+            try:
+                Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["entry.id"])
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
 
 def buildSchema():
     suiteSelect = unittest.TestSuite()

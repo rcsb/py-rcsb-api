@@ -457,7 +457,7 @@ class Schema:
         if unknown_return_list:
             raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         for return_field in return_data_list:
-            if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):   
+            if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):
                 raise ValueError(
                     f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")'
                 )
@@ -707,7 +707,7 @@ class Schema:
         for node_idx in node_matches:
             found_path: List[int] = []
             found_path = self.find_idx_path(path_list[1:], found_path, node_idx)
-            if len(found_path) == len(idx_path_list):
+            if len(found_path) == len(path_list):
                 idx_path_list.append(found_path)
         if len(idx_path_list) == 0:
             raise ValueError(f'return_data_list path is not valid: {dot_path}')
