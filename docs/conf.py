@@ -45,10 +45,6 @@ extensions = [
 ]
 # source_suffix = [".rst", ".md"]  # Redundant with newer sphinx versions
 
-myst_enable_extensions = [
-    "linkify",
-]
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
