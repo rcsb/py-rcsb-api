@@ -6,7 +6,6 @@ import os
 import requests
 import networkx as nx
 from graphql import validate, parse, build_client_schema
-from pprint import pprint
 
 use_networkx: bool = False
 try:
@@ -17,6 +16,7 @@ except ImportError:
     use_networkx = True
 
 PDB_URL: str = "https://data.rcsb.org/graphql"
+
 
 class FieldNode:
 
@@ -60,14 +60,14 @@ class Schema:
         self.schema_graph = None
         self.type_to_idx_dict: Dict[str, int] = {}
         self.dot_field_to_idx_dict: Dict[str, int] = {} 
-        """Dictionary where keys are field names (str) and the values are indices (int). Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
+        """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
         self.field_to_idx_dict: Dict[str, List[int]] = {}
-        """Dictionary where keys are field names (str) and the values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
-        self.type_fields_dict: Dict[str, Dict]= {}
+        """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
+        self.type_fields_dict: Dict[str, Dict] = {}
         self.seen_names = set()
         self.field_description_dict: Dict[str, str] = {}
         self.root_introspection = self.request_root_types(PDB_URL)
-        self.root_dict: Dict[str,List[Dict[str,str]]] = {}
+        self.root_dict: Dict[str, List[Dict[str, str]]] = {}
         self.schema = self.fetch_schema(self.pdb_url)
         self.client_schema = build_client_schema(self.schema["data"])
 
@@ -457,8 +457,10 @@ class Schema:
         if unknown_return_list:
             raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         for return_field in return_data_list:
-            if ("." not in field) and (self.field_names_list.count(field) > 1):
-                raise ValueError(f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")')
+            if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):     
+                raise ValueError(
+                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")'
+                    )
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
@@ -615,21 +617,23 @@ class Schema:
             if "." in field:
                 possible_paths = self.parse_dot_path(field)
                 shortest_paths = self.compare_paths(start_node_index, possible_paths)
-                assert len(shortest_paths) > 0  # TODO: remove after testing?
                 if len(shortest_paths) > 1:
                     shortest_name_paths = [".".join([self.idx_to_name(idx) for idx in path if isinstance(self.schema_graph[idx], FieldNode)]) for path in shortest_paths]
                     shortest_name_paths.sort()
                     path_choice_msg = ""
                     for name_path in shortest_name_paths:
                         path_choice_msg += name_path + "\n"
-                    raise ValueError(f"Given path not specific enough. Use one or more of these paths in return_data_list argument:\n{path_choice_msg}\n\nSome paths may not be in suggestion list. If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html")
+                    raise ValueError(
+                        f"""Given path not specific enough. Use one or more of these paths in return_data_list argument:
+                                     \n{path_choice_msg}\n\n
+                        Some paths may not be in suggestion list. If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"""
+                        )
                 else:
                     node_idx = shortest_paths[0][-1]
                     all_paths[node_idx] = shortest_paths
             else:
                 node_idx = self.dot_field_to_idx_dict[field]
                 paths = rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, node_idx, weight_fn=lambda edge: edge)
-                # TODO: determine whether to keep this or whether there are other reasons for duplicate paths
                 unique_paths = {tuple(path) for path in paths}
                 unique_paths_list: List[List[int]] = [list(unique_path) for unique_path in unique_paths]
                 all_paths[node_idx] = unique_paths_list
@@ -716,7 +720,6 @@ class Schema:
                 unique_paths_list: List[List[int]] = [path]
             else:
                 paths = rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, first_path_idx, weight_fn=lambda edge: edge)
-                # TODO: maybe delete this, if can eliminate duplicate paths
                 unique_paths = {tuple(path) for path in paths}
                 unique_paths_list = [list(unique_path) for unique_path in unique_paths]
                 if len(unique_paths_list) == 0:
