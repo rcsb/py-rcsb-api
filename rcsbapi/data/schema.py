@@ -59,7 +59,7 @@ class Schema:
         self.use_networkx: bool = use_networkx
         self.schema_graph = None
         self.type_to_idx_dict: Dict[str, int] = {}
-        self.dot_field_to_idx_dict: Dict[str, int] = {} 
+        self.dot_field_to_idx_dict: Dict[str, int] = {}
         """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
@@ -444,7 +444,7 @@ class Schema:
         if isinstance(input_ids, List) and (len(input_ids) > 1):
             if self.schema_graph[input_type_idx].kind == "OBJECT":
                 raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
-        unknown_return_list: List[str]= []
+        unknown_return_list: List[str] = []
         for field in return_data_list:
             if "." in field:
                 separate_fields = field.split(".")
@@ -457,10 +457,10 @@ class Schema:
         if unknown_return_list:
             raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
         for return_field in return_data_list:
-            if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):     
+            if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):   
                 raise ValueError(
                     f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")'
-                    )
+                )
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
         else:
@@ -626,8 +626,9 @@ class Schema:
                     raise ValueError(
                         f"""Given path not specific enough. Use one or more of these paths in return_data_list argument:
                                      \n{path_choice_msg}\n\n
-                        Some paths may not be in suggestion list. If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"""
-                        )
+                        Some paths may not be in suggestion list.
+                        If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"""
+                    )
                 else:
                     node_idx = shortest_paths[0][-1]
                     all_paths[node_idx] = shortest_paths
@@ -681,7 +682,7 @@ class Schema:
         query += self.recurse_fields(final_fields, field_names)
         query += " " + "}\n}\n"
         return query
-    
+
     def find_idx_path(self, dot_path: List[str], idx_list: List[int], node_idx: int) -> List[int]:
         if len(dot_path) == 0:
             idx_list.append(node_idx)
@@ -734,6 +735,6 @@ class Schema:
             shortest_path_len = len(min(all_paths, key=len))
             shortest_paths = [path for path in all_paths if len(path) == shortest_path_len]
         return shortest_paths
-    
-    def idx_to_name(self, idx:int) -> str:
+
+    def idx_to_name(self, idx: int) -> str:
         return self.schema_graph[idx].name
