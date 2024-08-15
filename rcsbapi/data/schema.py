@@ -692,7 +692,7 @@ class Schema:
             node_idx (int): index to be searched for a child node matching the next field name
 
         Returns:
-            List[int]: a list of indices matching the given dot_path. If no path is found, an empty list is returned. 
+            List[int]: a list of indices matching the given dot_path. If no path is found, an empty list is returned.
         """
         if len(dot_path) == 0:
             idx_list.append(node_idx)
@@ -748,7 +748,7 @@ class Schema:
             ValueError: thrown when there is no path from the input_type node to the return data nodes.
 
         Returns:
-            List[List[int]]: list of shortest paths from the input_type node index to the index of the final node given in dot notation 
+            List[List[int]]: list of shortest paths from the input_type node index to the index of the final node given in dot notation
                 ex: input_type "entry" and "exptl.method" would return a list of shortest path(s) with indices from "entry" to "method"
         """
         all_paths: List[List[int]] = []
