@@ -9,9 +9,9 @@ This package requires Python 3.7 or later.
 ## Installation
 Get it from PyPI:
 
-    pip install rcsbapi
+    pip install rcsb-api
 
-Or, download from [GitHub](https://github.com/rcsb/py-rcsbsearchapi)
+Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api/)
 
 
 ## Getting Started
@@ -38,7 +38,7 @@ Data is returned in JSON format
 {"data": {"entry": {"exptl": [{"method": "X-RAY DIFFRACTION"}]}}}
 ```
 
-Here is a slightly [more complex query](https://data.rcsb.org/graphql/index.html?query=%7B%0A%20%20polymer_entities(entity_ids%3A%5B%222CPK_1%22%2C%223WHM_1%22%2C%222D5Z_1%22%5D)%20%7B%0A%20%20%20%20rcsb_id%0A%20%20%20%20rcsb_entity_source_organism%20%7B%0A%20%20%20%20%20%20ncbi_taxonomy_id%0A%20%20%20%20%20%20ncbi_scientific_name%0A%20%20%20%20%7D%0A%20%20%20%20rcsb_cluster_membership%20%7B%0A%20%20%20%20%20%20cluster_id%0A%20%20%20%20%20%20identity%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D). Note that periods can be used to further specify requested data in return_data_list. Also note multiple return data items and ids can be requested in one query.
+Here is a [more complex query](https://data.rcsb.org/graphql/index.html?query=%7B%0A%20%20polymer_entities(entity_ids%3A%5B%222CPK_1%22%2C%223WHM_1%22%2C%222D5Z_1%22%5D)%20%7B%0A%20%20%20%20rcsb_id%0A%20%20%20%20rcsb_entity_source_organism%20%7B%0A%20%20%20%20%20%20ncbi_taxonomy_id%0A%20%20%20%20%20%20ncbi_scientific_name%0A%20%20%20%20%7D%0A%20%20%20%20rcsb_cluster_membership%20%7B%0A%20%20%20%20%20%20cluster_id%0A%20%20%20%20%20%20identity%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D). Note that periods can be used to further specify requested data in return_data_list. Also note multiple return data items and ids can be requested in one query.
 ```python
 from rcsbapi.data import Query
 query = Query(
