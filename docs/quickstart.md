@@ -7,6 +7,7 @@ Get it from PyPI:
 
 Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
 
+## Import
 To import this package, use:
 ```python
 from rcsbapi.data import Schema, Query

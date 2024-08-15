@@ -1,4 +1,4 @@
-# Additional examples
+# Additional Examples
 Examples come from [RCSB PDB Data API documentation](https://data.rcsb.org/#examples)
 
 ### Entries
