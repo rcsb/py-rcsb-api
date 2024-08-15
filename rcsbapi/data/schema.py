@@ -626,7 +626,7 @@ class Schema:
                     raise ValueError(
                         "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n"
                         f"{path_choice_msg}\n"
-                        "Some paths may not be in suggestion list. "
+                        "Please note that this list may not be complete. "
                         "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
                     )
                 else:
@@ -684,6 +684,16 @@ class Schema:
         return query
 
     def find_idx_path(self, dot_path: List[str], idx_list: List[int], node_idx: int) -> List[int]:
+        """function that recursively finds a list of indexes that matches a list of field names.
+
+        Args:
+            dot_path (List[str]): list of field names to find index matches for
+            idx_list (List[int]): list of matching indices, appended to as matches are found during recursion
+            node_idx (int): index to be searched for a child node matching the next field name
+
+        Returns:
+            List[int]: a list of indices matching the given dot_path. If no path is found, an empty list is returned. 
+        """
         if len(dot_path) == 0:
             idx_list.append(node_idx)
             return idx_list
@@ -701,6 +711,19 @@ class Schema:
             return []
 
     def parse_dot_path(self, dot_path: str) -> List[List[int]]:
+        """Parse return data given as dot-separated field names into lists of matching node indices
+                ex: "exptl.method" --> [[513, 1505]]
+
+        Args:
+            dot_path (str): dot-separated field names given in return_data_list
+                ex: "exptl.method" or "chem_comp.id"
+
+        Raises:
+            ValueError: thrown if no path is found matching the given field names
+
+        Returns:
+            List[List[int]]: list of paths where each path is a list of indices matching the given dot_path
+        """
         path_list = dot_path.split(".")
         node_matches: List[int] = self.field_to_idx_dict[path_list[0]]
         idx_path_list: List[List[int]] = []
@@ -714,6 +737,20 @@ class Schema:
         return idx_path_list
 
     def compare_paths(self, start_node_index: int, dot_paths: List[List[int]]) -> List[List[int]]:
+        """Compare paths from the starting node to dot notation paths, returning the paths closest to the starting node
+
+        Args:
+            start_node_index (int): the index of Query's input_type
+                ex: input_type entry --> 20
+            dot_paths (List[List[int]]):  a list of paths where each path is a list of node indices matching the dot notation passed in return_data_list
+
+        Raises:
+            ValueError: thrown when there is no path from the input_type node to the return data nodes.
+
+        Returns:
+            List[List[int]]: list of shortest paths from the input_type node index to the index of the final node given in dot notation 
+                ex: input_type "entry" and "exptl.method" would return a list of shortest path(s) with indices from "entry" to "method"
+        """
         all_paths: List[List[int]] = []
         for path in dot_paths:
             first_path_idx = path[0]
@@ -737,4 +774,12 @@ class Schema:
         return shortest_paths
 
     def idx_to_name(self, idx: int) -> str:
+        """Take an index and return the associated node's name
+
+        Args:
+            idx (int): index of a TypeNode or FieldNode
+
+        Returns:
+            str: name of node
+        """
         return self.schema_graph[idx].name
