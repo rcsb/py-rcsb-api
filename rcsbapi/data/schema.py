@@ -684,7 +684,7 @@ class Schema:
         return query
 
     def find_idx_path(self, dot_path: List[str], idx_list: List[int], node_idx: int) -> List[int]:
-        """function that recursively finds a list of indexes that matches a list of field names.
+        """function that recursively finds a list of indices that matches a list of field names.
 
         Args:
             dot_path (List[str]): list of field names to find index matches for
@@ -711,15 +711,15 @@ class Schema:
             return []
 
     def parse_dot_path(self, dot_path: str) -> List[List[int]]:
-        """Parse return data given as dot-separated field names into lists of matching node indices
-                ex: "exptl.method" --> [[513, 1505]]
+        """Parse dot-separated field names into lists of matching node indices
+                ex: "prd.chem_comp.id" --> [[57, 81, 116], [610, 81, 116], [858, 81, 116]]
 
         Args:
             dot_path (str): dot-separated field names given in return_data_list
-                ex: "exptl.method" or "chem_comp.id"
+                ex: "exptl.method" or "prd.chem_comp.id"
 
         Raises:
-            ValueError: thrown if no path is found matching the given field names
+            ValueError: thrown if no path matches dot_path
 
         Returns:
             List[List[int]]: list of paths where each path is a list of indices matching the given dot_path
@@ -737,18 +737,18 @@ class Schema:
         return idx_path_list
 
     def compare_paths(self, start_node_index: int, dot_paths: List[List[int]]) -> List[List[int]]:
-        """Compare paths from the starting node to dot notation paths, returning the paths closest to the starting node
+        """Compare length of paths from the starting node to dot notation paths, returning the shortest paths
 
         Args:
-            start_node_index (int): the index of Query's input_type
+            start_node_index (int): the index of query's input_type
                 ex: input_type entry --> 20
-            dot_paths (List[List[int]]):  a list of paths where each path is a list of node indices matching the dot notation passed in return_data_list
+            dot_paths (List[List[int]]):  a list of paths where each path is a list of node indices matching a dot notation string
 
         Raises:
             ValueError: thrown when there is no path from the input_type node to the return data nodes.
 
         Returns:
-            List[List[int]]: list of shortest paths from the input_type node index to the index of the final node given in dot notation
+            List[List[int]]: list of shortest paths from the input_type node index to the index of the final field given in dot notation
                 ex: input_type "entry" and "exptl.method" would return a list of shortest path(s) with indices from "entry" to "method"
         """
         all_paths: List[List[int]] = []
@@ -774,10 +774,10 @@ class Schema:
         return shortest_paths
 
     def idx_to_name(self, idx: int) -> str:
-        """Take an index and return the associated node's name
+        """Given an index, return the associated node's name
 
         Args:
-            idx (int): index of a TypeNode or FieldNode
+            idx (int): index of a node
 
         Returns:
             str: name of node
