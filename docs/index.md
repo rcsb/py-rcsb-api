@@ -11,7 +11,7 @@ quickstart.md
 query_construction.md
 implementation_details.md
 additional_examples.md
-api.md
+api.rst
 ```
 
 ## Availability
