@@ -21,13 +21,17 @@ print(query.get_response())
 ### input_ids
 Specifies which entry, entity, etc you would like to request data for.
 
-This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.html#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format. 
-|<div style="width:200px">Type</div>|PDB ID Format|Example|
+This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.html#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format.
+<div style="width:750px">
+
+|Type|PDB ID Format|Example|
 |---|---|---|
 |polymer, branched, or non-polymer entities|[entry_id]_[entity_id]|4HHB_1|
 |polymer, branched, or non-polymer entity instances|[entry_id].[asym_id]|4HHB.A|
 |biological assemblies|[entry_id]-[assembly_id]|4HHB-1|
 |interface|[entry_id]-[assembly_id].[interface_id]|4HHB-1.1|
+
+</div>
 
 Dictionaries and Lists will be treated equivalently for the input_ids argument. For example, these input_ids arguments are equivalent.
 
