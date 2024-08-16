@@ -55,8 +55,6 @@ class Schema:
         self.pdb_url: str = PDB_URL
         self.use_networkx: bool = use_networkx
         self.type_to_idx_dict: Dict[str, int] = {}
-        self.dot_field_to_idx_dict: Dict[str, int] = {}
-        """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
         self.seen_names: set[str] = set()
@@ -74,9 +72,9 @@ class Schema:
         self.field_names_list = self.construct_name_list()
         self.root_dict: Dict[str, List[Dict[str, str]]] = self.construct_root_dict(self.pdb_url)
         self.schema_graph = self.recurse_build_schema(self.schema_graph, "Query")
-        self.make_field_to_idx()
+        self.dot_field_to_idx_dict: Dict[str, int] = self.make_dot_field_to_idx()
+        """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
         self.create_description_dict()
-        self.make_field_to_idx()
         self.apply_weights(["CoreAssembly"], 2)
 
     def request_root_types(self, pdb_url) -> Dict:
@@ -359,21 +357,23 @@ class Schema:
         field_node.set_index(index)
         return field_node
 
-    def make_dot_field_to_idx(self) -> None:
+    def make_dot_field_to_idx(self) -> Dict[str, int]:
+        dot_field_to_idx: Dict[str, int] = {}
         for node in self.schema_graph.nodes():
             if isinstance(node, FieldNode):
                 parent_list = list(self.schema_graph.predecessor_indices(node.index))
                 assert len(parent_list) == 1
                 parent_type_index = parent_list[0]
                 if self.schema_graph[parent_type_index].name == "Query":
-                    self.field_to_idx_dict[f"Query.{node.name}"] = node.index
+                    dot_field_to_idx[f"Query.{node.name}"] = node.index
                 if node.redundant is True:
                     predecessor_fields = self.schema_graph.predecessors(parent_type_index)
                     for pred_field in predecessor_fields:
                         if f"{pred_field.name}.{node.name}" not in self.field_to_idx_dict.keys():
-                            self.field_to_idx_dict[f"{pred_field.name}.{node.name}"] = node.index
+                            dot_field_to_idx[f"{pred_field.name}.{node.name}"] = node.index
                 else:
-                    self.field_to_idx_dict[node.name] = node.index
+                    dot_field_to_idx[node.name] = node.index
+        return dot_field_to_idx
 
     def verify_unique_field(self, return_data_name: str) -> Union[bool, None]:
         node_index_names = list(self.field_to_idx_dict.keys())
