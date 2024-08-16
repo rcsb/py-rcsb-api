@@ -1,7 +1,7 @@
 API Documentation
 *****************
 
-.. automodule:: rcsbapi.data
+.. automodule:: rcsbapi
     :members:
     :private-members:
     :special-members:
