@@ -30,8 +30,7 @@ from rcsbapi.data import Query
 query = Query(
               input_ids={"entry_id":"4HHB"},
               input_type="entry",
-              return_data_list=["exptl.method"]
-            )
+              return_data_list=["exptl.method"])
 print(query.exec())
 ```
 Data is returned in JSON format
@@ -51,8 +50,7 @@ query = Query(
                                 "rcsb_entity_source_organism.ncbi_scientific_name",
                                 "cluster_id",
                                 "identity"
-                                ]
-            )
+                                ])
 print(query.exec())
 ```
 

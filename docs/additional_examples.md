@@ -8,8 +8,7 @@ from rcsbapi.data import Query
 query = Query(
               input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},
               input_type="entries",
-              return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"]
-              )
+              return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"])
 query.exec()
 ```
 Performs the following query:
@@ -42,8 +41,7 @@ query = Query(
                                 "audit_author.name",
                                 "rcsb_primary_citation.pdbx_database_id_PubMed",
                                 "rcsb_primary_citation.pdbx_database_id_DOI"
-                                ]
-              )
+                                ])
 query.exec()
 ```
 Performs the following query:
@@ -79,8 +77,7 @@ query = Query(
                                 "rcsb_entity_source_organism.ncbi_scientific_name",
                                 "cluster_id",
                                 "identity"
-                                ]
-              )
+                                ])
 query.exec()
 ```
 Performs the following query:
@@ -113,8 +110,7 @@ query = Query(
                                 "rcsb_polymer_instance_annotation.annotation_id",
                                 "rcsb_polymer_instance_annotation.name",
                                 "rcsb_polymer_instance_annotation.type"
-                                ]
-              )
+                                ])
 query.exec()
 ```
 Performs the following query:
@@ -143,8 +139,7 @@ query = Query(
                                 "pdbx_entity_branch.type",
                                 "pdbx_entity_branch_descriptor.type",
                                 "pdbx_entity_branch_descriptor.descriptor"
-                                ]
-              )
+                                ])
 query.exec()
 ```
 Performs the following query:
@@ -178,8 +173,7 @@ query = Query(
                                 "rcsb_polymer_instance_feature.type",
                                 "feature_positions.beg_seq_id",
                                 "feature_positions.end_seq_id"
-                                ]
-              )
+                                ])
 query.exec()
 ```
 Performs the following query:
@@ -209,8 +203,7 @@ query = Query(
                                 "entries.rcsb_id",
                                 "reference_sequence_identifiers.database_accession",
                                 "reference_sequence_identifiers.database_name"
-                                ]
-              )
+                                ])
 query.exec()
 ```
 Performs the following query:
@@ -245,8 +238,7 @@ query = Query(
                                 "chem_comp.name",
                                 "chem_comp.formula",
                                 "rcsb_chem_comp_info.initial_release_date"
-                                ]
-              )
+                                ])
 query.exec()
 ```
 Performs the following query:
