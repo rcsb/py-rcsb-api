@@ -199,12 +199,13 @@ To find valid fields with this name, run: get_unique_fields("id")
 ```python
 from rcsbapi.data import Schema
 
-# Run get_unique_field("<field name>")
+# run get_unique_field("<field name>")
 schema = Schema()
 print(schema.get_unique_fields("id"))
 ```
 
-```
+```python
+# select desired field from the returned list
 ['PdbxStructSpecialSymmetry.id',
 'RcsbBirdCitation.id',
 'ChemComp.id',
@@ -217,7 +218,7 @@ print(schema.get_unique_fields("id"))
 ```python
 from rcsbapi.data import Query
 
-# valid Query
+# valid query
 query = Query(
               input_ids={"entry_id":"4HHB"},
               input_type="entry",
