@@ -13,12 +13,6 @@ To import this package, use:
 from rcsbapi.data import Schema, Query
 ```
 
-## Jupyter Notebooks
-Two Jupyter notebooks are available if the package is downloaded from [GitHub](https://github.com/rcsb/py-rcsb-api)
-
-A notebook briefly summarizing the README is available in [notebooks/quickstart.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/quickstart.ipynb).
-Another notebook using both Search and Data API packages in a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/search_data_workflow.ipynb).
-
 ## Getting Started
 The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
 
@@ -75,3 +69,7 @@ query.exec()
 ```
 This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose, requesting all scalar fields under "exptl" (see [return_data_list](query_construction.html#return-data-list)).
 
+## Jupyter Notebooks
+A notebook briefly summarizing the [readthedocs](https://py-rcsb-api.readthedocs.io/en/latest/index.html) is available in [notebooks/quickstart.ipynb](notebooks/quickstart.ipynb) or online through Google Colab <a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/quickstart.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+Another notebook using both Search and Data API packages for a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](notebooks/search_data_workflow.ipynb) or online through Google Colab <a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/search_data_workflow.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.

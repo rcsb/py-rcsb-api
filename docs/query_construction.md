@@ -22,7 +22,7 @@ print(query.get_response())
 Specifies which entry, entity, etc you would like to request data for.
 
 This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.html#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format. 
-|<div style="width:250px">Type</div>|PDB ID Format|Example|
+|<div style="width:200px">Type</div>|PDB ID Format|Example|
 |---|---|---|
 |polymer, branched, or non-polymer entities|[entry_id]_[entity_id]|4HHB_1|
 |polymer, branched, or non-polymer entity instances|[entry_id].[asym_id]|4HHB.A|
@@ -188,7 +188,8 @@ query = Query(
 query.exec()
 ```
 ```
-> ValueError: "id" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("id")
+> ValueError: "id" exists, but is not a unique field, must specify further.
+To find valid fields with this name, run: get_unique_fields("id")
 ```
 
 ```python
