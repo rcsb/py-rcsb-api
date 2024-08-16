@@ -56,7 +56,10 @@ Data is returned in JSON format
 To generate the same query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 ```python
 from rcsbapi.data import Query
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["exptl.method"])
 query.exec()
 ```
 
@@ -64,7 +67,10 @@ query.exec()
 One way this package simplifies making requests is by adding fields that return scalars into the generated query if you request a field that returns a type.
 ```python
 from rcsbapi.data import Query
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["exptl"])
 query.exec()
 ```
 This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose, requesting all scalar fields under "exptl" (see [return_data_list](query_construction.html#return-data-list)).

@@ -6,7 +6,10 @@ Constructing a query object requires three inputs. The JSON response to a query 
 from rcsbapi.data import Query
 
 # constructing the Query object
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["exptl.method"])
 
 # executing the query
 query.exec()
@@ -84,7 +87,10 @@ In GraphQL syntax, the final requested data must be a "scalar" type (string, int
 
 ```python
 from rcsbapi.data import Query
-query = Query(input_ids={"entry_id":"4HHB"}, input_type="entry", return_data_list=["exptl"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["exptl"])
 query.exec()
 ```
 ```json
@@ -106,7 +112,10 @@ query.exec()
 This query can be made more concise by specifying a field, like "method". In this case, the field name "method" is redundant because it appears under other types and must be further specified using dot notation. For more details see [ValueError: Not a unique field](query_construction.html#valueerror-not-a-unique-field)
 ```python
 from rcsbapi.data import Query
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["exptl.method"])
 query.exec()
 ```
 ```json
@@ -131,7 +140,10 @@ This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index
 
 ```python
 from rcsbapi.data import Query
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["exptl"])
 print(query.get_editor_link())
 ```
 
@@ -169,7 +181,10 @@ Some fields are redundant within our GraphQL Data API schema. For example, "id" 
 from rcsbapi.data import Query
 
 # querying a redundant field
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["id"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["id"])
 query.exec()
 ```
 ```
@@ -198,6 +213,9 @@ print(schema.get_unique_fields("id"))
 from rcsbapi.data import Query
 
 # valid Query
-query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["entry.id"])
+query = Query(
+              input_ids={"entry_id":"4HHB"},
+              input_type="entry",
+              return_data_list=["entry.id"])
 query.exec()
 ```
