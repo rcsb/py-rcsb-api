@@ -88,7 +88,7 @@ class SchemaTests(unittest.TestCase):
     def testConstructTypeDict(self):
         type_fields_dict = {}
         entry_dict = {}
-        type_fields_dict = SCHEMA.construct_type_dict(SCHEMA.schema, type_fields_dict)
+        type_fields_dict = SCHEMA.construct_type_dict()
         entry_dict_from_func = type_fields_dict["CoreEntry"]
         type_dict_list = SCHEMA.schema["data"]["__schema"]["types"]
         entry_found = False

@@ -20,53 +20,49 @@ PDB_URL: str = "https://data.rcsb.org/graphql"
 
 class FieldNode:
 
-    def __init__(self, kind, node_type, name, description):
-        self.name = name
-        self.description = description
-        self.redundant = False
-        self.kind = kind
-        self.of_kind = None
-        self.type = node_type
-        self.index = None
+    def __init__(self, kind, node_type, name, description) -> None:
+        self.name: str = name
+        self.description: str = description
+        self.redundant: bool = False
+        self.kind: str = kind
+        self.of_kind: str = ""
+        self.type: str = node_type
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
-    def set_index(self, index: int):
-        self.index = index
+    def set_index(self, index: int) -> None:
+        self.index: int = index
 
-    def set_of_kind(self, of_kind: str):
+    def set_of_kind(self, of_kind: str) -> None:
         self.of_kind = of_kind
 
 
 class TypeNode:
 
-    def __init__(self, name: str):
-        self.name = name
-        self.index = None
-        self.field_list = None
+    def __init__(self, name: str) -> None:
+        self.name:str = name
 
-    def set_index(self, index):
-        self.index = index
+    def set_index(self, index) -> None:
+        self.index: int = index
 
-    def set_field_list(self, field_list: Union[None, List[FieldNode]]):
-        self.field_list = field_list
+    def set_field_list(self, field_list: List[FieldNode]) -> None:
+        self.field_list: List[FieldNode] = field_list
 
 
 class Schema:
-    def __init__(self):
-        self.pdb_url = PDB_URL
-        self.use_networkx = use_networkx
-        self.schema_graph = None
-        self.type_to_idx_dict = {}
-        self.field_to_idx_dict = {}
-        self.edge_index_dict = {}
-        self.type_fields_dict = {}
-        self.field_description_dict = {}
-        self.name_description_dict = {}
+    def __init__(self) -> None:
+        self.pdb_url: str = PDB_URL
+        self.use_networkx: bool = use_networkx
+        self.type_to_idx_dict: Dict[str, int] = {}
+        self.dot_field_to_idx_dict: Dict[str, int] = {}
+        """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
+        self.field_to_idx_dict: Dict[str, List[int]] = {}
+        """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
+        self.seen_names: set[str] = set()
+        self.field_description_dict: Dict[str, str] = {}
         self.root_introspection = self.request_root_types(PDB_URL)
-        self.root_dict = {}
-        self.schema = self.fetch_schema(self.pdb_url)
+        self.schema: Dict = self.fetch_schema(self.pdb_url)
         self.client_schema = build_client_schema(self.schema["data"])
 
         if use_networkx:
@@ -74,10 +70,11 @@ class Schema:
         else:
             self.schema_graph = rx.PyDiGraph()
 
-        self.construct_type_dict(self.schema, self.type_fields_dict)
+        self.type_fields_dict: Dict[str, Dict] =  self.construct_type_dict()
         self.field_names_list = self.construct_name_list()
-        self.construct_root_dict(self.pdb_url)
-        self.recurse_build_schema(self.schema_graph, "Query")
+        self.root_dict: Dict[str, List[Dict[str, str]]] = self.construct_root_dict(self.pdb_url)
+        self.schema_graph = self.recurse_build_schema(self.schema_graph, "Query")
+        self.make_field_to_idx()
         self.create_description_dict()
         self.make_field_to_idx()
         self.apply_weights(["CoreAssembly"], 2)
@@ -115,8 +112,9 @@ class Schema:
         response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=pdb_url, timeout=10)
         return response.json()
 
-    def construct_root_dict(self, url: str) -> Dict[str, str]:
+    def construct_root_dict(self, url: str) -> Dict[str, List[Dict[str, str]]]:
         response = self.root_introspection
+        root_dict: Dict[str, List[Dict[str, str]]] = {}
         root_fields_list = response["data"]["__schema"]["queryType"]["fields"]
         for name_arg_dict in root_fields_list:
             root_name = name_arg_dict["name"]
@@ -126,10 +124,10 @@ class Schema:
                 arg_description = arg_dict["description"]
                 arg_kind = arg_dict["type"]["ofType"]["kind"]
                 arg_type = self.find_type_name(arg_dict["type"]["ofType"])
-                if root_name not in self.root_dict.keys():
-                    self.root_dict[root_name] = []
-                self.root_dict[root_name].append({"name": arg_name, "description": arg_description, "kind": arg_kind, "type": arg_type})
-        return self.root_dict
+                if root_name not in root_dict.keys():
+                    root_dict[root_name] = []
+                root_dict[root_name].append({"name": arg_name, "description": arg_description, "kind": arg_kind, "type": arg_type})
+        return root_dict
 
     def fetch_schema(self, url: str) -> Dict[str, str]:
         query = """
@@ -238,8 +236,9 @@ class Schema:
             with open(json_file_path, "r", encoding="utf-8") as schema_file:
                 return json.load(schema_file)
 
-    def construct_type_dict(self, schema: Dict, type_fields_dict: Dict) -> Dict[str, Dict[str, Dict[str, str]]]:
-        all_types_dict = schema["data"]["__schema"]["types"]
+    def construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        all_types_dict = self.schema["data"]["__schema"]["types"]
+        type_fields_dict = {}
         for each_type_dict in all_types_dict:
             type_name = str(each_type_dict["name"])
             fields = each_type_dict["fields"]
@@ -250,11 +249,11 @@ class Schema:
             type_fields_dict[type_name] = field_dict
         return type_fields_dict
 
-    def construct_name_list(self) -> None:
+    def construct_name_list(self) -> List[str]:
         field_names_list = []
-        for type_name in self.type_fields_dict.keys():
+        for type_name, field_dict in self.type_fields_dict.items():
             if "__" not in type_name:  # doesn't look through dunder methods because those are not added to the schema
-                for field_name in self.type_fields_dict[type_name].keys():
+                for field_name in field_dict.keys():
                     field_names_list.append(field_name)
         return field_names_list
 
@@ -269,14 +268,16 @@ class Schema:
         type_node.set_field_list(field_node_list)
         return type_node
 
-    def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name: str) -> None:
+    def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name: str) -> Union[nx.DiGraph, rx.PyDiGraph]:
         type_node = self.make_type_subgraph(type_name)
         for field_node in type_node.field_list:
             if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
                 continue
             else:
                 type_name = field_node.type
-                if type_name in self.type_to_idx_dict.keys():
+                if type_name in self.type_to_idx_dict:
+                    type_index = self.type_to_idx_dict[type_name]
+                if type_name in self.type_to_idx_dict:
                     type_index = self.type_to_idx_dict[type_name]
                     if use_networkx:
                         schema_graph.add_edge(field_node.index, type_index, 1)
@@ -289,6 +290,7 @@ class Schema:
                         schema_graph.add_edge(field_node.index, type_index, 1)
                     else:
                         schema_graph.add_edge(field_node.index, type_index, 1)
+        return schema_graph
 
     def apply_weights(self, root_type_list: List[str], weight: int) -> None:  # applies weight in all edges from a root TypeNode to FieldNodes
         for root_type in root_type_list:
@@ -357,7 +359,7 @@ class Schema:
         field_node.set_index(index)
         return field_node
 
-    def make_field_to_idx(self) -> None:
+    def make_dot_field_to_idx(self) -> None:
         for node in self.schema_graph.nodes():
             if isinstance(node, FieldNode):
                 parent_list = list(self.schema_graph.predecessor_indices(node.index))
