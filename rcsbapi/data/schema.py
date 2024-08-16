@@ -438,12 +438,12 @@ class Schema:
                     query_str += " " * indent + "}\n"
         return query_str
 
-    def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
+    def construct_query(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str]) -> str:
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
             raise ValueError(f"Unknown input type: {input_type}")
-        input_type_idx: int = self.field_to_idx_dict[f"Query.{input_type}"]
+        input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
         if isinstance(input_ids, List) and (len(input_ids) > 1):
             if self.schema_graph[input_type_idx].kind == "OBJECT":
                 raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
@@ -457,9 +457,9 @@ class Schema:
                 raise ValueError(
                     f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")')
         if use_networkx:
-            query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
+            query = self._construct_query_networkx(input_ids, input_type, return_data_list)
         else:
-            query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+            query = self._construct_query_rustworkx(input_ids, input_type, return_data_list)
         validation_error_list = validate(self.client_schema, parse(query))
         if not validation_error_list:
             return query
@@ -556,7 +556,7 @@ class Schema:
                 input_dict[attr] = input_ids
         return input_dict
 
-    def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function
+    def _construct_query_networkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         # query_name = input_type
         # attr_list = self.root_dict[input_type]
@@ -580,7 +580,7 @@ class Schema:
         query = "query"
         return query
 
-    def __construct_query_rustworkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
+    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str]) -> str:
         # return_data_name = [name.split('.')[-1] for name in return_data_list]
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
