@@ -27,7 +27,7 @@ Performs the following GraphQL query:
   }
 }
 ```
-To find more about the return_data_list dot notation, see [ValueError: Not a unique field](query_construction.html#valueerror-not-a-unique-field)
+To find more about the return_data_list dot notation, see [ValueError: Not a unique field](query_construction.md#valueerror-not-a-unique-field)
 
 ### Primary Citation
 Fetch primary citation information (structure authors, PubMed ID, DOI) and release date for PDB entries:
