@@ -54,6 +54,9 @@ class TypeNode:
 
 
 class Schema:
+    """
+    GraphQL schema defining available fields, types, and how they are connected.
+    """
     def __init__(self) -> None:
         self.pdb_url: str = PDB_URL
         self.use_networkx: bool = use_networkx
