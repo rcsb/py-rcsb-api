@@ -31,7 +31,7 @@ Code is licensed under the MIT license. See the
 
 Please cite the `rcsb-api` package by URL:
 
-    https://rcsbapi.readthedocs.io
+> https://rcsbapi.readthedocs.io
 
 You should also cite the RCSB.org API services this package utilizes:
 
