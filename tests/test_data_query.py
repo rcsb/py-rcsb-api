@@ -269,7 +269,7 @@ class QueryTests(unittest.TestCase):
             self.assertGreaterEqual(len(list(result_list)), 10)
         with self.subTest(msg="2. Construct data API query and request"):
             try:
-                data_query = Query(input_ids={"entry_ids":['6W61', '7ARF', '7AWU', '7C8B', '7JP0', '7JPZ', '7JQ0', '7JQ1', '7JQ2', '7JQ3']}, input_type="entries", return_data_list=[
+                data_query = Query(input_ids={"entry_ids": ['6W61', '7ARF', '7AWU', '7C8B', '7JP0', '7JPZ', '7JQ0', '7JQ1', '7JQ2', '7JQ3']}, input_type="entries", return_data_list=[
                 "entries.rcsb_id", "is_subject_of_investigation", "rcsb_nonpolymer_entity_instance_container_identifiers.comp_id", "citation.title", "citation.pdbx_database_id_DOI"])
                 data_query.exec()
             except Exception as error:

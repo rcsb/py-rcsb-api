@@ -30,10 +30,10 @@ class Query:
         if SCHEMA.root_dict[input_type][0]["kind"] == "LIST":
             self._plural_input = True
             if isinstance(input_ids, dict):
-                self._input_ids_list = input_ids[SCHEMA.root_dict[input_type][0]["name"]]
+                self._input_ids_list: List[str] = input_ids[SCHEMA.root_dict[input_type][0]["name"]]
             if isinstance(input_ids, list):
                 self._input_ids_list = input_ids
-        self._response = None
+        self._response: Union [None, Dict[str, Any]]= None
 
     def get_input_ids(self) -> Union[List[str], Dict[str, List[str]], Dict[str, str]]:
         return self._input_ids
@@ -47,10 +47,13 @@ class Query:
     def get_query(self) -> str:
         return self._query
 
-    def get_input_ids_list(self) -> List[str]:
-        return self._input_ids_list
+    def get_input_ids_list(self) -> Union[str, List[str], None]:
+        try:
+            return self._input_ids_list
+        except AttributeError:
+            return None
 
-    def get_response(self) -> Dict[str, Any]:
+    def get_response(self) -> Union[None, Dict[str, Any]]:
         return self._response
 
     def get_editor_link(self) -> str:
@@ -61,7 +64,7 @@ class Query:
         batch_size = 50
         if (self._plural_input is True) and (len(self._input_ids_list) > batch_size):
             batched_ids = self.batch_ids(batch_size)
-            response_json = {}
+            response_json: Dict[str, Any] = {}
             # count = 0
             for id_batch in batched_ids:
                 query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("\'", "\""), self._query)
@@ -82,7 +85,7 @@ class Query:
             if isinstance(query_response, list):
                 if len(query_response) == 0:
                     logging.warning("Input produced no results. Check that input ids are valid")
-        self.__response = response_json
+        self._response = response_json
         return response_json
 
     def parse_gql_error(self, response_json: Dict[str, Any]):

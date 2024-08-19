@@ -57,17 +57,12 @@ class Schema:
         """
         self.pdb_url: str = PDB_URL
         self.use_networkx: bool = use_networkx
-        self.schema_graph = None
         self.type_to_idx_dict: Dict[str, int] = {}
-        self.dot_field_to_idx_dict: Dict[str, int] = {}
-        """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
-        self.type_fields_dict: Dict[str, Dict] = {}
-        self.seen_names = set()
+        self.seen_names: set[str] = set()
         self.field_description_dict: Dict[str, str] = {}
         self.root_introspection = self.request_root_types(PDB_URL)
-        self.root_dict: Dict[str, List[Dict[str, str]]] = {}
         self.schema = self.fetch_schema(self.pdb_url)
         self.client_schema = build_client_schema(self.schema["data"])
 
@@ -385,7 +380,7 @@ class Schema:
                 if node.redundant is True:
                     predecessor_fields = self.schema_graph.predecessors(parent_type_index)
                     for pred_field in predecessor_fields:
-                        if f"{pred_field.name}.{node.name}" not in dot_field_to_idx_dict.keys():
+                        if f"{pred_field.name}.{node.name}" not in dot_field_to_idx.keys():
                             dot_field_to_idx[f"{pred_field.name}.{node.name}"] = node.index
                 else:
                     dot_field_to_idx[node.name] = node.index
@@ -659,12 +654,12 @@ class Schema:
         field_names: Dict[Any, Any] = {}
         paths: Dict[Any, Any] = {}
 
-        for target_idx in all_paths.keys():
+        for target_idx, paths_list in all_paths.items():
             node_data = self.schema_graph[target_idx]
             if isinstance(node_data, FieldNode):
                 field_names[target_idx] = []
                 paths[target_idx] = []
-            for each_path in all_paths[target_idx]:
+            for each_path in paths_list:
                 skip_first = True
                 path = [node_idx for node_idx in each_path if isinstance(self.schema_graph[node_idx], FieldNode)][1:]
                 paths[target_idx].append(path)
@@ -791,3 +786,21 @@ class Schema:
             str: name of node
         """
         return self.schema_graph[idx].name
+
+
+schema = Schema()
+def get_unique_fields2(input_type:str, return_data_name: str) -> List[str]:
+    paths: List[List[int]] = []
+    input_type_idx: int = schema.dot_field_to_idx_dict[f"Query.{input_type}"]
+    for possible_idx in schema.field_to_idx_dict[return_data_name]:
+        paths_to_idx = rx.all_shortest_paths(schema.schema_graph, input_type_idx, possible_idx)
+        paths.extend(paths_to_idx)
+    
+    name_paths: List[List[str]] = []
+    for path in paths:
+        name_path: List[str] = []
+        for idx in path:
+            if isinstance(schema.schema_graph[idx], FieldNode):
+                name_path.append(schema.schema_graph[idx].name)
+        name_paths.append(name_path)
+    return [".".join(name_path) for name_path in name_paths]
