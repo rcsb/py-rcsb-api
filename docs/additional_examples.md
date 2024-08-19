@@ -6,10 +6,12 @@ Fetch information about structure title and experimental method for PDB entries:
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},
-              input_type="entries",
-              return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"])
-query.exec()
+    input_ids={"entry_ids": ["1STP", "2JEF", "1CDG"]},
+    input_type="entries",
+    return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
@@ -33,16 +35,18 @@ Fetch primary citation information (structure authors, PubMed ID, DOI) and relea
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},
-              input_type="entries",
-              return_data_list=[
-                                "entries.rcsb_id",
-                                "rcsb_accession_info.initial_release_date",
-                                "audit_author.name",
-                                "rcsb_primary_citation.pdbx_database_id_PubMed",
-                                "rcsb_primary_citation.pdbx_database_id_DOI"
-                                ])
-query.exec()
+    input_ids={"entry_ids": ["1STP", "2JEF", "1CDG"]},
+    input_type="entries",
+    return_data_list=[
+        "entries.rcsb_id",
+        "rcsb_accession_info.initial_release_date",
+        "audit_author.name",
+        "rcsb_primary_citation.pdbx_database_id_PubMed",
+        "rcsb_primary_citation.pdbx_database_id_DOI"
+    ]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
@@ -69,21 +73,23 @@ Fetch taxonomy information and information about membership in the sequence clus
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entity_ids":["2CPK_1","3WHM_1","2D5Z_1"]},
-              input_type="polymer_entities",
-              return_data_list=[
-                                "polymer_entities.rcsb_id",
-                                "rcsb_entity_source_organism.ncbi_taxonomy_id",
-                                "rcsb_entity_source_organism.ncbi_scientific_name",
-                                "cluster_id",
-                                "identity"
-                                ])
-query.exec()
+    input_ids={"entity_ids": ["2CPK_1", "3WHM_1", "2D5Z_1"]},
+    input_type="polymer_entities",
+    return_data_list=[
+        "polymer_entities.rcsb_id",
+        "rcsb_entity_source_organism.ncbi_taxonomy_id",
+        "rcsb_entity_source_organism.ncbi_scientific_name",
+        "cluster_id",
+        "identity"
+    ]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
 {
-  polymer_entities(entity_ids:["2CPK_1","3WHM_1","2D5Z_1"]) {
+  polymer_entities(entity_ids: ["2CPK_1", "3WHM_1", "2D5Z_1"]) {
     rcsb_id
     rcsb_entity_source_organism {
       ncbi_taxonomy_id
@@ -103,15 +109,17 @@ Fetch information about the domain assignments for polymer entity instances:
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"instance_ids":["4HHB.A", "12CA.A", "3PQR.A"]},
-              input_type="polymer_entity_instances",
-              return_data_list=[
-                                "polymer_entity_instances.rcsb_id",
-                                "rcsb_polymer_instance_annotation.annotation_id",
-                                "rcsb_polymer_instance_annotation.name",
-                                "rcsb_polymer_instance_annotation.type"
-                                ])
-query.exec()
+    input_ids={"instance_ids": ["4HHB.A", "12CA.A", "3PQR.A"]},
+    input_type="polymer_entity_instances",
+    return_data_list=[
+        "polymer_entity_instances.rcsb_id",
+        "rcsb_polymer_instance_annotation.annotation_id",
+        "rcsb_polymer_instance_annotation.name",
+        "rcsb_polymer_instance_annotation.type"
+    ]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
@@ -133,19 +141,21 @@ Query branched entities (sugars or oligosaccharides) for commonly used linear de
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entity_ids":["5FMB_2", "6L63_3"]},
-              input_type="branched_entities",
-              return_data_list=[
-                                "pdbx_entity_branch.type",
-                                "pdbx_entity_branch_descriptor.type",
-                                "pdbx_entity_branch_descriptor.descriptor"
-                                ])
-query.exec()
+    input_ids={"entity_ids": ["5FMB_2", "6L63_3"]},
+    input_type="branched_entities",
+    return_data_list=[
+        "pdbx_entity_branch.type",
+        "pdbx_entity_branch_descriptor.type",
+        "pdbx_entity_branch_descriptor.descriptor"
+    ]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
 {
-  branched_entities(entity_ids:["5FMB_2", "6L63_3"]) {
+  branched_entities(entity_ids: ["5FMB_2", "6L63_3"]) {
     pdbx_entity_branch {
       type
     }
@@ -166,15 +176,17 @@ This example queries 'polymer_entity_instances' positional features. The query r
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"instance_ids":["1NDO.A"]},
-              input_type="polymer_entity_instances",
-              return_data_list=[
-                                "polymer_entity_instances.rcsb_id",
-                                "rcsb_polymer_instance_feature.type",
-                                "feature_positions.beg_seq_id",
-                                "feature_positions.end_seq_id"
-                                ])
-query.exec()
+    input_ids={"instance_ids": ["1NDO.A"]},
+    input_type="polymer_entity_instances",
+    return_data_list=[
+        "polymer_entity_instances.rcsb_id",
+        "rcsb_polymer_instance_feature.type",
+        "feature_positions.beg_seq_id",
+        "feature_positions.end_seq_id"
+    ]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
@@ -197,19 +209,21 @@ This example shows how to access identifiers related to entries (cross-reference
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entry_ids": ["7NHM", "5L2G"]},
-              input_type="entries",
-              return_data_list=[
-                                "entries.rcsb_id",
-                                "reference_sequence_identifiers.database_accession",
-                                "reference_sequence_identifiers.database_name"
-                                ])
-query.exec()
+    input_ids={"entry_ids": ["7NHM", "5L2G"]},
+    input_type="entries",
+    return_data_list=[
+        "entries.rcsb_id",
+        "reference_sequence_identifiers.database_accession",
+        "reference_sequence_identifiers.database_name"
+    ]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
 {
-  entries(entry_ids:["7NHM", "5L2G"]){
+  entries(entry_ids: ["7NHM", "5L2G"]){
     polymer_entities {
       rcsb_id
       rcsb_polymer_entity_container_identifiers {
@@ -229,22 +243,24 @@ Query for specific items in the chemical component dictionary based on a given l
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"comp_ids":["NAG", "EBW"]},
-              input_type="chem_comps",
-              return_data_list=[
-                                "chem_comps.rcsb_id",
-                                "chem_comp.type",
-                                "chem_comp.formula_weight",
-                                "chem_comp.name",
-                                "chem_comp.formula",
-                                "rcsb_chem_comp_info.initial_release_date"
-                                ])
-query.exec()
+    input_ids={"comp_ids": ["NAG", "EBW"]},
+    input_type="chem_comps",
+    return_data_list=[
+        "chem_comps.rcsb_id",
+        "chem_comp.type",
+        "chem_comp.formula_weight",
+        "chem_comp.name",
+        "chem_comp.formula",
+        "rcsb_chem_comp_info.initial_release_date"
+    ]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```
 {
-  chem_comps(comp_ids:["NAG", "EBW"]) {
+  chem_comps(comp_ids: ["NAG", "EBW"]) {
     rcsb_id
     chem_comp {
       type
@@ -265,10 +281,11 @@ This example shows how to get a list of global Model Quality Assessment metrics 
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entry_ids": ["AF_AFP68871F1"]},
-              input_type="entries",
-              return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"])
-query.exec()
+    input_ids={"entry_ids": ["AF_AFP68871F1"]},
+    input_type="entries",
+    return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"])
+result_dict = query.exec()
+print(result_dict)
 ```
 Performs the following query:
 ```

@@ -7,14 +7,16 @@ from rcsbapi.data import Query
 
 # constructing the Query object
 query = Query(
-              input_ids={"entry_id":"4HHB"},
-              input_type="entry",
-              return_data_list=["exptl.method"])
+    input_ids={"entry_id": "4HHB"},
+    input_type="entry",
+    return_data_list=["exptl.method"]
+)
 
 # executing the query
 query.exec()
 
 # accessing the response
+# can also print using print(query.exec())
 print(query.get_response())
 ```
 
@@ -22,6 +24,7 @@ print(query.get_response())
 Specifies which entry, entity, etc you would like to request data for.
 
 This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.html#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format.
+
 <div style="width:750px">
 
 |Type|PDB ID Format|Example|
@@ -38,12 +41,12 @@ Dictionaries and Lists will be treated equivalently for the input_ids argument. 
 ```python
 # input_type is polymer_entity_instance
 input_ids=["4HHB.A"]
-input_ids={"entry_id":"4HHB", "asym_id":"A"}
+input_ids={"entry_id": "4HHB", "asym_id": "A"}
 ```
 ```python
 # input_type is polymer_entity_instances (plural)
-input_ids=["4HHB.A","4HHB.B"]
-input_ids={"instance_ids":["4HHB.A","4HHB.B"]}
+input_ids=["4HHB.A", "4HHB.B"]
+input_ids={"instance_ids": ["4HHB.A", "4HHB.B"]}
 ```
 
 ### input_type
@@ -92,10 +95,12 @@ In GraphQL syntax, the final requested data must be a "scalar" type (string, int
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entry_id":"4HHB"},
-              input_type="entry",
-              return_data_list=["exptl"])
-query.exec()
+    input_ids={"entry_id": "4HHB"},
+    input_type="entry",
+    return_data_list=["exptl"]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 ```json
 {
@@ -117,10 +122,12 @@ This query can be made more concise by specifying a field, like "method". In thi
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entry_id":"4HHB"},
-              input_type="entry",
-              return_data_list=["exptl.method"])
-query.exec()
+    input_ids={"entry_id": "4HHB"},
+    input_type="entry",
+    return_data_list=["exptl.method"]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
 ```json
 {
@@ -145,10 +152,12 @@ This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index
 ```python
 from rcsbapi.data import Query
 query = Query(
-              input_ids={"entry_id":"4HHB"},
-              input_type="entry",
-              return_data_list=["exptl"])
-print(query.get_editor_link())
+    input_ids={"entry_id": "4HHB"},
+    input_type="entry",
+    return_data_list=["exptl"]
+)
+editor_link = query.get_editor_link()
+print(editor_link)
 ```
 
 ### get_unique_fields() <!--Should this be moved outside the schema method?-->
@@ -171,13 +180,14 @@ schema.find_field_names("exptl")
 
 ### get_input_id_dict()
 Given an input_type, returns a dictionary with the corresponding keys and descriptions of each key. Method of Schema class.
+
 ```python
 from rcsbapi.data import Schema
 schema = Schema()
 schema.get_input_id_dict("polymer_entity_instance")
 ```
 
-## Trouble-shooting
+## Troubleshooting
 ### ValueError: Not a unique field
 Some fields are redundant within our GraphQL Data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<type>.<field name>`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is redundant. You can then use `get_unique_fields("<field name>")` to find notation that would specify a unique field for the given name.
 
@@ -186,15 +196,15 @@ from rcsbapi.data import Query
 
 # querying a redundant field
 query = Query(
-              input_ids={"entry_id":"4HHB"},
-              input_type="entry",
-              return_data_list=["id"])
-query.exec()
+    input_ids={"entry_id": "4HHB"},
+    input_type="entry",
+    return_data_list=["id"]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
-```
-> ValueError: "id" exists, but is not a unique field, must specify further.
+> \> ValueError: "id" exists, but is not a unique field, must specify further.
 To find valid fields with this name, run: get_unique_fields("id")
-```
 
 ```python
 from rcsbapi.data import Schema
@@ -220,8 +230,10 @@ from rcsbapi.data import Query
 
 # valid query
 query = Query(
-              input_ids={"entry_id":"4HHB"},
-              input_type="entry",
-              return_data_list=["entry.id"])
-query.exec()
+    input_ids={"entry_id": "4HHB"},
+    input_type="entry",
+    return_data_list=["entry.id"]
+)
+result_dict = query.exec()
+print(result_dict)
 ```
