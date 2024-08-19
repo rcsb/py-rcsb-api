@@ -27,6 +27,7 @@ query = Query(
 )
 result_dict = query.exec()
 print(result_dict)
+# print(query.get_response()) would be equivalent
 ```
 Data is returned in JSON format
 ```json

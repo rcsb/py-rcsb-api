@@ -13,7 +13,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   entries(entry_ids: ["1STP", "2JEF", "1CDG"]) {
@@ -48,7 +48,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   entries(entry_ids: ["1STP", "2JEF", "1CDG"]) {
@@ -86,7 +86,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   polymer_entities(entity_ids: ["2CPK_1", "3WHM_1", "2D5Z_1"]) {
@@ -121,7 +121,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   polymer_entity_instances(instance_ids: ["4HHB.A", "12CA.A", "3PQR.A"]) {
@@ -152,7 +152,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   branched_entities(entity_ids: ["5FMB_2", "6L63_3"]) {
@@ -188,7 +188,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   polymer_entity_instances(instance_ids: ["1NDO.A"]) {
@@ -220,7 +220,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   entries(entry_ids: ["7NHM", "5L2G"]){
@@ -257,7 +257,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   chem_comps(comp_ids: ["NAG", "EBW"]) {
@@ -287,7 +287,7 @@ query = Query(
 result_dict = query.exec()
 print(result_dict)
 ```
-Performs the following query:
+Performs the following GraphQL query:
 ```
 {
   entries(entry_ids: ["AF_AFP68871F1"]) {
