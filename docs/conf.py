@@ -14,8 +14,6 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
-sys.path.insert(0, os.path.abspath("../rcsbapi"))
-sys.path.insert(0, os.path.abspath("../rcsbapi/docs"))
 import rcsbapi  # noqa: E402
 
 # -- Project information -----------------------------------------------------
