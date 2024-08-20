@@ -81,23 +81,23 @@ class QueryTests(unittest.TestCase):
         # assert that the lengths are combined and all ids are present?
         pass
 
-    def testReadMe(self):
+    def testDocs(self):
         with self.subTest(msg="1.initialize Schema"):
             schema = Schema()
         with self.subTest(msg="2. Background 1"):
             try:
-                query_obj = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl.method"])
+                query_obj = Query(input_ids=["4HHB"], input_type="entry", return_data_list=["exptl.method"])
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="3. Background 2"):
             try:
-                query_obj = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
+                query_obj = Query(input_ids=["4HHB"], input_type="entry", return_data_list=["exptl"])
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="4. Helpful methods, get_editor_link()"):
-            query = Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["exptl"])
+            query = Query(input_ids=["4HHB"], input_type="entry", return_data_list=["exptl"])
             response = requests.get(query.get_editor_link(),timeout=5)
             self.assertEqual(response.status_code, 200)
         with self.subTest(msg="5. Helpful methods, get_unique_fields()"):
@@ -109,77 +109,77 @@ class QueryTests(unittest.TestCase):
             test_dict = schema.get_input_id_dict("polymer_entity_instance") 
             polymer_instance_keys = ["entry_id", "asym_id"]
             for key in polymer_instance_keys:
-                self.assertIn(key ,test_dict.keys())
+                self.assertIn(key, test_dict.keys())
             for value in test_dict.values():
                 self.assertIsNotNone(value)
         with self.subTest(msg="7. Troubleshooting, Not a unique field"):
             with self.assertRaises(ValueError):
-                Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["id"])
+                Query(input_ids=["4HHB"], input_type="entry", return_data_list=["id"])
             try:
-                Query(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=["entry.rcsb_ma_qa_metric_global.ma_qa_metric_global.type", "entry.rcsb_ma_qa_metric_global.ma_qa_metric_global.value"])
+                Query(input_ids=["4HHB"], input_type="entry", return_data_list=["entry.rcsb_ma_qa_metric_global.ma_qa_metric_global.type", "entry.rcsb_ma_qa_metric_global.ma_qa_metric_global.value"])
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testReadMeAddExamples(self):
         with self.subTest(msg="1. Entries"):
             try:
-                query = Query(input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},input_type="entries", return_data_list=[
+                query = Query(input_ids=["1STP","2JEF","1CDG"],input_type="entries", return_data_list=[
                     "entries.rcsb_id", "struct.title", "exptl.method"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="2. Primary Citation"):
             try:
-                query = Query(input_ids={"entry_ids": ["1STP","2JEF","1CDG"]},input_type="entries", return_data_list=[
+                query = Query(input_ids=["1STP","2JEF","1CDG"],input_type="entries", return_data_list=[
                     "entries.rcsb_id", "rcsb_accession_info.initial_release_date", "audit_author.name", "rcsb_primary_citation.pdbx_database_id_PubMed", "rcsb_primary_citation.pdbx_database_id_DOI"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="3. Polymer Entities"):
             try:
-                query = Query(input_ids={"entity_ids":["2CPK_1","3WHM_1","2D5Z_1"]},input_type="polymer_entities", return_data_list=[
+                query = Query(input_ids=["2CPK_1","3WHM_1","2D5Z_1"],input_type="polymer_entities", return_data_list=[
                     "polymer_entities.rcsb_id", "rcsb_entity_source_organism.ncbi_taxonomy_id", "rcsb_entity_source_organism.ncbi_scientific_name", "cluster_id", "identity"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="4. Polymer Instances"):
             try:
-                query = Query(input_ids={"instance_ids":["4HHB.A", "12CA.A", "3PQR.A"]},input_type="polymer_entity_instances", return_data_list=[
+                query = Query(input_ids=["4HHB.A", "12CA.A", "3PQR.A"],input_type="polymer_entity_instances", return_data_list=[
                     "polymer_entity_instances.rcsb_id", "rcsb_polymer_instance_annotation.annotation_id", "rcsb_polymer_instance_annotation.name", "rcsb_polymer_instance_annotation.type"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="5. Carbohydrates"):
             try:
-                query = Query(input_ids={"entity_ids":["5FMB_2", "6L63_3"]},input_type="branched_entities", return_data_list=[
+                query = Query(input_ids=["5FMB_2", "6L63_3"],input_type="branched_entities", return_data_list=[
                     "pdbx_entity_branch.type","pdbx_entity_branch_descriptor.type","pdbx_entity_branch_descriptor.descriptor"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="6. Sequence Positional Features"):
             try:
-                query = Query(input_ids={"instance_ids":["1NDO.A"]},input_type="polymer_entity_instances", return_data_list=[
+                query = Query(input_ids=["1NDO.A"],input_type="polymer_entity_instances", return_data_list=[
                     "polymer_entity_instances.rcsb_id", "rcsb_polymer_instance_feature.type", "feature_positions.beg_seq_id", "feature_positions.end_seq_id"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="7. Reference Sequence Identifiers"):
             try:
-                query = Query(input_ids={"entry_ids": ["7NHM", "5L2G"]}, input_type="entries", return_data_list=[
+                query = Query(input_ids=["7NHM", "5L2G"], input_type="entries", return_data_list=[
                     "entries.rcsb_id", "reference_sequence_identifiers.database_accession", "reference_sequence_identifiers.database_name"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="8. Chemical Components"):
             try:
-                query = Query(input_ids={"comp_ids":["NAG", "EBW"]}, input_type="chem_comps", return_data_list=[
+                query = Query(input_ids=["NAG", "EBW"], input_type="chem_comps", return_data_list=[
                     "chem_comps.rcsb_id","chem_comp.type","chem_comp.formula_weight","chem_comp.name","chem_comp.formula","rcsb_chem_comp_info.initial_release_date"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="9. Computed Structure Models"):
             try:
-                query = Query(input_ids={"entry_ids": ["AF_AFP68871F1"]}, input_type="entries", return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"])
+                query = Query(input_ids=["AF_AFP68871F1"], input_type="entries", return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
@@ -239,19 +239,19 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="7. return_data_list, corrected query with non-redundant field"):
             try:
-                query = Query(input_ids={"entry_id": "4HHB"},input_type="entry", return_data_list=["nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"])
+                query = Query(input_ids=["4HHB"],input_type="entry", return_data_list=["nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="8. More complex queries, multiple ids"):
             try:
-                query = Query(input_ids={"entry_ids": ["4HHB", "12CA", "3PQR"]},input_type="entries", return_data_list=["nonpolymer_bound_components"])
+                query = Query(input_ids=["4HHB", "12CA", "3PQR"],input_type="entries", return_data_list=["nonpolymer_bound_components"])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="8. More complex queries, multiple return data"):
             try:
-                query = Query(input_ids={"entry_id": "4HHB"},input_type="entry", return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition", ])
+                query = Query(input_ids=["4HHB"], input_type="entry", return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition", ])
                 query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
@@ -269,7 +269,7 @@ class QueryTests(unittest.TestCase):
             self.assertGreaterEqual(len(list(result_list)), 10)
         with self.subTest(msg="2. Construct data API query and request"):
             try:
-                data_query = Query(input_ids={"entry_ids":['6W61', '7ARF', '7AWU', '7C8B', '7JP0', '7JPZ', '7JQ0', '7JQ1', '7JQ2', '7JQ3']}, input_type="entries", return_data_list=[
+                data_query = Query(input_ids=['6W61', '7ARF', '7AWU', '7C8B', '7JP0', '7JPZ', '7JQ0', '7JQ1', '7JQ2', '7JQ3'], input_type="entries", return_data_list=[
                 "entries.rcsb_id", "is_subject_of_investigation", "rcsb_nonpolymer_entity_instance_container_identifiers.comp_id", "citation.title", "citation.pdbx_database_id_DOI"])
                 data_query.exec()
             except Exception as error:
@@ -291,7 +291,7 @@ class QueryTests(unittest.TestCase):
 def buildQuery():
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(QueryTests("testBatchIDs"))
-    suiteSelect.addTest(QueryTests("testReadMe"))
+    suiteSelect.addTest(QueryTests("testDocs"))
     suiteSelect.addTest(QueryTests("testReadMeAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
     suiteSelect.addTest(QueryTests("testSearchDataNotebook"))

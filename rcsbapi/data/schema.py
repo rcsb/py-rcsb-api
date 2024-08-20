@@ -462,7 +462,10 @@ class Schema:
         for return_field in return_data_list:
             if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):
                 raise ValueError(
-                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")'
+                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run:\n'
+                    f'  from rcsbapi.data import Schema\n'
+                    f'  schema = Schema()\n'
+                    f'  schema.get_unique_fields("{return_field}")'
                 )
         if use_networkx:
             query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
@@ -555,6 +558,15 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "chem_comps" or input_type == "chem_comp"):  #TODO: talk about this with Dennis
+                if len(input_ids) == 1:
+                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "entry_groups"):  #TODO: talk about this with Dennis
+                if len(input_ids) == 1:
+                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "polymer_entity_groups"):  #TODO: talk about this with Dennis
+                if len(input_ids) == 1:
+                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
             else:
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
             if input_type in plural_types:
@@ -625,7 +637,7 @@ class Schema:
                     shortest_name_paths.sort()
                     path_choice_msg = ""
                     for name_path in shortest_name_paths:
-                        path_choice_msg += name_path + "\n"
+                        path_choice_msg += "  " + name_path + "\n"
                     raise ValueError(
                         "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n"
                         f"{path_choice_msg}\n"

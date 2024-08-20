@@ -7,7 +7,7 @@ from rcsbapi.data import Query
 
 # constructing the Query object
 query = Query(
-    input_ids={"entry_id": "4HHB"},
+    input_ids=["4HHB"],
     input_type="entry",
     return_data_list=["exptl.method"]
 )
@@ -29,6 +29,7 @@ This can be a dictionary or a list. Dictionaries must be passed with specific ke
 
 |Type|PDB ID Format|Example|
 |---|---|---|
+|entries|entry id|4HHB|
 |polymer, branched, or non-polymer entities|[entry_id]_[entity_id]|4HHB_1|
 |polymer, branched, or non-polymer entity instances|[entry_id].[asym_id]|4HHB.A|
 |biological assemblies|[entry_id]-[assembly_id]|4HHB-1|
@@ -95,7 +96,7 @@ In GraphQL syntax, the final requested data must be a "scalar" type (string, int
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
+    input_ids=["4HHB"],
     input_type="entry",
     return_data_list=["exptl"]
 )
@@ -122,7 +123,7 @@ This query can be made more concise by specifying a field, like "method". In thi
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
+    input_ids=["4HHB"],
     input_type="entry",
     return_data_list=["exptl.method"]
 )
@@ -152,7 +153,7 @@ This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
+    input_ids=["4HHB"],
     input_type="entry",
     return_data_list=["exptl"]
 )
@@ -196,16 +197,19 @@ from rcsbapi.data import Query
 
 # querying a redundant field
 query = Query(
-    input_ids={"entry_id": "4HHB"},
+    input_ids=["4HHB"],
     input_type="entry",
     return_data_list=["id"]
 )
 result_dict = query.exec()
 print(result_dict)
 ```
-> \> ValueError: "id" exists, but is not a unique field, must specify further.
-To find valid fields with this name, run: get_unique_fields("id")
-
+```
+ValueError: "id" exists, but is not a unique field, must specify further. To find valid fields with this name, run:
+  from rcsbapi.data import Schema
+  schema = Schema()
+  schema.get_unique_fields("id")
+```
 ```python
 from rcsbapi.data import Schema
 
@@ -230,7 +234,7 @@ from rcsbapi.data import Query
 
 # valid query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
+    input_ids=["4HHB"],
     input_type="entry",
     return_data_list=["entry.id"]
 )
