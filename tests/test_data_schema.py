@@ -235,28 +235,38 @@ class SchemaTests(unittest.TestCase):
     def testDotNotation(self):
         with self.subTest(msg="1. dot notation on deeply nested path"):
             try:
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=[
-                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.group_provenance.rcsb_group_provenance_container_identifiers.group_provenance_id"
-                ])
+                SCHEMA._Schema__construct_query_rustworkx(
+                    input_ids={"entry_id": "4HHB"},
+                    input_type="entry",
+                    return_data_list=[
+                        "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.group_provenance.rcsb_group_provenance_container_identifiers.group_provenance_id"
+                    ],
+                )
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="2. query that loops back to input type"):
             try:
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=[
-                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_instances.polymer_entity.entry.rcsb_id"
-                ])
+                SCHEMA._Schema__construct_query_rustworkx(
+                    input_ids={"entry_id": "4HHB"},
+                    input_type="entry",
+                    return_data_list=["entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_instances.polymer_entity.entry.rcsb_id"],
+                )
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="3. request same field at many levels"):
             try:
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id":"4HHB"},input_type="entry", return_data_list=[
-                    "entry.rcsb_id",
-                    "entry.assemblies.rcsb_id",
-                    "entry.assemblies.polymer_entity_instances.rcsb_id",
-                    "entry.assemblies.polymer_entity_instances.polymer_entity.rcsb_id",
-                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.rcsb_id",
-                    "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.group_provenance.rcsb_id"
-                ])
+                SCHEMA._Schema__construct_query_rustworkx(
+                    input_ids={"entry_id": "4HHB"},
+                    input_type="entry",
+                    return_data_list=[
+                        "entry.rcsb_id",
+                        "entry.assemblies.rcsb_id",
+                        "entry.assemblies.polymer_entity_instances.rcsb_id",
+                        "entry.assemblies.polymer_entity_instances.polymer_entity.rcsb_id",
+                        "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.rcsb_id",
+                        "entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_groups.group_provenance.rcsb_id",
+                    ],
+                )
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="4. throw error when multiple paths are available"):

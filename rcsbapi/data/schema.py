@@ -57,6 +57,7 @@ class Schema:
     """
     GraphQL schema defining available fields, types, and how they are connected.
     """
+
     def __init__(self) -> None:
         self.pdb_url: str = PDB_URL
         self.use_networkx: bool = use_networkx
@@ -416,7 +417,7 @@ class Schema:
         for target_idx, idx_path in fields.items():
             # print(f"idx_path: {idx_path}")
             mapped_path = field_map.get(target_idx, [target_idx])
-            mapped_path = mapped_path[:mapped_path.index(target_idx) + 1]  # Only take the path up to the field itself
+            mapped_path = mapped_path[: mapped_path.index(target_idx) + 1]  # Only take the path up to the field itself
             for idx, subfield in enumerate(mapped_path):
                 query_str += " " * indent + self.idx_to_name(subfield)
                 if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
@@ -446,7 +447,7 @@ class Schema:
         input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
         if isinstance(input_ids, List) and (len(input_ids) > 1):
             if self.schema_graph[input_type_idx].kind == "OBJECT":
-                raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
+                raise ValueError(f'Entered multiple input_ids, but input_type is not a plural type. Try making "{input_type}" plural')
         unknown_return_list: List[str] = []
         for field in return_data_list:
             if "." in field:
@@ -463,8 +464,8 @@ class Schema:
             if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):
                 raise ValueError(
                     f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run:\n'
-                    f'  from rcsbapi.data import Schema\n'
-                    f'  schema = Schema()\n'
+                    f"  from rcsbapi.data import Schema\n"
+                    f"  schema = Schema()\n"
                     f'  schema.get_unique_fields("{return_field}")'
                 )
         if use_networkx:
@@ -558,13 +559,13 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "chem_comps" or input_type == "chem_comp"):  #TODO: talk about this with Dennis
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "chem_comps" or input_type == "chem_comp"):  # TODO: talk about this with Dennis
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "entry_groups"):  #TODO: talk about this with Dennis
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "entry_groups"):  # TODO: talk about this with Dennis
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "polymer_entity_groups"):  #TODO: talk about this with Dennis
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "polymer_entity_groups"):  # TODO: talk about this with Dennis
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
             else:
@@ -656,7 +657,7 @@ class Schema:
         # pprint(f"all_paths: {all_paths}")
         for return_data in return_data_list:
             if any(not value for value in all_paths.values()):
-                raise ValueError(f"You can't access \"{return_data}\" from input type {input_type}")
+                raise ValueError(f'You can\'t access "{return_data}" from input type {input_type}')
 
         final_fields = {}
         for target_idx in all_paths.keys():
@@ -712,7 +713,7 @@ class Schema:
         if len(dot_path) == 0:
             idx_list.append(node_idx)
             return idx_list
-        if (self.schema_graph[node_idx].kind == 'SCALAR') or (self.schema_graph[node_idx].of_kind == 'SCALAR'):
+        if (self.schema_graph[node_idx].kind == "SCALAR") or (self.schema_graph[node_idx].of_kind == "SCALAR"):
             return self.find_idx_path(dot_path[1:], idx_list, node_idx)
         else:
             type_node = list(self.schema_graph.successor_indices(node_idx))[0]
@@ -748,7 +749,7 @@ class Schema:
             if len(found_path) == len(path_list):
                 idx_path_list.append(found_path)
         if len(idx_path_list) == 0:
-            raise ValueError(f'return_data_list path is not valid: {dot_path}')
+            raise ValueError(f"return_data_list path is not valid: {dot_path}")
         return idx_path_list
 
     def compare_paths(self, start_node_index: int, dot_paths: List[List[int]]) -> List[List[int]]:
