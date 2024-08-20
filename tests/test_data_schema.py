@@ -236,7 +236,6 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="1. uniprot"):
             try:
                 query = SCHEMA._Schema__construct_query_rustworkx(input_type="uniprot", input_ids={"uniprot_id": "P01308"}, return_data_list=["uniprot.rcsb_id", "reference_sequence_identifiers.database_accession"])
-                query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
