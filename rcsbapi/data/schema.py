@@ -569,7 +569,7 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
             # TODO: uniprot, pubmed, group provenance
-            #regex for uniprot: https://www.uniprot.org/help/accession_numbers
+            # regex for uniprot: https://www.uniprot.org/help/accession_numbers
             elif re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id) and (input_type == "uniprot"):
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
@@ -589,7 +589,8 @@ class Schema:
         return input_dict
 
     def __construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # incomplete function
-        pass
+        query = ""
+        return query
 
     def __construct_query_rustworkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str], str], return_data_list: List[str]) -> str:
         attr_list = self.root_dict[input_type]
