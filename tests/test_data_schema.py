@@ -124,6 +124,14 @@ class SchemaTests(unittest.TestCase):
     #     importlib.reload(schema)
     #     SCHEMA = Schema(PDB_URL)
 
+    def testConstructQuery(self):
+        with self.subTest(msg="1. return data not specific enough"):
+            with self.assertRaises(ValueError):
+                SCHEMA.construct_query(input_ids=["4HHB"], input_type="entry", return_data_list=["id"])
+        with self.subTest(msg="1. multiple ids, but entered singular input_type"):
+            with self.assertRaises(ValueError):
+                SCHEMA.construct_query(input_ids=["4HHB", "1IYE"], input_type="entry", return_data_list=["id"])
+
     def testConstructQueryRustworkX(self):
         with self.subTest(msg="1.  singular input_type (entry)"):
             query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl"])
@@ -224,13 +232,13 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA._Schema__construct_query_rustworkx(input_type="assemblies", return_data_list=["exptl"], input_ids=["4HHB", "1IYE"])
 
-    def testConstructQuery(self):
-        with self.subTest(msg="1. return data not specific enough"):
-            with self.assertRaises(ValueError):
-                SCHEMA.construct_query(input_ids=["4HHB"], input_type="entry", return_data_list=["id"])
-        with self.subTest(msg="1. multiple ids, but entered singular input_type"):
-            with self.assertRaises(ValueError):
-                SCHEMA.construct_query(input_ids=["4HHB", "1IYE"], input_type="entry", return_data_list=["id"])
+    def testAllRoots(self):
+        with self.subTest(msg="1. uniprot"):
+            try:
+                query = SCHEMA._Schema__construct_query_rustworkx(input_type="uniprot", input_ids=["P01308"], return_data_list=["uniprot.rcsb_id", "reference_sequence_identifiers.database_accession"])
+                query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
 
     def testDotNotation(self):
         with self.subTest(msg="1. dot notation on deeply nested path"):

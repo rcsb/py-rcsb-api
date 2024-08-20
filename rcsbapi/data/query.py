@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 
 class Query:
 
-    def __init__(self, input_ids: Union[List[str], Dict[str, str], Dict[str,List[str]]], input_type: str, return_data_list: List[str]):
+    def __init__(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str]):
         input_id_limit = 200
         if isinstance(input_ids, list):
             if len(input_ids) > input_id_limit:

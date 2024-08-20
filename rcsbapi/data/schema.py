@@ -439,7 +439,7 @@ class Schema:
                     query_str += " " * indent + "}\n"
         return query_str
 
-    def construct_query(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]) -> str:
+    def construct_query(self, input_type: str, input_ids: Union[Dict[str, str], Dict[str, List[str]], List[str]], return_data_list: List[str]) -> str:
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
@@ -559,15 +559,27 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "chem_comps" or input_type == "chem_comp"):  # TODO: talk about this with Dennis
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "chem_comp" or input_type == "chem_comps"):  # TODO: talk about this with Dennis
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "entry_groups"):  # TODO: talk about this with Dennis
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "entry_group" or input_type == "entry_groups"):
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "polymer_entity_groups"):  # TODO: talk about this with Dennis
+            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "polymer_entity_group" or input_type == "polymer_entity_groups"):
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+            # TODO: uniprot, pubmed, group provenance
+            #regex for uniprot: https://www.uniprot.org/help/accession_numbers
+            elif re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id) and (input_type == "uniprot"):
+                if len(input_ids) == 1:
+                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                else:
+                    raise ValueError("Uniprot IDs must be searched one at a time")
+            elif re.match(r"[0-9]*", single_id) and (input_type == "pubmed"):
+                if len(input_ids) == 1:
+                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                else:
+                    raise ValueError("Uniprot IDs must be searched one at a time")
             else:
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
             if input_type in plural_types:
