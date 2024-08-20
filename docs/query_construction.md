@@ -8,7 +8,7 @@ from rcsbapi.data import Query
 # constructing the Query object
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl.method"]
 )
 
@@ -97,7 +97,7 @@ In GraphQL syntax, the final requested data must be a "scalar" type (string, int
 from rcsbapi.data import Query
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl"]
 )
 result_dict = query.exec()
@@ -124,7 +124,7 @@ This query can be made more concise by specifying a field, like "method". In thi
 from rcsbapi.data import Query
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl.method"]
 )
 result_dict = query.exec()
@@ -154,14 +154,14 @@ This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index
 from rcsbapi.data import Query
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl"]
 )
 editor_link = query.get_editor_link()
 print(editor_link)
 ```
 
-### get_unique_fields() <!--Should this be moved outside the schema method?-->
+### get_unique_fields()
 Given a redundant field, this method returns a list of matching fields in dot notation. You can look through the list to identify your intended field. Method of Schema class.
 
 ```python
@@ -198,7 +198,7 @@ from rcsbapi.data import Query
 # querying a redundant field
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["id"]
 )
 result_dict = query.exec()
@@ -235,7 +235,7 @@ from rcsbapi.data import Query
 # valid query
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["entry.id"]
 )
 result_dict = query.exec()

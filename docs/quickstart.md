@@ -22,7 +22,7 @@ from rcsbapi.data import Query
 # query requesting the experimental method of a structure with PDB ID 4HHB (Hemoglobin)
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl.method"]
 )
 result_dict = query.exec()
@@ -66,7 +66,7 @@ One way this package simplifies making requests is by adding fields that return 
 from rcsbapi.data import Query
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl"]
 )
 result_dict = query.exec()

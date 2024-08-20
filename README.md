@@ -30,7 +30,7 @@ The query must be executed using the `.exec()` method, which will return the JSO
 from rcsbapi.data import Query
 query = Query(
     input_type="entry",
-    input_ids=["4HHB"],
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl.method"]
 )
 print(query.exec())

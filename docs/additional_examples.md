@@ -177,7 +177,7 @@ This example queries 'polymer_entity_instances' positional features. The query r
 from rcsbapi.data import Query
 query = Query(
     input_type="polymer_entity_instances",
-    input_ids=["1NDO.A"],
+    input_ids={"instance_ids": ["1NDO.A"]},
     return_data_list=[
         "polymer_entity_instances.rcsb_id",
         "rcsb_polymer_instance_feature.type",
@@ -283,7 +283,8 @@ from rcsbapi.data import Query
 query = Query(
     input_type="entries",
     input_ids=["AF_AFP68871F1"],
-    return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"])
+    return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"]
+)
 result_dict = query.exec()
 print(result_dict)
 ```
