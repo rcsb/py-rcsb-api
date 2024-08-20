@@ -47,7 +47,7 @@ class QueryTests(unittest.TestCase):
 
     def testGetEditorLink(self):
         # query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
-        query_obj = Query({"entry_ids": ["4HHB", "1IYE"]}, "entries", ["exptl"])
+        query_obj = Query(input_type="entries", input_ids={"entry_ids": ["4HHB", "1IYE"]}, return_data_list=["exptl"])
         url = query_obj.get_editor_link()
         response_json = requests.get(url, timeout=10)
         self.assertEqual(response_json.status_code, 200)
@@ -57,7 +57,7 @@ class QueryTests(unittest.TestCase):
             input_ids = []
             for _ in range(165):
                 input_ids.append("4HHB")
-            query_obj = Query({"entry_ids": input_ids}, "entries", ["exptl"])
+            query_obj = Query(input_type="entries", input_ids={"entry_ids": input_ids}, return_data_list=["exptl"])
             query_obj.exec()
             # assert that the batch and merge functions are called
             # assert len of results is same as num of input ids
