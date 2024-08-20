@@ -439,7 +439,7 @@ class Schema:
                     query_str += " " * indent + "}\n"
         return query_str
 
-    def construct_query(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
+    def construct_query(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]) -> str:
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
@@ -469,9 +469,9 @@ class Schema:
                     f'  schema.get_unique_fields("{return_field}")'
                 )
         if use_networkx:
-            query = self.__construct_query_networkx(input_ids, input_type, return_data_list)
+            query = self.__construct_query_networkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list)
         else:
-            query = self.__construct_query_rustworkx(input_ids, input_type, return_data_list)
+            query = self.__construct_query_rustworkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list)
         validation_error_list = validate(self.client_schema, parse(query))
         if not validation_error_list:
             return query
@@ -576,35 +576,13 @@ class Schema:
                 input_dict[attr] = input_ids
         return input_dict
 
-    def __construct_query_networkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function
-        input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
-        # query_name = input_type
-        # attr_list = self.root_dict[input_type]
-        # attr_name = [id["name"] for id in attr_list]
-        # field_names = {}
-        # start_node_index = None
-        for node in self.schema_graph.nodes():
-            node_data = self.schema_graph.nodes[node]
-            if node_data.get("name") == input_type:
-                # start_node_index = node_data.get("index")
-                # start_node_name = node_data.get("name")
-                # start_node_type = node_data.get("type")
-                break
-        target_node_indices = []
-        for return_data in return_data_list:
-            for node, node_data in self.schema_graph.nodes(data=True):
-                if isinstance(node_data, dict) and node_data.get("name") == return_data:
-                    target_node_indices.append(node_data.get("index"))
-                    break
-        # all_paths = {target_node: nx.shortest_path(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
-        query = "query"
-        return query
+    def __construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # incomplete function
+        pass
 
-    def __construct_query_rustworkx(self, input_ids: Union[Dict[str, str], List[str]], input_type: str, return_data_list: List[str]) -> str:
-        # return_data_name = [name.split('.')[-1] for name in return_data_list]
+    def __construct_query_rustworkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str], str], return_data_list: List[str]) -> str:
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
-        input_dict = {}
+        input_dict: Union[Dict[str, str], Dict[str, List[str]]] = {}
         if isinstance(input_ids, Dict):
             input_dict = input_ids
             if not all(key in attr_name for key in input_dict.keys()):
@@ -628,7 +606,7 @@ class Schema:
 
         start_node_index = self.dot_field_to_idx_dict[f"Query.{input_type}"]
 
-        all_paths: Dict[int, List[List[input_type]]] = {}
+        all_paths: Dict[int, List[List[int]]] = {}
         for field in return_data_list:
             if "." in field:
                 possible_paths = self.parse_dot_path(field)

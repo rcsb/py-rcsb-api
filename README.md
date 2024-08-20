@@ -1,5 +1,6 @@
 [![PyPi Release](https://img.shields.io/pypi/v/rcsb-api.svg)](https://pypi.org/project/rcsb-api/)
 [![Build Status](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_apis/build/status/rcsb.py-rcsb-api?branchName=master)](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master)
+[![Documentation Status](https://readthedocs.org/projects/rcsbapi/badge/?version=latest)](https://rcsbapi.readthedocs.io/en/latest/?badge=latest)
 
 # rcsb-api
 Python interface for RCSB PDB API services at RCSB.org.
@@ -28,8 +29,8 @@ The query must be executed using the `.exec()` method, which will return the JSO
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids=["4HHB"],
     input_type="entry",
+    input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
 print(query.exec())
@@ -43,8 +44,8 @@ Here is a [more complex query](https://data.rcsb.org/graphql/index.html?query=%7
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids=["2CPK_1", "3WHM_1", "2D5Z_1"],
     input_type="polymer_entities",
+    input_ids=["2CPK_1", "3WHM_1", "2D5Z_1"],
     return_data_list=[
         "polymer_entities.rcsb_id",
         "rcsb_entity_source_organism.ncbi_taxonomy_id",

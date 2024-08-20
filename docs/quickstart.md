@@ -21,8 +21,8 @@ To generate a query in this package, you would create a Query object. The Query 
 from rcsbapi.data import Query
 # query requesting the experimental method of a structure with PDB ID 4HHB (Hemoglobin)
 query = Query(
-    input_ids=["4HHB"],
     input_type="entry",
+    input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
 result_dict = query.exec()
@@ -65,8 +65,8 @@ One way this package simplifies making requests is by adding fields that return 
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids=["4HHB"],
     input_type="entry",
+    input_ids=["4HHB"],
     return_data_list=["exptl"]
 )
 result_dict = query.exec()
