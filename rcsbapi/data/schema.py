@@ -787,6 +787,21 @@ class Schema:
         """
         return self.schema_graph[idx].name
 
+    def idx_path_to_name_path(self, idx_path: List[int]) -> List[str]:
+        """Take a path of graph indices and return a path of field names
+
+        Args:
+            idx_path (List[int]): List of node indices (can be both TypeNodes and FieldNodes)
+
+        Returns:
+            List[str]: List of field names, removing TypeNodes.
+        """
+        name_path: List[str] = []
+        for idx in idx_path:
+            if isinstance(schema.schema_graph[idx], FieldNode):
+                name_path.append(schema.schema_graph[idx].name)
+        return name_path
+
 
 schema = Schema()
 def get_unique_fields2(input_type:str, return_data_name: str) -> List[str]:
@@ -795,12 +810,9 @@ def get_unique_fields2(input_type:str, return_data_name: str) -> List[str]:
     for possible_idx in schema.field_to_idx_dict[return_data_name]:
         paths_to_idx = rx.all_shortest_paths(schema.schema_graph, input_type_idx, possible_idx)
         paths.extend(paths_to_idx)
-    
     name_paths: List[List[str]] = []
     for path in paths:
-        name_path: List[str] = []
-        for idx in path:
-            if isinstance(schema.schema_graph[idx], FieldNode):
-                name_path.append(schema.schema_graph[idx].name)
-        name_paths.append(name_path)
-    return [".".join(name_path) for name_path in name_paths]
+        name_paths.append(schema.idx_path_to_name_path(path))
+    dot_paths: List[str] = [".".join(name_path) for name_path in name_paths[1:]]
+    dot_paths.sort()
+    return dot_paths
