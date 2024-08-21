@@ -559,27 +559,31 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "chem_comp" or input_type == "chem_comps"):  # TODO: talk about this with Dennis
+            elif input_type == "chem_comp" or input_type == "chem_comps":
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "entry_group" or input_type == "entry_groups"):
+            elif input_type == "entry_group" or input_type == "entry_groups":
                 if len(input_ids) == 1:
-                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            elif re.match(r"[][_,.;:\"&<>()/\{}'`~!@#$%A-Za-z0-9*|+-]*", single_id) and (input_type == "polymer_entity_group" or input_type == "polymer_entity_groups"):
+                    input_dict["group_id"] = str(input_ids[0])
+            elif input_type == "polymer_entity_group" or input_type == "polymer_entity_groups":
                 if len(input_ids) == 1:
-                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            # TODO: uniprot, pubmed, group provenance
+                    input_dict["group_id"] = str(input_ids[0])
             # regex for uniprot: https://www.uniprot.org/help/accession_numbers
             elif re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id) and (input_type == "uniprot"):
                 if len(input_ids) == 1:
-                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                    input_dict["uniprot_id"] = str(input_ids[0])
                 else:
                     raise ValueError("Uniprot IDs must be searched one at a time")
-            elif re.match(r"[0-9]*", single_id) and (input_type == "pubmed"):
+            elif input_type == "pubmed":
                 if len(input_ids) == 1:
-                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                    input_dict["pubmed_id"] = str(input_ids[0])
                 else:
-                    raise ValueError("Uniprot IDs must be searched one at a time")
+                    raise ValueError("Pubmed IDs must be searched one at a time")
+            elif input_type == "group provenance":
+                if len(input_ids) == 1:
+                    input_dict["group_provenance_id"] = str(input_ids[0])
+                else:
+                    raise ValueError("Group provenance IDs must be searched one at a time")
             else:
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
             if input_type in plural_types:
