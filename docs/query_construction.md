@@ -7,8 +7,8 @@ from rcsbapi.data import Query
 
 # constructing the Query object
 query = Query(
-    input_ids={"entry_id": "4HHB"},
     input_type="entry",
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl.method"]
 )
 
@@ -18,35 +18,6 @@ query.exec()
 # accessing the response
 # can also print using print(query.exec())
 print(query.get_response())
-```
-
-### input_ids
-Specifies which entry, entity, etc you would like to request data for.
-
-This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.md#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format.
-
-<div style="width:750px">
-
-|Type|PDB ID Format|Example|
-|---|---|---|
-|polymer, branched, or non-polymer entities|[entry_id]_[entity_id]|4HHB_1|
-|polymer, branched, or non-polymer entity instances|[entry_id].[asym_id]|4HHB.A|
-|biological assemblies|[entry_id]-[assembly_id]|4HHB-1|
-|interface|[entry_id]-[assembly_id].[interface_id]|4HHB-1.1|
-
-</div>
-
-Dictionaries and Lists will be treated equivalently for the input_ids argument. For example, these input_ids arguments are equivalent.
-
-```python
-# input_type is polymer_entity_instance
-input_ids=["4HHB.A"]
-input_ids={"entry_id": "4HHB", "asym_id": "A"}
-```
-```python
-# input_type is polymer_entity_instances (plural)
-input_ids=["4HHB.A", "4HHB.B"]
-input_ids={"instance_ids": ["4HHB.A", "4HHB.B"]}
 ```
 
 ### input_type
@@ -87,6 +58,36 @@ input_types, also called "root fields", are designated points where you can begi
 
 </details>
 
+### input_ids
+Specifies which entry, entity, etc you would like to request data for.
+
+This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.md#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format.
+
+<div style="width:750px">
+
+|Type|PDB ID Format|Example|
+|---|---|---|
+|entries|entry id|4HHB|
+|polymer, branched, or non-polymer entities|[entry_id]_[entity_id]|4HHB_1|
+|polymer, branched, or non-polymer entity instances|[entry_id].[asym_id]|4HHB.A|
+|biological assemblies|[entry_id]-[assembly_id]|4HHB-1|
+|interface|[entry_id]-[assembly_id].[interface_id]|4HHB-1.1|
+
+</div>
+
+Dictionaries and Lists will be treated equivalently for the input_ids argument. For example, these input_ids arguments are equivalent.
+
+```python
+# input_type is polymer_entity_instance
+input_ids=["4HHB.A"]
+input_ids={"entry_id": "4HHB", "asym_id": "A"}
+```
+```python
+# input_type is polymer_entity_instances (plural)
+input_ids=["4HHB.A", "4HHB.B"]
+input_ids={"instance_ids": ["4HHB.A", "4HHB.B"]}
+```
+
 ### return_data_list
 These are the data that you are requesting (or "fields").
 
@@ -95,8 +96,8 @@ In GraphQL syntax, the final requested data must be a "scalar" type (string, int
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
     input_type="entry",
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl"]
 )
 result_dict = query.exec()
@@ -122,8 +123,8 @@ This query can be made more concise by specifying a field, like "method". In thi
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
     input_type="entry",
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl.method"]
 )
 result_dict = query.exec()
@@ -152,15 +153,15 @@ This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
     input_type="entry",
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["exptl"]
 )
 editor_link = query.get_editor_link()
 print(editor_link)
 ```
 
-### get_unique_fields() <!--Should this be moved outside the schema method?-->
+### get_unique_fields()
 Given a redundant field, this method returns a list of matching fields in dot notation. You can look through the list to identify your intended field. Method of Schema class.
 
 ```python
@@ -196,16 +197,19 @@ from rcsbapi.data import Query
 
 # querying a redundant field
 query = Query(
-    input_ids={"entry_id": "4HHB"},
     input_type="entry",
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["id"]
 )
 result_dict = query.exec()
 print(result_dict)
 ```
-> \> ValueError: "id" exists, but is not a unique field, must specify further.
-To find valid fields with this name, run: get_unique_fields("id")
-
+```
+ValueError: "id" exists, but is not a unique field, must specify further. To find valid fields with this name, run:
+  from rcsbapi.data import Schema
+  schema = Schema()
+  schema.get_unique_fields("id")
+```
 ```python
 from rcsbapi.data import Schema
 
@@ -230,8 +234,8 @@ from rcsbapi.data import Query
 
 # valid query
 query = Query(
-    input_ids={"entry_id": "4HHB"},
     input_type="entry",
+    input_ids={"entry_id": "4HHB"},
     return_data_list=["entry.id"]
 )
 result_dict = query.exec()

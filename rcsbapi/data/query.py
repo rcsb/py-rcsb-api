@@ -67,7 +67,7 @@ class Query:
             response_json: Dict[str, Any] = {}
             # count = 0
             for id_batch in batched_ids:
-                query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("\'", "\""), self._query)
+                query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
                 part_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
                 self.parse_gql_error(part_response)
                 time.sleep(0.2)

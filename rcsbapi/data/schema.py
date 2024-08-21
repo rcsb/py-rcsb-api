@@ -51,6 +51,9 @@ class TypeNode:
 
 
 class Schema:
+    """
+    GraphQL schema defining available fields, types, and how they are connected.
+    """
     def __init__(self) -> None:
         """
         GraphQL schema defining available fields, types, and how they are connected.
@@ -416,7 +419,7 @@ class Schema:
         for target_idx, idx_path in fields.items():
             # print(f"idx_path: {idx_path}")
             mapped_path = field_map.get(target_idx, [target_idx])
-            mapped_path = mapped_path[:mapped_path.index(target_idx) + 1]  # Only take the path up to the field itself
+            mapped_path = mapped_path[: mapped_path.index(target_idx) + 1]  # Only take the path up to the field itself
             for idx, subfield in enumerate(mapped_path):
                 query_str += " " * indent + self.idx_to_name(subfield)
                 if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
@@ -519,6 +522,31 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
+            elif input_type == "chem_comp" or input_type == "chem_comps":
+                if len(input_ids) == 1:
+                    input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+            elif input_type == "entry_group" or input_type == "entry_groups":
+                if len(input_ids) == 1:
+                    input_dict["group_id"] = str(input_ids[0])
+            elif input_type == "polymer_entity_group" or input_type == "polymer_entity_groups":
+                if len(input_ids) == 1:
+                    input_dict["group_id"] = str(input_ids[0])
+            # regex for uniprot: https://www.uniprot.org/help/accession_numbers
+            elif re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id) and (input_type == "uniprot"):
+                if len(input_ids) == 1:
+                    input_dict["uniprot_id"] = str(input_ids[0])
+                else:
+                    raise ValueError("Uniprot IDs must be searched one at a time")
+            elif input_type == "pubmed":
+                if len(input_ids) == 1:
+                    input_dict["pubmed_id"] = str(input_ids[0])
+                else:
+                    raise ValueError("Pubmed IDs must be searched one at a time")
+            elif input_type == "group provenance":
+                if len(input_ids) == 1:
+                    input_dict["group_provenance_id"] = str(input_ids[0])
+                else:
+                    raise ValueError("Group provenance IDs must be searched one at a time")
             else:
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
             if input_type in plural_types:
@@ -571,28 +599,8 @@ class Schema:
         else:
             raise ValueError(validation_error_list)
 
-    def _construct_query_networkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id = True) -> str:  # incomplete function
-        input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
-        # query_name = input_type
-        # attr_list = self.root_dict[input_type]
-        # attr_name = [id["name"] for id in attr_list]
-        # field_names = {}
-        # start_node_index = None
-        for node in self.schema_graph.nodes():
-            node_data = self.schema_graph.nodes[node]
-            if node_data.get("name") == input_type:
-                # start_node_index = node_data.get("index")
-                # start_node_name = node_data.get("name")
-                # start_node_type = node_data.get("type")
-                break
-        target_node_indices = []
-        for return_data in return_data_list:
-            for node, node_data in self.schema_graph.nodes(data=True):
-                if isinstance(node_data, dict) and node_data.get("name") == return_data:
-                    target_node_indices.append(node_data.get("index"))
-                    break
-        # all_paths = {target_node: nx.shortest_path(self.schema_graph, start_node_index, target_node) for target_node in target_node_indices}
-        query = "query"
+    def _construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # incomplete function
+        query = ""
         return query
 
     def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool = True) -> str:
@@ -621,7 +629,8 @@ class Schema:
         attr_name = [id["name"] for id in attr_list]
 
         # check formatting of input_ids
-        input_dict = {}
+        input_dict: Union[Dict[str, str], Dict[str, List[str]]] = {}
+
         if isinstance(input_ids, Dict):
             input_dict = input_ids
             if not all(key in attr_name for key in input_dict.keys()):
@@ -654,7 +663,8 @@ class Schema:
         if (f"{input_type}.rcsb_id" not in return_data_list) and (add_rcsb_id is True):
             return_data_list.insert(0, f"{input_type}.rcsb_id")
 
-        all_paths: Dict[int, List[List[input_type]]] = {}
+        all_paths: Dict[int, List[List[int]]] = {}
+
         for field in return_data_list:
             if "." in field:
                 possible_paths = self.parse_dot_path(field)
@@ -664,7 +674,7 @@ class Schema:
                     shortest_name_paths.sort()
                     path_choice_msg = ""
                     for name_path in shortest_name_paths:
-                        path_choice_msg += name_path + "\n"
+                        path_choice_msg += "  " + name_path + "\n"
                     raise ValueError(
                         "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n"
                         f"{path_choice_msg}\n"
@@ -683,7 +693,7 @@ class Schema:
         # pprint(f"all_paths: {all_paths}")
         for return_data in return_data_list:
             if any(not value for value in all_paths.values()):
-                raise ValueError(f"You can't access \"{return_data}\" from input type {input_type}")
+                raise ValueError(f'You can\'t access "{return_data}" from input type {input_type}')
 
         final_fields = {}
         for target_idx in all_paths.keys():
@@ -739,7 +749,7 @@ class Schema:
         if len(dot_path) == 0:
             idx_list.append(node_idx)
             return idx_list
-        if (self.schema_graph[node_idx].kind == 'SCALAR') or (self.schema_graph[node_idx].of_kind == 'SCALAR'):
+        if (self.schema_graph[node_idx].kind == "SCALAR") or (self.schema_graph[node_idx].of_kind == "SCALAR"):
             return self.find_idx_path(dot_path[1:], idx_list, node_idx)
         else:
             type_node = list(self.schema_graph.successor_indices(node_idx))[0]
@@ -775,7 +785,7 @@ class Schema:
             if len(found_path) == len(path_list):
                 idx_path_list.append(found_path)
         if len(idx_path_list) == 0:
-            raise ValueError(f'return_data_list path is not valid: {dot_path}')
+            raise ValueError(f"return_data_list path is not valid: {dot_path}")
         return idx_path_list
 
     def compare_paths(self, start_node_index: int, dot_paths: List[List[int]]) -> List[List[int]]:
