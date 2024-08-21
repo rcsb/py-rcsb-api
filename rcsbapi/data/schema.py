@@ -438,42 +438,6 @@ class Schema:
                     query_str += " " * indent + "}\n"
         return query_str
 
-    def construct_query(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str]) -> str:
-        if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
-            raise ValueError("input_ids must be dictionary or list")
-        if input_type not in self.root_dict.keys():
-            raise ValueError(f"Unknown input type: {input_type}")
-        input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
-        if isinstance(input_ids, List) and (len(input_ids) > 1):
-            if self.schema_graph[input_type_idx].kind == "OBJECT":
-                raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
-        unknown_return_list: List[str] = []
-        for field in return_data_list:
-            if "." in field:
-                separate_fields = field.split(".")
-                for sep_field in separate_fields:
-                    if sep_field not in self.field_names_list:
-                        unknown_return_list.append(sep_field)
-            else:
-                if field not in self.field_names_list:
-                    unknown_return_list.append(field)
-        if unknown_return_list:
-            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
-        for return_field in return_data_list:
-            if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):
-                raise ValueError(
-                    f'"{return_field}" exists, but is not a unique field, must specify further. To find valid fields with this name, run: get_unique_fields("{return_field}")'
-                )
-        if use_networkx:
-            query = self._construct_query_networkx(input_ids, input_type, return_data_list)
-        else:
-            query = self._construct_query_rustworkx(input_ids, input_type, return_data_list)
-        validation_error_list = validate(self.client_schema, parse(query))
-        if not validation_error_list:
-            return query
-        else:
-            raise ValueError(validation_error_list)
-
     def get_descendant_fields(self, node_idx: int, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
         if visited is None:
             visited = set()
@@ -563,7 +527,51 @@ class Schema:
                 input_dict[attr] = input_ids
         return input_dict
 
-    def _construct_query_networkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str]) -> str:  # incomplete function
+    def construct_query(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id = True) -> str:
+        if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
+            raise ValueError("input_ids must be dictionary or list")
+        if input_type not in self.root_dict.keys():
+            raise ValueError(f"Unknown input type: {input_type}")
+        input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
+        if isinstance(input_ids, List) and (len(input_ids) > 1):
+            if self.schema_graph[input_type_idx].kind == "OBJECT":
+                raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
+        unknown_return_list: List[str] = []
+        for field in return_data_list:
+            if "." in field:
+                separate_fields = field.split(".")
+                for sep_field in separate_fields:
+                    if sep_field not in self.field_names_list:
+                        unknown_return_list.append(sep_field)
+            else:
+                if field not in self.field_names_list:
+                    unknown_return_list.append(field)
+        if unknown_return_list:
+            raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
+        for return_field in return_data_list:
+            if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):
+                path_list = self.find_paths(input_type, return_field)
+                path_msg = "  " + "\n  ".join(path_list[:10])
+                raise ValueError(
+                    f'"{return_field}" exists, but is not a unique field, must specify further.\n'
+                    f"10 of {len(path_list)} possible paths:\n"
+                    f"{path_msg}\n\n"
+                    f"For all paths run:\n"
+                    f"  from rcsbapi.data import Schema\n"
+                    f"  schema = Schema()\n"
+                    f'  schema.get_unique_fields("{return_field}")'
+                )
+        if use_networkx:
+            query = self._construct_query_networkx(input_ids, input_type, return_data_list)
+        else:
+            query = self._construct_query_rustworkx(input_ids, input_type, return_data_list)
+        validation_error_list = validate(self.client_schema, parse(query))
+        if not validation_error_list:
+            return query
+        else:
+            raise ValueError(validation_error_list)
+
+    def _construct_query_networkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id = True) -> str:  # incomplete function
         input_ids = [input_ids] if isinstance(input_ids, str) else input_ids
         # query_name = input_type
         # attr_list = self.root_dict[input_type]
@@ -587,18 +595,45 @@ class Schema:
         query = "query"
         return query
 
-    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str]) -> str:
-        # return_data_name = [name.split('.')[-1] for name in return_data_list]
+    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool = True) -> str:
+        """_summary_
+
+        Args:
+            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): identifing information for the specific entry, chemical component, etc to query
+            input_type (str): specifies where you are starting your query. These are specific fields like "entry" or "polymer_entity_instance".
+            return_data_list (List[str]): requested data, can be field name(s) or dot-separated field names
+                ex: "cluster_id" or "exptl.method"
+            add_rcsb_id (bool): automatically request rcsb_id at the top of the query. Default is True.
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+
+        Returns:
+            str: query in GraphQL syntax
+        """
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
+
+        # check formatting of input_ids
         input_dict = {}
         if isinstance(input_ids, Dict):
             input_dict = input_ids
             if not all(key in attr_name for key in input_dict.keys()):
-                raise ValueError(f"Input IDs keys do not match attribute names: {input_dict.keys()} vs {attr_name}")
+                raise ValueError(f"Input IDs keys do not match: {input_dict.keys()} vs {attr_name}")
             missing_keys = [key_arg for key_arg in attr_name if key_arg not in input_dict]
             if len(missing_keys) > 0:
-                raise ValueError(f'Missing input_id dictionary keys: {missing_keys}. Find input_id keys and descriptions by running SCHEMA.get_input_id_dict("{input_type}")')
+                raise ValueError(
+                    f"Missing input_id dictionary keys: {missing_keys}. Find input_id keys and descriptions by running:\n"
+                    f"  from rcsbapi.data import Schema\n"
+                    f"  schema = Schema()\n"
+                    f'  schema.get_input_id_dict("{input_type}")'
+                )
             attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
             for key, value in input_dict.items():
                 if attr_kind[key] == "SCALAR":
@@ -614,6 +649,10 @@ class Schema:
             input_dict = self.regex_checks(input_dict, input_ids, attr_list, input_type)
 
         start_node_index = self.dot_field_to_idx_dict[f"Query.{input_type}"]
+
+        #if rcsb_id isn't requested, add it to the query for more readable query results
+        if (f"{input_type}.rcsb_id" not in return_data_list) and (add_rcsb_id is True):
+            return_data_list.insert(0, f"{input_type}.rcsb_id")
 
         all_paths: Dict[int, List[List[input_type]]] = {}
         for field in return_data_list:
@@ -798,21 +837,19 @@ class Schema:
         """
         name_path: List[str] = []
         for idx in idx_path:
-            if isinstance(schema.schema_graph[idx], FieldNode):
-                name_path.append(schema.schema_graph[idx].name)
+            if isinstance(self.schema_graph[idx], FieldNode):
+                name_path.append(self.schema_graph[idx].name)
         return name_path
 
-
-schema = Schema()
-def get_unique_fields2(input_type:str, return_data_name: str) -> List[str]:
-    paths: List[List[int]] = []
-    input_type_idx: int = schema.dot_field_to_idx_dict[f"Query.{input_type}"]
-    for possible_idx in schema.field_to_idx_dict[return_data_name]:
-        paths_to_idx = rx.all_shortest_paths(schema.schema_graph, input_type_idx, possible_idx)
-        paths.extend(paths_to_idx)
-    name_paths: List[List[str]] = []
-    for path in paths:
-        name_paths.append(schema.idx_path_to_name_path(path))
-    dot_paths: List[str] = [".".join(name_path) for name_path in name_paths[1:]]
-    dot_paths.sort()
-    return dot_paths
+    def find_paths(self, input_type:str, return_data_name: str) -> List[str]:
+        paths: List[List[int]] = []
+        input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
+        for possible_idx in self.field_to_idx_dict[return_data_name]:
+            paths_to_idx = rx.all_shortest_paths(self.schema_graph, input_type_idx, possible_idx)
+            paths.extend(paths_to_idx)
+        name_paths: List[List[str]] = []
+        for path in paths:
+            name_paths.append(self.idx_path_to_name_path(path))
+        dot_paths: List[str] = [".".join(name_path[1:]) for name_path in name_paths]
+        dot_paths.sort()
+        return dot_paths
