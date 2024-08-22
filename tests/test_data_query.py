@@ -261,8 +261,8 @@ class QueryTests(unittest.TestCase):
                     return_data_list=[
                         "polymer_entity_instances.rcsb_id",
                         "rcsb_polymer_instance_feature.type",
-                        "feature_positions.beg_seq_id",
-                        "feature_positions.end_seq_id"
+                        "rcsb_polymer_instance_feature.feature_positions.beg_seq_id",
+                        "rcsb_polymer_instance_feature.feature_positions.end_seq_id"
                     ]
                 )
                 query.exec()
@@ -276,7 +276,7 @@ class QueryTests(unittest.TestCase):
                     input_ids=["7NHM", "5L2G"],
                     return_data_list=[
                         "entries.rcsb_id",
-                        "reference_sequence_identifiers.database_accession",
+                        "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession",
                         "reference_sequence_identifiers.database_name"
                     ]
                 )
@@ -403,6 +403,7 @@ class QueryTests(unittest.TestCase):
 
     def testSearchDataNotebook(self):
         with self.subTest(msg="1. Construct search API query and request"):
+            # search API query and request
             try:
                 q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "COVID-19 virus"
                 q2 = attrs.rcsb_nonpolymer_entity_annotation.type == "SUBJECT_OF_INVESTIGATION"
@@ -412,7 +413,7 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             self.assertGreaterEqual(len(list(result_list)), 10)
-        with self.subTest(msg="2. Construct data API query and request"):
+        with self.subTest(msg="2. Construct data API query and parse result"):
             try:
                 data_query = Query(
                     input_type="entries",
@@ -428,7 +429,6 @@ class QueryTests(unittest.TestCase):
                 data_query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="3. Parse result"):
             try:
                 json = data_query.get_response()["data"]["entries"]
                 json[0]["rcsb_id"]

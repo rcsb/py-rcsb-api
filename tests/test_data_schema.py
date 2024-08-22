@@ -166,9 +166,7 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="20. nested query"):
-            query = SCHEMA._construct_query_rustworkx(
-                input_type="interfaces", return_data_list=["rcsb_interface_partner"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"]
-            )
+            query = SCHEMA._construct_query_rustworkx(input_type="interfaces", return_data_list=["rcsb_interface_partner"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="20. requesting scalars under same field"):
@@ -210,9 +208,7 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. regex for assemblies"):
-            query = SCHEMA._construct_query_rustworkx(
-                input_type="assemblies", return_data_list=["rcsb_struct_symmetry_lineage"], input_ids=["4HHB-1", "MA_MACOFFESLACC100000G1I2-2"]
-            )
+            query = SCHEMA._construct_query_rustworkx(input_type="assemblies", return_data_list=["rcsb_struct_symmetry_lineage"], input_ids=["4HHB-1", "MA_MACOFFESLACC100000G1I2-2"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="5. regex for interfaces"):
@@ -232,10 +228,12 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA._construct_query_rustworkx(input_type="assemblies", return_data_list=["exptl"], input_ids=["4HHB", "1IYE"])
 
-    def testAllRoots(self):
+    def testAllRoots(self):  # incomplete
         with self.subTest(msg="1. uniprot"):
             try:
-                query = SCHEMA._Schema__construct_query_rustworkx(input_type="uniprot", input_ids={"uniprot_id": "P01308"}, return_data_list=["uniprot.rcsb_id", "reference_sequence_identifiers.database_accession"])
+                query = SCHEMA._construct_query_rustworkx(
+                    input_type="uniprot", input_ids={"uniprot_id": "P01308"}, return_data_list=["uniprot.rcsb_id", "reference_sequence_identifiers.database_accession"]
+                )
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
@@ -280,21 +278,17 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA._construct_query_rustworkx(input_ids=["4HHB"], input_type="entry", return_data_list=["chem_comp.id"])
 
-    def testDescriptionDict(self):
+    def testDescription(self):
         with self.subTest(msg="1. check nonpolymer_comp description"):
-            SCHEMA.create_description_dict()
-            self.assertIn("nonpolymer_comp", SCHEMA.field_description_dict)
-            description = SCHEMA.field_description_dict.get("nonpolymer_comp")
-            logger.info("Description for 'nonpolymer_comp': %s", description)
+            nonpolymer_comp_idx = SCHEMA.field_to_idx_dict["nonpolymer_comp"][0]
+            description = SCHEMA.schema_graph[nonpolymer_comp_idx].description
+            logger.info("Description for 'nonpolymer_comp': %s", SCHEMA.schema_graph[nonpolymer_comp_idx].description)
             self.assertEqual(description, "Get a non-polymer chemical components described in this molecular entity.")
-        with self.subTest(msg="2. check `rcsb_id` not in dict"):
-            SCHEMA.create_description_dict()
-            self.assertNotIn("rcsb_id", SCHEMA.field_description_dict)
 
     def testFindFieldNames(self):
         with self.subTest(msg="1. search for rcsb"):
             result = SCHEMA.find_field_names("rcsb")
-            self.assertIn("entry.rcsb_id", result)
+            self.assertIn("rcsb_id", result)
         with self.subTest(msg="1. search for nonexistent field"):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names("foo")
@@ -308,13 +302,13 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("test_schema_version"))
     suiteSelect.addTest(SchemaTests("testFetch"))
     suiteSelect.addTest(SchemaTests("testConstructRootDict"))
-    suiteSelect.addTest(SchemaTests("testConstructTypeDict"))
     # suiteSelect.addTest(SchemaTests("testRecurseBuildSchema"))
     suiteSelect.addTest(SchemaTests("regexChecks"))
     suiteSelect.addTest(SchemaTests("testConstructQuery"))
+    suiteSelect.addTest(SchemaTests("testAllRoots"))
     suiteSelect.addTest(SchemaTests("testDotNotation"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
-    suiteSelect.addTest(SchemaTests("testDescriptionDict"))
+    suiteSelect.addTest(SchemaTests("testDescription"))
     suiteSelect.addTest(SchemaTests("testFindFieldNames"))
     return suiteSelect
 

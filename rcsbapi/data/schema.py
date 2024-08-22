@@ -64,9 +64,8 @@ class Schema:
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
         self.seen_names: set[str] = set()
-        self.field_description_dict: Dict[str, str] = {}
         self.root_introspection = self.request_root_types(PDB_URL)
-        self.schema = self.fetch_schema(self.pdb_url)
+        self.schema: Dict = self.fetch_schema(self.pdb_url)
         self.client_schema = build_client_schema(self.schema["data"])
 
         if use_networkx:
@@ -80,7 +79,6 @@ class Schema:
         self.schema_graph = self.recurse_build_schema(self.schema_graph, "Query")
         self.dot_field_to_idx_dict: Dict[str, int] = self.make_dot_field_to_idx()
         """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
-        self.create_description_dict()
         self.apply_weights(["CoreAssembly"], 2)
 
     def request_root_types(self, pdb_url) -> Dict:
@@ -241,7 +239,7 @@ class Schema:
                 return json.load(schema_file)
 
     def construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
-        all_types_dict = self.schema["data"]["__schema"]["types"]
+        all_types_dict: Dict = self.schema["data"]["__schema"]["types"]
         type_fields_dict = {}
         for each_type_dict in all_types_dict:
             type_name = str(each_type_dict["name"])
@@ -302,6 +300,7 @@ class Schema:
         for root_type in root_type_list:
             node_idx = self.type_to_idx_dict[root_type]
             if use_networkx is False:
+                assert isinstance(self.schema_graph, rx.PyDiGraph)
                 out_edge_list = self.schema_graph.incident_edges(node_idx)
                 for edge_idx in out_edge_list:
                     self.schema_graph.update_edge_by_index(edge_idx, weight)
@@ -469,21 +468,25 @@ class Schema:
         # print(f"get_descendant_fields: {result}")
         return result
 
-    def create_description_dict(self) -> None:
-        for field_name, field_index in self.dot_field_to_idx_dict.items():
-            assert isinstance(field_index, int)
-            field_node: FieldNode = self.schema_graph[field_index]
-            if isinstance(field_node, FieldNode):
-                self.field_description_dict[field_name] = field_node.description
+    def find_field_names(self, search_string: str) -> List[str]:
+        """find field names that fully or partially match the search string
 
-    def find_field_names(self, search_string: str) -> Dict[str, str]:
+        Args:
+            search_string (str): string to search field names for
+
+        Raises:
+            ValueError: thrown when a type other than string is passed in for search_string
+            ValueError: thrown when no fields match search_string
+
+        Returns:
+            List[str]: list of matching field names
+        """
         if not isinstance(search_string, str):
             raise ValueError(f"Please input a string instead of {type(search_string)}")
-        field_names = [key for key in self.field_description_dict if search_string.lower() in key.lower()]
+        field_names = [key for key in self.field_to_idx_dict if search_string.lower() in key.lower()]
         if not field_names:
             raise ValueError(f"No fields found matching '{search_string}'")
-        name_description = {name: self.field_description_dict[name] for name in field_names if name in self.field_description_dict}
-        return name_description
+        return field_names
 
     def regex_checks(self, input_dict: Dict, input_ids: List[str], attr_list: List[Dict], input_type: str) -> Union[Dict[str, str], Dict[str, List[str]]]:
         plural_types = [key for key, value in self.root_dict.items() for item in value if item["kind"] == "LIST"]
@@ -555,7 +558,7 @@ class Schema:
                 input_dict[attr] = input_ids
         return input_dict
 
-    def construct_query(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id = True) -> str:
+    def construct_query(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id=True) -> str:
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self.root_dict.keys():
@@ -580,9 +583,13 @@ class Schema:
             if ("." not in return_field) and (self.field_names_list.count(return_field) > 1):
                 path_list = self.find_paths(input_type, return_field)
                 path_msg = "  " + "\n  ".join(path_list[:10])
+                if len(path_list) > 10:
+                    len_path = 10
+                else:
+                    len_path = len(path_list)
                 raise ValueError(
                     f'"{return_field}" exists, but is not a unique field, must specify further.\n'
-                    f"10 of {len(path_list)} possible paths:\n"
+                    f"{len_path} of {len(path_list)} possible paths:\n"
                     f"{path_msg}\n\n"
                     f"For all paths run:\n"
                     f"  from rcsbapi.data import Schema\n"
@@ -592,7 +599,7 @@ class Schema:
         if use_networkx:
             query = self._construct_query_networkx(input_ids, input_type, return_data_list)
         else:
-            query = self._construct_query_rustworkx(input_ids, input_type, return_data_list)
+            query = self._construct_query_rustworkx(input_ids, input_type, return_data_list, add_rcsb_id)
         validation_error_list = validate(self.client_schema, parse(query))
         if not validation_error_list:
             return query
@@ -603,8 +610,8 @@ class Schema:
         query = ""
         return query
 
-    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool = True) -> str:
-        """_summary_
+    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool=True) -> str:
+        """Construct a query in GraphQL syntax using a rustworkx graph.
 
         Args:
             input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): identifing information for the specific entry, chemical component, etc to query
@@ -614,13 +621,11 @@ class Schema:
             add_rcsb_id (bool): automatically request rcsb_id at the top of the query. Default is True.
 
         Raises:
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
+            ValueError: input_ids dictionary keys don't match the input_type given
+            ValueError: input_ids dictionary keys missing
+            ValueError: input_ids dictionary value should be a string, but another type was passed in
+            ValueError: field in return_data_list exists, but is a redundant name and needs to be further specified
+            ValueError: path in return_data_list exists, but is a redundant and needs to be further specified
 
         Returns:
             str: query in GraphQL syntax
@@ -667,30 +672,62 @@ class Schema:
 
         for field in return_data_list:
             if "." in field:
-                possible_paths = self.parse_dot_path(field)
-                shortest_paths = self.compare_paths(start_node_index, possible_paths)
-                if len(shortest_paths) > 1:
-                    shortest_name_paths = [".".join([self.idx_to_name(idx) for idx in path if isinstance(self.schema_graph[idx], FieldNode)]) for path in shortest_paths]
-                    shortest_name_paths.sort()
+                # generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
+                path_list = field.split(".")
+                possible_paths = self.find_paths(input_type, path_list[-1])
+                matching_paths: List[str] = []
+                for path in possible_paths:
+                    possible_paths_list = path.split(".")
+                    possible_paths_list.insert(0, str(input_type))
+                    for i in range(len(possible_paths_list)):
+                        if possible_paths_list[i:i + len(path_list)] == path_list:
+                            matching_paths.append(".".join(possible_paths_list))
+
+                idx_paths: List[List[int]] = []
+                if len(matching_paths) > 0:
+                    for path in matching_paths:
+                        idx_paths.extend(self.parse_dot_path(path))
+                    idx_paths = self.compare_paths(start_node_index, idx_paths)
+
+                if len(idx_paths) > 1:
                     path_choice_msg = ""
-                    for name_path in shortest_name_paths:
+                    for name_path in matching_paths:
                         path_choice_msg += "  " + name_path + "\n"
                     raise ValueError(
-                        "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n"
+                        f'"{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n'
                         f"{path_choice_msg}\n"
-                        "Please note that this list may not be complete. "
-                        "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
                     )
-                else:
-                    node_idx = shortest_paths[0][-1]
-                    all_paths[node_idx] = shortest_paths
+
+                # if path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
+                if len(matching_paths) == 0:
+                    possible_dot_paths: List[List[int]] = self.parse_dot_path(field)  # throws an error if path is invalid
+                    shortest_full_paths: List[List[int]] = self.compare_paths(start_node_index, possible_dot_paths)
+                    assert len(shortest_full_paths) != 0
+                    if len(shortest_full_paths) > 1:
+                        shortest_name_paths = [".".join([self.idx_to_name(idx) for idx in path if isinstance(self.schema_graph[idx], FieldNode)]) for path in shortest_full_paths]
+                        shortest_name_paths.sort()
+                        path_choice_msg = ""
+                        for name_path in shortest_name_paths:
+                            path_choice_msg += "  " + name_path + "\n"
+                        raise ValueError(
+                            "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n"
+                            f"{path_choice_msg}\n"
+                            "Please note that this list may not be complete. "
+                            "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
+                        )
+                    idx_paths = shortest_full_paths
+                
+                final_idx: int = idx_paths[0][-1]
+                all_paths[final_idx] = idx_paths
+
+            # if no dots and the node name is unique in schema_graph
             else:
                 node_idx = self.dot_field_to_idx_dict[field]
                 paths = rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, node_idx, weight_fn=lambda edge: edge)
                 unique_paths = {tuple(path) for path in paths}
                 unique_paths_list: List[List[int]] = [list(unique_path) for unique_path in unique_paths]
                 all_paths[node_idx] = unique_paths_list
-        # pprint(f"all_paths: {all_paths}")
+
         for return_data in return_data_list:
             if any(not value for value in all_paths.values()):
                 raise ValueError(f'You can\'t access "{return_data}" from input type {input_type}')
@@ -698,7 +735,6 @@ class Schema:
         final_fields = {}
         for target_idx in all_paths.keys():
             final_fields[target_idx] = self.get_descendant_fields(target_idx)
-        # print(f"final fields: {final_fields}")
 
         field_names: Dict[Any, Any] = {}
         paths: Dict[Any, Any] = {}
@@ -719,8 +755,6 @@ class Schema:
                             skip_first = False
                             continue
                         field_names[target_idx].append(node_idx)
-        # print(f"paths: {paths}")
-        # print(f"field_names: {field_names}")
         query = "{ " + input_type + "("
 
         for i, attr in enumerate(attr_name):
@@ -774,7 +808,7 @@ class Schema:
             ValueError: thrown if no path matches dot_path
 
         Returns:
-            List[List[int]]: list of paths where each path is a list of indices matching the given dot_path
+            List[List[int]]: list of paths where each path is a list of FieldNode indices matching the given dot_path
         """
         path_list = dot_path.split(".")
         node_matches: List[int] = self.field_to_idx_dict[path_list[0]]
@@ -800,10 +834,12 @@ class Schema:
             ValueError: thrown when there is no path from the input_type node to the return data nodes.
 
         Returns:
-            List[List[int]]: list of shortest paths from the input_type node index to the index of the final field given in dot notation
-                ex: input_type "entry" and "exptl.method" would return a list of shortest path(s) with indices from "entry" to "method"
+            List[List[int]]: list of shortest paths from the input_type node index to the index of the final field given in dot notation.
+                ex: input_type "entry" and "exptl.method" would return a list of shortest path(s) with indices from "entry" to "method".
         """
         all_paths: List[List[int]] = []
+        assembly_node_idxs = list(self.field_to_idx_dict["assemblies"])
+        assembly_node_idxs.remove(self.dot_field_to_idx_dict["Query.assemblies"])  # nodes named "assemblies" except the root "assemblies"
         for path in dot_paths:
             first_path_idx = path[0]
             if start_node_index == first_path_idx:
@@ -819,11 +855,33 @@ class Schema:
                         unique_path += path[1:]
             all_paths.extend(unique_paths_list)
         if len(all_paths) == 0:
-            raise ValueError(f"You can't access \"{'.'.join([self.idx_to_name(idx) for idx in dot_paths[0]])}\" from given input_type {self.schema_graph[start_node_index].name}")
-        else:
-            shortest_path_len = len(min(all_paths, key=len))
-            shortest_paths = [path for path in all_paths if len(path) == shortest_path_len]
+            raise ValueError(f"Can't access \"{'.'.join(self.idx_path_to_name_path(dot_paths[0]))}\" from given input_type {self.schema_graph[start_node_index].name}")
+        shortest_path_len = len(min(all_paths, key=len))
+        shortest_paths = [path for path in all_paths if len(path) == shortest_path_len]
+        shortest_paths = self._weigh_assemblies(shortest_paths, assembly_node_idxs)
         return shortest_paths
+    
+    def _weigh_assemblies(self, paths: List[List[int]], assembly_node_idxs: List[int]) -> List[List[int]]:
+        """remove paths containing "assemblies" that are otherwise equivalent. Mimics weighing assembly edges in the rest of query construction
+
+        Args:
+            paths (List[List[int]]): list of paths where each path is a list of indices from a root node to a requested field.
+            assembly_node_idxs (List[int]): list of indices of nodes named "assemblies" (root node excluded)
+
+        Returns:
+            List[List[int]]: List with weight applied (no "assemblies" path if there is an equivalent path present)
+        """
+        for path in paths:
+            for assemblies_idx in assembly_node_idxs:
+                if assemblies_idx in path:
+                    path_no_assemblies = [field for field in path if field != assemblies_idx]
+                    for compare_path in paths:
+                        if compare_path == path:
+                            continue
+                        name_compare_path = self.idx_path_to_name_path(compare_path)
+                        if (len(compare_path) == len(path)) and all(self.idx_to_name(field) in name_compare_path for field in path_no_assemblies):
+                            paths.remove(path)
+        return paths
 
     def idx_to_name(self, idx: int) -> str:
         """Given an index, return the associated node's name
@@ -852,10 +910,19 @@ class Schema:
         return name_path
 
     def find_paths(self, input_type:str, return_data_name: str) -> List[str]:
+        """Find path from input_type to any nodes matching return_data_name
+
+        Args:
+            input_type (str): name of an input_type (ex: entry, polymer_entity_instance)
+            return_data_name (str): name of one field, can be a redundant name
+
+        Returns:
+            List[str]: list of paths to nodes with names that match return_data_name
+        """
         paths: List[List[int]] = []
         input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
         for possible_idx in self.field_to_idx_dict[return_data_name]:
-            paths_to_idx = rx.all_shortest_paths(self.schema_graph, input_type_idx, possible_idx)
+            paths_to_idx = rx.all_simple_paths(self.schema_graph, input_type_idx, possible_idx)
             paths.extend(paths_to_idx)
         name_paths: List[List[str]] = []
         for path in paths:
