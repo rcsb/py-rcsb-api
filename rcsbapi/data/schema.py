@@ -393,16 +393,6 @@ class Schema:
                     dot_field_to_idx[node.name] = node.index
         return dot_field_to_idx
 
-    def get_unique_fields(self, return_data_name: str) -> List[str]:
-        return_data_name = return_data_name.lower()
-        valid_field_list: List[str] = []
-        for name, idx in self.dot_field_to_idx_dict.items():
-            if isinstance(self.schema_graph[idx], FieldNode):
-                if self.schema_graph[idx].redundant is True:
-                    if name.split(".")[1].lower() == return_data_name:
-                        valid_field_list.append(name)
-        return valid_field_list
-
     def get_input_id_dict(self, input_type: str) -> Dict[str, str]:
         if input_type not in self.root_dict.keys():
             raise ValueError("Not a valid input_type, no available input_id dictionary")
@@ -599,7 +589,7 @@ class Schema:
                     f"For all paths run:\n"
                     f"  from rcsbapi.data import Schema\n"
                     f"  schema = Schema()\n"
-                    f'  schema.get_unique_fields("{return_field}")'
+                    f'  schema.find_paths("{input_type}", "{return_field}")'
                 )
         if use_networkx:
             query = self._construct_query_networkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list)

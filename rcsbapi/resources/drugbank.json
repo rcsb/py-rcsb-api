@@ -1,0 +1,639 @@
+{
+    "type": "object",
+    "properties": {
+        "drugbank_container_identifiers": {
+            "type": "object",
+            "properties": {
+                "drugbank_id": {
+                    "type": "string",
+                    "description": "The DrugBank accession code",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank accession code",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "drugbank_id"
+            ]
+        },
+        "drugbank_info": {
+            "type": "object",
+            "properties": {
+                "affected_organisms": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "Humans and other mammals"
+                        ],
+                        "description": "The DrugBank drug affected organisms.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "The DrugBank drug affected organisms.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "atc_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "A11HA04"
+                        ],
+                        "description": "The Anatomical Therapeutic Chemical Classification System (ATC) codes.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "The Anatomical Therapeutic Chemical Classification System (ATC) codes.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "brand_names": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "Atriphos; Striadyne"
+                        ],
+                        "description": "DrugBank drug brand names.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "DrugBank drug brand names.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Drug Brand Name",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Chemical Components",
+                                "priority_order": 35
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "cas_number": {
+                    "type": "string",
+                    "examples": [
+                        "56-65-5"
+                    ],
+                    "description": "The DrugBank assigned Chemical Abstracts Service identifier.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank assigned Chemical Abstracts Service identifier.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "description": {
+                    "type": "string",
+                    "description": "The DrugBank drug description.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank drug description.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "drug_categories": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "Adenine Nucleotides;Carbohydrates;Dietary Supplements"
+                        ],
+                        "description": "The DrugBank drug categories.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "The DrugBank drug categories.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "drug_groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "approved",
+                            "experimental",
+                            "illicit",
+                            "investigational",
+                            "nutraceutical",
+                            "vet_approved",
+                            "withdrawn"
+                        ],
+                        "examples": [
+                            "approved",
+                            "nutraceutical"
+                        ],
+                        "description": "The DrugBank drug groups determine their drug development status.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "approved",
+                                "detail": "A drug that has been approved in at least one jurisdiction, at some point in time",
+                                "name": "Approved"
+                            },
+                            {
+                                "value": "experimental",
+                                "detail": "A compound that has been shown experimentally to bind specific proteins in mammals, bacteria, viruses, fungi, or parasites",
+                                "name": "Experimental"
+                            },
+                            {
+                                "value": "illicit",
+                                "detail": "A drug that is scheduled in at least one jurisdiction, at some point in time",
+                                "name": "Illicit"
+                            },
+                            {
+                                "value": "investigational",
+                                "detail": "A drug that is in some phase of the drug approval process in at least one jurisdiction",
+                                "name": "Investigational"
+                            },
+                            {
+                                "value": "nutraceutical",
+                                "detail": "A drug that is a pharmaceutical-grade and standardized nutrient (with confirmed or unconfirmed health benefits)",
+                                "name": "Nutraceutical"
+                            },
+                            {
+                                "value": "vet_approved",
+                                "detail": "A drug that has been approved in at least one jurisdiction, at some point in time for the treatment of animals",
+                                "name": "Vet Approved"
+                            },
+                            {
+                                "value": "withdrawn",
+                                "detail": "A previously approved drug that has been withdrawn from the market in at least one jurisdiction, at some point in time",
+                                "name": "Withdrawn"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The DrugBank drug groups determine their drug development status.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Drug Groups",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Chemical Components",
+                                "priority_order": 40
+                            }
+                        ]
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
+                "drugbank_id": {
+                    "type": "string",
+                    "description": "The DrugBank accession code",
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank accession code",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "indication": {
+                    "type": "string",
+                    "examples": [
+                        "For nutritional supplementation, also for treating dietary shortage or imbalance"
+                    ],
+                    "description": "The DrugBank drug indication.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank drug indication.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "mechanism_of_action": {
+                    "type": "string",
+                    "examples": [
+                        "ATP is able to store and transport chemical energy within cells."
+                    ],
+                    "description": "The DrugBank drug mechanism of actions.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank drug mechanism of actions.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The DrugBank drug name.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank drug name.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "pharmacology": {
+                    "type": "string",
+                    "examples": [
+                        "Adenosine triphosphate (ATP) is the nucleotide known in biochemistry as the \"molecular currency\" of intracellular energy transfer; that is, ATP is able to store and transport chemical energy within cells. ATP also plays an important role in the synthesis of nucleic acids. The total quantity of ATP in the human body is about 0.1 mole. The energy used by human cells requires the hydrolysis of 200 to 300 moles of ATP daily. This means that each ATP molecule is recycled 2000 to 3000 times during a single day. ATP cannot be stored, hence its consumption must closely follow its synthesis."
+                    ],
+                    "description": "The DrugBank drug pharmacology.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "The DrugBank drug pharmacology.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "synonyms": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "Adenosine-5'-triphosphate; ATP"
+                        ],
+                        "description": "DrugBank drug name synonyms.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "DrugBank drug name synonyms.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "drug_products": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "approved": {
+                                "type": "string",
+                                "enum": [
+                                    "N",
+                                    "Y"
+                                ],
+                                "description": "Indicates whether this drug has been approved by the regulating government.",
+                                "rcsb_search_context": [
+                                    "exact-match"
+                                ],
+                                "rcsb_full_text_priority": 10,
+                                "rcsb_description": [
+                                    {
+                                        "text": "Indicates whether this drug has been approved by the regulating government.",
+                                        "context": "dictionary"
+                                    },
+                                    {
+                                        "text": "Drug Is Approved",
+                                        "context": "brief"
+                                    }
+                                ],
+                                "rcsb_search_group": [
+                                    {
+                                        "group_name": "Chemical Components",
+                                        "priority_order": 45
+                                    }
+                                ]
+                            },
+                            "country": {
+                                "type": "string",
+                                "enum": [
+                                    "Canada",
+                                    "EU",
+                                    "US"
+                                ],
+                                "examples": [
+                                    "Canada"
+                                ],
+                                "description": "The country where this commercially available drug has been approved.",
+                                "rcsb_search_context": [
+                                    "exact-match"
+                                ],
+                                "rcsb_full_text_priority": 10,
+                                "rcsb_description": [
+                                    {
+                                        "text": "The country where this commercially available drug has been approved.",
+                                        "context": "dictionary"
+                                    },
+                                    {
+                                        "text": "Drug Market Availability",
+                                        "context": "brief"
+                                    }
+                                ],
+                                "rcsb_search_group": [
+                                    {
+                                        "group_name": "Chemical Components",
+                                        "priority_order": 60
+                                    }
+                                ]
+                            },
+                            "ended_marketing_on": {
+                                "type": "string",
+                                "format": "date",
+                                "examples": [
+                                    "2003-07-30"
+                                ],
+                                "description": "The ending date for market approval.",
+                                "rcsb_search_context": [
+                                    "default-match"
+                                ],
+                                "rcsb_description": [
+                                    {
+                                        "text": "The ending date for market approval.",
+                                        "context": "dictionary"
+                                    },
+                                    {
+                                        "text": "Drug Marketing End",
+                                        "context": "brief"
+                                    }
+                                ],
+                                "rcsb_search_group": [
+                                    {
+                                        "group_name": "Chemical Components",
+                                        "priority_order": 55
+                                    }
+                                ]
+                            },
+                            "name": {
+                                "type": "string",
+                                "examples": [
+                                    "Hivid Tab 0.375mg"
+                                ],
+                                "description": "The proprietary name(s) provided by the manufacturer for any commercially available products containing this drug.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "The proprietary name(s) provided by the manufacturer for any commercially available products containing this drug.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "source": {
+                                "type": "string",
+                                "enum": [
+                                    "DPD",
+                                    "EMA",
+                                    "FDA NDC"
+                                ],
+                                "examples": [
+                                    "DPD"
+                                ],
+                                "description": "Source of this product information. For example, a value of DPD indicates this information was retrieved from the Canadian Drug Product Database.",
+                                "rcsb_enum_annotated": [
+                                    {
+                                        "value": "DPD",
+                                        "detail": "Canadian Drug Product Database"
+                                    },
+                                    {
+                                        "value": "EMA",
+                                        "detail": "European Medcines Agency"
+                                    },
+                                    {
+                                        "value": "FDA NDC",
+                                        "detail": "United States Food and Drug Administration National Drug Code"
+                                    }
+                                ],
+                                "rcsb_description": [
+                                    {
+                                        "text": "Source of this product information. For example, a value of DPD indicates this information was retrieved from the Canadian Drug Product Database.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "started_marketing_on": {
+                                "type": "string",
+                                "format": "date",
+                                "examples": [
+                                    "1992-12-31"
+                                ],
+                                "description": "The starting date for market approval.",
+                                "rcsb_search_context": [
+                                    "default-match"
+                                ],
+                                "rcsb_description": [
+                                    {
+                                        "text": "The starting date for market approval.",
+                                        "context": "dictionary"
+                                    },
+                                    {
+                                        "text": "Drug Marketing Start",
+                                        "context": "brief"
+                                    }
+                                ],
+                                "rcsb_search_group": [
+                                    {
+                                        "group_name": "Chemical Components",
+                                        "priority_order": 50
+                                    }
+                                ]
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "rcsb_nested_indexing": true
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "drugbank_id"
+            ]
+        },
+        "drugbank_target": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "interaction_type": {
+                        "type": "string",
+                        "description": "The type of target interaction.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "The type of target interaction.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "The target name.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "The target name.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "ordinal": {
+                        "type": "integer",
+                        "description": "The value of _drugbank_target.ordinal distinguishes\n related examples for each chemical component.",
+                        "rcsb_description": [
+                            {
+                                "text": "The value of _drugbank_target.ordinal distinguishes\n related examples for each chemical component.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "organism_common_name": {
+                        "type": "string",
+                        "description": "The organism common name.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "The organism common name.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "reference_database_accession_code": {
+                        "type": "string",
+                        "examples": [
+                            "Q9HD40"
+                        ],
+                        "description": "The reference identifier code for the target interaction reference.",
+                        "rcsb_description": [
+                            {
+                                "text": "The reference identifier code for the target interaction reference.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "reference_database_name": {
+                        "type": "string",
+                        "enum": [
+                            "UniProt"
+                        ],
+                        "examples": [
+                            "UniProt"
+                        ],
+                        "description": "The reference database name for the target interaction.",
+                        "rcsb_description": [
+                            {
+                                "text": "The reference database name for the target interaction.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "seq_one_letter_code": {
+                        "type": "string",
+                        "examples": [
+                            "MAKQRSG..."
+                        ],
+                        "description": "Target sequence expressed as string of one-letter amino acid codes.",
+                        "rcsb_description": [
+                            {
+                                "text": "Target sequence expressed as string of one-letter amino acid codes.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "target_actions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "description": "The actions of the target interaction.",
+                            "rcsb_search_context": [
+                                "full-text"
+                            ],
+                            "rcsb_full_text_priority": 1,
+                            "rcsb_description": [
+                                {
+                                    "text": "The actions of the target interaction.",
+                                    "context": "dictionary"
+                                }
+                            ]
+                        },
+                        "uniqueItems": false
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "ordinal"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        }
+    },
+    "additionalProperties": false,
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "schema: drugbank_core collection: drugbank_core version: 1.3.2",
+    "description": "RCSB Exchange Database JSON schema derived from the drugbank_core content type schema. This schema supports collection drugbank_core version 1.3.2. This schema is hosted in repository https://github.com/rcsb/py-rcsb.db/tree/master/rcsb.db/data/json-schema/json-schema-min-drugbank_core.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 1.3.2"
+}

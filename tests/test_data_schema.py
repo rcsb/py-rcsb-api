@@ -41,18 +41,47 @@ logger.setLevel(logging.INFO)
 
 class SchemaTests(unittest.TestCase):
     def test_schema_version(self):
-        entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "entry_schema.json")
-        with open(entry_schema_path, "r", encoding="utf-8") as f:
-            schema_data = json.load(f)
-        local_schema_version = schema_data.get("$comment").split(": ")[1]
-        local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
+        with self.subTest(msg="1. Compare entry schema"):
+            entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "entry.json")
+            with open(entry_schema_path, "r", encoding="utf-8") as f:
+                schema_data = json.load(f)
+            local_schema_version = schema_data.get("$comment").split(": ")[1]
+            local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
 
-        online_schema_url = "https://data.rcsb.org/rest/v1/schema/entry"
-        response = requests.get(online_schema_url)
-        online_schema_data = response.json()
-        online_schema_version = online_schema_data.get("$comment").split(": ")[1]
-        online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
-        self.assertEqual(local_major_minor_version, online_major_minor_version)
+            online_schema_url = "https://data.rcsb.org/rest/v1/schema/entry"
+            response = requests.get(online_schema_url)
+            online_schema_data = response.json()
+            online_schema_version = online_schema_data.get("$comment").split(": ")[1]
+            online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
+            self.assertEqual(local_major_minor_version, online_major_minor_version)
+
+        with self.subTest(msg="2. Compare polymer_entity schema"):
+            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "polymer_entity.json")
+            with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
+                schema_data = json.load(f)
+            local_schema_version = schema_data.get("$comment").split(": ")[1]
+            local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
+
+            online_schema_url = "https://data.rcsb.org/rest/v1/schema/polymer_entity"
+            response = requests.get(online_schema_url)
+            online_schema_data = response.json()
+            online_schema_version = online_schema_data.get("$comment").split(": ")[1]
+            online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
+            self.assertEqual(local_major_minor_version, online_major_minor_version)
+
+        with self.subTest(msg="3. Compare polymer_entity_instance schema"):
+            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "polymer_entity_instance.json")
+            with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
+                schema_data = json.load(f)
+            local_schema_version = schema_data.get("$comment").split(": ")[1]
+            local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
+
+            online_schema_url = "https://data.rcsb.org/rest/v1/schema/polymer_entity_instance"
+            response = requests.get(online_schema_url)
+            online_schema_data = response.json()
+            online_schema_version = online_schema_data.get("$comment").split(": ")[1]
+            online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
+            self.assertEqual(local_major_minor_version, online_major_minor_version)
 
     def setUp(self):
         self.__startTime = time.time()
@@ -294,7 +323,7 @@ class SchemaTests(unittest.TestCase):
                 SCHEMA.find_field_names("foo")
         with self.subTest(msg="2. search for field list"):
             with self.assertRaises(ValueError):
-                SCHEMA.find_field_names(["rcsb", "exptl"])
+                SCHEMA.find_field_names(["rcsb", "exptl"])  # type: ignore
 
 
 def buildSchema():
