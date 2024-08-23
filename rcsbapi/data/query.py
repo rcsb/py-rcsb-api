@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 
 class Query:
 
-    def __init__(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id: bool=True):
+    def __init__(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id: bool = True):
         input_id_limit = 200
         if isinstance(input_ids, list):
             if len(input_ids) > input_id_limit:
@@ -33,7 +33,7 @@ class Query:
                 self._input_ids_list: List[str] = input_ids[SCHEMA.root_dict[input_type][0]["name"]]
             if isinstance(input_ids, list):
                 self._input_ids_list = input_ids
-        self._response: Union [None, Dict[str, Any]]= None
+        self._response: Union[None, Dict[str, Any]] = None
 
     def get_input_ids(self) -> Union[List[str], Dict[str, List[str]], Dict[str, str]]:
         return self._input_ids

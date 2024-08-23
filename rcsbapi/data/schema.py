@@ -1,6 +1,6 @@
 import re
 import logging
-from typing import List, Dict, Union, Any
+from typing import List, Dict, Union, Any, Optional
 import json
 import os
 import requests
@@ -27,12 +27,13 @@ class FieldNode:
         self.kind: str = kind
         self.of_kind: str = ""
         self.type: str = node_type
+        self.index: Optional[int] = None
 
     def __str__(self) -> str:
         return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
     def set_index(self, index: int) -> None:
-        self.index: int = index
+        self.index = index
 
     def set_of_kind(self, of_kind: str) -> None:
         self.of_kind = of_kind
@@ -41,13 +42,15 @@ class FieldNode:
 class TypeNode:
 
     def __init__(self, name: str) -> None:
-        self.name:str = name
+        self.name: str = name
+        self.index: Optional[int] = None
+        self.field_list: Optional[List[FieldNode]] = None
 
     def set_index(self, index) -> None:
-        self.index: int = index
+        self.index = index
 
     def set_field_list(self, field_list: List[FieldNode]) -> None:
-        self.field_list: List[FieldNode] = field_list
+        self.field_list = field_list
 
 
 class Schema:
@@ -73,7 +76,7 @@ class Schema:
         else:
             self.schema_graph = rx.PyDiGraph()
 
-        self.type_fields_dict: Dict[str, Dict] =  self.construct_type_dict()
+        self.type_fields_dict: Dict[str, Dict] = self.construct_type_dict()
         self.field_names_list = self.construct_name_list()
         self.root_dict: Dict[str, List[Dict[str, str]]] = self.construct_root_dict(self.pdb_url)
         self.schema_graph = self.recurse_build_schema(self.schema_graph, "Query")
@@ -597,9 +600,9 @@ class Schema:
                     f'  schema.get_unique_fields("{return_field}")'
                 )
         if use_networkx:
-            query = self._construct_query_networkx(input_ids, input_type, return_data_list)
+            query = self._construct_query_networkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list)
         else:
-            query = self._construct_query_rustworkx(input_ids, input_type, return_data_list, add_rcsb_id)
+            query = self._construct_query_rustworkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list, add_rcsb_id=add_rcsb_id)
         validation_error_list = validate(self.client_schema, parse(query))
         if not validation_error_list:
             return query
@@ -610,7 +613,7 @@ class Schema:
         query = ""
         return query
 
-    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool=True) -> str:
+    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool = True) -> str:
         """Construct a query in GraphQL syntax using a rustworkx graph.
 
         Args:
@@ -909,7 +912,7 @@ class Schema:
                 name_path.append(self.schema_graph[idx].name)
         return name_path
 
-    def find_paths(self, input_type:str, return_data_name: str) -> List[str]:
+    def find_paths(self, input_type: str, return_data_name: str) -> List[str]:
         """Find path from input_type to any nodes matching return_data_name
 
         Args:
