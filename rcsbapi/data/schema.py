@@ -57,6 +57,7 @@ class Schema:
     """
     GraphQL schema defining available fields, types, and how they are connected.
     """
+
     def __init__(self) -> None:
         """
         GraphQL schema defining available fields, types, and how they are connected.
@@ -570,7 +571,7 @@ class Schema:
         input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
         if isinstance(input_ids, List) and (len(input_ids) > 1):
             if self.schema_graph[input_type_idx].kind == "OBJECT":
-                raise ValueError(f"Entered multiple input_ids, but input_type is not a plural type. Try making \"{input_type}\" plural")
+                raise ValueError(f'Entered multiple input_ids, but input_type is not a plural type. Try making "{input_type}" plural')
         unknown_return_list: List[str] = []
         for field in return_data_list:
             if "." in field:
@@ -614,7 +615,9 @@ class Schema:
         query = ""
         return query
 
-    def _construct_query_rustworkx(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool = True) -> str:
+    def _construct_query_rustworkx(
+        self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool = True
+    ) -> str:
         """Construct a query in GraphQL syntax using a rustworkx graph.
 
         Args:
@@ -668,7 +671,7 @@ class Schema:
 
         start_node_index = self.dot_field_to_idx_dict[f"Query.{input_type}"]
 
-        #If rcsb_id isn't requested, add it to the query for more readable query results
+        # If rcsb_id isn't requested, add it to the query for more readable query results
         if (f"{input_type}.rcsb_id" not in return_data_list) and (add_rcsb_id is True):
             return_data_list.insert(0, f"{input_type}.rcsb_id")
 
@@ -684,7 +687,7 @@ class Schema:
                     possible_paths_list = path.split(".")
                     possible_paths_list.insert(0, str(input_type))
                     for i in range(len(possible_paths_list)):
-                        if possible_paths_list[i:i + len(path_list)] == path_list:
+                        if possible_paths_list[i : i + len(path_list)] == path_list:
                             matching_paths.append(".".join(possible_paths_list))
 
                 idx_paths: List[List[int]] = []
@@ -697,10 +700,7 @@ class Schema:
                     path_choice_msg = ""
                     for name_path in matching_paths:
                         path_choice_msg += "  " + name_path + "\n"
-                    raise ValueError(
-                        f'"{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n'
-                        f"{path_choice_msg}\n"
-                    )
+                    raise ValueError(f'"{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n' f"{path_choice_msg}\n")
 
                 # If path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
                 if len(matching_paths) == 0:
@@ -720,7 +720,7 @@ class Schema:
                             "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
                         )
                     idx_paths = shortest_full_paths
-                
+
                 final_idx: int = idx_paths[0][-1]
                 all_paths[final_idx] = idx_paths
 
@@ -864,7 +864,7 @@ class Schema:
         shortest_paths = [path for path in all_paths if len(path) == shortest_path_len]
         shortest_paths = self._weigh_assemblies(shortest_paths, assembly_node_idxs)
         return shortest_paths
-    
+
     def _weigh_assemblies(self, paths: List[List[int]], assembly_node_idxs: List[int]) -> List[List[int]]:
         """remove paths containing "assemblies" that are otherwise equivalent. Mimics weighing assembly edges in the rest of query construction
 
