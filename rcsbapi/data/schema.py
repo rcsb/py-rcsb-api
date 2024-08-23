@@ -257,7 +257,8 @@ class Schema:
     def construct_name_list(self) -> List[str]:
         field_names_list = []
         for type_name, field_dict in self.type_fields_dict.items():
-            if "__" not in type_name:  # doesn't look through dunder methods because those are not added to the schema
+            # Doesn't look through dunder methods because those are not added to the schema
+            if "__" not in type_name:
                 for field_name in field_dict.keys():
                     field_names_list.append(field_name)
         return field_names_list
@@ -299,7 +300,7 @@ class Schema:
                         schema_graph.add_edge(field_node.index, type_index, 1)
         return schema_graph
 
-    def apply_weights(self, root_type_list: List[str], weight: int) -> None:  # applies weight in all edges from a root TypeNode to FieldNodes
+    def apply_weights(self, root_type_list: List[str], weight: int) -> None:  # Applies weight in all edges from a root TypeNode to FieldNodes
         for root_type in root_type_list:
             node_idx = self.type_to_idx_dict[root_type]
             if use_networkx is False:
@@ -537,7 +538,7 @@ class Schema:
             elif input_type == "polymer_entity_group" or input_type == "polymer_entity_groups":
                 if len(input_ids) == 1:
                     input_dict["group_id"] = str(input_ids[0])
-            # regex for uniprot: https://www.uniprot.org/help/accession_numbers
+            # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
             elif re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id) and (input_type == "uniprot"):
                 if len(input_ids) == 1:
                     input_dict["uniprot_id"] = str(input_ids[0])
@@ -609,7 +610,7 @@ class Schema:
         else:
             raise ValueError(validation_error_list)
 
-    def _construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # incomplete function
+    def _construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # Incomplete function
         query = ""
         return query
 
@@ -636,7 +637,7 @@ class Schema:
         attr_list = self.root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
 
-        # check formatting of input_ids
+        # Check formatting of input_ids
         input_dict: Union[Dict[str, str], Dict[str, List[str]]] = {}
 
         if isinstance(input_ids, Dict):
@@ -667,7 +668,7 @@ class Schema:
 
         start_node_index = self.dot_field_to_idx_dict[f"Query.{input_type}"]
 
-        #if rcsb_id isn't requested, add it to the query for more readable query results
+        #If rcsb_id isn't requested, add it to the query for more readable query results
         if (f"{input_type}.rcsb_id" not in return_data_list) and (add_rcsb_id is True):
             return_data_list.insert(0, f"{input_type}.rcsb_id")
 
@@ -675,7 +676,7 @@ class Schema:
 
         for field in return_data_list:
             if "." in field:
-                # generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
+                # Generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
                 path_list = field.split(".")
                 possible_paths = self.find_paths(input_type, path_list[-1])
                 matching_paths: List[str] = []
@@ -701,9 +702,9 @@ class Schema:
                         f"{path_choice_msg}\n"
                     )
 
-                # if path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
+                # If path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
                 if len(matching_paths) == 0:
-                    possible_dot_paths: List[List[int]] = self.parse_dot_path(field)  # throws an error if path is invalid
+                    possible_dot_paths: List[List[int]] = self.parse_dot_path(field)  # Throws an error if path is invalid
                     shortest_full_paths: List[List[int]] = self.compare_paths(start_node_index, possible_dot_paths)
                     assert len(shortest_full_paths) != 0
                     if len(shortest_full_paths) > 1:
@@ -723,7 +724,7 @@ class Schema:
                 final_idx: int = idx_paths[0][-1]
                 all_paths[final_idx] = idx_paths
 
-            # if no dots and the node name is unique in schema_graph
+            # If no dots and the node name is unique in schema_graph
             else:
                 node_idx = self.dot_field_to_idx_dict[field]
                 paths = rx.digraph_all_shortest_paths(self.schema_graph, start_node_index, node_idx, weight_fn=lambda edge: edge)
@@ -842,7 +843,7 @@ class Schema:
         """
         all_paths: List[List[int]] = []
         assembly_node_idxs = list(self.field_to_idx_dict["assemblies"])
-        assembly_node_idxs.remove(self.dot_field_to_idx_dict["Query.assemblies"])  # nodes named "assemblies" except the root "assemblies"
+        assembly_node_idxs.remove(self.dot_field_to_idx_dict["Query.assemblies"])
         for path in dot_paths:
             first_path_idx = path[0]
             if start_node_index == first_path_idx:
