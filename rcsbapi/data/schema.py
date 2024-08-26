@@ -444,7 +444,7 @@ class Schema:
 
         for idx in children_idx:
             if idx in visited:
-                continue
+                return result
             visited.add(idx)
 
             child_data = self.schema_graph[idx]
@@ -460,7 +460,6 @@ class Schema:
                     result.extend(type_descendants)
                 else:
                     result.append(child_data.index)
-        # print(f"get_descendant_fields: {result}")
         return result
 
     def find_field_names(self, search_string: str) -> List[str]:
@@ -586,7 +585,7 @@ class Schema:
                     f'"{return_field}" exists, but is not a unique field, must specify further.\n'
                     f"{len_path} of {len(path_list)} possible paths:\n"
                     f"{path_msg}\n\n"
-                    f"For all paths run:\n"
+                    f"If there are more than 10 paths, For all paths run:\n"
                     f"  from rcsbapi.data import Schema\n"
                     f"  schema = Schema()\n"
                     f'  schema.find_paths("{input_type}", "{return_field}")'
@@ -599,7 +598,8 @@ class Schema:
         if not validation_error_list:
             return query
         else:
-            raise ValueError(validation_error_list)
+            return query
+            # raise ValueError(validation_error_list)
 
     def _construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # Incomplete function
         query = ""
