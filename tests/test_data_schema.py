@@ -41,18 +41,47 @@ logger.setLevel(logging.INFO)
 
 class SchemaTests(unittest.TestCase):
     def test_schema_version(self):
-        entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "entry_schema.json")
-        with open(entry_schema_path, "r", encoding="utf-8") as f:
-            schema_data = json.load(f)
-        local_schema_version = schema_data.get("$comment").split(": ")[1]
-        local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
+        with self.subTest(msg="1. Compare entry schema"):
+            entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "entry.json")
+            with open(entry_schema_path, "r", encoding="utf-8") as f:
+                schema_data = json.load(f)
+            local_schema_version = schema_data.get("$comment").split(": ")[1]
+            local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
 
-        online_schema_url = "https://data.rcsb.org/rest/v1/schema/entry"
-        response = requests.get(online_schema_url)
-        online_schema_data = response.json()
-        online_schema_version = online_schema_data.get("$comment").split(": ")[1]
-        online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
-        self.assertEqual(local_major_minor_version, online_major_minor_version)
+            online_schema_url = "https://data.rcsb.org/rest/v1/schema/entry"
+            response = requests.get(online_schema_url)
+            online_schema_data = response.json()
+            online_schema_version = online_schema_data.get("$comment").split(": ")[1]
+            online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
+            self.assertEqual(local_major_minor_version, online_major_minor_version)
+
+        with self.subTest(msg="2. Compare polymer_entity schema"):
+            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "polymer_entity.json")
+            with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
+                schema_data = json.load(f)
+            local_schema_version = schema_data.get("$comment").split(": ")[1]
+            local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
+
+            online_schema_url = "https://data.rcsb.org/rest/v1/schema/polymer_entity"
+            response = requests.get(online_schema_url)
+            online_schema_data = response.json()
+            online_schema_version = online_schema_data.get("$comment").split(": ")[1]
+            online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
+            self.assertEqual(local_major_minor_version, online_major_minor_version)
+
+        with self.subTest(msg="3. Compare polymer_entity_instance schema"):
+            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "polymer_entity_instance.json")
+            with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
+                schema_data = json.load(f)
+            local_schema_version = schema_data.get("$comment").split(": ")[1]
+            local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
+
+            online_schema_url = "https://data.rcsb.org/rest/v1/schema/polymer_entity_instance"
+            response = requests.get(online_schema_url)
+            online_schema_data = response.json()
+            online_schema_version = online_schema_data.get("$comment").split(": ")[1]
+            online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
+            self.assertEqual(local_major_minor_version, online_major_minor_version)
 
     def setUp(self):
         self.__startTime = time.time()
@@ -88,7 +117,7 @@ class SchemaTests(unittest.TestCase):
     def testConstructTypeDict(self):
         type_fields_dict = {}
         entry_dict = {}
-        type_fields_dict = SCHEMA.construct_type_dict(SCHEMA.schema, type_fields_dict)
+        type_fields_dict = SCHEMA.construct_type_dict()
         entry_dict_from_func = type_fields_dict["CoreEntry"]
         type_dict_list = SCHEMA.schema["data"]["__schema"]["types"]
         entry_found = False
@@ -134,115 +163,113 @@ class SchemaTests(unittest.TestCase):
 
     def testConstructQueryRustworkX(self):
         with self.subTest(msg="1.  singular input_type (entry)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl"])
+            query = SCHEMA._construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="2. plural input_type (entries)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_ids": ["4HHB", "1IYE"]}, input_type="entries", return_data_list=["exptl"])
+            query = SCHEMA._construct_query_rustworkx(input_ids={"entry_ids": ["4HHB", "1IYE"]}, input_type="entries", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="3. two arguments (polymer_entity_instance)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"asym_id": "A", "entry_id": "4HHB"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
+            query = SCHEMA._construct_query_rustworkx(input_ids={"asym_id": "A", "entry_id": "4HHB"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. three arguments (interface)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(
+            query = SCHEMA._construct_query_rustworkx(
                 input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["interface.rcsb_id"]
             )
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="5. request multiple return fields"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl", "rcsb_polymer_instance_annotation"])
+            query = SCHEMA._construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["exptl", "rcsb_polymer_instance_annotation"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="6. request scalar field"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["entry.rcsb_id"])
+            query = SCHEMA._construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="entry", return_data_list=["entry.rcsb_id"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="12. two arguments (polymer_entity_instances)"):
-            query = SCHEMA._Schema__construct_query_rustworkx(
+            query = SCHEMA._construct_query_rustworkx(
                 input_ids={"instance_ids": ["4HHB.A", "4HHB.C"]}, input_type="polymer_entity_instances", return_data_list=["rcsb_polymer_instance_annotation"]
             )
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="20. nested query"):
-            query = SCHEMA._Schema__construct_query_rustworkx(
-                input_type="interfaces", return_data_list=["rcsb_interface_partner"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"]
-            )
+            query = SCHEMA._construct_query_rustworkx(input_type="interfaces", return_data_list=["rcsb_interface_partner"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="20. requesting scalars under same field"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["exptl.method", "exptl.details"], input_ids=["4HHB"])
+            query = SCHEMA._construct_query_rustworkx(input_type="entry", return_data_list=["exptl.method", "exptl.details"], input_ids=["4HHB"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         # Test error handling
         with self.subTest(msg="7. too many input ids passed in"):
             with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": ["4HHB", "1IYE"]}, input_type="entry", return_data_list=["exptl"])
+                SCHEMA._construct_query_rustworkx(input_ids={"entry_id": ["4HHB", "1IYE"]}, input_type="entry", return_data_list=["exptl"])
         with self.subTest(msg="8. too few inputs keys provided"):
             with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
+                SCHEMA._construct_query_rustworkx(input_ids={"entry_id": "4HHB"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
         with self.subTest(msg="9. incorrect input keys provided"):
             with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"assembly_id": "1"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
+                SCHEMA._construct_query_rustworkx(input_ids={"assembly_id": "1"}, input_type="polymer_entity_instance", return_data_list=["exptl"])
         with self.subTest(msg="10. no path exists"):
             with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["exptl"])
-        # with self.subTest(msg="11. field doesn't exist"):  # TODO move this test to testQuery
+                SCHEMA._construct_query_rustworkx(input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["exptl"])
+        # with self.subTest(msg="11. field doesn't exist"):
         #     with self.assertRaises(ValueError):
-        #         SCHEMA._Schema__construct_query_rustworkx(input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["aaa"])
+        #         SCHEMA._construct_query_rustworkx(input_ids={"assembly_id": "1", "interface_id": "1", "entry_id": "4HHB"}, input_type="interface", return_data_list=["aaa"])
 
     def regexChecks(self):
         with self.subTest(msg="1. regex for _entity_instances"):
-            query = SCHEMA._Schema__construct_query_rustworkx(
+            query = SCHEMA._construct_query_rustworkx(
                 input_type="polymer_entity_instances", return_data_list=["rcsb_polymer_instance_annotation"], input_ids=["4HHB.A", "AF_AFA0A009IHW8F1.B"]
             )
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="2. regex for _entities"):
-            query = SCHEMA._Schema__construct_query_rustworkx(
+            query = SCHEMA._construct_query_rustworkx(
                 input_type="polymer_entities", return_data_list=["rcsb_polymer_entity_feature", "polymer_entity.rcsb_id"], input_ids=["AF_AFA0A009IHW8F1_1", "4HHB_1"]
             )
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="3. regex for entries"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_type="entries", return_data_list=["exptl"], input_ids=["7XIW", "4HHB"])
+            query = SCHEMA._construct_query_rustworkx(input_type="entries", return_data_list=["exptl"], input_ids=["7XIW", "4HHB"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. regex for assemblies"):
-            query = SCHEMA._Schema__construct_query_rustworkx(
-                input_type="assemblies", return_data_list=["rcsb_struct_symmetry_lineage"], input_ids=["4HHB-1", "MA_MACOFFESLACC100000G1I2-2"]
-            )
+            query = SCHEMA._construct_query_rustworkx(input_type="assemblies", return_data_list=["rcsb_struct_symmetry_lineage"], input_ids=["4HHB-1", "MA_MACOFFESLACC100000G1I2-2"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="5. regex for interfaces"):
-            query = SCHEMA._Schema__construct_query_rustworkx(
+            query = SCHEMA._construct_query_rustworkx(
                 input_type="interfaces", return_data_list=["rcsb_interface_container_identifiers.assembly_id"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"]
             )
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="6. regex with a singular type"):
-            query = SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["exptl"], input_ids=["4HHB"])
+            query = SCHEMA._construct_query_rustworkx(input_type="entry", return_data_list=["exptl"], input_ids=["4HHB"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="7. wrong format for CSM entry id"):
             with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_type="entry", return_data_list=["exptl.method", "exptl.details"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1"])
+                SCHEMA._construct_query_rustworkx(input_type="entry", return_data_list=["exptl.method", "exptl.details"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1"])
         with self.subTest(msg="8. id_list provided with incorrect input_type"):
             with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_type="assemblies", return_data_list=["exptl"], input_ids=["4HHB", "1IYE"])
+                SCHEMA._construct_query_rustworkx(input_type="assemblies", return_data_list=["exptl"], input_ids=["4HHB", "1IYE"])
 
-    def testAllRoots(self):
+    def testAllRoots(self):  # incomplete
         with self.subTest(msg="1. uniprot"):
             try:
-                query = SCHEMA._Schema__construct_query_rustworkx(input_type="uniprot", input_ids={"uniprot_id": "P01308"}, return_data_list=["uniprot.rcsb_id", "reference_sequence_identifiers.database_accession"])
+                query = SCHEMA._construct_query_rustworkx(
+                    input_type="uniprot", input_ids={"uniprot_id": "P01308"}, return_data_list=["uniprot.rcsb_id", "reference_sequence_identifiers.database_accession"]
+                )
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testDotNotation(self):
         with self.subTest(msg="1. dot notation on deeply nested path"):
             try:
-                SCHEMA._Schema__construct_query_rustworkx(
+                SCHEMA._construct_query_rustworkx(
                     input_ids={"entry_id": "4HHB"},
                     input_type="entry",
                     return_data_list=[
@@ -253,7 +280,7 @@ class SchemaTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="2. query that loops back to input type"):
             try:
-                SCHEMA._Schema__construct_query_rustworkx(
+                SCHEMA._construct_query_rustworkx(
                     input_ids={"entry_id": "4HHB"},
                     input_type="entry",
                     return_data_list=["entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_instances.polymer_entity.entry.rcsb_id"],
@@ -262,7 +289,7 @@ class SchemaTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="3. request same field at many levels"):
             try:
-                SCHEMA._Schema__construct_query_rustworkx(
+                SCHEMA._construct_query_rustworkx(
                     input_ids={"entry_id": "4HHB"},
                     input_type="entry",
                     return_data_list=[
@@ -278,29 +305,25 @@ class SchemaTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="4. throw error when multiple paths are available"):
             with self.assertRaises(ValueError):
-                SCHEMA._Schema__construct_query_rustworkx(input_ids=["4HHB"], input_type="entry", return_data_list=["chem_comp.id"])
+                SCHEMA._construct_query_rustworkx(input_ids=["4HHB"], input_type="entry", return_data_list=["chem_comp.id"])
 
-    def testDescriptionDict(self):
+    def testDescription(self):
         with self.subTest(msg="1. check nonpolymer_comp description"):
-            SCHEMA.create_description_dict()
-            self.assertIn("nonpolymer_comp", SCHEMA.field_description_dict)
-            description = SCHEMA.field_description_dict.get("nonpolymer_comp")
-            logger.info("Description for 'nonpolymer_comp': %s", description)
+            nonpolymer_comp_idx = SCHEMA.field_to_idx_dict["nonpolymer_comp"][0]
+            description = SCHEMA.schema_graph[nonpolymer_comp_idx].description
+            logger.info("Description for 'nonpolymer_comp': %s", SCHEMA.schema_graph[nonpolymer_comp_idx].description)
             self.assertEqual(description, "Get a non-polymer chemical components described in this molecular entity.")
-        with self.subTest(msg="2. check `rcsb_id` not in dict"):
-            SCHEMA.create_description_dict()
-            self.assertNotIn("rcsb_id", SCHEMA.field_description_dict)
 
     def testFindFieldNames(self):
         with self.subTest(msg="1. search for rcsb"):
             result = SCHEMA.find_field_names("rcsb")
-            self.assertIn("entry.rcsb_id", result)
+            self.assertIn("rcsb_id", result)
         with self.subTest(msg="1. search for nonexistent field"):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names("foo")
         with self.subTest(msg="2. search for field list"):
             with self.assertRaises(ValueError):
-                SCHEMA.find_field_names(["rcsb", "exptl"])
+                SCHEMA.find_field_names(["rcsb", "exptl"])  # type: ignore
 
 
 def buildSchema():
@@ -308,13 +331,13 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("test_schema_version"))
     suiteSelect.addTest(SchemaTests("testFetch"))
     suiteSelect.addTest(SchemaTests("testConstructRootDict"))
-    suiteSelect.addTest(SchemaTests("testConstructTypeDict"))
     # suiteSelect.addTest(SchemaTests("testRecurseBuildSchema"))
     suiteSelect.addTest(SchemaTests("regexChecks"))
     suiteSelect.addTest(SchemaTests("testConstructQuery"))
+    suiteSelect.addTest(SchemaTests("testAllRoots"))
     suiteSelect.addTest(SchemaTests("testDotNotation"))
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
-    suiteSelect.addTest(SchemaTests("testDescriptionDict"))
+    suiteSelect.addTest(SchemaTests("testDescription"))
     suiteSelect.addTest(SchemaTests("testFindFieldNames"))
     return suiteSelect
 

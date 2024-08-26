@@ -1,0 +1,160 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Core PubMed",
+    "description": "JSON schema for core PubMed collection in RCSB Data Warehouse.",
+    "required": [
+        "rcsb_pubmed_container_identifiers"
+    ],
+    "type": "object",
+    "properties": {
+        "rcsb_id": {
+            "type": "string",
+            "description": "Unique integer value assigned to each PubMed record.",
+            "rcsb_search_context": [
+                "exact-match"
+            ]
+        },
+        "rcsb_pubmed_container_identifiers": {
+            "type": "object",
+            "properties": {
+                "pubmed_id": {
+                    "type": "integer",
+                    "description": "UID assigned to each PubMed record.",
+                    "rcsb_search_context": [
+                        "default-match"
+                    ],
+                    "examples": [
+                        15937111
+                    ],
+                    "rcsb_description": [
+                        {
+                            "text": "PubMed ID",
+                            "context": "brief"
+                        }
+                    ],
+                    "rcsb_search_group": [
+                        {
+                            "group_name": "ID(s) and Keywords",
+                            "priority_order": 18
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "rcsb_pubmed_central_id": {
+            "type": "string",
+            "description": "Unique integer value assigned to each PubMed Central record."
+        },
+        "rcsb_pubmed_doi": {
+            "type": "string",
+            "description": "Persistent identifier used to provide a link to an article location on the Internet."
+        },
+        "rcsb_pubmed_abstract_text": {
+            "type": "string",
+            "description": "A concise, accurate and factual mini-version of the paper contents.",
+            "rcsb_search_context": [
+                "full-text"
+            ],
+            "rcsb_description": [
+                {
+                    "text": "PubMed Abstract",
+                    "context": "brief"
+                }
+            ],
+            "rcsb_search_group": [
+                {
+                    "group_name": "Publications Primary",
+                    "priority_order": 30
+                }
+            ]
+        },
+        "rcsb_pubmed_affiliation_info": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "type": "string"
+            },
+            "description": "The institution(s) that the author is affiliated with. Multiple affiliations per author are allowed."
+        },
+        "rcsb_pubmed_mesh_descriptors": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "type": "string"
+            },
+            "description": "NLM controlled vocabulary, Medical Subject Headings (MeSH), is used to characterize the content of the articles represented by MEDLINE citations."
+        },
+        "rcsb_pubmed_mesh_descriptors_lineage": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Identifier for MeSH classification term.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "examples": [
+                            "E01.370.225.500.388",
+                            "H01.181"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "MeSH Identifier",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Publications Primary",
+                                "priority_order": 35
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "MeSH classification term.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "full-text"
+                        ],
+                        "examples": [
+                            "Chemistry",
+                            "Mammals",
+                            "Therapeutic Uses"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "MeSH Descriptor",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Publications Primary",
+                                "priority_order": 36
+                            }
+                        ]
+                    },
+                    "depth": {
+                        "type": "integer",
+                        "description": "Hierarchy depth.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "rcsb_nested_indexing": true,
+            "description": "Members of the MeSH classification lineage."
+        }
+    },
+    "additionalProperties": false
+}

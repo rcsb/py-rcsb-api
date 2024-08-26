@@ -181,8 +181,8 @@ query = Query(
     return_data_list=[
         "polymer_entity_instances.rcsb_id",
         "rcsb_polymer_instance_feature.type",
-        "feature_positions.beg_seq_id",
-        "feature_positions.end_seq_id"
+        "rcsb_polymer_instance_feature.feature_positions.beg_seq_id",
+        "rcsb_polymer_instance_feature.feature_positions.end_seq_id"
     ]
 )
 result_dict = query.exec()
@@ -213,8 +213,8 @@ query = Query(
     input_ids=["7NHM", "5L2G"],
     return_data_list=[
         "entries.rcsb_id",
-        "reference_sequence_identifiers.database_accession",
-        "reference_sequence_identifiers.database_name"
+        "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession",
+        "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name"
     ]
 )
 result_dict = query.exec()

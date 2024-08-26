@@ -1,0 +1,977 @@
+{
+    "type": "object",
+    "properties": {
+        "pdbx_entity_nonpoly": {
+            "type": "object",
+            "properties": {
+                "comp_id": {
+                    "type": "string",
+                    "description": "This data item is a pointer to _chem_comp.id in the CHEM_COMP category.",
+                    "rcsb_description": [
+                        {
+                            "text": "This data item is a pointer to _chem_comp.id in the CHEM_COMP category.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "entity_id": {
+                    "type": "string",
+                    "description": "This data item is a pointer to _entity.id in the ENTITY category.",
+                    "rcsb_description": [
+                        {
+                            "text": "This data item is a pointer to _entity.id in the ENTITY category.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "name": {
+                    "type": "string",
+                    "description": "A name for the non-polymer entity",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "A name for the non-polymer entity",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "rcsb_prd_id": {
+                    "type": "string",
+                    "description": "For non-polymer BIRD molecules the BIRD identifier for the entity.",
+                    "rcsb_description": [
+                        {
+                            "text": "For non-polymer BIRD molecules the BIRD identifier for the entity.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "entity_id"
+            ]
+        },
+        "rcsb_nonpolymer_entity": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "string",
+                    "description": "A description of special aspects of the entity.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "A description of special aspects of the entity.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "formula_weight": {
+                    "type": "number",
+                    "description": "Formula mass (KDa) of the entity.",
+                    "rcsb_search_context": [
+                        "default-match"
+                    ],
+                    "rcsb_units": "KDa",
+                    "rcsb_description": [
+                        {
+                            "text": "Formula mass (KDa) of the entity.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "pdbx_description": {
+                    "type": "string",
+                    "description": "A description of the nonpolymer entity.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "A description of the nonpolymer entity.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "pdbx_number_of_molecules": {
+                    "type": "integer",
+                    "description": "The number of molecules of the nonpolymer entity in the entry.",
+                    "rcsb_search_context": [
+                        "default-match"
+                    ],
+                    "rcsb_description": [
+                        {
+                            "text": "The number of molecules of the nonpolymer entity in the entry.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "rcsb_nonpolymer_entity_annotation": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "annotation_id": {
+                        "type": "string",
+                        "description": "An identifier for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "An identifier for the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Identifier",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "assignment_version": {
+                        "type": "string",
+                        "examples": [
+                            "V4_0_2"
+                        ],
+                        "description": "Identifies the version of the annotation assignment.",
+                        "rcsb_description": [
+                            {
+                                "text": "Identifies the version of the annotation assignment.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Version",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "comp_id": {
+                        "type": "string",
+                        "examples": [
+                            "GTP",
+                            "STN"
+                        ],
+                        "description": "Non-polymer(ligand) chemical component identifier for the entity.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Non-polymer(ligand) chemical component identifier for the entity.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Component Identifier",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Nonpolymer Molecular Features",
+                                "priority_order": 10
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A description for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A description for the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Description",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "A name for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A name for the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Name",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "provenance_source": {
+                        "type": "string",
+                        "examples": [
+                            "PDB"
+                        ],
+                        "description": "Code identifying the individual, organization or program that\n assigned the annotation.",
+                        "rcsb_description": [
+                            {
+                                "text": "Code identifying the individual, organization or program that\n assigned the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Source",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "SUBJECT_OF_INVESTIGATION"
+                        ],
+                        "examples": [
+                            "SUBJECT_OF_INVESTIGATION"
+                        ],
+                        "description": "A type or category of the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "SUBJECT_OF_INVESTIGATION",
+                                "detail": "Investigated Molecule",
+                                "name": "Investigated Molecule"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "A type or category of the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Type",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "annotation_lineage": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "depth": {
+                                    "type": "integer",
+                                    "description": "Members of the annotation lineage as parent lineage depth (1-N)",
+                                    "rcsb_search_context": [
+                                        "default-match"
+                                    ],
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Members of the annotation lineage as parent lineage depth (1-N)",
+                                            "context": "dictionary"
+                                        },
+                                        {
+                                            "text": "Lineage Depth",
+                                            "context": "brief"
+                                        }
+                                    ]
+                                },
+                                "id": {
+                                    "type": "string",
+                                    "description": "Members of the annotation lineage as parent class identifiers.",
+                                    "rcsb_search_context": [
+                                        "exact-match"
+                                    ],
+                                    "rcsb_full_text_priority": 10,
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Members of the annotation lineage as parent class identifiers.",
+                                            "context": "dictionary"
+                                        },
+                                        {
+                                            "text": "Lineage Identifier",
+                                            "context": "brief"
+                                        }
+                                    ]
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "Members of the annotation lineage as parent class names.",
+                                    "rcsb_search_context": [
+                                        "exact-match",
+                                        "full-text"
+                                    ],
+                                    "rcsb_full_text_priority": 10,
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Members of the annotation lineage as parent class names.",
+                                            "context": "dictionary"
+                                        },
+                                        {
+                                            "text": "Lineage Name",
+                                            "context": "brief"
+                                        }
+                                    ]
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false,
+                        "rcsb_nested_indexing": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true,
+            "rcsb_nested_indexing_context": [
+                {
+                    "category_name": "annotation_type",
+                    "category_path": "rcsb_nonpolymer_entity_annotation.type",
+                    "context_attributes": [
+                        {
+                            "context_value": "SUBJECT_OF_INVESTIGATION",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        "BEZ",
+                                        "PQM"
+                                    ],
+                                    "path": "rcsb_nonpolymer_entity_annotation.comp_id"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "rcsb_nonpolymer_entity_container_identifiers": {
+            "type": "object",
+            "properties": {
+                "asym_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "A",
+                            "B"
+                        ],
+                        "description": "Instance identifiers corresponding to copies of the entity in this container.",
+                        "rcsb_description": [
+                            {
+                                "text": "Instance identifiers corresponding to copies of the entity in this container.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "auth_asym_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "A",
+                            "B"
+                        ],
+                        "description": "Author instance identifiers corresponding to copies of the entity in this container.",
+                        "rcsb_description": [
+                            {
+                                "text": "Author instance identifiers corresponding to copies of the entity in this container.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "chem_ref_def_id": {
+                    "type": "string",
+                    "examples": [
+                        "PRD_000010"
+                    ],
+                    "description": "The chemical reference definition identifier for the entity in this container.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "The chemical reference definition identifier for the entity in this container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "entity_id": {
+                    "type": "string",
+                    "examples": [
+                        "1",
+                        "2"
+                    ],
+                    "description": "Entity identifier for the container.",
+                    "rcsb_description": [
+                        {
+                            "text": "Entity identifier for the container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "entry_id": {
+                    "type": "string",
+                    "examples": [
+                        "4HHB",
+                        "1KIP"
+                    ],
+                    "description": "Entry identifier for the container.",
+                    "rcsb_description": [
+                        {
+                            "text": "Entry identifier for the container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "nonpolymer_comp_id": {
+                    "type": "string",
+                    "examples": [
+                        "GTP",
+                        "STN"
+                    ],
+                    "description": "Non-polymer(ligand) chemical component identifier for the entity in this container.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "Non-polymer(ligand) chemical component identifier for the entity in this container.",
+                            "context": "dictionary"
+                        },
+                        {
+                            "text": "Component Identifier",
+                            "context": "brief"
+                        }
+                    ],
+                    "rcsb_search_group": [
+                        {
+                            "group_name": "Nonpolymer Molecular Features",
+                            "priority_order": 5
+                        }
+                    ]
+                },
+                "prd_id": {
+                    "type": "string",
+                    "examples": [
+                        "PRD_000010"
+                    ],
+                    "description": "The BIRD identifier for the entity in this container.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "The BIRD identifier for the entity in this container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "rcsb_id": {
+                    "type": "string",
+                    "examples": [
+                        "6EL3_1"
+                    ],
+                    "description": "A unique identifier for each object in this entity container formed by\n an underscore separated concatenation of entry and entity identifiers.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "A unique identifier for each object in this entity container formed by\n an underscore separated concatenation of entry and entity identifiers.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "reference_chemical_identifiers_provenance_source": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "PDB",
+                            "RCSB"
+                        ],
+                        "examples": [
+                            "PDB"
+                        ],
+                        "description": "Source of the reference database assignment",
+                        "rcsb_description": [
+                            {
+                                "text": "Source of the reference database assignment",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "reference_chemical_identifiers_resource_accession": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "5957",
+                            "CHEMBL14249"
+                        ],
+                        "description": "Reference resource accession code",
+                        "rcsb_description": [
+                            {
+                                "text": "Reference resource accession code",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                },
+                "reference_chemical_identifiers_resource_name": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "ChEBI",
+                            "ChEMBL",
+                            "DrugBank",
+                            "PubChem"
+                        ],
+                        "examples": [
+                            "PubChem",
+                            "ChEBI"
+                        ],
+                        "description": "Reference resource name",
+                        "rcsb_description": [
+                            {
+                                "text": "Reference resource name",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "entity_id",
+                "entry_id"
+            ]
+        },
+        "rcsb_nonpolymer_entity_feature": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "assignment_version": {
+                        "type": "string",
+                        "examples": [
+                            "V4_0_2"
+                        ],
+                        "description": "Identifies the version of the feature assignment.",
+                        "rcsb_description": [
+                            {
+                                "text": "Identifies the version of the feature assignment.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Version",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "comp_id": {
+                        "type": "string",
+                        "examples": [
+                            "GTP",
+                            "STN"
+                        ],
+                        "description": "Non-polymer(ligand) chemical component identifier for the entity.",
+                        "rcsb_description": [
+                            {
+                                "text": "Non-polymer(ligand) chemical component identifier for the entity.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A description for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "A description for the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Description",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "feature_id": {
+                        "type": "string",
+                        "description": "An identifier for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "An identifier for the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "A name for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "A name for the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Name",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "provenance_source": {
+                        "type": "string",
+                        "examples": [
+                            "PDB"
+                        ],
+                        "description": "Code identifying the individual, organization or program that\n assigned the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "Code identifying the individual, organization or program that\n assigned the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Source",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "SUBJECT_OF_INVESTIGATION"
+                        ],
+                        "examples": [
+                            "SUBJECT_OF_INVESTIGATION"
+                        ],
+                        "description": "A type or category of the feature.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "SUBJECT_OF_INVESTIGATION",
+                                "detail": "Investigated Molecule",
+                                "name": "Investigated Molecule"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "A type or category of the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Type",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "The feature value.",
+                        "rcsb_description": [
+                            {
+                                "text": "The feature value.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "additional_properties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "The additional property name.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The additional property name.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "values": {
+                                    "type": "array",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
+                                        ],
+                                        "examples": [
+                                            "2.54",
+                                            "300"
+                                        ],
+                                        "description": "The value(s) of the additional property.",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "The value(s) of the additional property.",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "rcsb_nonpolymer_entity_feature_summary": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "comp_id": {
+                        "type": "string",
+                        "examples": [
+                            "GTP",
+                            "STN"
+                        ],
+                        "description": "Non-polymer(ligand) chemical component identifier for the entity.",
+                        "rcsb_description": [
+                            {
+                                "text": "Non-polymer(ligand) chemical component identifier for the entity.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "count": {
+                        "type": "integer",
+                        "description": "The feature count.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The feature count.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "maximum_length": {
+                        "type": "integer",
+                        "description": "The maximum feature length.",
+                        "rcsb_description": [
+                            {
+                                "text": "The maximum feature length.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "maximum_value": {
+                        "type": "number",
+                        "examples": [
+                            1.012,
+                            0.813
+                        ],
+                        "description": "The maximum feature value.",
+                        "rcsb_description": [
+                            {
+                                "text": "The maximum feature value.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "minimum_length": {
+                        "type": "integer",
+                        "description": "The minimum feature length.",
+                        "rcsb_description": [
+                            {
+                                "text": "The minimum feature length.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "minimum_value": {
+                        "type": "number",
+                        "examples": [
+                            0.012,
+                            0.00132
+                        ],
+                        "description": "The minimum feature value.",
+                        "rcsb_description": [
+                            {
+                                "text": "The minimum feature value.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "SUBJECT_OF_INVESTIGATION"
+                        ],
+                        "examples": [
+                            "SUBJECT_OF_INVESTIGATION"
+                        ],
+                        "description": "Type or category of the feature.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "SUBJECT_OF_INVESTIGATION",
+                                "detail": "Subject molecule of investigation"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Type or category of the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true,
+            "rcsb_nested_indexing_context": [
+                {
+                    "category_name": "feature_summary",
+                    "category_path": "rcsb_nonpolymer_entity_feature_summary.type"
+                }
+            ]
+        },
+        "rcsb_nonpolymer_entity_keywords": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string",
+                    "description": "Keywords describing this non-polymer entity.",
+                    "rcsb_search_context": [
+                        "full-text"
+                    ],
+                    "rcsb_full_text_priority": 1,
+                    "rcsb_description": [
+                        {
+                            "text": "Keywords describing this non-polymer entity.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "rcsb_nonpolymer_entity_name_com": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "A common name for the nonpolymer entity.",
+                        "rcsb_search_context": [
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 1,
+                        "rcsb_description": [
+                            {
+                                "text": "A common name for the nonpolymer entity.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "name"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "rcsb_id": {
+            "type": "string",
+            "examples": [
+                "6EL3_1"
+            ],
+            "description": "A unique identifier for each object in this entity container formed by\n an underscore separated concatenation of entry and entity identifiers.",
+            "rcsb_search_context": [
+                "exact-match"
+            ],
+            "rcsb_full_text_priority": 10,
+            "rcsb_description": [
+                {
+                    "text": "A unique identifier for each object in this entity container formed by\n an underscore separated concatenation of entry and entity identifiers.",
+                    "context": "dictionary"
+                }
+            ]
+        },
+        "rcsb_latest_revision": {
+            "type": "object",
+            "properties": {
+                "major_revision": {
+                    "type": "integer",
+                    "description": "The major version number of the latest revision."
+                },
+                "minor_revision": {
+                    "type": "integer",
+                    "description": "The minor version number of the latest revision."
+                },
+                "revision_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The release date of the latest revision item."
+                }
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "rcsb_id"
+    ],
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Core Nonpolymer Entity",
+    "description": "JSON schema for nonpolymer entity core.",
+    "$comment": "schema_version: 10.0.0"
+}

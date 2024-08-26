@@ -161,13 +161,13 @@ editor_link = query.get_editor_link()
 print(editor_link)
 ```
 
-### get_unique_fields()
-Given a redundant field, this method returns a list of matching fields in dot notation. You can look through the list to identify your intended field. Method of Schema class.
+### find_paths()
+Given a redundant field, this method finds all paths from an input_type to nodes named as return_data_name. Method of Schema class.
 
 ```python
 from rcsbapi.data import Schema
 schema = Schema()
-schema.get_unique_fields("id")
+schema.find_paths(input_type="entry", return_data_name="id")
 ```
 
 ### find_field_names()
@@ -190,7 +190,7 @@ schema.get_input_id_dict("polymer_entity_instance")
 
 ## Troubleshooting
 ### ValueError: Not a unique field
-Some fields are redundant within our GraphQL Data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<type>.<field name>`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is redundant. You can then use `get_unique_fields("<field name>")` to find notation that would specify a unique field for the given name.
+Some fields are redundant within our GraphQL Data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<field name>.<field name>...`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is not unique. You can then use `find_paths(input_type, return_data_name)` to find a path that would specify the field.
 
 ```python
 from rcsbapi.data import Query
@@ -205,17 +205,23 @@ result_dict = query.exec()
 print(result_dict)
 ```
 ```
-ValueError: "id" exists, but is not a unique field, must specify further. To find valid fields with this name, run:
+ValueError: "id" exists, but is not a unique field, must specify further.
+10 of 118 possible paths:
+  assemblies.branched_entity_instances.branched_entity.chem_comp_monomers.chem_comp.id
+  assemblies.branched_entity_instances.branched_entity.chem_comp_monomers.rcsb_bird_citation.id
+  ...
+
+For all paths run:
   from rcsbapi.data import Schema
   schema = Schema()
-  schema.get_unique_fields("id")
+  schema.find_paths(input_type="entry", return_data_name="id")
 ```
 ```python
 from rcsbapi.data import Schema
 
-# run get_unique_field("<field name>")
+# run find_paths(input_type, return_data_name)
 schema = Schema()
-print(schema.get_unique_fields("id"))
+print(schema.find_paths(input_type="entry", return_data_name="id"))
 ```
 
 ```python
