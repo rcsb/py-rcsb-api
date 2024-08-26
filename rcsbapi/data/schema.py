@@ -496,27 +496,27 @@ class Schema:
         ]
 
         for single_id in input_ids:
-            if re.match(r"^(MA|AF)_.*_[0-9]+$", single_id) and input_type in entities:
+            if (input_type in entities) and re.match(r"^(MA|AF)_.*_[0-9]+$", single_id):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[A-Z0-9]{4}\.[A-Z]$", single_id)) and input_type in instances:
+            elif (input_type in instances) and (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[A-Z0-9]{4}\.[A-Z]$", single_id)):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
                     input_dict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+$", single_id)) and input_type in ["assemblies", "assembly"]:
+            elif (input_type in ["assemblies", "assembly"]) and (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+$", single_id)):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     input_dict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$", single_id)) and input_type in ["interfaces", "interface"]:
+            elif (input_type in ["interfaces", "interface"]) and (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$", single_id)):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     input_dict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
                     input_dict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
-            elif (re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) or re.match(r"^[A-Z0-9]{4}$", single_id)) and input_type in ["entries", "entry"]:
+            elif (input_type in ["entries", "entry"]) and (re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) or re.match(r"^[A-Z0-9]{4}$", single_id)):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(input_ids[0])
-            elif re.match(r"^[A-Z0-9]{4}_[0-9]+$", single_id) and input_type in entities:
+            elif (input_type in entities) and re.match(r"^[A-Z0-9]{4}_[0-9]+$", single_id):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
@@ -530,7 +530,7 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["group_id"] = str(input_ids[0])
             # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
-            elif re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id) and (input_type == "uniprot"):
+            elif (input_type == "uniprot") and re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id):
                 if len(input_ids) == 1:
                     input_dict["uniprot_id"] = str(input_ids[0])
                 else:
