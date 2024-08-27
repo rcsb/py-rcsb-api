@@ -435,7 +435,7 @@ class Schema:
                     query_str += " " * indent + "}\n"
         return query_str
 
-    def get_descendant_fields(self, node_idx: int, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
+    def get_descendant_fields(self, node_idx: int, field_name: str, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
         if visited is None:
             visited = set()
 
@@ -444,18 +444,19 @@ class Schema:
 
         for idx in children_idx:
             if idx in visited:
-                return result
+                raise ValueError(f"{field_name} in return_data_list is too general, unable to autocomplete query.\n" "Please request a more specific field.")
+                continue
             visited.add(idx)
 
             child_data = self.schema_graph[idx]
             if isinstance(child_data, FieldNode):
-                child_descendants = self.get_descendant_fields(idx, visited)
+                child_descendants = self.get_descendant_fields(idx, field_name, visited)
                 if child_descendants:
                     result.append({child_data.index: child_descendants})
                 else:
                     result.append(child_data.index)
             elif isinstance(child_data, TypeNode):
-                type_descendants = self.get_descendant_fields(idx, visited)
+                type_descendants = self.get_descendant_fields(idx, field_name, visited)
                 if type_descendants:
                     result.extend(type_descendants)
                 else:
@@ -728,7 +729,7 @@ class Schema:
 
         final_fields = {}
         for target_idx in all_paths.keys():
-            final_fields[target_idx] = self.get_descendant_fields(target_idx)
+            final_fields[target_idx] = self.get_descendant_fields(node_idx=target_idx, field_name=field)
 
         field_names: Dict[Any, Any] = {}
         paths: Dict[Any, Any] = {}
