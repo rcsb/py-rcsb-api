@@ -1,0 +1,20 @@
+{
+    "@context": "https://w3id.org/codemeta/3.0",
+    "type": "SoftwareSourceCode",
+    "codeRepository": "https://github.com/rcsb/py-rcsb-api",
+    "dateCreated": "2024-04-15",
+    "datePublished": "2024-07-22",
+    "description": "Python interface for RCSB PDB API services at RCSB.org.",
+    "license": "https://spdx.org/licenses/MIT",
+    "name": "rcsb-api",
+    "operatingSystem": [
+        "Linux",
+        "Windows",
+        "macOS"
+    ],
+    "programmingLanguage": "Python 3",
+    "relatedLink": [
+        "https://pypi.org/project/rcsb-api/",
+        "https://rcsbapi.readthedocs.io/en/latest/index.html"
+    ]
+}
