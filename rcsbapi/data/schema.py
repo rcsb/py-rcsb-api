@@ -27,8 +27,19 @@ class FieldNode:
         of_kind (str): If "LIST", whether list of "SCALAR" or "OBJECT"
         type (str): GraphQL schema type (ex: CoreEntry)
         index (int): graph index
+    """    """
+    Class for nodes representing GraphQL fields in the schema graph.
     """
-    def __init__(self, kind, node_type, name, description) -> None:
+
+    def __init__(self, kind: str, node_type: str, name: str, description: str):
+        """Initialize FieldNodes
+
+        Args:
+            kind (str): GraphQL kind, can be "OBJECT", "SCALAR", "LIST"
+            node_type (str): If applicable, the GraphQL type returned by the field
+            name (str): Name of field
+            description (str): Description of field
+        """
         self.name: str = name
         self.description: str = description
         self.redundant: bool = False
@@ -40,24 +51,52 @@ class FieldNode:
     def __str__(self) -> str:
         return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
-    def set_index(self, index: int) -> None:
+    def set_index(self, index: int):
+        """set index that is associated with the FieldNode
+
+        Args:
+            index (int): index of node in schema_graph
+        """
         self.index = index
 
-    def set_of_kind(self, of_kind: str) -> None:
+    def set_of_kind(self, of_kind: str):
+        """Only applicable if kind is LIST. Describes the GraphQL kind of the list (OBJECT, SCALAR)
+
+        Args:
+            of_kind (str): GraphQL kind of the list returned by a node (a LIST can be "of_kind" OBJECT)
+        """
         self.of_kind = of_kind
 
 
 class TypeNode:
+    """
+    Class for nodes representing GraphQL Types in the schema graph.
+    """
 
-    def __init__(self, name: str) -> None:
-        self.name: str = name
+    def __init__(self, name: str):
+        """Initialize TypeNodes
+
+        Args:
+            name (str): name of GraphQL type (ex: CoreEntry)
+        """
+        self.name = name
         self.index: Optional[int] = None
         self.field_list: List[FieldNode] = []
 
-    def set_index(self, index) -> None:
+    def set_index(self, index: int):
+        """set index that is associated with the TypeNode
+
+        Args:
+            index (int): index of node in schema_graph
+        """
         self.index = index
 
-    def set_field_list(self, field_list: List[FieldNode]) -> None:
+    def set_field_list(self, field_list: List[FieldNode]):
+        """List of FieldNodes associated with the GraphQL type
+
+        Args:
+            field_list (Union[None, List[FieldNode]]): list of FieldNodes
+        """
         self.field_list = field_list
 
 
@@ -73,20 +112,28 @@ class Schema:
         self.pdb_url: str = ApiSettings.API_ENDPOINT.value
         self.timeout: int = ApiSettings.TIMEOUT.value
         self.use_networkx: bool = use_networkx
+        self.schema_graph: Optional[Union[nx.DiGraph, rx.PyDiGraph]] = None
+
         self.type_to_idx_dict: Dict[str, int] = {}
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
         self.seen_names: set[str] = set()
         self.root_introspection = self.request_root_types()
+        """Request root types of the GraphQL schema and their required arguments"""
         self.schema: Dict = self.fetch_schema()
+        """JSON resulting from full introspection of the GraphQL schema"""
         self.client_schema = build_client_schema(self.schema["data"])
+        """GraphQLSchema object from graphql package, used for query validation"""
 
         if use_networkx:
             self.schema_graph = nx.DiGraph()
+            """NetworkX graph representing the GraphQL schema"""
         else:
             self.schema_graph = rx.PyDiGraph()
+            """rustworkx graph representing the GraphQL schema"""
 
         self.type_fields_dict: Dict[str, Dict] = self.construct_type_dict()
+        """Dict where keys are type names and the values are their associated fields"""
         self.field_names_list = self.construct_name_list()
         self.root_dict: Dict[str, List[Dict[str, str]]] = self.construct_root_dict(self.pdb_url)
         self.schema_graph = self.recurse_build_schema(self.schema_graph, "Query")
@@ -95,6 +142,13 @@ class Schema:
         self.apply_weights(["CoreAssembly"], 2)
 
     def request_root_types(self) -> Dict:
+        """Make an introspection query to get information about schema's root types
+        Args:
+            pdb_url (str): URL for GraphQL endpoint
+
+        Returns:
+            Dict: JSON response of introspection request
+        """
         root_query = """
         query IntrospectionQuery{
         __schema{
@@ -128,6 +182,17 @@ class Schema:
         return response.json()
 
     def construct_root_dict(self, url: str) -> Dict[str, List[Dict[str, str]]]:
+        """Build a dictionary to organize information about schema root types.
+
+        Args:
+            pdb_url (str): URL for GraphQL endpoint
+
+        Returns:
+            Dict[str, List[Dict]]: Dict where keys are the type names.
+            Values are lists of dictionaries with information about arguments.
+
+            ex: {"entry": [{'name': 'entry_id', 'description': '', 'kind': 'SCALAR', 'type': 'String'}]}
+        """
         response = self.root_introspection
         root_dict: Dict[str, List[Dict[str, str]]] = {}
         root_fields_list = response["data"]["__schema"]["queryType"]["fields"]
@@ -144,7 +209,16 @@ class Schema:
                 root_dict[root_name].append({"name": arg_name, "description": arg_description, "kind": arg_kind, "type": arg_type})
         return root_dict
 
-    def fetch_schema(self) -> Dict[str, str]:
+    def fetch_schema(self) -> Dict:
+        """Make an introspection query to get full Data API query.
+        Can also be found in resources folder as "data_api_schema.json"
+
+        Args:
+            pdb_url (str): URL for GraphQL endpoint
+
+        Returns:
+            Dict: JSON response of introspection request
+        """
         query = """
             query IntrospectionQuery {
             __schema {
@@ -251,6 +325,14 @@ class Schema:
             return json.load(schema_file)
 
     def construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        """Construct dictionary of GraphQL types and their associated fields.
+
+        Args:
+            schema (Dict): GraphQL schema
+
+        Returns:
+            Dict[str, Dict[str, Dict[str, str]]]: Dict where keys are GraphQL types and values are lists of field names
+        """
         all_types_dict: Dict = self.schema["data"]["__schema"]["types"]
         type_fields_dict = {}
         for each_type_dict in all_types_dict:
@@ -260,8 +342,8 @@ class Schema:
             if fields is not None:
                 for field in fields:
                     field_dict[str(field["name"])] = dict(field["type"])
-            type_fields_dict[type_name] = field_dict
-        return type_fields_dict
+            self.type_fields_dict[type_name] = field_dict
+        return self.type_fields_dict
 
     def construct_name_list(self) -> List[str]:
         field_names_list = []
@@ -309,7 +391,14 @@ class Schema:
                         schema_graph.add_edge(field_node.index, type_index, 1)
         return schema_graph
 
-    def apply_weights(self, root_type_list: List[str], weight: int) -> None:  # Applies weight in all edges from a root TypeNode to FieldNodes
+    def apply_weights(self, root_type_list: List[str], weight: int) -> None: 
+        """applies weight to all edges from a root TypeNode to FieldNodes
+
+        Args:
+            root_type_list (List[str]): list of root fields to apply weights to
+                ex: "CoreEntry", "CoreAssembly"
+            weight (int): integer weight to apply to edges from specified type(s)
+        """
         for root_type in root_type_list:
             node_idx = self.type_to_idx_dict[root_type]
             if use_networkx is False:
