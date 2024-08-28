@@ -442,10 +442,10 @@ class Schema:
         for idx in children_idx:
             if idx in visited:
                 raise ValueError(f"{field_name} in return_data_list is too general, unable to autocomplete query.\n" "Please request a more specific field.")
-                continue
-            visited.add(idx)
 
+            visited.add(idx)
             child_data = self.schema_graph[idx]
+
             if isinstance(child_data, FieldNode):
                 child_descendants = self.get_descendant_fields(idx, field_name, visited)
                 if child_descendants:
@@ -731,7 +731,7 @@ class Schema:
 
         final_fields = {}
         for target_idx in all_paths.keys():
-            final_fields[target_idx] = self.get_descendant_fields(node_idx=target_idx, field_name=field)
+            final_fields[target_idx] = self.get_descendant_fields(node_idx=target_idx, field_name=self.schema_graph[target_idx].name)
 
         field_names: Dict[Any, Any] = {}
         paths: Dict[Any, Any] = {}

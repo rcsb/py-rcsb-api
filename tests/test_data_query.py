@@ -381,11 +381,11 @@ class QueryTests(unittest.TestCase):
                         "citation.pdbx_database_id_DOI",
                     ],
                 )
-                result = data_query.exec()
+                data_query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             try:
-                json = result["data"]["entries"]
+                json = data_query.get_response()["data"]["entries"]
                 json[0]["rcsb_id"]
                 json[0]["nonpolymer_entities"]
                 json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]
