@@ -1,6 +1,6 @@
 import re
 import logging
-from typing import List, Dict, Union, Any, Optional, Set
+from typing import List, Dict, Union, Any, Optional
 import json
 import os
 import requests
@@ -571,28 +571,6 @@ class Schema:
                     unknown_return_list.append(field)
         if unknown_return_list:
             raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
-        # for return_field in return_data_list:
-        ## if the field has no dots, is redundant, and has multiple paths to it from the input_type, we are unable to construct the query
-        # if (
-        #     ("." not in return_field)
-        #     and (self.field_names_list.count(return_field) > 1)
-        #     and (len(self.find_paths(input_type, return_field)) > 1)
-        # ):  # fmt: skip
-        #     path_list = self.find_paths(input_type, return_field)
-        #     path_msg = "  " + "\n  ".join(path_list[:10])
-        #     if len(path_list) > 10:
-        #         len_path = 10
-        #     else:
-        #         len_path = len(path_list)
-        #     raise ValueError(
-        #         f'"{return_field}" exists, but is not a unique field, must specify further.\n'
-        #         f"{len_path} of {len(path_list)} possible paths:\n"
-        #         f"{path_msg}\n\n"
-        #         f"If there are more than 10 paths, For all paths run:\n"
-        #         f"  from rcsbapi.data import Schema\n"
-        #         f"  schema = Schema()\n"
-        #         f'  schema.find_paths("{input_type}", "{return_field}")'
-        #     )
         if use_networkx:
             query = self._construct_query_networkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list)
         else:

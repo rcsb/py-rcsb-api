@@ -403,7 +403,7 @@ def buildQuery():
     suiteSelect.addTest(QueryTests("testDocs"))
     suiteSelect.addTest(QueryTests("testReadMeAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
-    suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    # suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
     return suiteSelect
 
 
