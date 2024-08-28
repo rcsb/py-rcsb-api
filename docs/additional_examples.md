@@ -212,7 +212,7 @@ query = Query(
     input_type="entries",
     input_ids=["7NHM", "5L2G"],
     return_data_list=[
-        "entries.rcsb_id",
+        "polymer_entities.rcsb_id",
         "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession",
         "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name"
     ]

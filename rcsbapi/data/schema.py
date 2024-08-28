@@ -534,7 +534,7 @@ class Schema:
                     raise ValueError("Uniprot IDs must be searched one at a time")
             elif input_type == "pubmed":
                 if len(input_ids) == 1:
-                    input_dict["pubmed_id"] = str(input_ids[0])
+                    input_dict["pubmed_id"] = input_ids[0]
                 else:
                     raise ValueError("Pubmed IDs must be searched one at a time")
             elif input_type == "group provenance":
@@ -677,10 +677,21 @@ class Schema:
             idx_paths = self._weigh_assemblies(idx_paths, assembly_node_idxs)
 
             if len(idx_paths) > 1:
-                path_choice_msg = ""
-                for name_path in matching_paths:
-                    path_choice_msg += "  " + name_path + "\n"
-                raise ValueError(f'"{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n' f"{path_choice_msg}\n")
+                path_choice_msg = "  " + "\n  ".join(matching_paths[:10])
+                if len(idx_paths) > 10:
+                    len_path = 10
+                else:
+                    len_path = len(matching_paths)
+
+                raise ValueError(
+                    f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n'
+                    f"{len_path} of {len(matching_paths)} possible paths:\n"
+                    f"{path_choice_msg}\n\n"
+                    f"For all paths run:\n"
+                    f"  from rcsbapi.data import Schema\n"
+                    f"  schema = Schema()\n"
+                    f'  schema.find_paths("{input_type}", "{path_list[-1]}")'
+                )
 
             # If path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
             if len(idx_paths) == 0:
@@ -736,7 +747,10 @@ class Schema:
             if isinstance(input_dict[attr], list):
                 query += attr + ': ["' + '", "'.join(input_dict[attr]) + '"]'
             else:
-                query += attr + ': "' + input_dict[attr] + '"'
+                if input_type == "pubmed":
+                    query += attr + ": " + str(input_dict[attr])
+                else:
+                    query += attr + ': "' + input_dict[attr] + '"'
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
