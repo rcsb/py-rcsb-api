@@ -2,7 +2,7 @@ import logging
 import urllib.parse
 import re
 import time
-from typing import Any, Union, List, Dict
+from typing import Any, Union, List, Dict, Optional
 import requests
 from rcsbapi.data import SCHEMA
 
@@ -33,7 +33,7 @@ class Query:
                 self._input_ids_list: List[str] = input_ids[SCHEMA.root_dict[input_type][0]["name"]]
             if isinstance(input_ids, list):
                 self._input_ids_list = input_ids
-        self._response: Union[None, Dict[str, Any]] = None
+        self._response: Optional[Dict[str, Any]] = None
 
     def get_input_ids(self) -> Union[List[str], Dict[str, List[str]], Dict[str, str]]:
         return self._input_ids
@@ -53,7 +53,7 @@ class Query:
         except AttributeError:
             return None
 
-    def get_response(self) -> Union[None, Dict[str, Any]]:
+    def get_response(self) -> Dict[str, Any]:
         return self._response
 
     def get_editor_link(self) -> str:

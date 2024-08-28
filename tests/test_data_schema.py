@@ -325,6 +325,29 @@ class SchemaTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 SCHEMA.find_field_names(["rcsb", "exptl"])  # type: ignore
 
+    def testWeigh(self):
+        with self.subTest(msg="1. Remove assembly paths that have a parallel/equivalent path"):
+            # 481 is the node index of an assemblies node
+            paths = [
+                [1, 481, 3],
+                [1, 2, 3],
+                [1, 2, 3, 4],
+            ]
+
+            weigh_paths = SCHEMA._weigh_assemblies(paths, [481])
+            self.assertEqual(len(weigh_paths), 2)
+
+        with self.subTest(msg="2. Do not remove paths without an equivalent path"):
+            # 481 is the node index of an assemblies node
+            paths = [
+                [1, 481, 3, 4, 5],
+                [1, 2, 3, 4, 5, 6],
+                [1, 481],
+            ]
+
+            weigh_paths = SCHEMA._weigh_assemblies(paths, [481])
+            self.assertEqual(len(weigh_paths), 3)
+
 
 def buildSchema():
     suiteSelect = unittest.TestSuite()
@@ -339,6 +362,7 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("testConstructQueryRustworkX"))
     suiteSelect.addTest(SchemaTests("testDescription"))
     suiteSelect.addTest(SchemaTests("testFindFieldNames"))
+    suiteSelect.addTest(SchemaTests("testWeigh"))
     return suiteSelect
 
 

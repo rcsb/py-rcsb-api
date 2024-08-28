@@ -245,7 +245,7 @@ class QueryTests(unittest.TestCase):
                     return_data_list=[
                         "entries.rcsb_id",
                         "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession",
-                        "reference_sequence_identifiers.database_name",
+                        "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name",
                     ],
                 )
                 query.exec()
@@ -381,11 +381,11 @@ class QueryTests(unittest.TestCase):
                         "citation.pdbx_database_id_DOI",
                     ],
                 )
-                data_query.exec()
+                result = data_query.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             try:
-                json = data_query.get_response()["data"]["entries"]
+                json = result["data"]["entries"]
                 json[0]["rcsb_id"]
                 json[0]["nonpolymer_entities"]
                 json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]
