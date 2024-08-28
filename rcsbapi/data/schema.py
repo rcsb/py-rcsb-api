@@ -117,7 +117,7 @@ class Schema:
         self.type_to_idx_dict: Dict[str, int] = {}
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
-        self.seen_names: set[str] = set()
+        self.seen_names : set[str] = set()
         self.root_introspection = self.request_root_types()
         """Request root types of the GraphQL schema and their required arguments"""
         self.schema: Dict = self.fetch_schema()
@@ -207,9 +207,6 @@ class Schema:
     def fetch_schema(self) -> Dict:
         """Make an introspection query to get full Data API query.
         Can also be found in resources folder as "data_api_schema.json"
-
-        Args:
-            pdb_url (str): URL for GraphQL endpoint
 
         Returns:
             Dict: JSON response of introspection request
