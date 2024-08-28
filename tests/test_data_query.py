@@ -356,45 +356,46 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    # def testSearchDataNotebook(self):
-    #     with self.subTest(msg="1. Construct search API query and request"):
-    #         # search API query and request
-    #         try:
-    #             q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "COVID-19 virus"
-    #             q2 = attrs.rcsb_nonpolymer_entity_annotation.type == "SUBJECT_OF_INVESTIGATION"
-    #             q3 = attrs.rcsb_polymer_entity_feature_summary.type == "modified_monomer"
-    #             query = q1 & q2 & q3
-    #             result_list = query()
-    #         except Exception as error:
-    #             self.fail(f"Failed unexpectedly: {error}")
-    #         self.assertGreaterEqual(len(list(result_list)), 10)
-    #     with self.subTest(msg="2. Construct data API query and parse result"):
-    #         try:
-    #             data_query = Query(
-    #                 input_type="entries",
-    #                 input_ids=["6W61", "7ARF", "7AWU", "7C8B", "7JP0", "7JPZ", "7JQ0", "7JQ1", "7JQ2", "7JQ3"],
-    #                 return_data_list=[
-    #                     "entries.rcsb_id",
-    #                     "rcsb_nonpolymer_entity_instance_container_identifiers.comp_id",
-    #                     "is_subject_of_investigation",
-    #                     "citation.title",
-    #                     "citation.pdbx_database_id_DOI",
-    #                 ],
-    #             )
-    #             data_query.exec()
-    #         except Exception as error:
-    #             self.fail(f"Failed unexpectedly: {error}")
-    #         try:
-    #             json = data_query.get_response()["data"]["entries"]
-    #             json[0]["rcsb_id"]
-    #             json[0]["nonpolymer_entities"]
-    #             json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]
-    #             json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_instance_validation_score"][0]["is_subject_of_investigation"]
-    #             json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_entity_instance_container_identifiers"]["comp_id"]
-    #             json[0]["citation"][0]["title"]
-    #             json[0]["citation"][0]["pdbx_database_id_DOI"]
-    #         except Exception as error:
-    #             self.fail(f"Failed unexpectedly: {error}")
+    def testSearchDataNotebook(self):
+        with self.subTest(msg="1. Construct search API query and request"):
+            # search API query and request
+            try:
+                q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "COVID-19 virus"
+                q2 = attrs.rcsb_nonpolymer_entity_annotation.type == "SUBJECT_OF_INVESTIGATION"
+                q3 = attrs.rcsb_polymer_entity_feature_summary.type == "modified_monomer"
+                query = q1 & q2 & q3
+                result_list = query()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+            self.assertGreaterEqual(len(list(result_list)), 10)
+        with self.subTest(msg="2. Construct data API query and parse result"):
+            try:
+                data_query = Query(
+                    input_type="entries",
+                    ## input ids removed because "rcsb_nonpolymer_instance_validation_score" is None: "6W61", "7ARF", "7JPZ", "7JQ3"
+                    input_ids=["7AWU", "7C8B", "7JP0", "7JQ0", "7JQ1", "7JQ2"],
+                    return_data_list=[
+                        "entries.rcsb_id",
+                        "rcsb_nonpolymer_entity_instance_container_identifiers.comp_id",
+                        "is_subject_of_investigation",
+                        "citation.title",
+                        "citation.pdbx_database_id_DOI",
+                    ],
+                )
+                data_query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+            try:
+                json = data_query.get_response()["data"]["entries"]
+                json[0]["rcsb_id"]
+                json[0]["nonpolymer_entities"]
+                json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]
+                json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_instance_validation_score"][0]["is_subject_of_investigation"]
+                json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_entity_instance_container_identifiers"]["comp_id"]
+                json[0]["citation"][0]["title"]
+                json[0]["citation"][0]["pdbx_database_id_DOI"]
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
 
 
 def buildQuery():
@@ -403,7 +404,7 @@ def buildQuery():
     suiteSelect.addTest(QueryTests("testDocs"))
     suiteSelect.addTest(QueryTests("testReadMeAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
-    # suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
     return suiteSelect
 
 
