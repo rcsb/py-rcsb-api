@@ -1,0 +1,2059 @@
+{
+    "type": "object",
+    "properties": {
+        "pdbx_struct_special_symmetry": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "PDB_model_num": {
+                        "type": "integer",
+                        "description": "Part of the identifier for the molecular component.\n\nThis data item is a pointer to _atom_site.pdbx_PDB_model_num in the\nATOM_SITE category.",
+                        "rcsb_description": [
+                            {
+                                "text": "Part of the identifier for the molecular component.\n\nThis data item is a pointer to _atom_site.pdbx_PDB_model_num in the\nATOM_SITE category.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "auth_seq_id": {
+                        "type": "string",
+                        "description": "Part of the identifier for the molecular component.\n\n This data item is a pointer to _atom_site.auth_seq_id in the\n ATOM_SITE category.",
+                        "rcsb_description": [
+                            {
+                                "text": "Part of the identifier for the molecular component.\n\n This data item is a pointer to _atom_site.auth_seq_id in the\n ATOM_SITE category.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "id": {
+                        "type": "integer",
+                        "description": "The value of _pdbx_struct_special_symmetry.id must uniquely identify\n each item in the PDBX_STRUCT_SPECIAL_SYMMETRY list.\n\n This is an integer serial number.",
+                        "rcsb_description": [
+                            {
+                                "text": "The value of _pdbx_struct_special_symmetry.id must uniquely identify\n each item in the PDBX_STRUCT_SPECIAL_SYMMETRY list.\n\n This is an integer serial number.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "label_asym_id": {
+                        "type": "string",
+                        "description": "Part of the identifier for the molecular component.\n\n This data item is a pointer to _atom_site.label_asym_id in the\n ATOM_SITE category.",
+                        "rcsb_description": [
+                            {
+                                "text": "Part of the identifier for the molecular component.\n\n This data item is a pointer to _atom_site.label_asym_id in the\n ATOM_SITE category.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "label_comp_id": {
+                        "type": "string",
+                        "description": "Part of the identifier for the molecular component.\n\n This data item is a pointer to _atom_site.label_comp_id in the\n ATOM_SITE category.",
+                        "rcsb_description": [
+                            {
+                                "text": "Part of the identifier for the molecular component.\n\n This data item is a pointer to _atom_site.label_comp_id in the\n ATOM_SITE category.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "id"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "rcsb_nonpolymer_entity_instance_container_identifiers": {
+            "type": "object",
+            "properties": {
+                "asym_id": {
+                    "type": "string",
+                    "description": "Instance identifier for this container.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "Instance identifier for this container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "auth_asym_id": {
+                    "type": "string",
+                    "description": "Author instance identifier for this container.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "Author instance identifier for this container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "auth_seq_id": {
+                    "type": "string",
+                    "description": "Residue number for non-polymer entity instance.",
+                    "rcsb_description": [
+                        {
+                            "text": "Residue number for non-polymer entity instance.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "comp_id": {
+                    "type": "string",
+                    "description": "Component identifier for non-polymer entity instance.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "Component identifier for non-polymer entity instance.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "entity_id": {
+                    "type": "string",
+                    "description": "Entity identifier for the container.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "Entity identifier for the container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "entry_id": {
+                    "type": "string",
+                    "description": "Entry identifier for the container.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "Entry identifier for the container.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "rcsb_id": {
+                    "type": "string",
+                    "examples": [
+                        "1KIP.A"
+                    ],
+                    "description": "A unique identifier for each object in this entity instance container formed by\n an 'dot' (.) separated concatenation of entry and entity instance identifiers.",
+                    "rcsb_search_context": [
+                        "exact-match"
+                    ],
+                    "rcsb_full_text_priority": 10,
+                    "rcsb_description": [
+                        {
+                            "text": "A unique identifier for each object in this entity instance container formed by\n an 'dot' (.) separated concatenation of entry and entity instance identifiers.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "asym_id",
+                "entry_id"
+            ]
+        },
+        "rcsb_nonpolymer_instance_annotation": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "annotation_id": {
+                        "type": "string",
+                        "description": "An identifier for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "An identifier for the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Identifier",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "assignment_version": {
+                        "type": "string",
+                        "examples": [
+                            "V4_0_2"
+                        ],
+                        "description": "Identifies the version of the annotation assignment.",
+                        "rcsb_description": [
+                            {
+                                "text": "Identifies the version of the annotation assignment.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Version",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "comp_id": {
+                        "type": "string",
+                        "examples": [
+                            "ATP"
+                        ],
+                        "description": "Non-polymer (ligand) chemical component identifier.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Non-polymer (ligand) chemical component identifier.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Component Identifier",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Nonpolymer Molecular Features",
+                                "priority_order": 15
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A description for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A description for the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Description",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "A name for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A name for the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Name",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "ordinal": {
+                        "type": "integer",
+                        "description": "Ordinal identifier for this category",
+                        "rcsb_description": [
+                            {
+                                "text": "Ordinal identifier for this category",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "provenance_source": {
+                        "type": "string",
+                        "examples": [
+                            "PDB"
+                        ],
+                        "description": "Code identifying the individual, organization or program that\n assigned the annotation.",
+                        "rcsb_description": [
+                            {
+                                "text": "Code identifying the individual, organization or program that\n assigned the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Source",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "HAS_COVALENT_LINKAGE",
+                            "HAS_METAL_COORDINATION_LINKAGE",
+                            "HAS_NO_COVALENT_LINKAGE"
+                        ],
+                        "examples": [
+                            "HAS_COVALENT_LINKAGE"
+                        ],
+                        "description": "A type or category of the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "HAS_COVALENT_LINKAGE",
+                                "detail": "Ligands with inter-molecular covalent interactions involving non-metal elements such as Carbon, Nitrogen, Oxygen, Phosphorus, and Sulfur",
+                                "name": "Has Covalent Linkage"
+                            },
+                            {
+                                "value": "HAS_METAL_COORDINATION_LINKAGE",
+                                "detail": "Ligands involved in metal coordination",
+                                "name": "Has Metal Coordination"
+                            },
+                            {
+                                "value": "HAS_NO_COVALENT_LINKAGE",
+                                "detail": "Ligands with no inter-molecular covalent interactions, but may be involved in metal coordination or other non-bonded interactions",
+                                "name": "Has No Covalent Linkage"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "A type or category of the annotation.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Annotation Type",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "annotation_lineage": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "depth": {
+                                    "type": "integer",
+                                    "description": "Members of the annotation lineage as parent lineage depth (1-N)",
+                                    "rcsb_search_context": [
+                                        "default-match"
+                                    ],
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Members of the annotation lineage as parent lineage depth (1-N)",
+                                            "context": "dictionary"
+                                        },
+                                        {
+                                            "text": "Lineage Depth",
+                                            "context": "brief"
+                                        }
+                                    ]
+                                },
+                                "id": {
+                                    "type": "string",
+                                    "description": "Members of the annotation lineage as parent class identifiers.",
+                                    "rcsb_search_context": [
+                                        "exact-match"
+                                    ],
+                                    "rcsb_full_text_priority": 10,
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Members of the annotation lineage as parent class identifiers.",
+                                            "context": "dictionary"
+                                        },
+                                        {
+                                            "text": "Lineage Identifier",
+                                            "context": "brief"
+                                        }
+                                    ]
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "Members of the annotation lineage as parent class names.",
+                                    "rcsb_search_context": [
+                                        "exact-match",
+                                        "full-text"
+                                    ],
+                                    "rcsb_full_text_priority": 10,
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Members of the annotation lineage as parent class names.",
+                                            "context": "dictionary"
+                                        },
+                                        {
+                                            "text": "Lineage Name",
+                                            "context": "brief"
+                                        }
+                                    ]
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false,
+                        "rcsb_nested_indexing": true
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "ordinal"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true,
+            "rcsb_nested_indexing_context": [
+                {
+                    "category_name": "annotation_type",
+                    "category_path": "rcsb_nonpolymer_instance_annotation.type",
+                    "context_attributes": [
+                        {
+                            "context_value": "HAS_COVALENT_LINKAGE",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        "BMZ",
+                                        "ATP"
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_annotation.comp_id"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "HAS_METAL_COORDINATION_LINKAGE",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        "SF4",
+                                        "HEM"
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_annotation.comp_id"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "HAS_NO_COVALENT_LINKAGE",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        "J5C",
+                                        "DID"
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_annotation.comp_id"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "rcsb_nonpolymer_instance_feature": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "assignment_version": {
+                        "type": "string",
+                        "examples": [
+                            "V4_0_2"
+                        ],
+                        "description": "Identifies the version of the feature assignment.",
+                        "rcsb_description": [
+                            {
+                                "text": "Identifies the version of the feature assignment.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Version",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "comp_id": {
+                        "type": "string",
+                        "description": "Component identifier for non-polymer entity instance.",
+                        "rcsb_description": [
+                            {
+                                "text": "Component identifier for non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A description for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "A description for the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Description",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "feature_id": {
+                        "type": "string",
+                        "description": "An identifier for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "An identifier for the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "A name for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "A name for the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Name",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "ordinal": {
+                        "type": "integer",
+                        "description": "Ordinal identifier for this category",
+                        "rcsb_description": [
+                            {
+                                "text": "Ordinal identifier for this category",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "provenance_source": {
+                        "type": "string",
+                        "examples": [
+                            "PDB"
+                        ],
+                        "description": "Code identifying the individual, organization or program that\n assigned the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "Code identifying the individual, organization or program that\n assigned the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Source",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "HAS_COVALENT_LINKAGE",
+                            "HAS_METAL_COORDINATION_LINKAGE",
+                            "MOGUL_ANGLE_OUTLIER",
+                            "MOGUL_BOND_OUTLIER",
+                            "RSCC_OUTLIER",
+                            "RSRZ_OUTLIER",
+                            "STEREO_OUTLIER"
+                        ],
+                        "examples": [
+                            "RSRZ_OUTLIER",
+                            "MOGUL_BOND_OUTLIER"
+                        ],
+                        "description": "A type or category of the feature.",
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "HAS_COVALENT_LINKAGE",
+                                "detail": "Has a covalent attachment"
+                            },
+                            {
+                                "value": "HAS_METAL_COORDINATION_LINKAGE",
+                                "detail": "Has a metal coordination attachment"
+                            },
+                            {
+                                "value": "MOGUL_ANGLE_OUTLIER",
+                                "detail": "Mogul bond angle outlier"
+                            },
+                            {
+                                "value": "MOGUL_BOND_OUTLIER",
+                                "detail": "Mogul bond distance outlier"
+                            },
+                            {
+                                "value": "RSCC_OUTLIER",
+                                "detail": "Real space density correlation value < 0.65"
+                            },
+                            {
+                                "value": "RSRZ_OUTLIER",
+                                "detail": "Real space R-value Z score > 2"
+                            },
+                            {
+                                "value": "STEREO_OUTLIER",
+                                "detail": "Stereochemical/chirality outlier"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "A type or category of the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Type",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "feature_value": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "comp_id": {
+                                    "type": "string",
+                                    "examples": [
+                                        "ATP,",
+                                        "STN"
+                                    ],
+                                    "description": "The chemical component identifier for the instance of the feature value.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The chemical component identifier for the instance of the feature value.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "details": {
+                                    "type": "string",
+                                    "examples": [
+                                        "C1,C2",
+                                        "C1,C2,C3"
+                                    ],
+                                    "description": "Specific details about the feature.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Specific details about the feature.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "reference": {
+                                    "type": "number",
+                                    "examples": [
+                                        5,
+                                        0.25
+                                    ],
+                                    "description": "The reference value of the feature.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The reference value of the feature.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "reported": {
+                                    "type": "number",
+                                    "examples": [
+                                        5,
+                                        0.25
+                                    ],
+                                    "description": "The reported value of the feature.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The reported value of the feature.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "uncertainty_estimate": {
+                                    "type": "number",
+                                    "examples": [
+                                        1,
+                                        -1.5
+                                    ],
+                                    "description": "The estimated uncertainty of the reported feature value.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The estimated uncertainty of the reported feature value.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "uncertainty_estimate_type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "Z-Score"
+                                    ],
+                                    "examples": [
+                                        "Z-score"
+                                    ],
+                                    "description": "The type of estimated uncertainty for the reported feature value.",
+                                    "rcsb_enum_annotated": [
+                                        {
+                                            "value": "Z-Score",
+                                            "detail": "Number of standard deviation units from the reference distribution mean"
+                                        }
+                                    ],
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The type of estimated uncertainty for the reported feature value.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false
+                    },
+                    "additional_properties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "examples": [
+                                        "bond_distance",
+                                        "bond_angle"
+                                    ],
+                                    "description": "The additional property name.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The additional property name.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "values": {
+                                    "type": "array",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
+                                        ],
+                                        "examples": [
+                                            "2.54",
+                                            "300"
+                                        ],
+                                        "description": "The value(s) of the additional property.",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "The value(s) of the additional property.",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "ordinal"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "rcsb_nonpolymer_instance_feature_summary": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "comp_id": {
+                        "type": "string",
+                        "description": "Component identifier for non-polymer entity instance.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Component identifier for non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "count": {
+                        "type": "integer",
+                        "description": "The feature count.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The feature count.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Count",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "maximum_length": {
+                        "type": "integer",
+                        "description": "The maximum feature length.",
+                        "rcsb_description": [
+                            {
+                                "text": "The maximum feature length.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "maximum_value": {
+                        "type": "number",
+                        "examples": [
+                            1.012,
+                            0.813
+                        ],
+                        "description": "The maximum feature value.",
+                        "rcsb_description": [
+                            {
+                                "text": "The maximum feature value.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "minimum_length": {
+                        "type": "integer",
+                        "description": "The minimum feature length.",
+                        "rcsb_description": [
+                            {
+                                "text": "The minimum feature length.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "minimum_value": {
+                        "type": "number",
+                        "examples": [
+                            0.012,
+                            0.00132
+                        ],
+                        "description": "The minimum feature value.",
+                        "rcsb_description": [
+                            {
+                                "text": "The minimum feature value.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "HAS_COVALENT_LINKAGE",
+                            "HAS_METAL_COORDINATION_LINKAGE",
+                            "MOGUL_ANGLE_OUTLIER",
+                            "MOGUL_BOND_OUTLIER",
+                            "RSCC_OUTLIER",
+                            "RSRZ_OUTLIER",
+                            "STEREO_OUTLIER"
+                        ],
+                        "examples": [
+                            "RSRZ_OUTLIER",
+                            "MOGUL_BOND_OUTLIER"
+                        ],
+                        "description": "Type or category of the feature.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "HAS_COVALENT_LINKAGE",
+                                "detail": "Has a covalent attachment"
+                            },
+                            {
+                                "value": "HAS_METAL_COORDINATION_LINKAGE",
+                                "detail": "Has a metal coordination attachment"
+                            },
+                            {
+                                "value": "MOGUL_ANGLE_OUTLIER",
+                                "detail": "Mogul bond angle outlier"
+                            },
+                            {
+                                "value": "MOGUL_BOND_OUTLIER",
+                                "detail": "Mogul bond distance outlier"
+                            },
+                            {
+                                "value": "RSCC_OUTLIER",
+                                "detail": "Real space density correlation value < 0.65"
+                            },
+                            {
+                                "value": "RSRZ_OUTLIER",
+                                "detail": "Real space R-value Z score > 2"
+                            },
+                            {
+                                "value": "STEREO_OUTLIER",
+                                "detail": "Stereochemical/chirality outlier"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Type or category of the feature.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Feature Type",
+                                "context": "brief"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true,
+            "rcsb_nested_indexing_context": [
+                {
+                    "category_name": "feature_summary",
+                    "category_path": "rcsb_nonpolymer_instance_feature_summary.type",
+                    "context_attributes": [
+                        {
+                            "context_value": "HAS_COVALENT_LINKAGE",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        1,
+                                        5
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "HAS_METAL_COORDINATION_LINKAGE",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        1,
+                                        5
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "MOGUL_ANGLE_OUTLIER",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        1,
+                                        5
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "MOGUL_BOND_OUTLIER",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        1,
+                                        5
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "RSCC_OUTLIER",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        1,
+                                        5
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "RSRZ_OUTLIER",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        1,
+                                        5
+                                    ],
+                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "rcsb_nonpolymer_instance_validation_score": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "RSCC": {
+                        "type": "number",
+                        "examples": [
+                            0.9,
+                            0.55
+                        ],
+                        "description": "The real space correlation coefficient (RSCC) for the non-polymer entity instance.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The real space correlation coefficient (RSCC) for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Real Space Correlation Coefficient",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "RSR": {
+                        "type": "number",
+                        "examples": [
+                            0.15,
+                            0.35
+                        ],
+                        "description": "The real space R-value (RSR) for the non-polymer entity instance.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The real space R-value (RSR) for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Real Space R-value (RSR)",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "alt_id": {
+                        "type": "string",
+                        "description": "Alternate conformer identifier for the non-polymer entity instance.",
+                        "rcsb_description": [
+                            {
+                                "text": "Alternate conformer identifier for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "average_occupancy": {
+                        "type": "number",
+                        "examples": [
+                            1,
+                            0.83
+                        ],
+                        "description": "The average heavy atom occupancy for coordinate records for the non-polymer entity instance.",
+                        "rcsb_description": [
+                            {
+                                "text": "The average heavy atom occupancy for coordinate records for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "completeness": {
+                        "type": "number",
+                        "examples": [
+                            1,
+                            0.83
+                        ],
+                        "description": "The reported fraction of atomic coordinate records for the non-polymer entity instance.",
+                        "rcsb_description": [
+                            {
+                                "text": "The reported fraction of atomic coordinate records for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "intermolecular_clashes": {
+                        "type": "integer",
+                        "description": "The number of intermolecular MolProbity clashes cacluated for reported atomic coordinate records.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The number of intermolecular MolProbity clashes cacluated for reported atomic coordinate records.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Number of Intermolecular Vlashes",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "is_best_instance": {
+                        "type": "string",
+                        "enum": [
+                            "N",
+                            "Y"
+                        ],
+                        "examples": [
+                            "Y",
+                            "N"
+                        ],
+                        "description": "This molecular instance is ranked as the best quality instance of this nonpolymer entity.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "N",
+                                "detail": "The molecular instance is not ranked as best instance of the molecule"
+                            },
+                            {
+                                "value": "Y",
+                                "detail": "The molecular instance is ranked as the best instance of the molecule"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "This molecular instance is ranked as the best quality instance of this nonpolymer entity.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Highest Ranking Ligand Instance in Structure",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "is_subject_of_investigation": {
+                        "type": "string",
+                        "enum": [
+                            "N",
+                            "Y"
+                        ],
+                        "examples": [
+                            "Y",
+                            "N"
+                        ],
+                        "description": "This molecular entity is identified as the subject of the current study.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "N",
+                                "detail": "Molecule instance is not the subject of the current investigation"
+                            },
+                            {
+                                "value": "Y",
+                                "detail": "Molecule instance is the subject of the current investigation"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "This molecular entity is identified as the subject of the current study.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Ligand Identified as Subject of Investigation",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "is_subject_of_investigation_provenance": {
+                        "type": "string",
+                        "enum": [
+                            "Author",
+                            "RCSB"
+                        ],
+                        "examples": [
+                            "Author",
+                            "RCSB"
+                        ],
+                        "description": "The provenance for the selection of the molecular entity identified as the subject of the current study.",
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "Author",
+                                "detail": "The entry author is the source of the selection of the molecular entity of interest"
+                            },
+                            {
+                                "value": "RCSB",
+                                "detail": "RCSB is the source of the selection of the molecular entity of interest"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The provenance for the selection of the molecular entity identified as the subject of the current study.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "mogul_angle_outliers": {
+                        "type": "integer",
+                        "description": "Number of bond angle outliers obtained from a CCDC Mogul survey of bond angles  in the CSD small\n   molecule crystal structure database. Outliers are defined as bond angles that have a Z-score\n   less than -2 or greater than 2.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Number of bond angle outliers obtained from a CCDC Mogul survey of bond angles  in the CSD small\n   molecule crystal structure database. Outliers are defined as bond angles that have a Z-score\n   less than -2 or greater than 2.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Number of Bond Angle Outliers (|Z|>2)",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "mogul_angles_RMSZ": {
+                        "type": "number",
+                        "examples": [
+                            7.22,
+                            1.16
+                        ],
+                        "description": "The root-mean-square value of the Z-scores of bond angles for the residue in degrees\nobtained from a CCDC Mogul survey of bond angles in the CSD small molecule crystal structure database.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_units": "degrees",
+                        "rcsb_description": [
+                            {
+                                "text": "The root-mean-square value of the Z-scores of bond angles for the residue in degrees\nobtained from a CCDC Mogul survey of bond angles in the CSD small molecule crystal structure database.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Root-Mean-Aquare Value of the Z-scores for Bond Angles",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "mogul_bond_outliers": {
+                        "type": "integer",
+                        "description": "Number of bond distance outliers obtained from a CCDC Mogul survey of bond lengths in the CSD small\n   molecule crystal structure database.  Outliers are defined as bond distances that have a Z-score\n   less than -2 or greater than 2.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Number of bond distance outliers obtained from a CCDC Mogul survey of bond lengths in the CSD small\n   molecule crystal structure database.  Outliers are defined as bond distances that have a Z-score\n   less than -2 or greater than 2.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Number of Bond Distance Outliers (|Z|>2)",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "mogul_bonds_RMSZ": {
+                        "type": "number",
+                        "examples": [
+                            0.69,
+                            1.32
+                        ],
+                        "description": "The root-mean-square value of the Z-scores of bond lengths for the residue in Angstroms\nobtained from a CCDC Mogul survey of bond lengths in the CSD small molecule crystal structure database.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_units": "angstroms",
+                        "rcsb_description": [
+                            {
+                                "text": "The root-mean-square value of the Z-scores of bond lengths for the residue in Angstroms\nobtained from a CCDC Mogul survey of bond lengths in the CSD small molecule crystal structure database.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Root-Mean-Aquare Value of the Z-scores for Bond Distances",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "ranking_model_fit": {
+                        "type": "number",
+                        "examples": [
+                            0.9,
+                            0.55
+                        ],
+                        "description": "The ranking of the model fit score component.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The ranking of the model fit score component.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Experimental Model Fit Ranking",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "ranking_model_geometry": {
+                        "type": "number",
+                        "examples": [
+                            0.9,
+                            0.55
+                        ],
+                        "description": "The ranking of the model geometry score component.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The ranking of the model geometry score component.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Model Geometry Ranking",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "score_model_fit": {
+                        "type": "number",
+                        "examples": [
+                            -1.5,
+                            -0.25
+                        ],
+                        "description": "The value of the model fit score component.",
+                        "rcsb_description": [
+                            {
+                                "text": "The value of the model fit score component.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "score_model_geometry": {
+                        "type": "number",
+                        "examples": [
+                            -0.79,
+                            0.025
+                        ],
+                        "description": "The value of the model geometry score component.",
+                        "rcsb_description": [
+                            {
+                                "text": "The value of the model geometry score component.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "stereo_outliers": {
+                        "type": "integer",
+                        "description": "Number of stereochemical/chirality errors.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Number of stereochemical/chirality errors.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Number of Chirality Errors",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "RCSB_LIGAND_QUALITY_SCORE_2021"
+                        ],
+                        "examples": [
+                            "RCSB_LIGAND_QUALITY_2021"
+                        ],
+                        "description": "Score type.",
+                        "rcsb_description": [
+                            {
+                                "text": "Score type.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "rcsb_nonpolymer_struct_conn": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "connect_type": {
+                        "type": "string",
+                        "enum": [
+                            "covalent bond",
+                            "disulfide bridge",
+                            "hydrogen bond",
+                            "ionic interaction",
+                            "metal coordination",
+                            "mismatched base pairs"
+                        ],
+                        "description": "The connection type.",
+                        "rcsb_description": [
+                            {
+                                "text": "The connection type.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "examples": [
+                            "Watson-Crick base pair"
+                        ],
+                        "description": "A description of special details of the connection.",
+                        "rcsb_description": [
+                            {
+                                "text": "A description of special details of the connection.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "dist_value": {
+                        "type": "number",
+                        "description": "Distance value for this contact.",
+                        "rcsb_units": "angstroms",
+                        "rcsb_description": [
+                            {
+                                "text": "Distance value for this contact.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "id": {
+                        "type": "string",
+                        "description": "The value of _rcsb_nonpolymer_struct_conn.id is an identifier for connection.\n\n Note that this item need not be a number; it can be any unique\n identifier.",
+                        "rcsb_description": [
+                            {
+                                "text": "The value of _rcsb_nonpolymer_struct_conn.id is an identifier for connection.\n\n Note that this item need not be a number; it can be any unique\n identifier.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "ordinal_id": {
+                        "type": "integer",
+                        "description": "The value of _rcsb_nonpolymer_struct_conn.id must uniquely identify a record in\n the rcsb_nonpolymer_struct_conn list.",
+                        "rcsb_description": [
+                            {
+                                "text": "The value of _rcsb_nonpolymer_struct_conn.id must uniquely identify a record in\n the rcsb_nonpolymer_struct_conn list.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "role": {
+                        "type": "string",
+                        "enum": [
+                            "C-Mannosylation",
+                            "N-Glycosylation",
+                            "O-Glycosylation",
+                            "S-Glycosylation"
+                        ],
+                        "examples": [
+                            "N-Glycosylation",
+                            "O-Glycosylation"
+                        ],
+                        "description": "The chemical or structural role of the interaction",
+                        "rcsb_description": [
+                            {
+                                "text": "The chemical or structural role of the interaction",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "value_order": {
+                        "type": "string",
+                        "enum": [
+                            "doub",
+                            "quad",
+                            "sing",
+                            "trip"
+                        ],
+                        "description": "The chemical bond order associated with the specified atoms in\n this contact.",
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "doub",
+                                "detail": "double bond"
+                            },
+                            {
+                                "value": "quad",
+                                "detail": "quadruple bond"
+                            },
+                            {
+                                "value": "sing",
+                                "detail": "single bond"
+                            },
+                            {
+                                "value": "trip",
+                                "detail": "triple bond"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The chemical bond order associated with the specified atoms in\n this contact.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "connect_target": {
+                        "type": "object",
+                        "properties": {
+                            "auth_asym_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.auth_asym_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.auth_asym_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "auth_seq_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.auth_seq_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.auth_seq_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_alt_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_alt_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_alt_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_asym_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_asym_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_asym_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_atom_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_atom_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_atom_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_comp_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_comp_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.label_comp_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_seq_id": {
+                                "type": "integer",
+                                "description": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.connect_target_label_seq_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the target of the structure\n connection.\n\n This data item is a pointer to _atom_site.connect_target_label_seq_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "symmetry": {
+                                "type": "string",
+                                "examples": [
+                                    "1_555",
+                                    "7_645"
+                                ],
+                                "description": "Describes the symmetry operation that should be applied to the\n atom set specified by _rcsb_nonpolymer_struct_conn.label* to generate the\n target of the structure connection.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "Describes the symmetry operation that should be applied to the\n atom set specified by _rcsb_nonpolymer_struct_conn.label* to generate the\n target of the structure connection.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                            "label_asym_id",
+                            "label_comp_id"
+                        ]
+                    },
+                    "connect_partner": {
+                        "type": "object",
+                        "properties": {
+                            "label_alt_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_alt_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_alt_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_asym_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_asym_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_asym_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_atom_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _chem_comp_atom.atom_id in the\n CHEM_COMP_ATOM category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _chem_comp_atom.atom_id in the\n CHEM_COMP_ATOM category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_comp_id": {
+                                "type": "string",
+                                "description": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_comp_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_comp_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "label_seq_id": {
+                                "type": "integer",
+                                "description": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_seq_id in the\n ATOM_SITE category.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "A component of the identifier for the partner in the structure\n connection.\n\n This data item is a pointer to _atom_site.label_seq_id in the\n ATOM_SITE category.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            },
+                            "symmetry": {
+                                "type": "string",
+                                "examples": [
+                                    "1_555",
+                                    "7_645"
+                                ],
+                                "description": "Describes the symmetry operation that should be applied to the\n atom set specified by _rcsb_nonpolymer_struct_conn.connect_partner_label* to generate the\n partner in the structure connection.",
+                                "rcsb_description": [
+                                    {
+                                        "text": "Describes the symmetry operation that should be applied to the\n atom set specified by _rcsb_nonpolymer_struct_conn.connect_partner_label* to generate the\n partner in the structure connection.",
+                                        "context": "dictionary"
+                                    }
+                                ]
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                            "label_asym_id",
+                            "label_comp_id"
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "ordinal_id"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "rcsb_target_neighbors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "alt_id": {
+                        "type": "string",
+                        "description": "Alternate conformer identifier for the non-polymer entity instance.",
+                        "rcsb_description": [
+                            {
+                                "text": "Alternate conformer identifier for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "atom_id": {
+                        "type": "string",
+                        "examples": [
+                            "O1",
+                            "N1",
+                            "C1"
+                        ],
+                        "description": "The atom identifier for the non-polymer entity instance.",
+                        "rcsb_description": [
+                            {
+                                "text": "The atom identifier for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "comp_id": {
+                        "type": "string",
+                        "description": "Component identifier for the non-polymer entity instance.",
+                        "rcsb_description": [
+                            {
+                                "text": "Component identifier for the non-polymer entity instance.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "distance": {
+                        "type": "number",
+                        "description": "Distance value for this target interaction.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_units": "angstroms",
+                        "rcsb_description": [
+                            {
+                                "text": "Distance value for this target interaction.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Target Neighbor Distance",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "target_asym_id": {
+                        "type": "string",
+                        "examples": [
+                            "A",
+                            "B"
+                        ],
+                        "description": "The entity instance identifier for the target of interaction.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "The entity instance identifier for the target of interaction.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Target Entity Instance Identifer",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "target_atom_id": {
+                        "type": "string",
+                        "examples": [
+                            "OG",
+                            "OE1",
+                            "CD1"
+                        ],
+                        "description": "The atom identifier for the target of interaction.",
+                        "rcsb_description": [
+                            {
+                                "text": "The atom identifier for the target of interaction.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "target_auth_seq_id": {
+                        "type": "integer",
+                        "description": "The author residue index for the target of interaction.",
+                        "rcsb_description": [
+                            {
+                                "text": "The author residue index for the target of interaction.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "target_comp_id": {
+                        "type": "string",
+                        "examples": [
+                            "ASN",
+                            "TRP",
+                            "SER"
+                        ],
+                        "description": "The chemical component identifier for the target of interaction.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "The chemical component identifier for the target of interaction.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Target Residue Identifier",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "target_entity_id": {
+                        "type": "string",
+                        "examples": [
+                            "1",
+                            "2"
+                        ],
+                        "description": "The entity identifier for the target of interaction.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "The entity identifier for the target of interaction.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Target Entity Identifier",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "target_is_bound": {
+                        "type": "string",
+                        "enum": [
+                            "N",
+                            "Y"
+                        ],
+                        "examples": [
+                            "Y",
+                            "N"
+                        ],
+                        "description": "A flag to indicate the nature of the target interaction is covalent or metal-coordination.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "N",
+                                "detail": "The target is not bound"
+                            },
+                            {
+                                "value": "Y",
+                                "detail": "The target is bound through a covalent or metal-coordination interaction"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "A flag to indicate the nature of the target interaction is covalent or metal-coordination.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Target is Bound to Ligand",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "target_model_id": {
+                        "type": "integer",
+                        "description": "Model identifier for the target of interaction.",
+                        "rcsb_description": [
+                            {
+                                "text": "Model identifier for the target of interaction.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "target_seq_id": {
+                        "type": "integer",
+                        "description": "The sequence position for the target of interaction.",
+                        "rcsb_description": [
+                            {
+                                "text": "The sequence position for the target of interaction.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "struct_asym": {
+            "type": "object",
+            "properties": {
+                "pdbx_PDB_id": {
+                    "type": "string",
+                    "examples": [
+                        "1ABC"
+                    ],
+                    "description": "This data item is a pointer to _atom_site.pdbx_PDB_strand_id the\n ATOM_SITE category.",
+                    "rcsb_description": [
+                        {
+                            "text": "This data item is a pointer to _atom_site.pdbx_PDB_strand_id the\n ATOM_SITE category.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "pdbx_alt_id": {
+                    "type": "string",
+                    "description": "This data item is a pointer to _atom_site.ndb_alias_strand_id the\n ATOM_SITE category.",
+                    "rcsb_description": [
+                        {
+                            "text": "This data item is a pointer to _atom_site.ndb_alias_strand_id the\n ATOM_SITE category.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "pdbx_order": {
+                    "type": "integer",
+                    "description": "This data item gives the order of the structural elements in the\n ATOM_SITE category.",
+                    "rcsb_description": [
+                        {
+                            "text": "This data item gives the order of the structural elements in the\n ATOM_SITE category.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "pdbx_type": {
+                    "type": "string",
+                    "enum": [
+                        "ATOMN",
+                        "ATOMP",
+                        "ATOMS",
+                        "HETAC",
+                        "HETAD",
+                        "HETAI",
+                        "HETAIN",
+                        "HETAS",
+                        "HETIC"
+                    ],
+                    "description": "This data item describes the general type of the structural elements\n in the ATOM_SITE category.",
+                    "rcsb_enum_annotated": [
+                        {
+                            "value": "ATOMN",
+                            "detail": "nucleic acid"
+                        },
+                        {
+                            "value": "ATOMP",
+                            "detail": "protein"
+                        },
+                        {
+                            "value": "ATOMS",
+                            "detail": "sugar"
+                        },
+                        {
+                            "value": "HETAC",
+                            "detail": "coenzyme"
+                        },
+                        {
+                            "value": "HETAD",
+                            "detail": "drug"
+                        },
+                        {
+                            "value": "HETAI",
+                            "detail": "ion"
+                        },
+                        {
+                            "value": "HETAIN",
+                            "detail": "inhibitor"
+                        },
+                        {
+                            "value": "HETAS",
+                            "detail": "solvent"
+                        },
+                        {
+                            "value": "HETIC",
+                            "detail": "ion complex"
+                        }
+                    ],
+                    "rcsb_description": [
+                        {
+                            "text": "This data item describes the general type of the structural elements\n in the ATOM_SITE category.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "rcsb_id": {
+            "type": "string",
+            "examples": [
+                "1KIP.A"
+            ],
+            "description": "A unique identifier for each object in this entity instance container formed by\n an 'dot' (.) separated concatenation of entry and entity instance identifiers.",
+            "rcsb_search_context": [
+                "exact-match"
+            ],
+            "rcsb_full_text_priority": 10,
+            "rcsb_description": [
+                {
+                    "text": "A unique identifier for each object in this entity instance container formed by\n an 'dot' (.) separated concatenation of entry and entity instance identifiers.",
+                    "context": "dictionary"
+                }
+            ]
+        },
+        "rcsb_latest_revision": {
+            "type": "object",
+            "properties": {
+                "major_revision": {
+                    "type": "integer",
+                    "description": "The major version number of the latest revision."
+                },
+                "minor_revision": {
+                    "type": "integer",
+                    "description": "The minor version number of the latest revision."
+                },
+                "revision_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The release date of the latest revision item."
+                }
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "rcsb_id"
+    ],
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Core Nonpolymer Entity Instance",
+    "description": "JSON schema for nonpolymer entity instance core.",
+    "$comment": "schema_version: 10.0.0"
+}
