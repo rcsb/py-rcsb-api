@@ -42,7 +42,7 @@ logger.setLevel(logging.INFO)
 class SchemaTests(unittest.TestCase):
     def test_schema_version(self):
         with self.subTest(msg="1. Compare entry schema"):
-            entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "entry.json")
+            entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "data", "resources", "entry.json")
             with open(entry_schema_path, "r", encoding="utf-8") as f:
                 schema_data = json.load(f)
             local_schema_version = schema_data.get("$comment").split(": ")[1]
@@ -56,7 +56,7 @@ class SchemaTests(unittest.TestCase):
             self.assertEqual(local_major_minor_version, online_major_minor_version)
 
         with self.subTest(msg="2. Compare polymer_entity schema"):
-            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "polymer_entity.json")
+            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "data", "resources", "polymer_entity.json")
             with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
                 schema_data = json.load(f)
             local_schema_version = schema_data.get("$comment").split(": ")[1]
@@ -70,7 +70,7 @@ class SchemaTests(unittest.TestCase):
             self.assertEqual(local_major_minor_version, online_major_minor_version)
 
         with self.subTest(msg="3. Compare polymer_entity_instance schema"):
-            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "resources", "polymer_entity_instance.json")
+            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "data", "resources", "polymer_entity_instance.json")
             with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
                 schema_data = json.load(f)
             local_schema_version = schema_data.get("$comment").split(": ")[1]

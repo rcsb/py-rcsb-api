@@ -54,7 +54,7 @@ setup(
     packages=find_packages(exclude=["tests", "tests-*", "tests.*"]),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:
-        "": ["*.md", "*.rst", "*.txt", "*.cfg", "resources/*"]
+        "": ["*.md", "*.rst", "*.txt", "*.cfg", "rcsbapi/*/resources/*"]
     },
     #
     test_suite="tests",
@@ -67,6 +67,8 @@ setup(
         "tests": ["tox", "pylint", "black>=21.5b1", "flake8"],
         # should match docs/requirements.txt
         "docs": ["sphinx", "sphinx-rtd-theme", "myst-parser"],
+        # "data": ["rustworkx", "graphql-core"],  # or call this extra "graphql"
+        # "all": ["rustworkx", "graphql-core"],
     },
     # Added for
     command_options={"build_sphinx": {"project": ("setup.py", thisPackage), "version": ("setup.py", version), "release": ("setup.py", version)}},

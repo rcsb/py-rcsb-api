@@ -1,6 +1,4 @@
-"""RCSB PDB Search API"""
-__version__ = "0.3.0"
-
+"""RCSB PDB Data API"""
 from .schema import Schema
 
 SCHEMA = Schema()

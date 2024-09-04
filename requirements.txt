@@ -1,8 +1,10 @@
 requests >= 2.0.0
 rustworkx
-networkx
-rcsbsearchapi
+# networkx
+# rcsbsearchapi
 graphql-core
 # matplotlib
 # scipy
 # pygraphviz
+tqdm
+rich  # pretty printing
