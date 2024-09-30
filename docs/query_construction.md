@@ -171,7 +171,7 @@ schema.find_paths(input_type="entry", return_data_name="id")
 ```
 
 ### find_field_names()
-Given a string, this method will return all fields containing that string, along with a description of each field.
+Given a string, this method will return all fields containing that string.
 
 ```python
 from rcsbapi.data import Schema

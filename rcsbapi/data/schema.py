@@ -6,6 +6,7 @@ import os
 import requests
 import networkx as nx
 from graphql import validate, parse, build_client_schema
+from .constants import ApiSettings
 
 use_networkx: bool = False
 try:
@@ -15,11 +16,18 @@ try:
 except ImportError:
     use_networkx = True
 
-PDB_URL: str = "https://data.rcsb.org/graphql"
-
 
 class FieldNode:
-
+    """
+    Node representing GraphQL field
+        name (str): field name
+        description (str): field description
+        redundant (bool): whether field name is redundant in schema
+        kind (str): "LIST", "SCALAR, or "OBJECT"
+        of_kind (str): If "LIST", whether list of "SCALAR" or "OBJECT"
+        type (str): GraphQL schema type (ex: CoreEntry)
+        index (int): graph index
+    """
     def __init__(self, kind, node_type, name, description) -> None:
         self.name: str = name
         self.description: str = description
@@ -44,7 +52,7 @@ class TypeNode:
     def __init__(self, name: str) -> None:
         self.name: str = name
         self.index: Optional[int] = None
-        self.field_list: Optional[List[FieldNode]] = None
+        self.field_list: List[FieldNode] = []
 
     def set_index(self, index) -> None:
         self.index = index
@@ -62,14 +70,15 @@ class Schema:
         """
         GraphQL schema defining available fields, types, and how they are connected.
         """
-        self.pdb_url: str = PDB_URL
+        self.pdb_url: str = ApiSettings.API_ENDPOINT.value
+        self.timeout: int = ApiSettings.TIMEOUT.value
         self.use_networkx: bool = use_networkx
         self.type_to_idx_dict: Dict[str, int] = {}
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
         self.seen_names: set[str] = set()
-        self.root_introspection = self.request_root_types(PDB_URL)
-        self.schema: Dict = self.fetch_schema(self.pdb_url)
+        self.root_introspection = self.request_root_types()
+        self.schema: Dict = self.fetch_schema()
         self.client_schema = build_client_schema(self.schema["data"])
 
         if use_networkx:
@@ -85,7 +94,7 @@ class Schema:
         """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
         self.apply_weights(["CoreAssembly"], 2)
 
-    def request_root_types(self, pdb_url) -> Dict:
+    def request_root_types(self) -> Dict:
         root_query = """
         query IntrospectionQuery{
         __schema{
@@ -115,7 +124,7 @@ class Schema:
         }
         }
         """
-        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=pdb_url, timeout=10)
+        response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=self.pdb_url, timeout=self.timeout)
         return response.json()
 
     def construct_root_dict(self, url: str) -> Dict[str, List[Dict[str, str]]]:
@@ -130,12 +139,12 @@ class Schema:
                 arg_description = arg_dict["description"]
                 arg_kind = arg_dict["type"]["ofType"]["kind"]
                 arg_type = self.find_type_name(arg_dict["type"]["ofType"])
-                if root_name not in root_dict.keys():
+                if root_name not in root_dict:
                     root_dict[root_name] = []
                 root_dict[root_name].append({"name": arg_name, "description": arg_description, "kind": arg_kind, "type": arg_type})
         return root_dict
 
-    def fetch_schema(self, url: str) -> Dict[str, str]:
+    def fetch_schema(self) -> Dict[str, str]:
         query = """
             query IntrospectionQuery {
             __schema {
@@ -232,15 +241,14 @@ class Schema:
             }
             }
         """
-        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=url, timeout=10)
+        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=self.pdb_url, timeout=self.timeout)
         if schema_response.status_code == 200:
             return schema_response.json()
-        else:
-            logging.info("Loading data schema from file")
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            json_file_path = os.path.join(current_dir, "../", "resources", "data_api_schema.json")
-            with open(json_file_path, "r", encoding="utf-8") as schema_file:
-                return json.load(schema_file)
+        logging.info("Loading data schema from file")
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        json_file_path = os.path.join(current_dir, "../", "resources", "data_api_schema.json")
+        with open(json_file_path, "r", encoding="utf-8") as schema_file:
+            return json.load(schema_file)
 
     def construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         all_types_dict: Dict = self.schema["data"]["__schema"]["types"]
@@ -286,7 +294,7 @@ class Schema:
                     type_index = self.type_to_idx_dict[type_name]
                 if type_name in self.type_to_idx_dict:
                     type_index = self.type_to_idx_dict[type_name]
-                if type_name in self.type_to_idx_dict.keys():
+                if type_name in self.type_to_idx_dict:
                     type_index = self.type_to_idx_dict[type_name]
                     if use_networkx:
                         schema_graph.add_edge(field_node.index, type_index, 1)
@@ -327,14 +335,12 @@ class Schema:
     def find_kind(self, field_dict: Dict) -> str:
         if field_dict["name"] is not None:
             return field_dict["kind"]
-        else:
-            return self.find_kind(field_dict["ofType"])
+        return self.find_kind(field_dict["ofType"])
 
     def find_type_name(self, field_dict: Dict) -> str:
         if field_dict["name"] is not None:
             return field_dict["name"]
-        else:
-            return self.find_type_name(field_dict["ofType"])
+        return self.find_type_name(field_dict["ofType"])
 
     def find_description(self, type_name: str, field_name: str) -> str:
         for type_dict in self.schema["data"]["__schema"]["types"]:
@@ -368,7 +374,7 @@ class Schema:
             field_node.redundant = True
         field_node.set_index(index)
 
-        if field_name not in self.field_to_idx_dict.keys():
+        if field_name not in self.field_to_idx_dict:
             self.field_to_idx_dict[field_name] = [field_node.index]
         else:
             self.field_to_idx_dict[field_name].append(field_node.index)
@@ -517,13 +523,13 @@ class Schema:
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
                     input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
-            elif input_type == "chem_comp" or input_type == "chem_comps":
+            elif input_type in ["chem_comp", "chem_comps"]:
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-            elif input_type == "entry_group" or input_type == "entry_groups":
+            elif input_type in ["entry_group", "entry_groups"]:
                 if len(input_ids) == 1:
                     input_dict["group_id"] = str(input_ids[0])
-            elif input_type == "polymer_entity_group" or input_type == "polymer_entity_groups":
+            elif input_type in ["polymer_entity_group", "polymer_entity_groups"]:
                 if len(input_ids) == 1:
                     input_dict["group_id"] = str(input_ids[0])
             # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
@@ -578,8 +584,7 @@ class Schema:
         validation_error_list = validate(self.client_schema, parse(query))
         if not validation_error_list:
             return query
-        else:
-            raise ValueError(validation_error_list)
+        raise ValueError(validation_error_list)
 
     def _construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # Incomplete function
         query = ""
@@ -912,24 +917,38 @@ class Schema:
                 name_path.append(self.schema_graph[idx].name)
         return name_path
 
-    def find_paths(self, input_type: str, return_data_name: str) -> List[str]:
+    def find_paths(self, input_type: str, return_data_name: str, descriptions: bool = False) -> Union[List[str], Dict]:
         """Find path from input_type to any nodes matching return_data_name
 
         Args:
             input_type (str): name of an input_type (ex: entry, polymer_entity_instance)
             return_data_name (str): name of one field, can be a redundant name
+            description (bool, optional): whether to include descriptions for the final field of each path. Default is False.
 
         Returns:
-            List[str]: list of paths to nodes with names that match return_data_name
+            Union[List[str], Dict]
+                List[str]: list of paths to nodes with names that match return_data_name
+                Dict: if description is True, a dictionary with paths as keys and descriptions as values is returned.
         """
         paths: List[List[int]] = []
         input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
         for possible_idx in self.field_to_idx_dict[return_data_name]:
             paths_to_idx = rx.all_simple_paths(self.schema_graph, input_type_idx, possible_idx)
             paths.extend(paths_to_idx)
-        name_paths: List[List[str]] = []
+        dot_paths: List[str] = []
+        description_dict: Dict[str, str] = {}
         for path in paths:
-            name_paths.append(self.idx_path_to_name_path(path))
-        dot_paths: List[str] = [".".join(name_path[1:]) for name_path in name_paths]
+            name_path = self.idx_path_to_name_path(path)
+            dot_path = ".".join(name_path[1:])
+            dot_paths.append(dot_path)
+            if descriptions:
+                final_field_idx = path[-1]
+                description = self.schema_graph[final_field_idx].description
+                if description is None:
+                    description = ""
+                description_dict[dot_path] = description.replace("\n", " ")
+
+        if descriptions:
+            return description_dict
         dot_paths.sort()
         return dot_paths

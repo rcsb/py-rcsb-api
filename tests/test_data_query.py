@@ -29,7 +29,7 @@ import requests
 # from rcsbapi.data import query
 from rcsbapi.data import Schema, Query
 from rcsbsearchapi import rcsb_attributes as attrs
-from rcsbapi.data.schema import PDB_URL
+from rcsbapi.data.constants import ApiSettings
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 logger = logging.getLogger()
@@ -290,7 +290,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. Making Queries"):
             try:

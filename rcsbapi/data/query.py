@@ -5,8 +5,8 @@ import time
 from typing import Any, Union, List, Dict, Optional
 import requests
 from rcsbapi.data import SCHEMA
+from .constants import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
 
-PDB_URL = "https://data.rcsb.org/graphql"
 logger = logging.getLogger()
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
 
@@ -22,17 +22,39 @@ class Query:
             for value in input_ids.values():
                 if len(value) > input_id_limit:
                     logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
-        self._input_ids = input_ids
-        self._input_type = input_type
-        self._return_data_list = return_data_list
-        self._query = SCHEMA.construct_query(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list, add_rcsb_id=add_rcsb_id)
+
         self._plural_input = False
         if SCHEMA.root_dict[input_type][0]["kind"] == "LIST":
             self._plural_input = True
             if isinstance(input_ids, dict):
+                assert isinstance(input_ids, dict)  # mypy
                 self._input_ids_list: List[str] = input_ids[SCHEMA.root_dict[input_type][0]["name"]]
-            if isinstance(input_ids, list):
-                self._input_ids_list = input_ids
+
+        self._input_type = input_type
+        # automatically turn singular input_types into plural for more flexibility in number of ids
+        if self._plural_input is False:
+            plural_type = SINGULAR_TO_PLURAL[input_type]
+            if plural_type:
+                self._input_type = plural_type
+                self._plural_input = True
+
+                # if input_ids is a dict, join into PDB id format
+                if isinstance(input_ids, dict):
+                    join_id = ""
+                    for k, v in input_ids.items():
+                        assert isinstance(v, str)  # for mypy
+                        if k in ID_TO_SEPARATOR:
+                            join_id += ID_TO_SEPARATOR[k] + v
+                        else:
+                            join_id += v
+
+                    input_ids = [join_id]
+
+        self._input_ids = input_ids
+        if isinstance(self._input_ids, list):
+            self._input_ids_list = self._input_ids
+        self._return_data_list = return_data_list
+        self._query = SCHEMA.construct_query(input_type=self._input_type, input_ids=self._input_ids, return_data_list=return_data_list, add_rcsb_id=add_rcsb_id)
         self._response: Optional[Dict[str, Any]] = None
 
     def get_input_ids(self) -> Union[List[str], Dict[str, List[str]], Dict[str, str]]:
@@ -53,11 +75,11 @@ class Query:
         except AttributeError:
             return None
 
-    def get_response(self) -> Dict[str, Any]:
+    def get_response(self) -> Union[None, Dict[str, Any]]:
         return self._response
 
     def get_editor_link(self) -> str:
-        editor_base_link = PDB_URL + "/index.html?query="
+        editor_base_link = str(ApiSettings.API_ENDPOINT.value) + "/index.html?query="
         return editor_base_link + urllib.parse.quote(self._query)
 
     def exec(self) -> Dict[str, Any]:
@@ -68,7 +90,7 @@ class Query:
             # count = 0
             for id_batch in batched_ids:
                 query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
-                part_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=PDB_URL, timeout=10).json()
+                part_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT).json()
                 self.parse_gql_error(part_response)
                 time.sleep(0.2)
                 if not response_json:
@@ -76,7 +98,7 @@ class Query:
                 else:
                     response_json = self.merge_response(response_json, part_response)
         else:
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=self._query, url=PDB_URL, timeout=10).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=self._query, url=ApiSettings.API_ENDPOINT.value, timeout=10).json()
             self.parse_gql_error(response_json)
         if "data" in response_json.keys():
             query_response = response_json["data"][self._input_type]
