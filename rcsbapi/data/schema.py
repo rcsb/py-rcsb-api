@@ -32,6 +32,13 @@ class FieldNode:
         index (int): graph index
     """    """
     Class for nodes representing GraphQL fields in the schema graph.
+        name (str): field name
+        description (str): field description
+        redundant (bool): whether field name is redundant in schema
+        kind (str): "LIST", "SCALAR, or "OBJECT"
+        of_kind (str): If "LIST", whether list of "SCALAR" or "OBJECT"
+        type (str): GraphQL schema type (ex: CoreEntry)
+        index (int): graph index
     """
 
     def __init__(self, kind: str, node_type: str, name: str, description: str):
