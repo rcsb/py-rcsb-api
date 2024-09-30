@@ -135,7 +135,7 @@ class Schema:
         self.type_fields_dict: Dict[str, Dict] = self.construct_type_dict()
         """Dict where keys are type names and the values are their associated fields"""
         self.field_names_list = self.construct_name_list()
-        self.root_dict: Dict[str, List[Dict[str, str]]] = self.construct_root_dict(self.pdb_url)
+        self.root_dict: Dict[str, List[Dict[str, str]]] = self.construct_root_dict()
         self.schema_graph = self.recurse_build_schema(self.schema_graph, "Query")
         self.dot_field_to_idx_dict: Dict[str, int] = self.make_dot_field_to_idx()
         """Dict where keys are field names and values are indices. Redundant field names are represented as <parent_field_name>.<field_name> (ex: {entry.id: 1452})"""
@@ -143,8 +143,6 @@ class Schema:
 
     def request_root_types(self) -> Dict:
         """Make an introspection query to get information about schema's root types
-        Args:
-            pdb_url (str): URL for GraphQL endpoint
 
         Returns:
             Dict: JSON response of introspection request
@@ -181,11 +179,8 @@ class Schema:
         response = requests.post(headers={"Content-Type": "application/graphql"}, data=root_query, url=self.pdb_url, timeout=self.timeout)
         return response.json()
 
-    def construct_root_dict(self, url: str) -> Dict[str, List[Dict[str, str]]]:
+    def construct_root_dict(self) -> Dict[str, List[Dict[str, str]]]:
         """Build a dictionary to organize information about schema root types.
-
-        Args:
-            pdb_url (str): URL for GraphQL endpoint
 
         Returns:
             Dict[str, List[Dict]]: Dict where keys are the type names.
