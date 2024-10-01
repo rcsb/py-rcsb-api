@@ -15,7 +15,7 @@ class Query:
     """
     class for Data API queries.
     """
-    def __init__(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str]):
+    def __init__(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id: bool = True):
         """
         Args:
             input_type (str): query input type

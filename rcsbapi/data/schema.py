@@ -117,7 +117,7 @@ class Schema:
         self.type_to_idx_dict: Dict[str, int] = {}
         self.field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices. Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
-        self.seen_names : set[str] = set()
+        self.seen_names: set[str] = set()
         self.root_introspection = self.request_root_types()
         """Request root types of the GraphQL schema and their required arguments"""
         self.schema: Dict = self.fetch_schema()
@@ -334,8 +334,8 @@ class Schema:
             if fields is not None:
                 for field in fields:
                     field_dict[str(field["name"])] = dict(field["type"])
-            self.type_fields_dict[type_name] = field_dict
-        return self.type_fields_dict
+            type_fields_dict[type_name] = field_dict
+        return type_fields_dict
 
     def construct_name_list(self) -> List[str]:
         field_names_list = []
@@ -360,6 +360,7 @@ class Schema:
     def recurse_build_schema(self, schema_graph: Union[nx.DiGraph, rx.PyDiGraph], type_name: str) -> Union[nx.DiGraph, rx.PyDiGraph]:
         type_node = self.make_type_subgraph(type_name)
         for field_node in type_node.field_list:
+            assert isinstance(field_node.index, int)  # for mypy
             if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
                 continue
             else:
@@ -519,11 +520,11 @@ class Schema:
                     query_str += " " * indent + "}\n"
         return query_str
 
-    def get_descendant_fields(self, node_idx: int, field_name: str, visited=None) -> Union[List[Union[str, Dict]], Union[str, Dict]]:
+    def get_descendant_fields(self, node_idx: int, field_name: str, visited=None) -> List[Union[int, Dict]]:
         if visited is None:
             visited = set()
 
-        result: List[Union[str, Dict]] = []
+        result: List[Union[int, Dict]] = []
         children_idx = list(self.schema_graph.neighbors(node_idx))
 
         for idx in children_idx:
@@ -532,6 +533,7 @@ class Schema:
 
             visited.add(idx)
             child_data = self.schema_graph[idx]
+            assert isinstance(child_data.index, int)  # for mypy
 
             if isinstance(child_data, FieldNode):
                 child_descendants = self.get_descendant_fields(idx, field_name, visited)
@@ -742,7 +744,7 @@ class Schema:
                 possible_paths_list = path.split(".")
                 possible_paths_list.insert(0, str(input_type))
                 for i in range(len(possible_paths_list)):
-                    if possible_paths_list[i : i + len(path_list)] == path_list:
+                    if possible_paths_list[i: i + len(path_list)] == path_list:
                         matching_paths.append(".".join(possible_paths_list))
 
             idx_paths: List[List[int]] = []
