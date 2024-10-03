@@ -15,7 +15,13 @@ class Query:
     """
     class for Data API queries.
     """
-    def __init__(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id: bool = True):
+    def __init__(
+        self,
+        input_type: str,
+        input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]],
+        return_data_list: List[str],
+        add_rcsb_id: bool = True,
+    ):
         """
         Args:
             input_type (str): query input type
@@ -23,6 +29,8 @@ class Query:
             input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list of ids to request information for
             return_data_list (List[str]): list of data to return (field names)
                 ex: ["rcsb_id", "exptl.method"]
+            add_rcsb_id (bool, optional): whether to automatically add <input_type>.rcsb_id to queries. Defaults to True.
+            disable_auto_complete_warning (bool, optional): whether to disable warning for auto-completion of queries. Defaults to False.
         """
         input_id_limit = 200
         if isinstance(input_ids, list):

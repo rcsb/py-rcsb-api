@@ -16,6 +16,9 @@ try:
 except ImportError:
     use_networkx = True
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 
 class FieldNode:
     """
@@ -310,7 +313,7 @@ class Schema:
         schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=self.pdb_url, timeout=self.timeout)
         if schema_response.status_code == 200:
             return schema_response.json()
-        logging.info("Loading data schema from file")
+        logger.info("Loading data schema from file")
         current_dir = os.path.dirname(os.path.abspath(__file__))
         json_file_path = os.path.join(current_dir, "../", "resources", "data_api_schema.json")
         with open(json_file_path, "r", encoding="utf-8") as schema_file:
@@ -642,7 +645,7 @@ class Schema:
     def construct_query(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id=True) -> str:
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
-        if input_type not in self.root_dict.keys():
+        if input_type not in self.root_dict:
             raise ValueError(f"Unknown input type: {input_type}")
         input_type_idx: int = self.dot_field_to_idx_dict[f"Query.{input_type}"]
         if isinstance(input_ids, List) and (len(input_ids) > 1):
@@ -679,7 +682,7 @@ class Schema:
         """Construct a query in GraphQL syntax using a rustworkx graph.
 
         Args:
-            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): identifing information for the specific entry, chemical component, etc to query
+            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): identifying information for the specific entry, chemical component, etc to query
             input_type (str): specifies where you are starting your query. These are specific fields like "entry" or "polymer_entity_instance".
             return_data_list (List[str]): requested data, can be field name(s) or dot-separated field names
                 ex: "cluster_id" or "exptl.method"
@@ -733,7 +736,8 @@ class Schema:
         if (f"{input_type}.rcsb_id" not in return_data_list) and (add_rcsb_id is True):
             return_data_list.insert(0, f"{input_type}.rcsb_id")
 
-        all_paths: Dict[int, List[List[int]]] = {}
+        return_data_paths: Dict[int, List[List[int]]] = {}
+        incomplete_path_num: int = 0
 
         for field in return_data_list:
             # Generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
@@ -741,11 +745,21 @@ class Schema:
             possible_paths = self.find_paths(input_type, path_list[-1])
             matching_paths: List[str] = []
             for path in possible_paths:
-                possible_paths_list = path.split(".")
-                possible_paths_list.insert(0, str(input_type))
-                for i in range(len(possible_paths_list)):
-                    if possible_paths_list[i: i + len(path_list)] == path_list:
-                        matching_paths.append(".".join(possible_paths_list))
+                possible_path_list = path.split(".")
+                possible_path_list.insert(0, str(input_type))
+
+                # If there is an exact path match,
+                # the path is fully specified and other possible_paths can be skipped
+                if possible_path_list == path_list:
+                    matching_paths.append(".".join(possible_path_list))
+                    break
+                # Else, check for matching path segments.
+                # If there is a match, iterate incomplete_path_num so INFO can be printed
+                else:
+                    for i in range(len(possible_path_list)):
+                        if possible_path_list[i : i + len(path_list)] == path_list:
+                            matching_paths.append(".".join(possible_path_list))
+                            incomplete_path_num += 1
 
             idx_paths: List[List[int]] = []
             if len(matching_paths) > 0:
@@ -760,6 +774,9 @@ class Schema:
                     full_idx_paths.remove(path)
             idx_paths = full_idx_paths
 
+            # Weigh edges from Query.assemblies to eliminate some trivial cases of parallel paths
+            # Ex: "entries.assemblies.polymer_entity_instances.rcsb_id"
+            # vs. "entries.polymer_entities.polymer_entity_instances.rcsb_id"
             assembly_node_idxs = list(self.field_to_idx_dict["assemblies"])
             assembly_node_idxs.remove(self.dot_field_to_idx_dict["Query.assemblies"])
             idx_paths = self._weigh_assemblies(idx_paths, assembly_node_idxs)
@@ -800,20 +817,35 @@ class Schema:
                     )
                 idx_paths = shortest_full_paths
             final_idx: int = idx_paths[0][-1]
-            all_paths[final_idx] = idx_paths
+            return_data_paths[final_idx] = idx_paths
+
+        if incomplete_path_num > 0:
+            info_list = []
+            for path in return_data_paths.values():
+                assert len(path) == 1
+                info_list.append(".".join(self.idx_path_to_name_path(path[0])))
+            info_list.remove(f"{input_type}.rcsb_id")
+
+            path_msg = "".join(f'\n        "{item}",' for item in info_list)
+            logger.info(
+                "Some paths are being autocompleted based on the current API. If this code is meant for long-term use, use the set of fully-specified paths below:\n"
+                "    ["
+                "%s\n"
+                "    ]", path_msg
+            )
 
         for return_data in return_data_list:
-            if any(not value for value in all_paths.values()):
+            if any(not value for value in return_data_paths.values()):
                 raise ValueError(f'You can\'t access "{return_data}" from input type {input_type}')
 
         final_fields = {}
-        for target_idx in all_paths.keys():
+        for target_idx in return_data_paths.keys():
             final_fields[target_idx] = self.get_descendant_fields(node_idx=target_idx, field_name=self.schema_graph[target_idx].name)
 
         field_names: Dict[Any, Any] = {}
         paths: Dict[Any, Any] = {}
 
-        for target_idx, paths_list in all_paths.items():
+        for target_idx, paths_list in return_data_paths.items():
             node_data = self.schema_graph[target_idx]
             if isinstance(node_data, FieldNode):
                 field_names[target_idx] = []
