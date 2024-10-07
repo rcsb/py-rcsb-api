@@ -55,11 +55,12 @@ Data is returned in JSON format
 ### GraphQL
 This is the equivalent query in GraphQL syntax.
 ```
-{ entries(entry_ids: ["4HHB"]) {  # returns type "CoreEntry"
-    exptl{  # returns type "Exptl"
+{
+  entries(entry_ids: ["4HHB"]) {  # returns type "CoreEntry"
+    exptl {  # returns type "Exptl"
       method  # returns a scalar (string)
-      }
- }
+    }
+  }
 }
 ```
 GraphQL is built on "types" and their associated "fields". All types and their fields are defined in a "schema". An example of a type in our schema is "CoreEntry" and a field under CoreEntry is "exptl" (experimental). Upon initialization, the Data API package fetches the schema from the RCSB PDB website (See [Implementation Details](implementation_details.md) for more). 

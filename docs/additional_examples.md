@@ -306,7 +306,11 @@ Performs the following GraphQL query:
 This example gets the abstract text of the paper with the specified PubMed ID.
 
 ```python
-query = Query(input_type="pubmed", return_data_list=["rcsb_pubmed_abstract_text"], input_ids=["6726807"])
+query = Query(
+  input_type="pubmed",
+  return_data_list=["rcsb_pubmed_abstract_text"],
+  input_ids=["6726807"]
+)
 
 result_dict = query.exec()
 print(result_dict)
@@ -325,7 +329,11 @@ Performs the following GraphQL query:
 This example gets a description of the function of a protein based on the UniProt ID.
 
 ```python
-query = Query(input_type="uniprot", return_data_list=["function.details"], input_ids=["P68871"])
+query = Query(
+  input_type="uniprot",
+  return_data_list=["function.details"],
+  input_ids=["P68871"]
+)
 
 result_dict = query.exec()
 print(result_dict)

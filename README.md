@@ -35,7 +35,7 @@ query = Query(
     input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
-# Note: when the package autocompletes a paths, it prints an INFO message.
+# Note: when the package autocompletes paths, it prints an INFO message.
 # Using fully-specified paths ("entries.exptl.method") will prevent the message
 
 print(query.exec())
