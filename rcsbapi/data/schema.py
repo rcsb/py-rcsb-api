@@ -999,7 +999,8 @@ class Schema:
         return shortest_paths
 
     def _weigh_assemblies(self, paths: List[List[int]], assembly_node_idxs: List[int]) -> List[List[int]]:
-        """remove paths containing "assemblies" that are otherwise equivalent. Mimics weighing assembly edges in the rest of query construction
+        """remove paths containing "assemblies" if there are shorter or equal length paths available.
+        Mimics weighing assembly edges in the rest of query construction.
 
         Args:
             paths (List[List[int]]): list of paths where each path is a list of indices from a root node to a requested field.
@@ -1013,16 +1014,17 @@ class Schema:
         for path in paths:
             for assemblies_idx in assembly_node_idxs:
                 if assemblies_idx in path:
-                    path_no_assemblies = [field for field in path if field != assemblies_idx]
                     for compare_path in paths:
                         if compare_path == path:
                             continue
                         name_compare_path = self.idx_path_to_name_path(compare_path)
+                        # If there are shorter or equal length paths without "assemblies", filter out
                         if (
-                            (len(compare_path) == len(path))
-                            and all(self.idx_to_name(field) in name_compare_path for field in path_no_assemblies)
+                            (len(compare_path) <= len(path))
                             and ("assemblies" not in name_compare_path)
+                            and (compare_path[-1] == path[-1])
                         ):
+                            print(f"remove {self.idx_path_to_name_path(path)}")
                             remove_paths.add(tuple(path))
 
         for path in remove_paths:

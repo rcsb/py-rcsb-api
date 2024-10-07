@@ -26,7 +26,7 @@ In GraphQL, you must begin your query at specific fields. These "input_types" ar
 This is a [simple query](https://data.rcsb.org/graphql/index.html?query=%7B%0A%20%20entry(entry_id%3A%20%224HHB%22)%20%7B%0A%20%20%20%20exptl%20%7B%0A%20%20%20%20%20%20method%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D) requesting the experimental method of a structure with PDB ID 4HHB (Hemoglobin).
 
 The query must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
-The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If using this package in code intended for long-term use, it's recommended to use fully-specified paths. When auto-completion is being used, an INFO message will be printed out as a reminder.
+The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If using this package in code intended for long-term use, it's recommended to use fully-specified paths. When autocompletion is being used, an INFO message will be printed out as a reminder.
 
 ```python
 from rcsbapi.data import Query
@@ -35,7 +35,7 @@ query = Query(
     input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
-# Note: when the package auto-completes a paths, it prints an INFO message.
+# Note: when the package autocompletes a paths, it prints an INFO message.
 # Using fully-specified paths ("entries.exptl.method") will prevent the message
 
 print(query.exec())

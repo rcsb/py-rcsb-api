@@ -18,7 +18,7 @@ The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL]
 
 To generate a query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 
-The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If the package is included in code that is going to be used long-term, it's recommended to use fully-specified paths. When auto-completion is being used, an INFO message will be printed out as a reminder.
+The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If the package is included in code that is going to be used long-term, it's recommended to use fully-specified paths. When autocompletion is being used, an INFO message will be printed out as a reminder.
 
 ```python
 from rcsbapi.data import Query
@@ -27,7 +27,7 @@ query = Query(
     input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
-# Note: when package auto-completes a paths, it prints an INFO message.
+# Note: when package autocompletes a paths, it prints an INFO message.
 # Using fully-specified paths ("entries.exptl.method") will prevent the message
 
 result_dict = query.exec()
@@ -66,7 +66,7 @@ GraphQL is built on "types" and their associated "fields". All types and their f
 
 In GraphQL, you must begin your query at specific fields. These are fields like entry, polymer_entity, and polymer_entity_instance (see full list [here](query_construction.md#input-type)). Each field can return a scalar (e.g. string, integer) or a type. Every query must ultimately request scalar value(s), which can be seen in the example query below. As shown in the example, only fields are explicitly included in queries while types are implicit. Types are named in CamelCase (CoreEntry) while fields are in snake case (exptl or audit_author).
 
-### Auto-completion of Queries
+### Autocompletion of Queries
 One way this package simplifies making requests is by adding fields that return scalars into the generated query if you request a field that returns a type.
 ```python
 from rcsbapi.data import Query
