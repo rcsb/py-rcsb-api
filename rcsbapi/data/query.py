@@ -146,7 +146,7 @@ class Query:
             # count = 0
             for id_batch in batched_ids:
                 query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
-                part_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT).json()
+                part_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
                 self.parse_gql_error(part_response)
                 time.sleep(0.2)
                 if not response_json:
