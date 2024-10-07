@@ -30,7 +30,6 @@ class Query:
             return_data_list (List[str]): list of data to return (field names)
                 ex: ["rcsb_id", "exptl.method"]
             add_rcsb_id (bool, optional): whether to automatically add <input_type>.rcsb_id to queries. Defaults to True.
-            disable_auto_complete_warning (bool, optional): whether to disable warning for auto-completion of queries. Defaults to False.
         """
         input_id_limit = 200
         if isinstance(input_ids, list):
@@ -98,7 +97,7 @@ class Query:
         """get return_data_list used to make query
 
         Returns:
-            List[str]: return_data_list 
+            List[str]: return_data_list
                 ex: ["rcsb_id", "exptl.method"]
         """
         return self._return_data_list

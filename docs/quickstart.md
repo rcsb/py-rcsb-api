@@ -17,14 +17,19 @@ from rcsbapi.data import Schema, Query
 The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
 
 To generate a query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
+
+The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If the package is included in code that is going to be used long-term, it's recommended to use fully-specified paths. When auto-completion is being used, an INFO message will be printed out as a reminder.
+
 ```python
 from rcsbapi.data import Query
-# query requesting the experimental method of a structure with PDB ID 4HHB (Hemoglobin)
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
+# Note: when package auto-completes a paths, it prints an INFO message.
+# Using fully-specified paths ("entries.exptl.method") will prevent the message
+
 result_dict = query.exec()
 print(result_dict)
 # print(query.get_response()) would be equivalent
@@ -33,13 +38,16 @@ Data is returned in JSON format
 ```json
 {
   "data": {
-    "entry": {
-      "exptl": [
-        {
-          "method": "X-RAY DIFFRACTION"
-        }
-      ]
-    }
+    "entries": [
+      {
+        "rcsb_id": "4HHB",
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -47,14 +55,12 @@ Data is returned in JSON format
 ### GraphQL
 This is the equivalent query in GraphQL syntax.
 ```
-{
-  entry(entry_id: "4HHB") {  # returns type "CoreEntry"
-    exptl {  # returns type "Exptl"
+{ entries(entry_ids: ["4HHB"]) {  # returns type "CoreEntry"
+    exptl{  # returns type "Exptl"
       method  # returns a scalar (string)
-    }
-  }
+      }
+ }
 }
-
 ```
 GraphQL is built on "types" and their associated "fields". All types and their fields are defined in a "schema". An example of a type in our schema is "CoreEntry" and a field under CoreEntry is "exptl" (experimental). Upon initialization, the Data API package fetches the schema from the RCSB PDB website (See [Implementation Details](implementation_details.md) for more). 
 
@@ -65,8 +71,8 @@ One way this package simplifies making requests is by adding fields that return 
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["exptl"]
 )
 result_dict = query.exec()

@@ -228,7 +228,7 @@ class SchemaTests(unittest.TestCase):
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="2. regex for _entities"):
             query = SCHEMA._construct_query_rustworkx(
-                input_type="polymer_entities", return_data_list=["rcsb_polymer_entity_feature", "polymer_entity.rcsb_id"], input_ids=["AF_AFA0A009IHW8F1_1", "4HHB_1"]
+                input_type="polymer_entities", return_data_list=["rcsb_polymer_entity_feature"], input_ids=["AF_AFA0A009IHW8F1_1", "4HHB_1"]
             )
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
             self.assertNotIn("errors", response_json.keys())

@@ -394,7 +394,7 @@ class Schema:
                         schema_graph.add_edge(field_node.index, type_index, 1)
         return schema_graph
 
-    def apply_weights(self, root_type_list: List[str], weight: int) -> None: 
+    def apply_weights(self, root_type_list: List[str], weight: int) -> None:
         """applies weight to all edges from a root TypeNode to FieldNodes
 
         Args:
@@ -795,14 +795,20 @@ class Schema:
                 else:
                     len_path = len(matching_paths)
 
+                if len(idx_paths) > 10:
+                    raise ValueError(
+                        f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
+                        f"{len_path} of {len(matching_paths)} possible paths:\n"
+                        f"{path_choice_msg}\n\n"
+                        f"For all paths run:\n"
+                        f"  from rcsbapi.data import Schema\n"
+                        f"  schema = Schema()\n"
+                        f'  schema.find_paths("{input_type}", "{path_list[-1]}")'
+                    )
                 raise ValueError(
-                    f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n'
+                    f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
                     f"{len_path} of {len(matching_paths)} possible paths:\n"
-                    f"{path_choice_msg}\n\n"
-                    f"For all paths run:\n"
-                    f"  from rcsbapi.data import Schema\n"
-                    f"  schema = Schema()\n"
-                    f'  schema.find_paths("{input_type}", "{path_list[-1]}")'
+                    f"{path_choice_msg}"
                 )
 
             # If path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
@@ -811,16 +817,26 @@ class Schema:
                 shortest_full_paths: List[List[int]] = self.compare_paths(start_node_index, possible_dot_paths)
                 assert len(shortest_full_paths) != 0
                 if len(shortest_full_paths) > 1:
-                    shortest_name_paths = [".".join([self.idx_to_name(idx) for idx in path if isinstance(self.schema_graph[idx], FieldNode)]) for path in shortest_full_paths]
-                    shortest_name_paths.sort()
-                    path_choice_msg = ""
-                    for name_path in shortest_name_paths:
-                        path_choice_msg += "  " + name_path + "\n"
+                    path_choice_msg = "  " + "\n  ".join(matching_paths[:10])
+                    if len(idx_paths) > 10:
+                        len_path = 10
+                    else:
+                        len_path = len(matching_paths)
+
+                    if len(idx_paths) > 10:
+                        raise ValueError(
+                            f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
+                            f"{len_path} of {len(matching_paths)} possible paths:\n"
+                            f"{path_choice_msg}\n\n"
+                            f"For all paths run:\n"
+                            f"  from rcsbapi.data import Schema\n"
+                            f"  schema = Schema()\n"
+                            f'  schema.find_paths("{input_type}", "{path_list[-1]}")'
+                        )
                     raise ValueError(
-                        "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n"
-                        f"{path_choice_msg}\n"
-                        "Please note that this list may not be complete. "
-                        "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
+                        f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
+                        f"{len_path} of {len(matching_paths)} possible paths:\n"
+                        f"{path_choice_msg}"
                     )
                 idx_paths = shortest_full_paths
             final_idx: int = idx_paths[0][-1]
@@ -831,7 +847,8 @@ class Schema:
             for path in return_data_paths.values():
                 assert len(path) == 1
                 info_list.append(".".join(self.idx_path_to_name_path(path[0])))
-            info_list.remove(f"{input_type}.rcsb_id")
+            if f"{input_type}.rcsb_id" in info_list:
+                info_list.remove(f"{input_type}.rcsb_id")
 
             path_msg = "".join(f'\n        "{item}",' for item in info_list)
             logger.info(
