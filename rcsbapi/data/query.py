@@ -154,7 +154,7 @@ class Query:
                 else:
                     response_json = self.merge_response(response_json, part_response)
         else:
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=self._query, url=ApiSettings.API_ENDPOINT.value, timeout=10).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=self._query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
             self.parse_gql_error(response_json)
         if "data" in response_json.keys():
             query_response = response_json["data"][self._input_type]
