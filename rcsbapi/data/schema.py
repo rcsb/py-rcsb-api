@@ -475,11 +475,11 @@ class Schema:
         #     index = len(self._schema_graph.nodes
         #     self._schema_graph.add_node(index, field_node=field_node)
         #     self._schema_graph.add_edge(parent_type_index, index, weight=1)
-        if self._use_networkx is False:
-            if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
-                index = self._schema_graph.add_child(parent_type_index, field_node, 1)
-            else:
-                index = self._schema_graph.add_child(parent_type_index, field_node, 1)
+        # if self._use_networkx is False:
+        if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
+            index = self._schema_graph.add_child(parent_type_index, field_node, 1)
+        else:
+            index = self._schema_graph.add_child(parent_type_index, field_node, 1)
         if self._field_names_list.count(field_name) > 1:
             field_node.redundant = True
         field_node.set_index(index)
