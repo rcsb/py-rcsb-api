@@ -889,7 +889,7 @@ class Schema:
             for path in return_data_paths.values():
                 assert len(path) == 1
                 info_list.append(".".join(self._idx_path_to_name_path(path[0][1:])))
-            if added_rcsb_id:
+            if (added_rcsb_id is True) and ("rcsb_id" in info_list):
                 info_list.remove("rcsb_id")
 
             path_msg = "".join(f'\n        "{item}",' for item in info_list)

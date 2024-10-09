@@ -282,7 +282,7 @@ class SchemaTests(unittest.TestCase):
                 SCHEMA._construct_query_rustworkx(
                     input_ids={"entry_id": "4HHB"},
                     input_type="entry",
-                    return_data_list=["entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_instances.polymer_entity.entry.rcsb_id"],
+                    return_data_list=["polymer_entities.entry.assemblies.polymer_entity_instances.polymer_entity.polymer_entity_instances.polymer_entity.entry.rcsb_id"],
                 )
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
