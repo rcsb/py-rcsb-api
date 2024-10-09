@@ -785,11 +785,13 @@ class Schema:
         start_node_index = self._root_to_idx[input_type]
 
         # If rcsb_id isn't requested, add it to the query for more readable query results
-        if (f"{input_type}.rcsb_id" not in return_data_list) and (add_rcsb_id is True):
+        added_rcsb_id: bool = False
+        if (f"{input_type}.rcsb_id" not in return_data_list) and ("rcsb_id" not in return_data_list) and (add_rcsb_id is True):
             return_data_list.insert(0, f"{input_type}.rcsb_id")
+            added_rcsb_id = True
 
         return_data_paths: Dict[int, List[List[int]]] = {}
-        incomplete_path_num: int = 0
+        complete_path: int = 0
 
         for field in return_data_list:
             # Generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
@@ -801,18 +803,18 @@ class Schema:
                 possible_path_list.insert(0, str(input_type))
 
                 # If there is an exact path match,
-                # the path is fully specified and other possible_paths can be skipped
+                # the path is fully specified and other possible_paths can be removed and loop can stop.
+                # Iterate complete path, so warning can be raised if autocompletion is used
                 path_list_with_input = [input_type] + path_list
                 if (possible_path_list == path_list) or (possible_path_list == path_list_with_input):
-                    matching_paths.append(".".join(possible_path_list))
+                    matching_paths = [".".join(possible_path_list)]
+                    complete_path += 1
                     break
                 # Else, check for matching path segments.
-                # If there is a match, iterate incomplete_path_num so INFO can be printed
                 else:
                     for i in range(len(possible_path_list)):
                         if possible_path_list[i: i + len(path_list)] == path_list:
                             matching_paths.append(".".join(possible_path_list))
-                            incomplete_path_num += 1
 
             idx_paths: List[List[int]] = []
             if len(matching_paths) > 0:
@@ -845,9 +847,10 @@ class Schema:
 
                 if len(matching_paths) > 10:
                     raise ValueError(
-                        f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
+                        f'Given path "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
                         f"{len_path} of {len(matching_paths)} possible paths:\n"
-                        f"{path_choice_msg}\n\n"
+                        f"{path_choice_msg}"
+                        f"\n  ...\n\n"
                         f"For all paths run:\n"
                         f"  from rcsbapi.data import Schema\n"
                         f"  schema = Schema()\n"
@@ -881,16 +884,17 @@ class Schema:
             final_idx: int = idx_paths[0][-1]
             return_data_paths[final_idx] = idx_paths
 
-        if (incomplete_path_num > 0) and (suppress_autocomplete_warning is False):
+        if (complete_path != len(return_data_list)) and (suppress_autocomplete_warning is False):
             info_list = []
             for path in return_data_paths.values():
                 assert len(path) == 1
-                info_list.append(".".join(self._idx_path_to_name_path(path[0])))
-            if f"{input_type}.rcsb_id" in info_list:
-                info_list.remove(f"{input_type}.rcsb_id")
+                info_list.append(".".join(self._idx_path_to_name_path(path[0][1:])))
+            if added_rcsb_id:
+                info_list.remove("rcsb_id")
 
             path_msg = "".join(f'\n        "{item}",' for item in info_list)
             logger.warning(
+                "\n"
                 "Some paths are being autocompleted based on the current API. If this code is meant for long-term use, use the set of fully-specified paths below:\n"
                 "    ["
                 "%s\n"
