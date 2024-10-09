@@ -48,7 +48,7 @@ class SchemaTests(unittest.TestCase):
             local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
 
             online_schema_url = "https://data.rcsb.org/rest/v1/schema/entry"
-            response = requests.get(online_schema_url)
+            response = requests.get(online_schema_url, timeout=ApiSettings.TIMEOUT.value)
             online_schema_data = response.json()
             online_schema_version = online_schema_data.get("$comment").split(": ")[1]
             online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
@@ -62,7 +62,7 @@ class SchemaTests(unittest.TestCase):
             local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
 
             online_schema_url = "https://data.rcsb.org/rest/v1/schema/polymer_entity"
-            response = requests.get(online_schema_url)
+            response = requests.get(online_schema_url, timeout=ApiSettings.TIMEOUT.value)
             online_schema_data = response.json()
             online_schema_version = online_schema_data.get("$comment").split(": ")[1]
             online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
@@ -76,7 +76,7 @@ class SchemaTests(unittest.TestCase):
             local_major_minor_version = ".".join(local_schema_version.split(".")[:2])
 
             online_schema_url = "https://data.rcsb.org/rest/v1/schema/polymer_entity_instance"
-            response = requests.get(online_schema_url)
+            response = requests.get(online_schema_url, timeout=ApiSettings.TIMEOUT.value)
             online_schema_data = response.json()
             online_schema_version = online_schema_data.get("$comment").split(": ")[1]
             online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
@@ -259,7 +259,7 @@ class SchemaTests(unittest.TestCase):
     def testAllRoots(self):  # incomplete
         with self.subTest(msg="1. uniprot"):
             try:
-                query = SCHEMA._construct_query_rustworkx(
+                SCHEMA._construct_query_rustworkx(
                     input_type="uniprot", input_ids={"uniprot_id": "P01308"}, return_data_list=["uniprot.rcsb_id", "reference_sequence_identifiers.database_accession"]
                 )
             except Exception as error:

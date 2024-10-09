@@ -20,6 +20,7 @@ class Query:
         input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]],
         return_data_list: List[str],
         add_rcsb_id: bool = True,
+        suppress_autocomplete_warning: bool = False
     ):
         """
         Args:
@@ -41,7 +42,13 @@ class Query:
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
-        self._query = SCHEMA.construct_query(input_type=self._input_type, input_ids=self._input_ids, return_data_list=return_data_list, add_rcsb_id=add_rcsb_id)
+        self._query = SCHEMA.construct_query(
+            input_type=self._input_type,
+            input_ids=self._input_ids,
+            return_data_list=return_data_list,
+            add_rcsb_id=add_rcsb_id,
+            suppress_autocomplete_warning=suppress_autocomplete_warning
+        )
         """GraphQL query as a string"""
         self._response: Optional[Dict[str, Any]] = None
         """JSON response to query, will be assigned after executing"""

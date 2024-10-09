@@ -484,6 +484,7 @@ class Schema:
             field_node.redundant = True
         field_node.set_index(index)
 
+        assert isinstance(field_node.index, int)  # for mypy
         if field_name not in self._field_to_idx_dict:
             self._field_to_idx_dict[field_name] = [field_node.index]
         else:
@@ -495,7 +496,7 @@ class Schema:
         root_to_idx: Dict[str, int] = {}
         # Assumes 0 is the index for root Query node.
         # Remains true as long as graph building starts from there
-        for root_node in self._schema_graph.successors(node=0):
+        for root_node in self._schema_graph.successors(0):
             root_to_idx[root_node.name] = root_node.index
         return root_to_idx
 
@@ -657,7 +658,14 @@ class Schema:
                 input_dict[attr] = input_ids
         return input_dict
 
-    def construct_query(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], return_data_list: List[str], add_rcsb_id=True) -> str:
+    def construct_query(
+        self,
+        input_type: str,
+        input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]],
+        return_data_list: List[str],
+        add_rcsb_id=True,
+        suppress_autocomplete_warning=False
+    ) -> str:
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self._root_dict:
@@ -678,21 +686,50 @@ class Schema:
                     unknown_return_list.append(field)
         if unknown_return_list:
             raise ValueError(f"Unknown item in return_data_list: {unknown_return_list}")
-        if use_networkx:
-            query = self._construct_query_networkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list)
-        else:
-            query = self._construct_query_rustworkx(input_type=input_type, input_ids=input_ids, return_data_list=return_data_list, add_rcsb_id=add_rcsb_id)
+        # if use_networkx:
+        #     query = self._construct_query_networkx(
+        #         input_type=input_type,
+        #         input_ids=input_ids,
+        #         return_data_list=return_data_list,
+        #         suppress_autocomplete_warning=suppress_autocomplete_warning
+        #     )
+        # else:
+            # query = self._construct_query_rustworkx(
+            #     input_type=input_type,
+            #     input_ids=input_ids,
+            #     return_data_list=return_data_list,
+            #     add_rcsb_id=add_rcsb_id,
+            #     suppress_autocomplete_warning=suppress_autocomplete_warning
+            # )
+        query = self._construct_query_rustworkx(
+            input_type=input_type,
+            input_ids=input_ids,
+            return_data_list=return_data_list,
+            add_rcsb_id=add_rcsb_id,
+            suppress_autocomplete_warning=suppress_autocomplete_warning
+        )
         validation_error_list = validate(self._client_schema, parse(query))
         if not validation_error_list:
             return query
         raise ValueError(validation_error_list)
 
-    def _construct_query_networkx(self, input_type: str, input_ids: Union[Dict[str, str], List[str]], return_data_list: List[str]):  # Incomplete function
-        query = ""
-        return query
+    # def _construct_query_networkx(
+    #     self,
+    #     input_type: str,
+    #     input_ids: Union[Dict[str, str], List[str]],
+    #     return_data_list: List[str],
+    #     add_rcsb_id: bool,
+    #     suppress_autocomplete_warning: bool
+    # ):  # Incomplete function
+    #     query = ""
+    #     return query
 
     def _construct_query_rustworkx(
-        self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str, return_data_list: List[str], add_rcsb_id: bool = True
+        self,
+        input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]],
+        input_type: str, return_data_list: List[str],
+        add_rcsb_id: bool = True,
+        suppress_autocomplete_warning: bool = False,
     ) -> str:
         """Construct a query in GraphQL syntax using a rustworkx graph.
 
@@ -773,7 +810,7 @@ class Schema:
                 # If there is a match, iterate incomplete_path_num so INFO can be printed
                 else:
                     for i in range(len(possible_path_list)):
-                        if possible_path_list[i : i + len(path_list)] == path_list:
+                        if possible_path_list[i: i + len(path_list)] == path_list:
                             matching_paths.append(".".join(possible_path_list))
                             incomplete_path_num += 1
 
@@ -844,7 +881,7 @@ class Schema:
             final_idx: int = idx_paths[0][-1]
             return_data_paths[final_idx] = idx_paths
 
-        if incomplete_path_num > 0:
+        if (incomplete_path_num > 0) and (suppress_autocomplete_warning is False):
             info_list = []
             for path in return_data_paths.values():
                 assert len(path) == 1
@@ -896,7 +933,7 @@ class Schema:
                 if input_type == "pubmed":
                     query += attr + ": " + str(input_dict[attr])
                 else:
-                    query += attr + ': "' + input_dict[attr] + '"'
+                    query += attr + ': "' + str(input_dict[attr]) + '"'
             if i < len(attr_name) - 1:
                 query += ", "
         query += ") {\n"
@@ -1011,7 +1048,7 @@ class Schema:
         Returns:
             List[List[int]]: List with weight applied (no "assemblies" path if there is an equivalent path present)
         """
-        remove_paths: set[List[int]] = set()
+        remove_paths: set = set()
 
         for path in paths:
             for assemblies_idx in assembly_node_idxs:
