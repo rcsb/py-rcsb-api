@@ -27,12 +27,10 @@ import unittest
 import requests
 
 from rcsbsearchapi import rcsb_attributes as attrs
-# from rcsbapi.data import query
 from rcsbapi.data import Schema, Query
 from rcsbapi.data.constants import ApiSettings
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
@@ -71,13 +69,13 @@ class QueryTests(unittest.TestCase):
             input_ids.append("4HHB")
         query_obj = Query(input_type="entries", input_ids={"entry_ids": input_ids}, return_data_list=["exptl"])
         batch_size = 50
-        batched_ids = query_obj.batch_ids(batch_size)
+        batched_ids = query_obj._batch_ids(batch_size)
         total_ids = 0
         for batch in batched_ids:
             len_id_batch = len(batch)
             self.assertLessEqual(len_id_batch, batch_size)
             total_ids += len_id_batch
-        self.assertEqual(len(query_obj.get_input_ids_list()), total_ids)
+        self.assertEqual(len(query_obj.get_input_ids()), total_ids)
 
     def testMergeResponse(self):
         # assert that the lengths are combined and all ids are present?

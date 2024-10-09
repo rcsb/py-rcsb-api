@@ -2,13 +2,12 @@ import logging
 import urllib.parse
 import re
 import time
-from typing import Any, Union, List, Dict, Optional
+from typing import Any, Union, List, Dict, Optional, Tuple
 import requests
 from rcsbapi.data import SCHEMA
 from .constants import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
 
-logger = logging.getLogger()
-logging.basicConfig(level=logging.INFO, format="[%(levelname)s]: %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class Query:
@@ -40,23 +39,37 @@ class Query:
                 if len(value) > input_id_limit:
                     logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
 
-        self._plural_input = False
-        """boolean indicating whether input type is plural or not (ex: "entry" vs "entries")"""
-        if SCHEMA.root_dict[input_type][0]["kind"] == "LIST":
-            self._plural_input = True
-            if isinstance(input_ids, dict):
-                assert isinstance(input_ids, dict)  # mypy
-                self._input_ids_list: List[str] = input_ids[SCHEMA.root_dict[input_type][0]["name"]]
+        self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
+        self._return_data_list = return_data_list
+        self._query = SCHEMA.construct_query(input_type=self._input_type, input_ids=self._input_ids, return_data_list=return_data_list, add_rcsb_id=add_rcsb_id)
+        """GraphQL query as a string"""
+        self._response: Optional[Dict[str, Any]] = None
+        """JSON response to query, will be assigned after executing"""
 
-        self._input_type = input_type
-        # automatically turn singular input_types into plural for more flexibility in number of ids
-        if self._plural_input is False:
+    def _process_input_ids(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]]) -> Tuple[str, List[str]]:
+        """Convert input_type to plural if possible.
+        Set input_ids to be a list of ids.
+
+        Args:
+            input_type (str): query input type
+                ex: "entry", "polymer_entity_instance", etc
+            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list/dict of ids to request information for
+
+        Returns:
+            Tuple[str, List[str]]: returns a tuple of converted input_type and list of input_ids
+        """
+        # Convert _input_type to plural if applicable
+        converted = False
+        if SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
             plural_type = SINGULAR_TO_PLURAL[input_type]
             if plural_type:
-                self._input_type = plural_type
-                self._plural_input = True
+                input_type = plural_type
+                converted = True
 
-                # if input_ids is a dict, join into PDB id format
+        # Set _input_ids
+        if isinstance(input_ids, dict):
+            if converted:
+                # If converted and input_ids is a dict, join into PDB id format
                 if isinstance(input_ids, dict):
                     join_id = ""
                     for k, v in input_ids.items():
@@ -68,15 +81,14 @@ class Query:
 
                     input_ids = [join_id]
 
-        self._input_ids = input_ids
-        if isinstance(self._input_ids, list):
-            self._input_ids_list = self._input_ids
-        self._return_data_list = return_data_list
-        self._query = SCHEMA.construct_query(input_type=self._input_type, input_ids=self._input_ids, return_data_list=return_data_list, add_rcsb_id=add_rcsb_id)
-        """GraphQL query as a string"""
-        self._response: Optional[Dict[str, Any]] = None
+            else:
+                # If not converted, retrieve id list from dictionary
+                input_ids = list(input_ids[SCHEMA._root_dict[input_type][0]["name"]])
 
-    def get_input_ids(self) -> Union[List[str], Dict[str, List[str]], Dict[str, str]]:
+        assert isinstance(input_ids, list)
+        return (input_type, input_ids)
+
+    def get_input_ids(self) -> List[str]:
         """get input_ids used to make query
 
         Returns:
@@ -110,12 +122,6 @@ class Query:
         """
         return self._query
 
-    def get_input_ids_list(self) -> Union[str, List[str], None]:
-        try:
-            return self._input_ids_list
-        except AttributeError:
-            return None
-
     def get_response(self) -> Union[None, Dict[str, Any]]:
         """get JSON response to executed query
 
@@ -140,19 +146,24 @@ class Query:
             Dict[str, Any]: JSON object
         """
         batch_size = 50
-        if (self._plural_input is True) and (len(self._input_ids_list) > batch_size):
-            batched_ids = self.batch_ids(batch_size)
+        if len(self._input_ids) > batch_size:
+            batched_ids = self._batch_ids(batch_size)
             response_json: Dict[str, Any] = {}
             # count = 0
             for id_batch in batched_ids:
                 query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
-                part_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
-                self.parse_gql_error(part_response)
+                part_response = requests.post(
+                    headers={"Content-Type": "application/graphql"},
+                    data=query,
+                    url=ApiSettings.API_ENDPOINT.value,
+                    timeout=ApiSettings.TIMEOUT.value
+                ).json()
+                self._parse_gql_error(part_response)
                 time.sleep(0.2)
                 if not response_json:
                     response_json = part_response
                 else:
-                    response_json = self.merge_response(response_json, part_response)
+                    response_json = self._merge_response(response_json, part_response)
         else:
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=self._query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
             self.parse_gql_error(response_json)
@@ -166,7 +177,7 @@ class Query:
         self._response = response_json
         return response_json
 
-    def parse_gql_error(self, response_json: Dict[str, Any]):
+    def _parse_gql_error(self, response_json: Dict[str, Any]):
         if "errors" in response_json.keys():
             error_msg_list: list[str] = []
             for error_dict in response_json["errors"]:
@@ -176,7 +187,7 @@ class Query:
                     combined_error_msg += f"{i+1}. {error_msg}\n"
                 raise ValueError(f"{combined_error_msg}. Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
-    def batch_ids(self, batch_size: int) -> List[List[str]]:  # assumes that plural types have only one arg, which is true right now
+    def _batch_ids(self, batch_size: int) -> List[List[str]]:  # assumes that plural types have only one arg, which is true right now
         """split queries with large numbers of input_ids into smaller batches
 
         Args:
@@ -187,18 +198,18 @@ class Query:
         """
         batched_ids: List[List[str]] = []
         i = 0
-        while i < len(self._input_ids_list):
+        while i < len(self._input_ids):
             count = 0
             batch_list: List[str] = []
-            while count < batch_size and i < len(self._input_ids_list):
-                batch_list.append(self._input_ids_list[i])
+            while count < batch_size and i < len(self._input_ids):
+                batch_list.append(self._input_ids[i])
                 count += 1
                 i += 1
             if len(batch_list) > 0:
                 batched_ids.append(batch_list)
         return batched_ids
 
-    def merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]):
+    def _merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]):
         """merge two JSON responses. Used after batching ids to merge responses from each batch.
 
         Args:

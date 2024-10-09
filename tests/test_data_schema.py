@@ -34,8 +34,7 @@ from rcsbapi.data import SCHEMA
 from rcsbapi.data.constants import ApiSettings
 
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
@@ -97,7 +96,7 @@ class SchemaTests(unittest.TestCase):
 
     def testConstructRootDict(self):
         with self.subTest(msg="1. root dict for singular type (interface)"):
-            interface_dict = SCHEMA.root_dict["interface"]
+            interface_dict = SCHEMA._root_dict["interface"]
             self.assertEqual(len(interface_dict), 3)
             arg_names = []
             for arg_dict in interface_dict:
@@ -106,13 +105,13 @@ class SchemaTests(unittest.TestCase):
             self.assertIn("interface_id", arg_names)
             self.assertIn("entry_id", arg_names)
         with self.subTest(msg="2. root dict for plural type (entries)"):
-            entries_dict = SCHEMA.root_dict["entries"]
+            entries_dict = SCHEMA._root_dict["entries"]
             self.assertEqual(len(entries_dict), 1)
             self.assertEqual(entries_dict[0]["name"], "entry_ids")
             self.assertEqual(entries_dict[0]["kind"], "LIST")
         with self.subTest(msg="3. root dict has the same number of types as schema"):
-            schema_list = SCHEMA.root_introspection["data"]["__schema"]["queryType"]["fields"]
-            self.assertEqual(len(schema_list), len(list(SCHEMA.root_dict.keys())))
+            schema_list = SCHEMA._root_introspection["data"]["__schema"]["queryType"]["fields"]
+            self.assertEqual(len(schema_list), len(list(SCHEMA._root_dict.keys())))
 
     def testConstructTypeDict(self):
         type_fields_dict = {}
@@ -309,9 +308,9 @@ class SchemaTests(unittest.TestCase):
 
     def testDescription(self):
         with self.subTest(msg="1. check nonpolymer_comp description"):
-            nonpolymer_comp_idx = SCHEMA.field_to_idx_dict["nonpolymer_comp"][0]
-            description = SCHEMA.schema_graph[nonpolymer_comp_idx].description
-            logger.info("Description for 'nonpolymer_comp': %s", SCHEMA.schema_graph[nonpolymer_comp_idx].description)
+            nonpolymer_comp_idx = SCHEMA._field_to_idx_dict["nonpolymer_comp"][0]
+            description = SCHEMA._schema_graph[nonpolymer_comp_idx].description
+            logger.info("Description for 'nonpolymer_comp': %s", SCHEMA._schema_graph[nonpolymer_comp_idx].description)
             self.assertEqual(description, "Get a non-polymer chemical components described in this molecular entity.")
 
     def testFindFieldNames(self):

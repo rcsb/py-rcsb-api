@@ -4,7 +4,7 @@ from typing import Dict
 
 class ApiSettings(Enum):
     API_ENDPOINT: str = "https://data.rcsb.org/graphql"
-    TIMEOUT: int = 10
+    TIMEOUT: int = 60
 
 
 SINGULAR_TO_PLURAL: Dict[str, str] = {
