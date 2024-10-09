@@ -116,7 +116,7 @@ class SchemaTests(unittest.TestCase):
     def testConstructTypeDict(self):
         type_fields_dict = {}
         entry_dict = {}
-        type_fields_dict = SCHEMA.construct_type_dict()
+        type_fields_dict = SCHEMA._construct_type_dict()
         entry_dict_from_func = type_fields_dict["CoreEntry"]
         type_dict_list = SCHEMA.schema["data"]["__schema"]["types"]
         entry_found = False
@@ -133,22 +133,22 @@ class SchemaTests(unittest.TestCase):
                 entry_found = True
             i += 1
         self.assertEqual(entry_dict_from_func, entry_dict)
-        self.assertEqual(len(type_dict_list), len(SCHEMA.type_fields_dict.keys()))
+        self.assertEqual(len(type_dict_list), len(SCHEMA._type_fields_dict.keys()))
 
     # def testRecurseBuildSchema(self):  # doesn't work right now
-    #     original_networkx_flag = schema.use_networkx
-    #     schema.use_networkx = False
+    #     original_networkx_flag = schema._use_networkx
+    #     schema._use_networkx = False
     #     importlib.reload(schema)
     #     SCHEMA = Schema(ApiSettings.API_ENDPOINT.value)
-    #     SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
-    #     self.assertIsInstance(SCHEMA.schema_graph, rx.PyDiGraph)
-    #     schema.use_networkx = True
+    #     SCHEMA.recurse_build_schema(SCHEMA._schema_graph, 'Query')
+    #     self.assertIsInstance(SCHEMA._schema_graph, rx.PyDiGraph)
+    #     schema._use_networkx = True
     #     importlib.reload(schema)
     #     SCHEMA = Schema(ApiSettings.API_ENDPOINT.value)
-    #     SCHEMA.recurse_build_schema(SCHEMA.schema_graph, 'Query')
-    #     self.assertIsInstance(SCHEMA.schema_graph, nx.classes.digraph.DiGraph)
+    #     SCHEMA.recurse_build_schema(SCHEMA._schema_graph, 'Query')
+    #     self.assertIsInstance(SCHEMA._schema_graph, nx.classes.digraph.DiGraph)
     #     # reset to original
-    #     schema.use_networkx = original_networkx_flag
+    #     schema._use_networkx = original_networkx_flag
     #     importlib.reload(schema)
     #     SCHEMA = Schema(ApiSettings.API_ENDPOINT.value)
 

@@ -436,8 +436,8 @@ class Schema:
         # if self._use_networkx:
         #     index = len(self._schema_graph.nodes)
         #     self._schema_graph.add_node(index, type_node=type_node)
-        if self._use_networkx is False:
-            index = self._schema_graph.add_node(type_node)
+        # if self._use_networkx is False:
+        index = self._schema_graph.add_node(type_node)
         self._type_to_idx_dict[type_name] = index
         type_node.set_index(index)
         return type_node
