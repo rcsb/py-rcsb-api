@@ -7,8 +7,8 @@ from rcsbapi.data import Query
 
 # constructing the Query object
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
 
@@ -21,9 +21,9 @@ print(query.get_response())
 ```
 
 ### input_type
-Specifies which field you are starting your query from. 
+Specifies which field you are starting your query from.
 
-input_types, also called "root fields", are designated points where you can begin querying. This includes entry, polymer_entity, polymer_entity_instance, etc. For the full list see below:  
+input_types, also called "root fields", are designated points where you can begin querying. This includes entries, polymer_entities, polymer_entity_instances, etc. Singular input_types are converted to their plural form to allow for more flexibility in input_ids. If no plural form is available, then the input_type will not be converted. For the full list see below:
 
 <details open>
   <summary>Full list of input_types</summary>
@@ -59,7 +59,7 @@ input_types, also called "root fields", are designated points where you can begi
 </details>
 
 ### input_ids
-Specifies which entry, entity, etc you would like to request data for.
+Specifies which entries, entities, etc you would like to request data for.
 
 This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.md#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format.
 
@@ -96,8 +96,8 @@ In GraphQL syntax, the final requested data must be a "scalar" type (string, int
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["exptl"]
 )
 result_dict = query.exec()
@@ -106,16 +106,19 @@ print(result_dict)
 ```json
 {
   "data": {
-    "entry": {
-      "exptl": [
-        {
-          "details": null,
-          "crystals_number": null,
-          "method_details": null,
-          "method": "X-RAY DIFFRACTION"
-        }
-      ]
-    }
+    "entries": [
+      {
+        "rcsb_id": "4HHB",
+        "exptl": [
+          {
+            "method_details": null,
+            "method": "X-RAY DIFFRACTION",
+            "crystals_number": null,
+            "details": null
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -123,8 +126,8 @@ This query can be made more concise by specifying a field, like "method". In thi
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
 result_dict = query.exec()
@@ -133,13 +136,16 @@ print(result_dict)
 ```json
 {
   "data": {
-    "entry": {
-      "exptl": [
-        {
-          "method": "X-RAY DIFFRACTION"
-        }
-      ]
-    }
+    "entries": [
+      {
+        "rcsb_id": "4HHB",
+        "exptl": [
+          {
+            "method": "X-RAY DIFFRACTION"
+          }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -153,8 +159,8 @@ This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index
 ```python
 from rcsbapi.data import Query
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["exptl"]
 )
 editor_link = query.get_editor_link()
@@ -167,11 +173,16 @@ Given a redundant field, this method finds all paths from an input_type to nodes
 ```python
 from rcsbapi.data import Schema
 schema = Schema()
-schema.find_paths(input_type="entry", return_data_name="id")
+schema.find_paths(input_type="entries", return_data_name="id")
+```
+
+To return a dictionary with descriptions for each path, set `descriptions` to true.
+```python
+schema.find_paths(input_type="entries", return_data_name="id". descriptions=True)
 ```
 
 ### find_field_names()
-Given a string, this method will return all fields containing that string, along with a description of each field.
+Given a string, this method will return all fields containing that string.
 
 ```python
 from rcsbapi.data import Schema
@@ -197,8 +208,8 @@ from rcsbapi.data import Query
 
 # querying a redundant field
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["id"]
 )
 result_dict = query.exec()
@@ -207,41 +218,40 @@ print(result_dict)
 ```
 ValueError: "id" exists, but is not a unique field, must specify further.
 10 of 118 possible paths:
-  assemblies.branched_entity_instances.branched_entity.chem_comp_monomers.chem_comp.id
-  assemblies.branched_entity_instances.branched_entity.chem_comp_monomers.rcsb_bird_citation.id
+  entries.assemblies.branched_entity_instances.branched_entity.chem_comp_monomers.chem_comp.id
+  entries.assemblies.branched_entity_instances.branched_entity.chem_comp_monomers.rcsb_bird_citation.id
   ...
 
 For all paths run:
   from rcsbapi.data import Schema
   schema = Schema()
-  schema.find_paths(input_type="entry", return_data_name="id")
+  schema.find_paths("entries", "id")
 ```
 ```python
 from rcsbapi.data import Schema
 
 # run find_paths(input_type, return_data_name)
 schema = Schema()
-print(schema.find_paths(input_type="entry", return_data_name="id"))
+print(schema.find_paths(input_type="entries", return_data_name="id"))
 ```
 
 ```python
 # select desired field from the returned list
-['PdbxStructSpecialSymmetry.id',
-'RcsbBirdCitation.id',
-'ChemComp.id',
-'Entry.id',
+['citation.id',
+'diffrn.id'
+'entry.id'
 ...
-'RcsbUniprotKeyword.id',
-'RcsbPolymerInstanceAnnotationAnnotationLineage.id',
-'RcsbPolymerStructConn.id']
+'polymer_entities.prd.chem_comp.id',
+'polymer_entities.prd.rcsb_bird_citation.id',
+'polymer_entities.prd.rcsb_chem_comp_annotation.annotation_lineage.id']
 ```
 ```python
 from rcsbapi.data import Query
 
 # valid query
 query = Query(
-    input_type="entry",
-    input_ids={"entry_id": "4HHB"},
+    input_type="entries",
+    input_ids=["4HHB"],
     return_data_list=["entry.id"]
 )
 result_dict = query.exec()

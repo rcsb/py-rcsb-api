@@ -1,5 +1,5 @@
 # Additional Examples
-Examples come from [RCSB PDB Data API documentation](https://data.rcsb.org/#examples)
+Most examples come from [RCSB PDB Data API documentation](https://data.rcsb.org/#examples)
 
 ### Entries
 Fetch information about structure title and experimental method for PDB entries:
@@ -177,7 +177,7 @@ This example queries 'polymer_entity_instances' positional features. The query r
 from rcsbapi.data import Query
 query = Query(
     input_type="polymer_entity_instances",
-    input_ids={"instance_ids": ["1NDO.A"]},
+    input_ids=["1NDO.A"],
     return_data_list=[
         "polymer_entity_instances.rcsb_id",
         "rcsb_polymer_instance_feature.type",
@@ -212,7 +212,7 @@ query = Query(
     input_type="entries",
     input_ids=["7NHM", "5L2G"],
     return_data_list=[
-        "entries.rcsb_id",
+        "polymer_entities.rcsb_id",
         "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_accession",
         "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name"
     ]
@@ -296,6 +296,56 @@ Performs the following GraphQL query:
       ma_qa_metric_global {
         type
         value
+      }
+    }
+  }
+}
+```
+
+### PubMed
+This example gets the abstract text of the paper with the specified PubMed ID.
+
+```python
+query = Query(
+  input_type="pubmed",
+  return_data_list=["rcsb_pubmed_abstract_text"],
+  input_ids=["6726807"]
+)
+
+result_dict = query.exec()
+print(result_dict)
+```
+
+Performs the following GraphQL query:
+```
+{
+  pubmed(pubmed_id: 6726807) {
+    rcsb_pubmed_abstract_text
+  }
+}
+```
+
+### UniProt
+This example gets a description of the function of a protein based on the UniProt ID.
+
+```python
+query = Query(
+  input_type="uniprot",
+  return_data_list=["function.details"],
+  input_ids=["P68871"]
+)
+
+result_dict = query.exec()
+print(result_dict)
+```
+
+Performs the following GraphQL query:
+```
+{
+  uniprot(uniprot_id: "P68871") {
+    rcsb_uniprot_protein {
+      function {
+        details
       }
     }
   }
