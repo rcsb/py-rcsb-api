@@ -1,12 +1,19 @@
-# rcsb-api - Query protein structures from Python
+rcsb-api - Query protein structures from Python
+===============================================
 
-The `rcsb-api` package provides a Python interface to [RCSB PDB API services](https://www.rcsb.org/docs/programmatic-access/web-services-overview). Use it to fetch data from RCSB PDB.
+The ``rcsb-api`` package provides a Python interface to 
+`RCSB PDB API services <https://www.rcsb.org/docs/programmatic-access/web-services-overview>`_. 
+Use it to fetch data from RCSB PDB.
+
+Contents
+--------
 
 .. toctree::
    :caption: Contents
    :maxdepth: 2
 
-# Data API Section
+Data API
+--------
 
 .. toctree::
    :caption: Data API
@@ -19,22 +26,29 @@ The `rcsb-api` package provides a Python interface to [RCSB PDB API services](ht
    data_api/api.rst
 
 
-## Availability
+Availability
+------------
 
 Get it from PyPI:
 
-    pip install rcsb-api
+.. code-block:: bash
 
-Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
+   pip install rcsb-api
 
-## License
+Or, download from `GitHub <https://github.com/rcsb/py-rcsb-api>`_
 
-Code is licensed under the MIT license. See the
-[LICENSE](https://github.com/rcsb/py-rcsb-api/blob/master/LICENSE) for details.
 
-## Citing
+License
+-------
 
-Please cite the `rcsb-api` package by URL:
+Code is licensed under the MIT license. See the 
+`LICENSE <https://github.com/rcsb/py-rcsb-api/blob/master/LICENSE>`_ for details.
+
+
+Citing
+------
+
+Please cite the ``rcsb-api`` package by URL:
 
 > https://rcsbapi.readthedocs.io
 
