@@ -12,11 +12,18 @@ Contents
    :caption: Contents
    :maxdepth: 2
 
-Data API
---------
-
 .. toctree::
    :caption: Data API
+   :maxdepth: 2
+
+   data_api/quickstart.md
+   data_api/query_construction.md
+   data_api/implementation_details.md
+   data_api/additional_examples.md
+   data_api/api.rst
+
+.. toctree::
+   :caption: Search API
    :maxdepth: 2
 
    data_api/quickstart.md
@@ -50,8 +57,8 @@ Citing
 
 Please cite the ``rcsb-api`` package by URL:
 
-> https://rcsbapi.readthedocs.io
+  https://rcsbapi.readthedocs.io
 
 You should also cite the RCSB.org API services this package utilizes:
 
-> Yana Rose, Jose M. Duarte, Robert Lowe, Joan Segura, Chunxiao Bi, Charmi Bhikadiya, Li Chen, Alexander S. Rose, Sebastian Bittrich, Stephen K. Burley, John D. Westbrook. RCSB Protein Data Bank: Architectural Advances Towards Integrated Searching and Efficient Access to Macromolecular Structure Data from the PDB Archive, Journal of Molecular Biology, 2020. DOI: 10.1016/j.jmb.2020.11.003
+  Yana Rose, Jose M. Duarte, Robert Lowe, Joan Segura, Chunxiao Bi, Charmi Bhikadiya, Li Chen, Alexander S. Rose, Sebastian Bittrich, Stephen K. Burley, John D. Westbrook. RCSB Protein Data Bank: Architectural Advances Towards Integrated Searching and Efficient Access to Macromolecular Structure Data from the PDB Archive, Journal of Molecular Biology, 2020. DOI: 10.1016/j.jmb.2020.11.003
