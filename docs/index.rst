@@ -2,17 +2,22 @@
 
 The `rcsb-api` package provides a Python interface to [RCSB PDB API services](https://www.rcsb.org/docs/programmatic-access/web-services-overview). Use it to fetch data from RCSB PDB.
 
-```{toctree}
----
-caption: Contents
-maxdepth: 2
----
-quickstart.md
-query_construction.md
-implementation_details.md
-additional_examples.md
-api.rst
-```
+.. toctree::
+   :caption: Contents
+   :maxdepth: 2
+
+# Data API Section
+
+.. toctree::
+   :caption: Data API
+   :maxdepth: 2
+
+   data_api/quickstart.md
+   data_api/query_construction.md
+   data_api/implementation_details.md
+   data_api/additional_examples.md
+   data_api/api.rst
+
 
 ## Availability
 
