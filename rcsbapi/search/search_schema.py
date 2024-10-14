@@ -10,14 +10,7 @@ import re
 import warnings
 from typing import List, Union
 import requests
-from ..const import (
-    STRUCTURE_ATTRIBUTE_SCHEMA_URL,
-    CHEMICAL_ATTRIBUTE_SCHEMA_URL,
-    STRUCTURE_ATTRIBUTE_SEARCH_SERVICE,
-    STRUCTURE_ATTRIBUTE_SCHEMA_FILE,
-    CHEMICAL_ATTRIBUTE_SEARCH_SERVICE,
-    CHEMICAL_ATTRIBUTE_SCHEMA_FILE,
-)
+from ..const import Const
 
 
 class SearchSchemaGroup:
@@ -167,10 +160,10 @@ class SearchSchema:
         refetch=True,
         use_fallback=True,
         reload=True,
-        struct_attr_schema_url=STRUCTURE_ATTRIBUTE_SCHEMA_URL,
-        struct_attr_schema_file=STRUCTURE_ATTRIBUTE_SCHEMA_FILE,
-        chem_attr_schema_url=CHEMICAL_ATTRIBUTE_SCHEMA_URL,
-        chem_attr_schema_file=CHEMICAL_ATTRIBUTE_SCHEMA_FILE,
+        struct_attr_schema_url=Const.STRUCTURE_ATTRIBUTE_SCHEMA_URL.value,
+        struct_attr_schema_file=Const.STRUCTURE_ATTRIBUTE_SCHEMA_FILE.value,
+        chem_attr_schema_url=Const.CHEMICAL_ATTRIBUTE_SCHEMA_URL.value,
+        chem_attr_schema_file=Const.CHEMICAL_ATTRIBUTE_SCHEMA_FILE.value,
     ):
         """Initialize SearchSchema object with all known RCSB PDB attributes.
 
@@ -210,7 +203,7 @@ class SearchSchema:
         return sD
 
     def _make_schema_group(self) -> SearchSchemaGroup:
-        schemas = [(self.struct_schema, STRUCTURE_ATTRIBUTE_SEARCH_SERVICE, ""), (self.chem_schema, CHEMICAL_ATTRIBUTE_SEARCH_SERVICE, "")]
+        schemas = [(self.struct_schema, Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value, ""), (self.chem_schema, Const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value, "")]
         schema = self._make_group("", schemas)
         assert isinstance(schema, SearchSchemaGroup)  # for type checking
         return schema

@@ -13,7 +13,7 @@ jobs:
   timeoutInMinutes: 0
   pool:
     ${{ if eq(parameters.os, 'macos') }}:
-      vmImage: 'macOS-12'
+      vmImage: 'macOS-13'
     ${{ if eq(parameters.os, 'linux') }}:
       vmImage: 'ubuntu-20.04'
 

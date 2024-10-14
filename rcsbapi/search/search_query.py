@@ -29,9 +29,7 @@ from typing import (
 )
 
 import requests
-from ..const import STRUCTURE_ATTRIBUTE_SEARCH_SERVICE, REQUESTS_PER_SECOND, FULL_TEXT_SEARCH_SERVICE, SEQUENCE_SEARCH_SERVICE, SEQUENCE_SEARCH_MIN_NUM_OF_RESIDUES
-from ..const import RCSB_SEARCH_API_QUERY_URL, SEQMOTIF_SEARCH_SERVICE, SEQMOTIF_SEARCH_MIN_CHARACTERS, UPLOAD_URL, RETURN_UP_URL, STRUCT_SIM_SEARCH_SERVICE
-from ..const import STRUCTMOTIF_SEARCH_SERVICE, STRUCT_MOTIF_MIN_RESIDUES, STRUCT_MOTIF_MAX_RESIDUES, CHEM_SIM_SEARCH_SERVICE
+from ..const import Const
 from .search_schema import SearchSchema
 
 if sys.version_info > (3, 8):
@@ -129,12 +127,12 @@ def fileUpload(filepath: str, fmt: str = "cif") -> str:
     should then be passed through as part of the value parameter,
     along with the format of the file."""
     with open(filepath, mode="rb") as f:
-        res = requests.post(UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=None)
+        res = requests.post(Const.UPLOAD_URL.value, files={"file": f}, data={"format": fmt}, timeout=None)
         try:
             spec = res.json()["key"]
         except KeyError:
             raise TypeError("There was an issue processing the file. Check the file format.")
-    return RETURN_UP_URL + spec
+    return Const.RETURN_UP_URL.value + spec
 
 
 class SearchQuery(ABC):
@@ -302,7 +300,7 @@ class SearchQuery(ABC):
     def and_(self, other: Union[str, "Attr"]) -> "PartialQuery":
         ...
 
-    def and_(self, other: Union[str, "SearchQuery", "Attr"], qtype=STRUCTURE_ATTRIBUTE_SEARCH_SERVICE) -> Union["SearchQuery", "PartialQuery"]:
+    def and_(self, other: Union[str, "SearchQuery", "Attr"], qtype=Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value) -> Union["SearchQuery", "PartialQuery"]:
         """Extend this query with an additional attribute via an AND"""
         if isinstance(other, SearchQuery):
             return self & other
@@ -321,7 +319,7 @@ class SearchQuery(ABC):
     def or_(self, other: Union[str, "Attr"]) -> "PartialQuery":
         ...
 
-    def or_(self, other: Union[str, "SearchQuery", "Attr"], qtype=STRUCTURE_ATTRIBUTE_SEARCH_SERVICE) -> Union["SearchQuery", "PartialQuery"]:
+    def or_(self, other: Union[str, "SearchQuery", "Attr"], qtype=Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value) -> Union["SearchQuery", "PartialQuery"]:
         """Extend this query with an additional attribute via an OR"""
         if isinstance(other, SearchQuery):
             return self | other
@@ -442,7 +440,7 @@ class Attr:
     """
 
     attribute: str
-    type: Optional[Union[List[str], str]]  # POSSIBLY BIG CHANGE -- was STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.
+    type: Optional[Union[List[str], str]]
     """search service type. `text` for structure attributes, `text_chem` for chemical attributes"""
     description: Optional[Union[str, List[str]]] = None
 
@@ -731,7 +729,7 @@ class TextQuery(Terminal):
         Args:
             value: free-text query
         """
-        super().__init__(service=FULL_TEXT_SEARCH_SERVICE, params={"value": value})
+        super().__init__(service=Const.FULL_TEXT_SEARCH_SERVICE.value, params={"value": value})
 
 
 class SequenceQuery(Terminal):
@@ -755,13 +753,13 @@ class SequenceQuery(Terminal):
             sequence_type (Optional[SequenceType], optional): type of biological sequence ("protein", "dna", "rna").
                 Defaults to "protein".
         """
-        if len(value) < SEQUENCE_SEARCH_MIN_NUM_OF_RESIDUES:  # (placeholder for now) look into deriving constraints from API Schema programatically
+        if len(value) < Const.SEQUENCE_SEARCH_MIN_NUM_OF_RESIDUES.value:  # (placeholder for now) look into deriving constraints from API Schema programatically
             raise ValueError("The sequence must contain at least 25 residues")
         if (identity_cutoff) and (identity_cutoff < 0.0 or identity_cutoff > 1.0):
             raise ValueError("Identity cutoff should be between 0 and 1 (inclusive)")
         else:
             super().__init__(
-                service=SEQUENCE_SEARCH_SERVICE,
+                service=Const.SEQUENCE_SEARCH_SERVICE.value,
                 params={"evalue_cutoff": evalue_cutoff, "identity_cutoff": identity_cutoff, "sequence_type": sequence_type, "value": value},
             )
 
@@ -781,10 +779,10 @@ class SeqMotifQuery(Terminal):
             pattern_type (Optional[SeqMode], optional): motif syntax ("simple", "prosite", "regex"). Defaults to "simple".
             sequence_type (Optional[SequenceType], optional): type of biological sequence ("protein", "dna", "rna"). Defaults to "protein".
         """
-        if len(value) < SEQMOTIF_SEARCH_MIN_CHARACTERS:
+        if len(value) < Const.SEQMOTIF_SEARCH_MIN_CHARACTERS.value:
             raise ValueError("The sequence motif must contain at least 2 characters")
         else:
-            super().__init__(service=SEQMOTIF_SEARCH_SERVICE, params={"value": value, "pattern_type": pattern_type, "sequence_type": sequence_type})
+            super().__init__(service=Const.SEQMOTIF_SEARCH_SERVICE.value, params={"value": value, "pattern_type": pattern_type, "sequence_type": sequence_type})
 
 
 class StructSimilarityQuery(Terminal):
@@ -833,7 +831,7 @@ class StructSimilarityQuery(Terminal):
             assert isinstance(file_format, str)
             parameters["value"] = {"url": fileUpload(file_path, file_format), "format": "bcif"}
 
-        super().__init__(service=STRUCT_SIM_SEARCH_SERVICE, params=parameters)
+        super().__init__(service=Const.STRUCT_SIM_SEARCH_SERVICE.value, params=parameters)
 
 
 class StructureMotifResidue:
@@ -913,7 +911,7 @@ class StructMotifQuery(Terminal):
         # we will construct value, and then pass it through. That's like 95% of this lol
         if not residue_ids:
             raise ValueError("You must include residues in a Structure Motif Query")
-        if len(residue_ids) > STRUCT_MOTIF_MAX_RESIDUES or len(residue_ids) < STRUCT_MOTIF_MIN_RESIDUES:
+        if len(residue_ids) > Const.STRUCT_MOTIF_MAX_RESIDUES.value or len(residue_ids) < Const.STRUCT_MOTIF_MIN_RESIDUES.value:
             raise ValueError("A Structure Motif Query Must contain 2-10 residues.")
         value: Dict = {}
         if structure_search_type == "entry_id":
@@ -966,7 +964,7 @@ class StructMotifQuery(Terminal):
 
         # now call super
 
-        super().__init__(service=STRUCTMOTIF_SEARCH_SERVICE, params=params)
+        super().__init__(service=Const.STRUCTMOTIF_SEARCH_SERVICE.value, params=params)
 
 
 class ChemSimilarityQuery(Terminal):
@@ -1010,7 +1008,7 @@ class ChemSimilarityQuery(Terminal):
             parameters["descriptor_type"] = descriptor_type
             parameters["match_type"] = match_type
 
-        super().__init__(service=CHEM_SIM_SEARCH_SERVICE, params=parameters)
+        super().__init__(service=Const.CHEM_SIM_SEARCH_SERVICE.value, params=parameters)
 
 
 @dataclass(frozen=True)
@@ -1630,7 +1628,7 @@ class Session(Iterable[str]):
     Handles paging the query and parsing results
     """
 
-    url = RCSB_SEARCH_API_QUERY_URL
+    url = Const.RCSB_SEARCH_API_QUERY_URL.value
     query_id: str
     query: SearchQuery
     return_type: ReturnType
@@ -1793,7 +1791,7 @@ class Session(Iterable[str]):
             if not self._group_by:
                 assert len(result_set) == self.rows
             req_count += 1
-            if req_count == REQUESTS_PER_SECOND:
+            if req_count == Const.REQUESTS_PER_SECOND.value:
                 time.sleep(1.2)  # This prevents the user from bottlenecking the server with requests.
                 req_count = 0
             response = self._single_query(start=start)
