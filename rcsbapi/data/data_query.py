@@ -4,13 +4,13 @@ import re
 import time
 from typing import Any, Union, List, Dict, Optional, Tuple
 import requests
-from rcsbapi.data import SCHEMA
-from .constants import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
+from rcsbapi.data import DATA_SCHEMA
+from ..config import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
 
 logger = logging.getLogger(__name__)
 
 
-class Query:
+class DataQuery:
     """
     class for Data API queries.
     """
@@ -42,7 +42,7 @@ class Query:
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
-        self._query = SCHEMA.construct_query(
+        self._query = DATA_SCHEMA.construct_query(
             input_type=self._input_type,
             input_ids=self._input_ids,
             return_data_list=return_data_list,
@@ -67,7 +67,7 @@ class Query:
         """
         # Convert _input_type to plural if applicable
         converted = False
-        if SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
+        if DATA_SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
             plural_type = SINGULAR_TO_PLURAL[input_type]
             if plural_type:
                 input_type = plural_type
@@ -90,7 +90,7 @@ class Query:
 
             else:
                 # If not converted, retrieve id list from dictionary
-                input_ids = list(input_ids[SCHEMA._root_dict[input_type][0]["name"]])
+                input_ids = list(input_ids[DATA_SCHEMA._root_dict[input_type][0]["name"]])
 
         assert isinstance(input_ids, list)
         return (input_type, input_ids)

@@ -54,7 +54,7 @@ setup(
     packages=find_packages(exclude=["tests", "tests-*", "tests.*"]),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:
-        "": ["*.md", "*.rst", "*.txt", "*.cfg", "resources/*"]
+        "": ["*.md", "*.rst", "*.txt", "*.cfg", "rcsbapi/*/resources/*"]
     },
     #
     test_suite="tests",

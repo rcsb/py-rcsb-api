@@ -10,18 +10,18 @@ Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
 ## Import
 To import this package, use:
 ```python
-from rcsbapi.data import Schema, Query
+from rcsbapi.data import DataSchema, DataQuery
 ```
 
 ## Getting Started
 The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
 
-To generate a query in this package, you would create a Query object. The Query object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the Query object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
+To generate a query in this package, you would create a DataQuery object. The DataQuery object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the DataQuery object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 
 The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If the package is included in code that is going to be used long-term, it's recommended to use fully-specified paths. When autocompletion is being used, an INFO message will be printed out as a reminder.
 
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 query = Query(
     input_type="entries",
     input_ids=["4HHB"],
@@ -70,7 +70,7 @@ In GraphQL, you must begin your query at specific fields. These are fields like 
 ### Autocompletion of Queries
 One way this package simplifies making requests is by adding fields that return scalars into the generated query if you request a field that returns a type.
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 query = Query(
     input_type="entries",
     input_ids=["4HHB"],

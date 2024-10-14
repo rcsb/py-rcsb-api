@@ -1,14 +1,9 @@
-"""RCSB PDB Search API"""
-__version__ = "0.3.0"
+"""RCSB PDB Data API"""
 
-import logging
-from .schema import Schema
+from .data_schema import DataSchema
+from .data_query import DataQuery  # noqa:E402
 
-logging.basicConfig(level=logging.WARNING, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
-logger = logging.getLogger()
+DATA_SCHEMA = DataSchema()
 
-SCHEMA = Schema()
 
-from .query import Query  # noqa:E402
-
-__all__ = ["Query", "Schema"]
+__all__ = ["DataQuery", "DataSchema"]

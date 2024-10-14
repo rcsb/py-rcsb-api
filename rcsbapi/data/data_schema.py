@@ -7,7 +7,7 @@ import requests
 # import networkx as nx
 from graphql import validate, parse, build_client_schema
 import rustworkx as rx
-from .constants import ApiSettings
+from ..config import ApiSettings
 
 use_networkx: bool = False
 # Below section and parts of code involving networkx are commented out
@@ -22,7 +22,7 @@ use_networkx: bool = False
 logger = logging.getLogger(__name__)
 
 
-class FieldNode:
+class DataFieldNode:
     """
     Node representing GraphQL field
         name (str): field name
@@ -55,7 +55,7 @@ class FieldNode:
         return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
     def set_index(self, index: int):
-        """set index that is associated with the FieldNode
+        """set index that is associated with the DataFieldNode
 
         Args:
             index (int): index of node in schema_graph
@@ -71,7 +71,7 @@ class FieldNode:
         self.of_kind = of_kind
 
 
-class TypeNode:
+class DataTypeNode:
     """
     Class for nodes representing GraphQL Types in the schema graph.
     """
@@ -84,26 +84,26 @@ class TypeNode:
         """
         self.name = name
         self.index: Optional[int] = None
-        self.field_list: List[FieldNode] = []
+        self.field_list: List[DataFieldNode] = []
 
     def set_index(self, index: int):
-        """set index that is associated with the TypeNode
+        """set index that is associated with the DataTypeNode
 
         Args:
             index (int): index of node in schema_graph
         """
         self.index = index
 
-    def set_field_list(self, field_list: List[FieldNode]):
+    def set_field_list(self, field_list: List[DataFieldNode]):
         """List of FieldNodes associated with the GraphQL type
 
         Args:
-            field_list (Union[None, List[FieldNode]]): list of FieldNodes
+            field_list (Union[None, List[DataFieldNode]]): list of FieldNodes
         """
         self.field_list = field_list
 
 
-class Schema:
+class DataSchema:
     """
     GraphQL schema defining available fields, types, and how they are connected.
     """
@@ -316,7 +316,7 @@ class Schema:
             return schema_response.json()
         logger.info("Loading data schema from file")
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        json_file_path = os.path.join(current_dir, "../", "resources", "data_api_schema.json")
+        json_file_path = os.path.join(current_dir, "resources", "data_api_schema.json")
         with open(json_file_path, "r", encoding="utf-8") as schema_file:
             return json.load(schema_file)
 
@@ -356,14 +356,14 @@ class Schema:
                 field_names_list.append(field_name)
         return field_names_list
 
-    def make_type_subgraph(self, type_name: str) -> TypeNode:
+    def make_type_subgraph(self, type_name: str) -> DataTypeNode:
         """Make a subgraph of only one type and its associated fields
 
         Args:
             type_name (str): name of the type for which to construct subgraph
 
         Returns:
-            TypeNode: returns TypeNode constructed from type_name
+            DataTypeNode: returns DataTypeNode constructed from type_name
         """
         field_name_list = self._type_fields_dict[type_name].keys()
         field_node_list = []
@@ -413,7 +413,7 @@ class Schema:
         return schema_graph
 
     def _apply_weights(self, root_type_list: List[str], weight: int) -> None:
-        """applies weight to all edges from a root TypeNode to FieldNodes
+        """applies weight to all edges from a root DataTypeNode to FieldNodes
 
         Args:
             root_type_list (List[str]): list of root fields to apply weights to
@@ -431,8 +431,8 @@ class Schema:
             #     out_edge_list = self._schema_graph.edges(node_idx)
             #     nx.set_edge_attributes(self._schema_graph, {edge_tuple: {"weight": weight} for edge_tuple in out_edge_list})
 
-    def _make_type_node(self, type_name: str) -> TypeNode:
-        type_node = TypeNode(type_name)
+    def _make_type_node(self, type_name: str) -> DataTypeNode:
+        type_node = DataTypeNode(type_name)
         # if self._use_networkx:
         #     index = len(self._schema_graph.nodes)
         #     self._schema_graph.add_node(index, type_node=type_node)
@@ -460,12 +460,12 @@ class Schema:
                         return field["description"]
         return ""
 
-    def _make_field_node(self, parent_type: str, field_name: str) -> FieldNode:
+    def _make_field_node(self, parent_type: str, field_name: str) -> DataFieldNode:
         kind = self._type_fields_dict[parent_type][field_name]["kind"]
         field_type_dict: Dict = self._type_fields_dict[parent_type][field_name]
         return_type = self._find_type_name(field_type_dict)
         description = self._find_description(parent_type, field_name)
-        field_node = FieldNode(kind, return_type, field_name, description)
+        field_node = DataFieldNode(kind, return_type, field_name, description)
         assert field_node.type is not None
         if kind == "LIST" or kind == "NON_NULL":
             of_kind = self._find_kind(field_type_dict)
@@ -554,13 +554,13 @@ class Schema:
             child_data = self._schema_graph[idx]
             assert isinstance(child_data.index, int)  # for mypy
 
-            if isinstance(child_data, FieldNode):
+            if isinstance(child_data, DataFieldNode):
                 child_descendants = self._get_descendant_fields(idx, field_name, visited)
                 if child_descendants:
                     result.append({child_data.index: child_descendants})
                 else:
                     result.append(child_data.index)
-            elif isinstance(child_data, TypeNode):
+            elif isinstance(child_data, DataTypeNode):
                 type_descendants = self._get_descendant_fields(idx, field_name, visited)
                 if type_descendants:
                     result.extend(type_descendants)
@@ -764,8 +764,8 @@ class Schema:
             if len(missing_keys) > 0:
                 raise ValueError(
                     f"Missing input_id dictionary keys: {missing_keys}. Find input_id keys and descriptions by running:\n"
-                    f"  from rcsbapi.data import Schema\n"
-                    f"  schema = Schema()\n"
+                    f"  from rcsbapi.data import DataSchema\n"
+                    f"  schema = DataSchema()\n"
                     f'  schema.get_input_id_dict("{input_type}")'
                 )
             attr_kind = {attr["name"]: attr["kind"] for attr in attr_list}
@@ -852,8 +852,8 @@ class Schema:
                         f"{path_choice_msg}"
                         f"\n  ...\n\n"
                         f"For all paths run:\n"
-                        f"  from rcsbapi.data import Schema\n"
-                        f"  schema = Schema()\n"
+                        f"  from rcsbapi.data import DataSchema\n"
+                        f"  schema = DataSchema()\n"
                         f'  schema.find_paths("{input_type}", "{path_list[-1]}")'
                     )
 
@@ -869,7 +869,7 @@ class Schema:
                 shortest_full_paths: List[List[int]] = self._compare_paths(start_node_index, possible_dot_paths)
                 assert len(shortest_full_paths) != 0
                 if len(shortest_full_paths) > 1:
-                    shortest_name_paths = [".".join([self._idx_to_name(idx) for idx in path[1:] if isinstance(self._schema_graph[idx], FieldNode)]) for path in shortest_full_paths]
+                    shortest_name_paths = [".".join([self._idx_to_name(idx) for idx in path[1:] if isinstance(self._schema_graph[idx], DataFieldNode)]) for path in shortest_full_paths]
                     shortest_name_paths.sort()
                     path_choice_msg = ""
                     for name_path in shortest_name_paths:
@@ -914,16 +914,16 @@ class Schema:
 
         for target_idx, paths_list in return_data_paths.items():
             node_data = self._schema_graph[target_idx]
-            if isinstance(node_data, FieldNode):
+            if isinstance(node_data, DataFieldNode):
                 field_names[target_idx] = []
                 paths[target_idx] = []
             for each_path in paths_list:
                 skip_first = True
-                path = [node_idx for node_idx in each_path if isinstance(self._schema_graph[node_idx], FieldNode)][1:]
+                path = [node_idx for node_idx in each_path if isinstance(self._schema_graph[node_idx], DataFieldNode)][1:]
                 paths[target_idx].append(path)
                 for node_idx in each_path:
                     node_data = self._schema_graph[node_idx]
-                    if isinstance(node_data, FieldNode):
+                    if isinstance(node_data, DataFieldNode):
                         if skip_first:
                             skip_first = False
                             continue
@@ -984,7 +984,7 @@ class Schema:
             ValueError: thrown if no path matches dot_path
 
         Returns:
-            List[List[int]]: list of paths where each path is a list of FieldNode indices matching the given dot_path
+            List[List[int]]: list of paths where each path is a list of DataFieldNode indices matching the given dot_path
         """
         path_list = dot_path.split(".")
         node_matches: List[int] = self._field_to_idx_dict[path_list[0]]
@@ -1096,7 +1096,7 @@ class Schema:
         """
         name_path: List[str] = []
         for idx in idx_path:
-            if isinstance(self._schema_graph[idx], FieldNode):
+            if isinstance(self._schema_graph[idx], DataFieldNode):
                 name_path.append(self._schema_graph[idx].name)
         return name_path
 
