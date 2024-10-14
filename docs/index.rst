@@ -9,10 +9,6 @@ Contents
 --------
 
 .. toctree::
-   :caption: Contents
-   :maxdepth: 2
-
-.. toctree::
    :caption: Data API
    :maxdepth: 2
 
