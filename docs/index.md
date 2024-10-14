@@ -7,9 +7,6 @@ The `rcsb-api` package provides a Python interface to [RCSB PDB API services](ht
 caption: Contents
 maxdepth: 2
 ---
-caption: Data API
-maxdepth: 2
----
 quickstart.md
 query_construction.md
 implementation_details.md
