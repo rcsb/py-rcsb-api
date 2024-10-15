@@ -26,13 +26,11 @@ import json
 import os
 import unittest
 import requests
-
 # import rustworkx as rx
 # import networkx as nx
 
 from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import ApiSettings
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

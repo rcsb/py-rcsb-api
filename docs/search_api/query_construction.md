@@ -38,7 +38,7 @@ List of supported comparative operators:
 |<=      |less than or equal to   |
 |in      |contains phrase or contains words|
 
-To use the `exists` operator, create an [AttributeQuery](quickstart.html#attribute-search)
+To use the `exists` operator, create an [AttributeQuery](quickstart.md#attribute-search)
 
 For methods to search and find details on attributes within this package, go to the [attributes page](attributes.md)
 For a full list of attributes, please refer to the [RCSB PDB schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema).
@@ -350,7 +350,7 @@ for polyid in query("polymer_entity"):
 |pattern_type   |no      |Motif syntax ("simple", "prosite", "regex")          |"simple"              |
 |sequence_type  |no      |Type of biological sequence ("protein", "dna", "rna")|"protein"             |
 
-See [Sequence Motif Search Examples](additional_examples.html#Sequence-Motif-Search-Examples) for more use cases.
+See [Sequence Motif Search Examples](additional_examples.md#Sequence-Motif-Search-Examples) for more use cases.
 
 ### Structure Similarity Search
 The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input or parameter, A chain ID or assembly ID must be specified, whether the input structure data should be compared to Assemblies or Polymer Entity Instance (Chains) is required, and defining the search type as either strict or relaxed is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/structure-similarity-search) page.
@@ -397,7 +397,7 @@ If you provide an entry_id, you must provide either an assembly_id or chain_id
 
 If you provide a file_url or file_path, you must also provide a file_format.
 
-See [Structure Similarity Search Examples](additional_examples.html#Structure-Similarity-Search-Examples) for more use cases.
+See [Structure Similarity Search Examples](additional_examples.md#Structure-Similarity-Search-Examples) for more use cases.
 
 ### Structure Motif Search
 The PDB Archive can also be queried by using a "motif" found in these 3D structures. To perform this type of query, an entry_id or a file URL/path must be provided, along with residues (which are parts of 3D structures.) This is the bare minimum needed to make a search, but there are lots of other parameters that can be added to a Structure Motif Query (see [full search schema](https://search.rcsb.org/redoc/index.html)).
@@ -474,7 +474,7 @@ If you provide a file_url, you must also provide a file_extension.
 
 If you provide a file_path, you must also provide a file_extension.
 
-See [Structure Motif Search Examples](additional_examples.html#Structure-Motif-Search-Examples) for more use cases.
+See [Structure Motif Search Examples](additional_examples.md#Structure-Motif-Search-Examples) for more use cases.
 
 ### Chemical Similarity Search
 When you have unique chemical information (e.g., a chemical formula or descriptor) you can use this information to find chemical components (e.g., drugs, inhibitors, modified residues, or building blocks such as amino acids, nucleotides, or sugars), so that it is similar to the formula or descriptor used in the query (perhaps one or two atoms/groups are different), is part of a larger molecule (i.e., the specified formula/descriptor is a substructure), or is exactly or very closely matches the formula or descriptor used in the query. 
@@ -518,7 +518,7 @@ list(q1())
 | "sub-struct-graph-relaxed"        | Substructure (including Stereoisomers)    |
 | "graph-exact"                     | Exact match                               |
 
-See [Chemical Similarity Search Examples](additional_examples.html#Chemical-Similarity-Search-Examples) for more use cases.
+See [Chemical Similarity Search Examples](additional_examples.md#Chemical-Similarity-Search-Examples) for more use cases.
 
 ## Request Options
 
@@ -619,7 +619,7 @@ List of available types of Faceted queries:
 - Multidimensional Facet
 - Filter Facet
 
-See example usage of each of these types of Faceted queries at [Faceted Query Examples](additional_examples.html#faceted-query-examples).
+See example usage of each of these types of Faceted queries at [Faceted Query Examples](additional_examples.md#faceted-query-examples).
 
 ### Additional Request Options
 Other request options can also be added to queries through arguments at execution. `facet`, `group_by`, and `sort` are more complex request_options and require creating a `RequestOption` object (`Facet`, `GroupBy`, `Sort`).
