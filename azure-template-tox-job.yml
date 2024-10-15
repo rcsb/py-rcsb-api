@@ -71,11 +71,6 @@ jobs:
           export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}-py38', parameters.tox) }}
         displayName: 'Running tox task'
-    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.7')) }}:
-      - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
-          ${{ format('python -m tox -e {0}-py37', parameters.tox) }}
-        displayName: 'Running tox task'
     #
     #  Build artifacts if this is a test target (i.e. labeled as py##)
     #
