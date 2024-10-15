@@ -55,7 +55,7 @@ class DataFieldNode:
         return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
     def set_index(self, index: int):
-        """set index that is associated with the DataFieldNode
+        """Set index that is associated with the DataFieldNode
 
         Args:
             index (int): index of node in schema_graph
@@ -87,7 +87,7 @@ class DataTypeNode:
         self.field_list: List[DataFieldNode] = []
 
     def set_index(self, index: int):
-        """set index that is associated with the DataTypeNode
+        """Set index that is associated with the DataTypeNode
 
         Args:
             index (int): index of node in schema_graph

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class DataQuery:
     """
-    class for Data API queries.
+    Class for Data API queries.
     """
     def __init__(
         self,
@@ -23,6 +23,8 @@ class DataQuery:
         suppress_autocomplete_warning: bool = False
     ):
         """
+        Query object for Data API requests.
+
         Args:
             input_type (str): query input type
                 ex: "entry", "polymer_entity_instance", etc

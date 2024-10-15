@@ -102,8 +102,8 @@ The list of supported search service types are listed in the table below. For mo
 Learn more about available search services on the [RCSB PDB Search API docs](https://search.rcsb.org/#search-services).
 
 ## Jupyter Notebooks
-A runnable jupyter notebook is available in [notebooks/quickstart.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/quickstart.ipynb), or can be run online using Google Colab:
-<a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/quickstart.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+A runnable jupyter notebook is available in [notebooks/search_quickstart.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/search_quickstart.ipynb), or can be run online using Google Colab:
+<a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/search_quickstart.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 An additional Covid-19 related example is in [notebooks/covid.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/covid.ipynb):
 <a href="https://colab.research.google.com/github//rcsb/py-rcsb-api/blob/master/notebooks/covid.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>

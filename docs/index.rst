@@ -1,9 +1,21 @@
-rcsb-api - Query macromoluecular structures from Python
+rcsb-api - Query RCSB PDB data from Python
 ===============================================
 
 The ``rcsb-api`` package provides a Python interface to 
 `RCSB PDB API services <https://www.rcsb.org/docs/programmatic-access/web-services-overview>`_. 
-Use it to search and fetch data from RCSB PDB (at RCSB.org).
+Use it to search and fetch macromolecular structure data from RCSB PDB (at RCSB.org).
+
+Availability
+------------
+
+Get it from PyPI:
+
+.. code-block:: bash
+
+   pip install rcsb-api
+
+Or, download from `GitHub <https://github.com/rcsb/py-rcsb-api>`_
+
 
 Contents
 --------
@@ -27,18 +39,6 @@ Contents
    data_api/implementation_details.md
    data_api/additional_examples.md
    data_api/api.rst
-
-
-Availability
-------------
-
-Get it from PyPI:
-
-.. code-block:: bash
-
-   pip install rcsb-api
-
-Or, download from `GitHub <https://github.com/rcsb/py-rcsb-api>`_
 
 
 License
