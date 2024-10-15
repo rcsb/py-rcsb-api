@@ -311,7 +311,7 @@ excluded = StructMotifQuery(
 )
 list(excluded())
 ```
-The Structure Motif Query can be used to make some very specific queries. Below is an example of a query that retrives occurances of the enolase superfamily, a group of proteins diverse in sequence and structure that are all capable of abstracting a proton from a carboxylic acid. Position-specific exchanges are crucial to represent this superfamily accurately.
+The Structure Motif Query can be used to make some very specific queries. Below is an example of a query that retrieves occurrences of the enolase superfamily, a group of proteins diverse in sequence and structure that are all capable of abstracting a proton from a carboxylic acid. Position-specific exchanges are crucial to represent this superfamily accurately.
 ```python
 Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
 Res2 = StructMotifResidue("A", "1", 193)
