@@ -16,6 +16,8 @@
   - `Schema()` Data API class -> `DataSchema()`
   - `search/search.py` -> `search/search_query.py`
   - `search/schema.py` -> `search/search_schema.py`
+- Automatically change singular "input_type" to plural when possible
+- Add warning message if fully qualified field path not provided
 - Update documentation
 
 ## v0.3.0 (2024-08-23)

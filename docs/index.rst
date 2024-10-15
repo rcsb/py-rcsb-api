@@ -58,3 +58,10 @@ Please cite the ``rcsb-api`` package by URL:
 You should also cite the RCSB.org API services this package utilizes:
 
   Yana Rose, Jose M. Duarte, Robert Lowe, Joan Segura, Chunxiao Bi, Charmi Bhikadiya, Li Chen, Alexander S. Rose, Sebastian Bittrich, Stephen K. Burley, John D. Westbrook. RCSB Protein Data Bank: Architectural Advances Towards Integrated Searching and Efficient Access to Macromolecular Structure Data from the PDB Archive, Journal of Molecular Biology, 2020. DOI: 10.1016/j.jmb.2020.11.003
+
+
+Support
+------
+
+If you experience any issues installing or using the package, please submit an issue on 
+`GitHub <https://github.com/rcsb/py-rcsb-api/issues>`_ and we will try to respond in a timely manner.
