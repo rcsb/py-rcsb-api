@@ -1837,12 +1837,12 @@ class Session(Iterable[str]):
 
         return result_set[:limit]
 
-    def rcsb_query_editor_url(self) -> str:
+    def get_editor_link(self) -> str:
         """URL to edit this query in the RCSB PDB query editor"""
         data = json.dumps(self._make_params(), separators=(",", ":"))
         return f"https://search.rcsb.org/query-editor.html?json={urllib.parse.quote(data)}"
 
-    def rcsb_query_builder_url(self) -> str:
+    def get_query_builder_link(self) -> str:
         """URL to view this query on the RCSB PDB website query builder"""
         params = self._make_params()
         params["request_options"]["paginate"]["rows"] = 25

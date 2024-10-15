@@ -87,7 +87,7 @@ class SearchSchemaGroup:
                 warnings.warn(f"Attribute path segment '{level}' (for input '{attribute}') not found in schema.", UserWarning)
                 return None
             ptr = ptr[level]
-        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SchemaGroup and Attr are compared as dictionaries
+        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SearchSchemaGroup and Attr are compared as dictionaries
             return ptr
         else:
             return {c for c in leaves(ptr)}
@@ -112,12 +112,12 @@ class SearchSchemaGroup:
                 warnings.warn(f"Attribute path segment '{level}' (for input '{attribute}') not found in schema.", UserWarning)
                 return None
             ptr = ptr[level]
-        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SchemaGroup and Attr are compared as dictionaries
+        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SearchSchemaGroup and Attr are compared as dictionaries
             return getattr(ptr, "type")
         warnings.warn(f"Incomplete attribute path '{attribute}' - must specify fully qualified path to leaf attribute node.", UserWarning)
         return None
 
-    # Below methods are for making SchemaGroup behave as a Dict (be able to access through keys, etc).
+    # Below methods are for making SearchSchemaGroup behave as a Dict (be able to access through keys, etc).
     # This is used for automatically determining search service based on attribute name.
 
     def __getitem__(self, key):
@@ -230,7 +230,7 @@ class SearchSchema:
         - name: full dot-separated attribute name
 
         Returns:
-        An Attr (Leaf nodes) or SchemaGroup (object nodes)
+        An Attr (Leaf nodes) or SearchSchemaGroup (object nodes)
         """
         group = SearchSchemaGroup(self.Attr)
         for node, attrtype, desc in nodeL:
@@ -276,10 +276,10 @@ class SearchSchema:
                         childgroup = self._make_group(fullchildname, [(childnode, attrlist, descriptlist)])
                     else:
                         childgroup = self._make_group(fullchildname, [(childnode, attrtype, childnode.get("description", desc))])
-                    # adding to SchemaGroup as a dict allows for determining search service by attribute name with O(1) lookup
+                    # adding to SearchSchemaGroup as a dict allows for determining search service by attribute name with O(1) lookup
                     group[childname] = childgroup
 
-                    # adding to SchemaGroup as an attribute allows for tab-completion for rcsb_attributes/attrs
+                    # adding to SearchSchemaGroup as an attribute allows for tab-completion for rcsb_attributes/attrs
                     setattr(group, childname, childgroup)
             else:
                 raise TypeError(f"Unrecognized node type {node['type']!r} of {fullname}")

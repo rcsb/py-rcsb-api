@@ -16,9 +16,10 @@ from rcsbapi.data import DataSchema, DataQuery
 ## Getting Started
 The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
 
-To generate a query in this package, you would create a DataQuery object. The DataQuery object must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the DataQuery object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
+To generate a query in this package, you would create a `DataQuery` object. The query must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the `DataQuery` object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
 
-The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If the package is included in code that is going to be used long-term, it's recommended to use fully qualified paths. When autocompletion is being used, an INFO message will be printed out as a reminder.
+The package is able to automatically build queries based on the "input_type" and path segment passed into "return_data_list". If using this package in code intended for long-term use, it's recommended to use fully qualified paths. When autocompletion is being used, an WARNING message will be printed out as a reminder.
+
 
 ```python
 from rcsbapi.data import DataQuery as Query
@@ -27,8 +28,9 @@ query = Query(
     input_ids=["4HHB"],
     return_data_list=["exptl.method"]
 )
-# Note: when package autocompletes a paths, it prints an INFO message.
-# Using fully qualified paths ("entries.exptl.method") will prevent the message
+# Note: When the package autocompletes a path, it prints an Warning message
+# To supress this warning in future query construction, either use the printed fully qualified path
+# or set `suppress_autocomplete_warning` to True.
 
 result_dict = query.exec()
 print(result_dict)

@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 try:
-    from .search_query import SEARCH_SCHEMA  # instance of Schema
+    from .search_query import SEARCH_SCHEMA  # instance of SearchSchema
 except Exception:
     # ignore errors that may occur parsing the schema
     pass

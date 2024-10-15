@@ -162,25 +162,25 @@ lazily as needed. The page size can be controlled with the `rows` parameter.
 first = next(iter(query(rows=1)))
 ```
 #### Query Editor Link
-`Session.rcsb_query_editor_url()` will return a link to the [Search API query editor](https://search.rcsb.org/query-editor.html) populated with the query.
+`Session.get_editor_link()` will return a link to the [Search API query editor](https://search.rcsb.org/query-editor.html) populated with the query.
 
 ```python
 from rcsbapi.search import AttributeQuery
 
 query = AttributeQuery("exptl.method", operator="exact_match", value="electron microscopy")
 session = query()
-session.rcsb_query_editor_url()
+session.get_editor_link()
 ```
 
 #### Advanced Search Query Builder Link
-`Session.rcsb_query_builder_url()` will return a link to the [Advanced Search Query Builder](https://www.rcsb.org/search/advanced) populated with the query.
+`Session.get_query_builder_link()` will return a link to the [Advanced Search Query Builder](https://www.rcsb.org/search/advanced) populated with the query.
 
 ```python
 from rcsbapi.search import AttributeQuery
 
 query = AttributeQuery("exptl.method", operator="exact_match", value="electron microscopy")
 session = query()
-session.rcsb_query_builder_url()
+session.get_query_builder_link()
 ```
 
 #### Progress Bar

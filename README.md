@@ -80,8 +80,8 @@ This is done by specifying the following input:
 #### Data API Examples
 This is a [simple query](https://data.rcsb.org/graphql/index.html?query=%7B%0A%20%20entry(entry_id%3A%20%224HHB%22)%20%7B%0A%20%20%20%20exptl%20%7B%0A%20%20%20%20%20%20method%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D) requesting the experimental method of a structure with PDB ID 4HHB (Hemoglobin).
 
-The query must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the DataQuery object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
-The package is able to automatically build queries based on the input_type and path segment passed into return_data_list. If using this package in code intended for long-term use, it's recommended to use fully qualified paths. When autocompletion is being used, an INFO message will be printed out as a reminder.
+The query must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the `DataQuery` object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
+The package is able to automatically build queries based on the "input_type" and path segment passed into "return_data_list". If using this package in code intended for long-term use, it's recommended to use fully qualified paths. When autocompletion is being used, an WARNING message will be printed out as a reminder.
 
 ```python
 from rcsbapi.data import DataQuery as Query
