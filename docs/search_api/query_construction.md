@@ -198,7 +198,7 @@ The list of supported search service types are listed in the table below.
 |----------------------------------|--------------------------|
 |Full-text                         |`TextQuery()`             |
 |Attribute (structure or chemical) |`AttributeQuery()`        |
-|Sequence similarity               |`SequenceQuery()`         |
+|Sequence similarity               |`SeqSimilarityQuery()`         |
 |Sequence motif                    |`SequenceMotifQuery()`    |
 |Structure similarity              |`StructSimilarityQuery()` |
 |Structure motif                   |`StructMotifQuery()`      |
@@ -301,10 +301,10 @@ Below is an example from the [RCSB PDB Search API](https://search.rcsb.org/#sear
 
 
 ```python
-from rcsbapi.search import SequenceQuery
+from rcsbapi.search import SeqSimilarityQuery
 
-# Use SequenceQuery class and add parameters
-query = SequenceQuery(
+# Use SeqSimilarityQuery class and add parameters
+query = SeqSimilarityQuery(
     "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET" +
     "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI" +
     "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ" +
@@ -408,20 +408,20 @@ Each residue can only have a maximum of 4 Exchanges, and each query can only hav
 
 Examples of how to instantiate Residues can be found below. These can then be put into a list and passed through to a Structure Motif Query.
 ```python
-from rcsbapi.search import StructureMotifResidue
+from rcsbapi.search import StructMotifResidue
 
 # Construct a Residue with:
 # Chain ID of A, an operator of 1, residue number 192, and Exchanges of "LYS" and "HIS".
 # As for what is a valid "Exchange", the package provides these as a literal,
 # and they should be type checked. 
-Res1 = StructureMotifResidue(
+Res1 = StructMotifResidue(
     struct_oper_id="1",
     chain_id="A",
     exchanges=["LYS", "HIS"],  # exchanges are optional
     label_seq_id=192
 )
 
-Res2 = StructureMotifResidue(
+Res2 = StructMotifResidue(
     struct_oper_id="1",
     chain_id="A",
     label_seq_id=162
@@ -458,7 +458,7 @@ list(q1())
 |url                         |If "file_url" specified, url to file                              |             |
 |file_path                   |If "file_path" specified, path to file                            |             |
 |file_extension              |If "file_url" specified, type of file linked to (ex: "cif")       |             |
-|residue_ids                 |List of StructureMotifResidue objects                             |             |
+|residue_ids                 |List of StructMotifResidue objects                             |             |
 |rmsd_cutoff                 |Upper cutoff for root-mean-square deviation (RMSD) score          |2            |
 |atom_pairing_scheme         |Which atoms to consider to compute RMSD scores and transformations.|"SIDE_CHAIN" |
 |motif_pruning_strategy      |Specifies how query motifs are pruned (i.e. simplified)           |"KRUSKAL"    |
@@ -594,7 +594,7 @@ print(result_count)
 In order to group and perform calculations and statistics on PDB data by using a simple search query, you can use a faceted query (or facets). Facets arrange search results into categories (buckets) based on the requested field values. More information on Faceted Queries can be found [here](https://search.rcsb.org/#using-facets). All facets should be provided with `name`, `aggregation_type`, and `attribute` values. Depending on the aggregation type, other parameters must also be specified. To run a faceted query, create a `Facet` object and pass it in as a single object or list into the `facets` argument during query execution.
 
 ```python
-from rcsbapi.search import AttributeQuery, Facet, Range
+from rcsbapi.search import AttributeQuery, Facet, FacetRange
 
 q = AttributeQuery(
     attribute="rcsb_accession_info.initial_release_date",

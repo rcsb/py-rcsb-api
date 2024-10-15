@@ -27,10 +27,11 @@ class DataQuery:
 
         Args:
             input_type (str): query input type
-                ex: "entry", "polymer_entity_instance", etc
-            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list of ids to request information for
-            return_data_list (List[str]): list of data to return (field names)
-                ex: ["rcsb_id", "exptl.method"]
+                (e.g., "entry", "polymer_entity_instance", etc.)
+            input_ids (list or dict): list (or singular dict) of ids for which to request information
+                (e.g., ["4HHB", "2LGI"])
+            return_data_list (list): list of data to return (field names)
+                (e.g., ["rcsb_id", "exptl.method"])
             add_rcsb_id (bool, optional): whether to automatically add <input_type>.rcsb_id to queries. Defaults to True.
         """
         input_id_limit = 200
@@ -61,7 +62,7 @@ class DataQuery:
 
         Args:
             input_type (str): query input type
-                ex: "entry", "polymer_entity_instance", etc
+                (e.g., "entry", "polymer_entity_instance", etc.)
             input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list/dict of ids to request information for
 
         Returns:
@@ -110,7 +111,7 @@ class DataQuery:
 
         Returns:
             str: input_type
-                ex: "entry", "polymer_entity_instance", etc
+                (e.g., "entry", "polymer_entity_instance", etc.)
         """
         return self._input_type
 
@@ -119,7 +120,7 @@ class DataQuery:
 
         Returns:
             List[str]: return_data_list
-                ex: ["rcsb_id", "exptl.method"]
+                (e.g., ["rcsb_id", "exptl.method"])
         """
         return self._return_data_list
 

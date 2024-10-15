@@ -67,7 +67,7 @@ class SearchSchemaGroup:
 
         Args:
             attribute (str): Full attribute name
-                ex: "rcsb_id", "rcsb_entity_source_organism.scientific_name"
+                (e.g., "rcsb_id", "rcsb_entity_source_organism.scientific_name")
 
         Returns:
             str: Return corresponding attribute description if there's a match
@@ -97,7 +97,7 @@ class SearchSchemaGroup:
 
         Args:
             attribute (str): Full attribute name
-                ex: "rcsb_id", "rcsb_entity_source_organism.scientific_name"
+                (e.g., "rcsb_id", "rcsb_entity_source_organism.scientific_name")
 
         Returns:
             Union[str, None]: Return search service if there's a match.

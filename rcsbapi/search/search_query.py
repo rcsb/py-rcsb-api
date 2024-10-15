@@ -732,7 +732,7 @@ class TextQuery(Terminal):
         super().__init__(service=Const.FULL_TEXT_SEARCH_SERVICE.value, params={"value": value})
 
 
-class SequenceQuery(Terminal):
+class SeqSimilarityQuery(Terminal):
     """Special case of a terminal for protein, DNA, or RNA sequence queries"""
 
     def __init__(
@@ -834,7 +834,7 @@ class StructSimilarityQuery(Terminal):
         super().__init__(service=Const.STRUCT_SIM_SEARCH_SERVICE.value, params=parameters)
 
 
-class StructureMotifResidue:
+class StructMotifResidue:
     """This class is for defining residues. For use with the Structure Motif Search."""
 
     def __init__(
@@ -881,7 +881,7 @@ class StructMotifQuery(Terminal):
         url: Optional[str] = None,
         file_path: Optional[str] = None,
         file_extension: Optional[str] = None,
-        residue_ids: Optional[list] = None,  # List of StructureMotifResidue objects
+        residue_ids: Optional[list] = None,  # List of StructMotifResidue objects
         rmsd_cutoff: int = 2,
         atom_pairing_scheme: StructMotifAtomPairing = "SIDE_CHAIN",
         motif_pruning_strategy: StructMotifPruning = "KRUSKAL",
@@ -899,7 +899,7 @@ class StructMotifQuery(Terminal):
             url (Optional[str], optional): if "file_url" specified, url to file. Defaults to None.
             file_path (Optional[str], optional): if "file_path" specified, path to file. Defaults to None.
             file_extension (Optional[str], optional): if "file_url" specified, type of file linked to (ex: "cif"). Defaults to None.
-            residue_ids (Optional[list], optional): list of StructureMotifResidue objects . Defaults to None.
+            residue_ids (Optional[list], optional): list of StructMotifResidue objects . Defaults to None.
             rmsd_cutoff (int, optional): upper cutoff for root-mean-square deviation (RMSD) score. Defaults to 2.
             atom_pairing_scheme (StructMotifAtomPairing, optional): Which atoms to consider to compute RMSD scores and transformations. Defaults to "SIDE_CHAIN".
             motif_pruning_strategy (StructMotifPruning, optional): specifies how query motifs are pruned (i.e. simplified). Defaults to "KRUSKAL".
@@ -1369,7 +1369,7 @@ class Value(Generic[T]):
 
 
 @dataclass(frozen=True)
-class Range:
+class FacetRange:
     """
     Primarily for use with "range" and "date_range" aggregations with the Facet class.
     include_upper and include_lower should not be used with Facet queries.
@@ -1467,8 +1467,8 @@ class Facet(RequestOption):
             attribute (str): Specifies the full attribute name to aggregate on.
             interval (Optional[Union[int, str]], optional): Size of the intervals into which a given set of values is divided. Required only for use with
                 "histogram" and "date_histogram" aggregation types (defaults to None if not included).
-            ranges (Optional[List[Range]], optional): A set of ranges, each representing a bucket. Note that this aggregation includes the 'from' value and
-                excludes the 'to' value for each range. Should be a list of Range objects (leave the "include_lower" and "include_upper" fields empty). Required
+            ranges (Optional[List[FacetRange]], optional): A set of ranges, each representing a bucket. Note that this aggregation includes the 'from' value and
+                excludes the 'to' value for each range. Should be a list of FacetRange objects (leave the "include_lower" and "include_upper" fields empty). Required
                 only for use with "range" and "date_range" aggregation types (defaults to None if not included).
             min_interval_population (Optional[int], optional): Minimum number of items (>= 0) in the bin required for the bin to be returned. Only for use with
                 "terms", "histogram", and "date_histogram" facets (defaults to 1 for these aggregation types, otherwise defaults to None).
@@ -1483,7 +1483,7 @@ class Facet(RequestOption):
     aggregation_type: AggregationType
     attribute: str
     interval: Optional[Union[int, str]] = None
-    ranges: Optional[List[Range]] = None
+    ranges: Optional[List[FacetRange]] = None
     min_interval_population: Optional[int] = None
     max_num_intervals: Optional[int] = None
     precision_threshold: Optional[int] = None
@@ -1537,14 +1537,14 @@ class TerminalFilter(RequestOption):
             attribute (str): specify attribute for search (i.e struct.title, exptl.method, rcsb_id). Defaults to None.
             operator (Literal["equals", "greater", "greater_or_equal", "less", "less_or_equal", "range", "exact_match", "in", "exists"]):
                 specify operation to be done for search (i.e "contains_phrase", "exact_match"). Defaults to None.
-            value (Optional[Union[str, int, float, bool, Range, List[str], List[int], List[float]]], optional):
+            value (Optional[Union[str, int, float, bool, FacetRange, List[str], List[int], List[float]]], optional):
                 The search term(s). Can be a single or multiple words, numbers, dates, date math expressions, or ranges.
             negation (bool, optional): logical not. Defaults to False.
             case_sensitive (bool, optional): whether to do case sensitive matching of value. Defaults to False.
     """
     attribute: str
     operator: Literal["equals", "greater", "greater_or_equal", "less", "less_or_equal", "range", "exact_match", "in", "exists"]
-    value: Optional[Union[str, int, float, bool, Range, List[str], List[int], List[float]]] = None
+    value: Optional[Union[str, int, float, bool, FacetRange, List[str], List[int], List[float]]] = None
     negation: bool = False
     case_sensitive: bool = False
 

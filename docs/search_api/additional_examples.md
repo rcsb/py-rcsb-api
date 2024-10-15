@@ -7,10 +7,10 @@ using the sequence search function.
 This query finds macromolecular PDB entities that share 90% sequence identity with
 GTPase HRas protein from *Gallus gallus* (*Chicken*).
 ```python
-from rcsbapi.search import SequenceQuery
+from rcsbapi.search import SeqSimilarityQuery
 
-# Use SequenceQuery class and add parameters
-results = SequenceQuery("MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET" +
+# Use SeqSimilarityQuery class and add parameters
+results = SeqSimilarityQuery("MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET" +
                         "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI" +
                         "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ" +
                         "GVEDAFYTLVREIRQHKLRKLNPPDESGPGCMNCKCVIS", 1, 0.9)
@@ -155,17 +155,17 @@ Each residue can only have a maximum of 4 Exchanges, and each query can only hav
 
 Examples of how to instantiate Residues can be found below. These can then be put into a list and passed through to a Structure Motif Query.
 ```python
-from rcsbapi.search import StructureMotifResidue
+from rcsbapi.search import StructMotifResidue
 
 # Construct a Residue with a Chain ID of A, an operator of 1, a residue 
 # number of 192, and Exchanges of "LYS" and "HIS"
-Res1 = StructureMotifResidue("A", "1", 192, ["LYS", "HIS"])
+Res1 = StructMotifResidue("A", "1", 192, ["LYS", "HIS"])
 # As for what is a valid "Exchange", the package provides these as a literal,
 # and they should be type checked. 
 
 # You can also specify the arguments:
 # This query is the same as above. 
-Res2 = StructureMotifResidue(
+Res2 = StructMotifResidue(
     struct_oper_id="1",
     chain_id="A",
     exchanges=["LYS", "HIS"],
@@ -174,7 +174,7 @@ Res2 = StructureMotifResidue(
 
 # After declaring a minimum of 2 and as many as 10 residues,
 # they can be passed into a list for use in the query itself:
-Res3 = StructureMotifResidue("A", "1", 162)  # exchanges are optional
+Res3 = StructMotifResidue("A", "1", 162)  # exchanges are optional
 
 ResList = [Res1, Res3]
 ```
@@ -313,11 +313,11 @@ list(excluded())
 ```
 The Structure Motif Query can be used to make some very specific queries. Below is an example of a query that retrives occurances of the enolase superfamily, a group of proteins diverse in sequence and structure that are all capable of abstracting a proton from a carboxylic acid. Position-specific exchanges are crucial to represent this superfamily accurately.
 ```python
-Res1 = StructureMotifResidue("A", "1", 162, ["LYS", "HIS"])
-Res2 = StructureMotifResidue("A", "1", 193)
-Res3 = StructureMotifResidue("A", "1", 219)
-Res4 = StructureMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
-Res5 = StructureMotifResidue("A", "1", 295, ["HIS", "LYS"])
+Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+Res2 = StructMotifResidue("A", "1", 193)
+Res3 = StructMotifResidue("A", "1", 219)
+Res4 = StructMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
+Res5 = StructMotifResidue("A", "1", 295, ["HIS", "LYS"])
 
 ResList = [Res1, Res2, Res3, Res4, Res5]
 
@@ -465,10 +465,10 @@ q(
 ```
 
 ### Range Facets
-We can define the buckets ourselves by using range facets. In order to specify the ranges, we use the `Range` class. Note that the range includes the `start` value and excludes the `end` value (`include_lower` and `include_upper` should not be specified). If the `start` or `end` is omitted, the minimum or maximum boundaries will be used by default. The buckets should be provided as a list of `Range` objects to the `ranges` parameter.  
+We can define the buckets ourselves by using range facets. In order to specify the ranges, we use the `FacetRange` class. Note that the range includes the `start` value and excludes the `end` value (`include_lower` and `include_upper` should not be specified). If the `start` or `end` is omitted, the minimum or maximum boundaries will be used by default. The buckets should be provided as a list of `FacetRange` objects to the `ranges` parameter.  
 ```python
 from rcsbapi.search import AttributeQuery
-from rcsbapi.search import Facet, Range
+from rcsbapi.search import Facet, FacetRange
 
 q = AttributeQuery(
     attribute="rcsb_entry_info.structure_determination_methodology",
@@ -482,10 +482,10 @@ q(
         aggregation_type="range",
         attribute="rcsb_entry_info.resolution_combined",
         ranges=[
-            Range(start=None,end=2),
-            Range(start=2, end=2.2),
-            Range(start=2.2, end=2.4),
-            Range(start=4.6, end=None)
+            FacetRange(start=None,end=2),
+            FacetRange(start=2, end=2.2),
+            FacetRange(start=2.2, end=2.4),
+            FacetRange(start=4.6, end=None)
         ]
     )
 ).facets
@@ -495,7 +495,7 @@ q(
 Date range facets allow us to specify date values as bucket ranges, using [date math expressions](https://search.rcsb.org/#date-math-expressions).
 ```python
 from rcsbapi.search import AttributeQuery
-from rcsbapi.search import Facet, Range
+from rcsbapi.search import Facet, FacetRange
 
 q = AttributeQuery(
     attribute="rcsb_entry_info.structure_determination_methodology",
@@ -509,9 +509,9 @@ q(
         aggregation_type="date_range",
         attribute="rcsb_accession_info.initial_release_date",
         ranges=[
-            Range(start=None,end="2020-06-01||-12M"),
-            Range(start="2020-06-01", end="2020-06-01||+12M"),
-            Range(start="2020-06-01||+12M", end=None)
+            FacetRange(start=None,end="2020-06-01||-12M"),
+            FacetRange(start="2020-06-01", end="2020-06-01||+12M"),
+            FacetRange(start="2020-06-01||+12M", end=None)
         ]
     )
 ).facets

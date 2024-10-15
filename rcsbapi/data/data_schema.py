@@ -1104,7 +1104,7 @@ class DataSchema:
         """Find path from input_type to any nodes matching return_data_name
 
         Args:
-            input_type (str): name of an input_type (ex: entry, polymer_entity_instance)
+            input_type (str): name of an input_type (e.g., "entry", "polymer_entity_instance", etc.)
             return_data_name (str): name of one field, can be a redundant name
             description (bool, optional): whether to include descriptions for the final field of each path. Default is False.
 

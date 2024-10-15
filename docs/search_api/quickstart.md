@@ -93,7 +93,7 @@ The list of supported search service types are listed in the table below. For mo
 |----------------------------------|--------------------------|
 |Full-text                         |`TextQuery()`             |
 |Attribute (structure or chemical) |`AttributeQuery()`        |
-|Sequence similarity               |`SequenceQuery()`         |
+|Sequence similarity               |`SeqSimilarityQuery()`         |
 |Sequence motif                    |`SequenceMotifQuery()`    |
 |Structure similarity              |`StructSimilarityQuery()` |
 |Structure motif                   |`StructMotifQuery()`      |

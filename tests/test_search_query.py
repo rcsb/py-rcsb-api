@@ -27,8 +27,8 @@ from itertools import islice
 import requests
 from rcsbapi.const import Const
 from rcsbapi.search import rcsb_attributes as attrs
-from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SequenceQuery, SeqMotifQuery, StructSimilarityQuery, StructureMotifResidue, StructMotifQuery
-from rcsbapi.search import Facet, Range, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
+from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
+from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group
 
 logger = logging.getLogger(__name__)
@@ -129,14 +129,14 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Inversion test results: ok : (%r)", ok)
         # Test that seqqueries fail as intended:
-        q4 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q4 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
         ok = False
         try:
             _ = ~q4
         except TypeError:
             ok = True
         self.assertTrue(ok)
-        logger.info("Inversion failed on SequenceQuery: ok : (%r)", ok)
+        logger.info("Inversion failed on SeqSimilarityQuery: ok : (%r)", ok)
 
     def testXor(self):
         """Test the overloaded XOR operator in a query. """
@@ -152,8 +152,8 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Xor test results: ok : (%r)", ok)
         # Test that xor fails when used for seqqueries
-        q4 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
-        q5 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q4 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q5 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
         ok = False
         try:
             _ = q4 ^ q5  # this should fail as xor is not supported behavior for seq queries
@@ -497,17 +497,17 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok2)
         logger.info("Query results with only computed models: ok : (%r) : ok2 : (%s)", ok, ok2)
 
-    def testSequenceQuery(self):
+    def testSeqSimilarityQuery(self):
         """Test firing off a Sequence query"""
         # Sequence query with hemoglobin protein sequence (id: 4HHB). Default parameters
-        q1 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q1 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
         result = list(q1())
         result_len = len(result)
         ok = result_len > 0  # this query displays 706 ids in pdb website search function
         logger.info("Sequence query results correctly displays ids: (%r)", ok)
 
         # Sequence query (id: 4HHB) with custom parameters
-        q1 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+        q1 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
                            evalue_cutoff=0.01, identity_cutoff=0.9)
         result = list(q1())
         result_len = len(result)
@@ -781,12 +781,12 @@ class SearchTests(unittest.TestCase):
 
     def testStructMotifQuery(self):
         # base example, entry ID, residues
-        Res1 = StructureMotifResidue("A", "1", 162, ["LYS", "HIS"])
-        Res2 = StructureMotifResidue("A", "1", 193, ["ASP"])
-        Res3 = StructureMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
-        Res4 = StructureMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
-        Res5 = StructureMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
-        Res6 = StructureMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
+        Res3 = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
+        Res4 = StructMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
+        Res5 = StructMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
+        Res6 = StructMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
         ResList = [Res1, Res2]
 
         q1 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)  # Avoid positionals for StructMotifQuery... way too many things are optional in these queries
@@ -844,7 +844,7 @@ class SearchTests(unittest.TestCase):
         # make sure max exchanges per residue is 4
         ok = False
         try:
-            _ = StructureMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL", "TYR"])  # not possible
+            _ = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL", "TYR"])  # not possible
         except AssertionError:
             ok = True
         self.assertTrue(ok)
@@ -978,7 +978,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Counting results of chemical Attribute query: (%d), ok : (%r)", result, ok)
 
-        q4 = SequenceQuery(
+        q4 = SeqSimilarityQuery(
             "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET"
             + "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI"
             + "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ"
@@ -1014,11 +1014,11 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Counting results of Structure similarity query: (%d), ok : (%r)", result, ok)
 
-        Res1 = StructureMotifResidue("A", "1", 162, ["LYS", "HIS"])
-        Res2 = StructureMotifResidue("A", "1", 193)
-        Res3 = StructureMotifResidue("A", "1", 219)
-        Res4 = StructureMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
-        Res5 = StructureMotifResidue("A", "1", 295, ["HIS", "LYS"])
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193)
+        Res3 = StructMotifResidue("A", "1", 219)
+        Res4 = StructMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
+        Res5 = StructMotifResidue("A", "1", 295, ["HIS", "LYS"])
         ResList = [Res1, Res2, Res3, Res4, Res5]
         q7 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
         result = q7(return_counts=True)
@@ -1138,7 +1138,7 @@ class SearchTests(unittest.TestCase):
                 "Resolution Combined",
                 "range",
                 "rcsb_entry_info.resolution_combined",
-                ranges=[Range(None, 2), Range(2, 2.2), Range(2.2, 2.4), Range(4.6, None)]
+                ranges=[FacetRange(None, 2), FacetRange(2, 2.2), FacetRange(2.2, 2.4), FacetRange(4.6, None)]
             )
         ).facets
         ok = len(result) > 0
@@ -1155,7 +1155,7 @@ class SearchTests(unittest.TestCase):
                 "Release Date",
                 "date_range",
                 "rcsb_accession_info.initial_release_date",
-                ranges=[Range(None, "2020-06-01||-12M"), Range("2020-06-01", "2020-06-01||+12M"), Range("2020-06-01||+12M", None)]
+                ranges=[FacetRange(None, "2020-06-01||-12M"), FacetRange("2020-06-01", "2020-06-01||+12M"), FacetRange("2020-06-01||+12M", None)]
             )
         ).facets
         ok = len(result) > 0
@@ -1499,7 +1499,7 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testChemSearch"))
     suiteSelect.addTest(SearchTests("testMismatch"))
     suiteSelect.addTest(SearchTests("testCSMquery"))
-    suiteSelect.addTest(SearchTests("testSequenceQuery"))
+    suiteSelect.addTest(SearchTests("testSeqSimilarityQuery"))
     suiteSelect.addTest(SearchTests("testSeqMotifQuery"))
     suiteSelect.addTest(SearchTests("testFileUpload"))
     suiteSelect.addTest(SearchTests("testStructSimQuery"))
