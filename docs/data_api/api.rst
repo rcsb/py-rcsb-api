@@ -5,11 +5,3 @@ API Documentation
     :members:
     :private-members:
     :special-members: __init__
-
-.. automodule:: rcsbapi.search
-    :members:
-    :special-members: __init__
-
-.. automodule:: rcsbapi.search.search_query
-    :members:
-    :special-members: __init__
