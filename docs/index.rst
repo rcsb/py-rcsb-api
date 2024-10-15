@@ -26,7 +26,7 @@ Contents
    search_api/query_construction.md
    search_api/attributes.md
    search_api/additional_examples.md
-..    search_api/api.rst
+   search_api/api.rst
 
 
 Availability
