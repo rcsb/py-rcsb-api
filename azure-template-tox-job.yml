@@ -13,7 +13,7 @@ jobs:
   timeoutInMinutes: 0
   pool:
     ${{ if eq(parameters.os, 'macos') }}:
-      vmImage: 'macOS-12'
+      vmImage: 'macOS-13'
     ${{ if eq(parameters.os, 'linux') }}:
       vmImage: 'ubuntu-20.04'
 
@@ -70,11 +70,6 @@ jobs:
       - script: |
           export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}-py38', parameters.tox) }}
-        displayName: 'Running tox task'
-    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.7')) }}:
-      - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
-          ${{ format('python -m tox -e {0}-py37', parameters.tox) }}
         displayName: 'Running tox task'
     #
     #  Build artifacts if this is a test target (i.e. labeled as py##)

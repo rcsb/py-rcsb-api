@@ -1,10 +1,9 @@
-"""RCSB PDB Search API"""
-__version__ = "0.3.0"
+"""RCSB PDB Data API"""
 
-from .schema import Schema
+from .data_schema import DataSchema
 
-SCHEMA = Schema()
+DATA_SCHEMA = DataSchema()
 
-from .query import Query  # noqa:E402
+from .data_query import DataQuery  # noqa:E402
 
-__all__ = ["Query", "Schema"]
+__all__ = ["DataQuery", "DataSchema"]
