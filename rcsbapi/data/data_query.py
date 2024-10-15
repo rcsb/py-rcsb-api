@@ -37,11 +37,11 @@ class DataQuery:
         input_id_limit = 200
         if isinstance(input_ids, list):
             if len(input_ids) > input_id_limit:
-                logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+                logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
         if isinstance(input_ids, dict):
             for value in input_ids.values():
                 if len(value) > input_id_limit:
-                    logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+                    logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
@@ -185,10 +185,10 @@ class DataQuery:
         if "data" in response_json.keys():
             query_response = response_json["data"][self._input_type]
             if query_response is None:
-                logging.warning("Input produced no results. Check that input ids are valid")
+                logger.warning("Input produced no results. Check that input ids are valid")
             if isinstance(query_response, list):
                 if len(query_response) == 0:
-                    logging.warning("Input produced no results. Check that input ids are valid")
+                    logger.warning("Input produced no results. Check that input ids are valid")
         self._response = response_json
         return response_json
 

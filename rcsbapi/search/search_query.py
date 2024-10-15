@@ -37,6 +37,8 @@ if sys.version_info > (3, 8):
 else:
     from typing_extensions import Literal
 
+logger = logging.getLogger(__name__)
+
 # tqdm is optional
 # Allowed return types for searches. https://search.rcsb.org/#return-type
 ReturnType = Literal["entry", "assembly", "polymer_entity", "non_polymer_entity", "polymer_instance", "mol_definition"]
@@ -1713,12 +1715,12 @@ class Session(Iterable[str]):
 
         if self._group_by:
             if (self._group_by.aggregation_method == "matching_deposit_group_id") and (self.return_type != "entry"):
-                logging.warning('group_by "matching_deposit_group_id" must be used with return_type "entry". '
+                logger.warning('group_by "matching_deposit_group_id" must be used with return_type "entry". '
                                 'Return type has been changed to "entry".')
                 setattr(self, "return_type", "entry")
 
             if (self._group_by.aggregation_method in ["sequence_identity", "matching_uniprot_accession"]) and (self.return_type != "polymer_entity"):
-                logging.warning('group_by "%s" must be used with return_type "polymer_entity". '
+                logger.warning('group_by "%s" must be used with return_type "polymer_entity". '
                                 'Return type has been changed to "polymer_entity".', self._group_by.aggregation_method)
                 setattr(self, "return_type", "polymer_entity")
 
@@ -1753,7 +1755,7 @@ class Session(Iterable[str]):
     def _single_query(self, start=0) -> Optional[Dict]:
         "Fires a single query"
         params = self._make_params(start)
-        logging.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
+        logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
         response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=None)
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
@@ -1777,7 +1779,7 @@ class Session(Iterable[str]):
         else:
             result_set = []
         start += self.rows
-        logging.debug("Got %s ids", len(result_set))
+        logger.debug("Got %s ids", len(result_set))
 
         if len(result_set) == 0:
             return
@@ -1802,7 +1804,7 @@ class Session(Iterable[str]):
                 result_set = response["group_set"]
             else:
                 result_set = []
-            logging.debug("Got %s ids", len(result_set))
+            logger.debug("Got %s ids", len(result_set))
             start += self.rows
             yield from result_set
 

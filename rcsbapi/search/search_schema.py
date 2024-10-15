@@ -12,6 +12,8 @@ from typing import List, Union
 import requests
 from ..const import Const
 
+logger = logging.getLogger(__name__)
+
 
 class SearchSchemaGroup:
     """A non-leaf node in the RCSB PDB schema. Leaves are Attr values."""
@@ -210,16 +212,16 @@ class SearchSchema:
 
     def _fetch_schema(self, url: str):
         "Request the current schema from the web"
-        logging.info("Requesting %s", url)
+        logger.info("Requesting %s", url)
         response = requests.get(url, timeout=None)
         if response.status_code == 200:
             return response.json()
         else:
-            logging.debug("HTTP response status code %r", response.status_code)
+            logger.debug("HTTP response status code %r", response.status_code)
             return None
 
     def _load_json_schema(self, schema_file):
-        logging.info("Loading attribute schema from file")
+        logger.info("Loading attribute schema from file")
         latest = pkgutil.get_data(__package__, schema_file)
         return json.loads(latest)
 
