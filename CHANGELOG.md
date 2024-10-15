@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.4.0 (2024-10-15)
+
+- Merge [rcsbsearchapi package](https://github.com/rcsb/py-rcsbsearchapi/tree/2ba4d82ed1ff23c4ba5d07d4dec63f6f4030207d) into package as separate `rcsbapi.search` module
+  - Renamed several classes and methods in this process:
+    - `SequenceQuery` -> `SeqSimilarityQuery`
+    - `StructureMotifResidue` -> `StructMotifResidue`
+    - `Range` -> `FacetRange`
+    - `rcsb_query_editor_url` -> `get_editor_link`
+    - `rcsb_query_builder_url` -> `get_query_builder_link`
+- Renamed several files and classes to prevent overlap with future developments:
+  - `data/query.py` -> `data/data_query.py`
+  - `data/schema.py` -> `data/schema_query.py`
+  - `Query()` Data API class -> `DataQuery()`
+  - `Schema()` Data API class -> `DataSchema()`
+  - `search/search.py` -> `search/search_query.py`
+  - `search/schema.py` -> `search/search_schema.py`
+- Update documentation
+
 ## v0.3.0 (2024-08-23)
 
 - Falls back to local schema file when fetch fails

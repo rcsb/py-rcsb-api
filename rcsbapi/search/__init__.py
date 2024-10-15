@@ -1,7 +1,6 @@
 """RCSB PDB Search API"""
 
 from typing import List
-# from .search_query import Terminal, Group, SearchQuery  # noqa: F401
 from .search_query import SEARCH_SCHEMA  # noqa: F401
 from .search_query import Attr, AttributeQuery, TextQuery
 from .search_query import SeqSimilarityQuery, SeqMotifQuery, ChemSimilarityQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
@@ -33,7 +32,4 @@ __all__ = [
     "Sort",  # Rename to prevent overlap?
     "GroupBy",
     "RankingCriteriaType",
-    # "SearchQuery",
-    # "Group",
-    # "Terminal",
 ]
