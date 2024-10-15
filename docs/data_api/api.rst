@@ -5,3 +5,8 @@ API Documentation
     :members:
     :private-members:
     :special-members: __init__
+
+.. automodule:: rcsbapi.data
+    :members:
+    :private-members:
+    :special-members: __init__
