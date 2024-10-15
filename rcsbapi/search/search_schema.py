@@ -114,7 +114,7 @@ class SearchSchemaGroup:
             ptr = ptr[level]
         if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SchemaGroup and Attr are compared as dictionaries
             return getattr(ptr, "type")
-        warnings.warn(f"Incomplete attribute path '{attribute}' - must specify fully-qualified path to leaf attribute node.", UserWarning)
+        warnings.warn(f"Incomplete attribute path '{attribute}' - must specify fully qualified path to leaf attribute node.", UserWarning)
         return None
 
     # Below methods are for making SchemaGroup behave as a Dict (be able to access through keys, etc).

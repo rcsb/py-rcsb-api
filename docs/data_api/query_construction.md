@@ -21,9 +21,9 @@ print(query.get_response())
 ```
 
 ### input_type
-Specifies which field you are starting your query from.
+Specifies which data hierarchy level from which you are starting your query (e.g., "entry", "polymer_entity", etc.).
 
-input_types, also called "root fields", are designated points where you can begin querying. This includes entries, polymer_entities, polymer_entity_instances, etc. Singular input_types are converted to their plural form to allow for more flexibility in input_ids. If no plural form is available, then the input_type will not be converted. For the full list see below:
+Also called "root fields", these represent designated points from which you can begin querying. This includes "entries", "polymer_entities", "polymer_entity_instances", etc. Singular input_types are converted to their plural form to allow for more flexibility in input_ids. If no plural form is available, then the input_type will not be converted. For the full list see below:
 
 <details open>
   <summary>Full list of input_types</summary>

@@ -895,7 +895,7 @@ class DataSchema:
             path_msg = "".join(f'\n        "{item}",' for item in info_list)
             logger.warning(
                 "\n"
-                "Some paths are being autocompleted based on the current API. If this code is meant for long-term use, use the set of fully-specified paths below:\n"
+                "Some paths are being autocompleted based on the current API. If this code is meant for long-term use, use the set of fully qualified paths below:\n"
                 "    ["
                 "%s\n"
                 "    ]", path_msg
