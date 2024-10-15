@@ -1,22 +1,12 @@
-rcsb-api - Query protein structures from Python
+rcsb-api - Query macromoluecular structures from Python
 ===============================================
 
 The ``rcsb-api`` package provides a Python interface to 
 `RCSB PDB API services <https://www.rcsb.org/docs/programmatic-access/web-services-overview>`_. 
-Use it to fetch data from RCSB PDB (at RCSB.org).
+Use it to search and fetch data from RCSB PDB (at RCSB.org).
 
 Contents
 --------
-
-.. toctree::
-   :caption: Data API
-   :maxdepth: 2
-
-   data_api/quickstart.md
-   data_api/query_construction.md
-   data_api/implementation_details.md
-   data_api/additional_examples.md
-   data_api/api.rst
 
 .. toctree::
    :caption: Search API
@@ -27,6 +17,16 @@ Contents
    search_api/attributes.md
    search_api/additional_examples.md
    search_api/api.rst
+
+.. toctree::
+   :caption: Data API
+   :maxdepth: 2
+
+   data_api/quickstart.md
+   data_api/query_construction.md
+   data_api/implementation_details.md
+   data_api/additional_examples.md
+   data_api/api.rst
 
 
 Availability

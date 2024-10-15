@@ -6,6 +6,11 @@ API Documentation
     :private-members:
     :special-members: __init__
 
+.. automodule:: rcsbapi.data.data_schema
+    :members:
+    :private-members:
+    :special-members: __init__
+
 .. automodule:: rcsbapi.data
     :members:
     :private-members:
