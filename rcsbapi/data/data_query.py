@@ -4,15 +4,15 @@ import re
 import time
 from typing import Any, Union, List, Dict, Optional, Tuple
 import requests
-from rcsbapi.data import SCHEMA
-from .constants import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
+from rcsbapi.data import DATA_SCHEMA
+from ..config import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
 
 logger = logging.getLogger(__name__)
 
 
-class Query:
+class DataQuery:
     """
-    class for Data API queries.
+    Class for Data API queries.
     """
     def __init__(
         self,
@@ -23,26 +23,29 @@ class Query:
         suppress_autocomplete_warning: bool = False
     ):
         """
+        Query object for Data API requests.
+
         Args:
             input_type (str): query input type
-                ex: "entry", "polymer_entity_instance", etc
-            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list of ids to request information for
-            return_data_list (List[str]): list of data to return (field names)
-                ex: ["rcsb_id", "exptl.method"]
+                (e.g., "entry", "polymer_entity_instance", etc.)
+            input_ids (list or dict): list (or singular dict) of ids for which to request information
+                (e.g., ["4HHB", "2LGI"])
+            return_data_list (list): list of data to return (field names)
+                (e.g., ["rcsb_id", "exptl.method"])
             add_rcsb_id (bool, optional): whether to automatically add <input_type>.rcsb_id to queries. Defaults to True.
         """
         input_id_limit = 200
         if isinstance(input_ids, list):
             if len(input_ids) > input_id_limit:
-                logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+                logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
         if isinstance(input_ids, dict):
             for value in input_ids.values():
                 if len(value) > input_id_limit:
-                    logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+                    logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
-        self._query = SCHEMA.construct_query(
+        self._query = DATA_SCHEMA.construct_query(
             input_type=self._input_type,
             input_ids=self._input_ids,
             return_data_list=return_data_list,
@@ -59,7 +62,7 @@ class Query:
 
         Args:
             input_type (str): query input type
-                ex: "entry", "polymer_entity_instance", etc
+                (e.g., "entry", "polymer_entity_instance", etc.)
             input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list/dict of ids to request information for
 
         Returns:
@@ -67,7 +70,7 @@ class Query:
         """
         # Convert _input_type to plural if applicable
         converted = False
-        if SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
+        if DATA_SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
             plural_type = SINGULAR_TO_PLURAL[input_type]
             if plural_type:
                 input_type = plural_type
@@ -90,7 +93,7 @@ class Query:
 
             else:
                 # If not converted, retrieve id list from dictionary
-                input_ids = list(input_ids[SCHEMA._root_dict[input_type][0]["name"]])
+                input_ids = list(input_ids[DATA_SCHEMA._root_dict[input_type][0]["name"]])
 
         assert isinstance(input_ids, list)
         return (input_type, input_ids)
@@ -108,7 +111,7 @@ class Query:
 
         Returns:
             str: input_type
-                ex: "entry", "polymer_entity_instance", etc
+                (e.g., "entry", "polymer_entity_instance", etc.)
         """
         return self._input_type
 
@@ -117,7 +120,7 @@ class Query:
 
         Returns:
             List[str]: return_data_list
-                ex: ["rcsb_id", "exptl.method"]
+                (e.g., ["rcsb_id", "exptl.method"])
         """
         return self._return_data_list
 
@@ -182,10 +185,10 @@ class Query:
         if "data" in response_json.keys():
             query_response = response_json["data"][self._input_type]
             if query_response is None:
-                logging.warning("Input produced no results. Check that input ids are valid")
+                logger.warning("Input produced no results. Check that input ids are valid")
             if isinstance(query_response, list):
                 if len(query_response) == 0:
-                    logging.warning("Input produced no results. Check that input ids are valid")
+                    logger.warning("Input produced no results. Check that input ids are valid")
         self._response = response_json
         return response_json
 

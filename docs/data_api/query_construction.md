@@ -3,7 +3,7 @@
 ## Query Objects
 Constructing a query object requires three inputs. The JSON response to a query is stored in the `response` attribute of a Query object and can be accessed using the `get_response()` method.
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 
 # constructing the Query object
 query = Query(
@@ -21,9 +21,9 @@ print(query.get_response())
 ```
 
 ### input_type
-Specifies which field you are starting your query from.
+Specifies which data hierarchy level from which you are starting your query (e.g., "entry", "polymer_entity", etc.).
 
-input_types, also called "root fields", are designated points where you can begin querying. This includes entries, polymer_entities, polymer_entity_instances, etc. Singular input_types are converted to their plural form to allow for more flexibility in input_ids. If no plural form is available, then the input_type will not be converted. For the full list see below:
+Also called "root fields", these represent designated points from which you can begin querying. This includes "entries", "polymer_entities", "polymer_entity_instances", etc. Singular input_types are converted to their plural form to allow for more flexibility in input_ids. If no plural form is available, then the input_type will not be converted. For the full list see below:
 
 <details open>
   <summary>Full list of input_types</summary>
@@ -94,7 +94,7 @@ These are the data that you are requesting (or "fields").
 In GraphQL syntax, the final requested data must be a "scalar" type (string, integer, boolean). However, if you request non-scalar data, the package will auto-populate the query to include all fields under the specified data until scalars are reached. Once you receive the query response and understand what specific data you would like to request, you can refine your query by requesting more specific fields.
 
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 query = Query(
     input_type="entries",
     input_ids=["4HHB"],
@@ -124,7 +124,7 @@ print(result_dict)
 ```
 This query can be made more concise by specifying a field, like "method". In this case, the field name "method" is redundant because it appears under other types and must be further specified using dot notation. For more details see [ValueError: Not a unique field](query_construction.md#valueerror-not-a-unique-field)
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 query = Query(
     input_type="entries",
     input_ids=["4HHB"],
@@ -157,7 +157,7 @@ There are several methods included to make working with query objects easier. Th
 This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index.html) window with the query. From the window, you can use the user interface to explore other fields and refine your query. Method of Query class.
 
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 query = Query(
     input_type="entries",
     input_ids=["4HHB"],
@@ -168,11 +168,11 @@ print(editor_link)
 ```
 
 ### find_paths()
-Given a redundant field, this method finds all paths from an input_type to nodes named as return_data_name. Method of Schema class.
+Given a redundant field, this method finds all paths from an input_type to nodes named as return_data_name. Method of DataSchema class.
 
 ```python
-from rcsbapi.data import Schema
-schema = Schema()
+from rcsbapi.data import DataSchema
+schema = DataSchema()
 schema.find_paths(input_type="entries", return_data_name="id")
 ```
 
@@ -185,17 +185,17 @@ schema.find_paths(input_type="entries", return_data_name="id". descriptions=True
 Given a string, this method will return all fields containing that string.
 
 ```python
-from rcsbapi.data import Schema
-schema = Schema()
+from rcsbapi.data import DataSchema
+schema = DataSchema()
 schema.find_field_names("exptl")
 ```
 
 ### get_input_id_dict()
-Given an input_type, returns a dictionary with the corresponding keys and descriptions of each key. Method of Schema class.
+Given an input_type, returns a dictionary with the corresponding keys and descriptions of each key. Method of DataSchema class.
 
 ```python
-from rcsbapi.data import Schema
-schema = Schema()
+from rcsbapi.data import DataSchema
+schema = DataSchema()
 schema.get_input_id_dict("polymer_entity_instance")
 ```
 
@@ -204,7 +204,7 @@ schema.get_input_id_dict("polymer_entity_instance")
 Some fields are redundant within our GraphQL Data API schema. For example, "id" appears over 50 times. To allow for specific querying, redundant fields are identified by the syntax `<field name>.<field name>...`. If you request a redundant field without this syntax, a `ValueError` will be returned stating that the field exists, but is not unique. You can then use `find_paths(input_type, return_data_name)` to find a path that would specify the field.
 
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 
 # querying a redundant field
 query = Query(
@@ -223,15 +223,15 @@ ValueError: "id" exists, but is not a unique field, must specify further.
   ...
 
 For all paths run:
-  from rcsbapi.data import Schema
-  schema = Schema()
+  from rcsbapi.data import DataSchema
+  schema = DataSchema()
   schema.find_paths("entries", "id")
 ```
 ```python
-from rcsbapi.data import Schema
+from rcsbapi.data import DataSchema
 
 # run find_paths(input_type, return_data_name)
-schema = Schema()
+schema = DataSchema()
 print(schema.find_paths(input_type="entries", return_data_name="id"))
 ```
 
@@ -246,7 +246,7 @@ print(schema.find_paths(input_type="entries", return_data_name="id"))
 'polymer_entities.prd.rcsb_chem_comp_annotation.annotation_lineage.id']
 ```
 ```python
-from rcsbapi.data import Query
+from rcsbapi.data import DataQuery as Query
 
 # valid query
 query = Query(

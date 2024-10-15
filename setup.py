@@ -30,6 +30,7 @@ setup(
     description="Python package interface for RCSB.org API services",
     long_description_content_type="text/markdown",
     long_description=longDescription,
+    python_requires=">=3.8,<4.0",
     author="Dennis Piehl",
     author_email="dennis.piehl@rcsb.org",
     url="https://github.com/rcsb/py-rcsb-api",
@@ -38,14 +39,20 @@ setup(
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Development Status :: 4 - Beta",
         # 'Development Status :: 5 - Production/Stable',
         "Operating System :: OS Independent",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Natural Language :: English",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: MIT License",
         "Typing :: Typed",
     ],
     entry_points={"console_scripts": []},
@@ -54,7 +61,7 @@ setup(
     packages=find_packages(exclude=["tests", "tests-*", "tests.*"]),
     package_data={
         # If any package contains *.md or *.rst ...  files, include them:
-        "": ["*.md", "*.rst", "*.txt", "*.cfg", "resources/*"]
+        "": ["*.md", "*.rst", "*.txt", "*.cfg", "rcsbapi/*/resources/*"]
     },
     #
     test_suite="tests",
