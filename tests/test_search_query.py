@@ -585,7 +585,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly. This is admittedly rather redundant.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly. This is admittedly rather redundant.
         self.assertTrue(ok)
         logger.info(".cif File Upload check two: (%r)", ok)
 
@@ -595,7 +595,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif.gz File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL in x
         self.assertTrue(ok)
         logger.info(".cif.gz File Upload check two: (%r)", ok)
 
@@ -605,7 +605,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL in x
         self.assertTrue(ok)
         logger.info(".pdb File Upload check two: (%r)", ok)
 
@@ -615,7 +615,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb.gz File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL in x
         self.assertTrue(ok)
         logger.info(".pdb.gz File Upload check two: (%r)", ok)
 
@@ -625,7 +625,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".bcif File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".bcif File Upload check two: (%r)", ok)
 
@@ -635,7 +635,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif.gz Assembly File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".cif.gz Assembly File Upload check two: (%r)", ok)
 
@@ -645,7 +645,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb1 File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".pdb1 File Upload check two: (%r)", ok)
 
@@ -655,7 +655,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb1.gz File Upload check one: (%r)", ok)
 
-        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".pdb1.gz File Upload check two: (%r)", ok)
 
@@ -971,7 +971,7 @@ class SearchTests(unittest.TestCase):
             "drugbank_info.brand_names",
             "contains_phrase",
             "tylenol",
-            const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value,  # this constant specifies "text_chem" service
+            const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE,  # this constant specifies "text_chem" service
         )
         result = q3(return_counts=True)
         ok = result == len(list(q3()))
