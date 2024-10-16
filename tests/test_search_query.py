@@ -25,7 +25,7 @@ import unittest
 import os
 from itertools import islice
 import requests
-from rcsbapi.const import Const
+from rcsbapi.const import const
 from rcsbapi.search import rcsb_attributes as attrs
 from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
@@ -227,9 +227,9 @@ class SearchTests(unittest.TestCase):
 
         # Fluent syntax
         query2 = TextQuery("heat-shock transcription factor").and_(AttributeQuery(attribute="rcsb_struct_symmetry.symbol", operator="exact_match", value="C2")
-                                                                   .and_("rcsb_struct_symmetry.kind", Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value)
+                                                                   .and_("rcsb_struct_symmetry.kind", const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE)
                                                                    .exact_match("Global Symmetry")
-                                                                   .and_("rcsb_entry_info.polymer_entity_count_DNA", Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value)
+                                                                   .and_("rcsb_entry_info.polymer_entity_count_DNA", const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE)
                                                                    .greater_or_equal(1))
         ok = query2 == query
         self.assertTrue(ok)
@@ -427,7 +427,7 @@ class SearchTests(unittest.TestCase):
         logger.info("Chemical Search Operator Syntax: result length: (%d), ok: (%r), ok2: (%r)", len(result), ok, ok2)
 
         result = TextQuery("Hemoglobin")\
-            .and_("chem_comp.name", Const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value).contains_phrase("adenine")
+            .and_("chem_comp.name", const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE).contains_phrase("adenine")
         # result = set(result("assembly"))
         q1 = TextQuery("Hemoglobin")
         q2 = attrs.chem_comp.name.contains_phrase("adenine")
@@ -449,7 +449,7 @@ class SearchTests(unittest.TestCase):
         Expected failure."""
         try:
             query = TextQuery('"hemoglobin"')\
-                .and_("rcsb_chem_comp.name", Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value).contains_phrase("adenine")\
+                .and_("rcsb_chem_comp.name", const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE).contains_phrase("adenine")\
                 .exec("assembly")
             resultL = list(query)
             ok = len(resultL) < 0  # set this to false as it should fail
@@ -585,7 +585,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly. This is admittedly rather redundant.
+        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly. This is admittedly rather redundant.
         self.assertTrue(ok)
         logger.info(".cif File Upload check two: (%r)", ok)
 
@@ -595,7 +595,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif.gz File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL.value in x
         self.assertTrue(ok)
         logger.info(".cif.gz File Upload check two: (%r)", ok)
 
@@ -605,7 +605,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL.value in x
         self.assertTrue(ok)
         logger.info(".pdb File Upload check two: (%r)", ok)
 
@@ -615,7 +615,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb.gz File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL.value in x
         self.assertTrue(ok)
         logger.info(".pdb.gz File Upload check two: (%r)", ok)
 
@@ -625,7 +625,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".bcif File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".bcif File Upload check two: (%r)", ok)
 
@@ -635,7 +635,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif.gz Assembly File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".cif.gz Assembly File Upload check two: (%r)", ok)
 
@@ -645,7 +645,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb1 File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".pdb1 File Upload check two: (%r)", ok)
 
@@ -655,7 +655,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb1.gz File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".pdb1.gz File Upload check two: (%r)", ok)
 
@@ -971,7 +971,7 @@ class SearchTests(unittest.TestCase):
             "drugbank_info.brand_names",
             "contains_phrase",
             "tylenol",
-            Const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value,  # this constant specifies "text_chem" service
+            const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value,  # this constant specifies "text_chem" service
         )
         result = q3(return_counts=True)
         ok = result == len(list(q3()))

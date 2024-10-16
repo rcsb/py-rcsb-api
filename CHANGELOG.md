@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.1 (2024-10-17)
+
+- Separate out package-wide settings into immutable constants (`const.py`) and configurable parameters (`config.py`)
+- Update documentation
+
 ## v0.4.0 (2024-10-15)
 
 - Merge [rcsbsearchapi package](https://github.com/rcsb/py-rcsbsearchapi/tree/2ba4d82ed1ff23c4ba5d07d4dec63f6f4030207d) into package as separate `rcsbapi.search` module

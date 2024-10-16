@@ -1,9 +1,19 @@
-from enum import Enum
-# from typing import Dict
+"""
+Constants for rcsb-api (immutable and cannot be overridden)
+
+These constants define fixed values used throughout the rcsb-api package,
+including API endpoints, search services, and schema URLs. The values are
+immutable and protected from modification during runtime.
+"""
+
+from typing import Dict
+from dataclasses import dataclass
+from types import MappingProxyType
 
 
-class Const(Enum):
-    REQUESTS_PER_SECOND: int = 10
+@dataclass(frozen=True)
+class Const:
+    # Search API constants
     STRUCTURE_INDEX: int = 0
     CHEMICAL_INDEX: int = 0
     STRUCTURE_ATTRIBUTE_SCHEMA_URL: str = "http://search.rcsb.org/rcsbsearch/v2/metadata/schema"
@@ -27,3 +37,34 @@ class Const(Enum):
     RCSB_SEARCH_API_QUERY_URL: str = "https://search.rcsb.org/rcsbsearch/v2/query"
     UPLOAD_URL: str = "https://user-upload.rcsb.org/v1/putMultipart"
     RETURN_UP_URL: str = "https://user-upload.rcsb.org/v1/download/"
+    #
+    # Data API constants
+    DATA_API_ENDPOINT: str = "https://data.rcsb.org/graphql"
+    #
+    SINGULAR_TO_PLURAL: Dict[str, str] = MappingProxyType({
+        "entry": "entries",
+        "polymer_entity": "polymer_entities",
+        "branched_entity": "branched_entities",
+        "nonpolymer_entity": "nonpolymer_entities",
+        "polymer_entity_instance": "polymer_entity_instances",
+        "nonpolymer_entity_instance": "nonpolymer_entity_instances",
+        "branched_entity_instance": "branched_entity_instances",
+        "assembly": "assemblies",
+        "interface": "interfaces",
+        "uniprot": "",
+        "pubmed": "",
+        "chem_comp": "chem_comps",
+        "entry_group": "entry_groups",
+        "polymer_entity_group": "polymer_entity_groups",
+        "group_provenance": ""
+    })
+    #
+    ID_TO_SEPARATOR: Dict[str, str] = MappingProxyType({
+        "entity_id": "_",
+        "asym_id": ".",
+        "assembly_id": "-",
+        "interface_id": "."
+    })
+
+
+const = Const()

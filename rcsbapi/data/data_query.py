@@ -5,7 +5,8 @@ import time
 from typing import Any, Union, List, Dict, Optional, Tuple
 import requests
 from rcsbapi.data import DATA_SCHEMA
-from ..config import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
+from ..config import config
+from ..const import const
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ class DataQuery:
                 (e.g., ["rcsb_id", "exptl.method"])
             add_rcsb_id (bool, optional): whether to automatically add <input_type>.rcsb_id to queries. Defaults to True.
         """
+        suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
         input_id_limit = 200
         if isinstance(input_ids, list):
             if len(input_ids) > input_id_limit:
@@ -71,7 +73,7 @@ class DataQuery:
         # Convert _input_type to plural if applicable
         converted = False
         if DATA_SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
-            plural_type = SINGULAR_TO_PLURAL[input_type]
+            plural_type = const.SINGULAR_TO_PLURAL[input_type]
             if plural_type:
                 input_type = plural_type
                 converted = True
@@ -84,8 +86,8 @@ class DataQuery:
                     join_id = ""
                     for k, v in input_ids.items():
                         assert isinstance(v, str)  # for mypy
-                        if k in ID_TO_SEPARATOR:
-                            join_id += ID_TO_SEPARATOR[k] + v
+                        if k in const.ID_TO_SEPARATOR:
+                            join_id += const.ID_TO_SEPARATOR[k] + v
                         else:
                             join_id += v
 
@@ -146,7 +148,7 @@ class DataQuery:
         Returns:
             str: GraphiQL url
         """
-        editor_base_link = str(ApiSettings.API_ENDPOINT.value) + "/index.html?query="
+        editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
         return editor_base_link + urllib.parse.quote(self._query)
 
     def exec(self) -> Dict[str, Any]:
@@ -165,8 +167,8 @@ class DataQuery:
                 part_response = requests.post(
                     headers={"Content-Type": "application/graphql"},
                     data=query,
-                    url=ApiSettings.API_ENDPOINT.value,
-                    timeout=ApiSettings.TIMEOUT.value
+                    url=const.DATA_API_ENDPOINT,
+                    timeout=config.DATA_API_TIMEOUT
                 ).json()
                 self._parse_gql_error(part_response)
                 time.sleep(0.2)
@@ -178,8 +180,8 @@ class DataQuery:
             response_json = requests.post(
                 headers={"Content-Type": "application/graphql"},
                 data=self._query,
-                url=ApiSettings.API_ENDPOINT.value,
-                timeout=ApiSettings.TIMEOUT.value
+                url=const.DATA_API_ENDPOINT,
+                timeout=config.DATA_API_TIMEOUT
             ).json()
             self._parse_gql_error(response_json)
         if "data" in response_json.keys():
