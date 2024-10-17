@@ -10,7 +10,7 @@ import re
 import warnings
 from typing import List, Union
 import requests
-from ..const import Const
+from ..const import const
 
 logger = logging.getLogger(__name__)
 
@@ -162,10 +162,10 @@ class SearchSchema:
         refetch=True,
         use_fallback=True,
         reload=True,
-        struct_attr_schema_url=Const.STRUCTURE_ATTRIBUTE_SCHEMA_URL.value,
-        struct_attr_schema_file=Const.STRUCTURE_ATTRIBUTE_SCHEMA_FILE.value,
-        chem_attr_schema_url=Const.CHEMICAL_ATTRIBUTE_SCHEMA_URL.value,
-        chem_attr_schema_file=Const.CHEMICAL_ATTRIBUTE_SCHEMA_FILE.value,
+        struct_attr_schema_url=const.STRUCTURE_ATTRIBUTE_SCHEMA_URL,
+        struct_attr_schema_file=const.STRUCTURE_ATTRIBUTE_SCHEMA_FILE,
+        chem_attr_schema_url=const.CHEMICAL_ATTRIBUTE_SCHEMA_URL,
+        chem_attr_schema_file=const.CHEMICAL_ATTRIBUTE_SCHEMA_FILE,
     ):
         """Initialize SearchSchema object with all known RCSB PDB attributes.
 
@@ -205,7 +205,7 @@ class SearchSchema:
         return sD
 
     def _make_schema_group(self) -> SearchSchemaGroup:
-        schemas = [(self.struct_schema, Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value, ""), (self.chem_schema, Const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value, "")]
+        schemas = [(self.struct_schema, const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE, ""), (self.chem_schema, const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE, "")]
         schema = self._make_group("", schemas)
         assert isinstance(schema, SearchSchemaGroup)  # for type checking
         return schema

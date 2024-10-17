@@ -29,7 +29,7 @@ query = Query(
     return_data_list=["exptl.method"]
 )
 # Note: When the package autocompletes a path, it prints an Warning message
-# To supress this warning in future query construction, either use the printed fully qualified path
+# To suppress this warning in future query construction, either use the printed fully qualified path
 # or set `suppress_autocomplete_warning` to True.
 
 result_dict = query.exec()

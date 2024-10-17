@@ -1,5 +1,4 @@
 requests >= 2.0.0
 rustworkx
 graphql-core
-# rcsbsearchapi
 tqdm

@@ -28,7 +28,8 @@ import requests
 
 from rcsbapi.search import rcsb_attributes as attrs
 from rcsbapi.data import DataSchema, DataQuery
-from rcsbapi.config import ApiSettings
+from rcsbapi.config import config
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -288,7 +289,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. Making Queries"):
             try:

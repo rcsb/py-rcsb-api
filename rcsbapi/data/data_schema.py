@@ -7,7 +7,8 @@ import requests
 # import networkx as nx
 from graphql import validate, parse, build_client_schema
 import rustworkx as rx
-from ..config import ApiSettings
+from ..config import config
+from ..const import const
 
 use_networkx: bool = False
 # Below section and parts of code involving networkx are commented out
@@ -112,8 +113,8 @@ class DataSchema:
         """
         GraphQL schema defining available fields, types, and how they are connected.
         """
-        self.pdb_url: str = ApiSettings.API_ENDPOINT.value
-        self.timeout: int = ApiSettings.TIMEOUT.value
+        self.pdb_url: str = const.DATA_API_ENDPOINT
+        self.timeout: int = config.DATA_API_TIMEOUT
         self.schema: Dict = self.fetch_schema()
         """JSON resulting from full introspection of the GraphQL schema"""
 
@@ -666,6 +667,7 @@ class DataSchema:
         add_rcsb_id=True,
         suppress_autocomplete_warning=False
     ) -> str:
+        suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
             raise ValueError("input_ids must be dictionary or list")
         if input_type not in self._root_dict:
@@ -750,6 +752,7 @@ class DataSchema:
         Returns:
             str: query in GraphQL syntax
         """
+        suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
         attr_list = self._root_dict[input_type]
         attr_name = [id["name"] for id in attr_list]
 
