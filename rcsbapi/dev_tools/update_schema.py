@@ -83,7 +83,7 @@ def make_changelog_msg(
 
         if not msg:
             msg = f"Update {package} schemas: \n"
-        msg += f"  {file_name.replace(".json", "")} schema {current_ver_dict[file_name]} --> {new_ver_dict[file_name]}\n"
+        msg += f"  {file_name.replace('.json', '')} schema {current_ver_dict[file_name]} --> {new_ver_dict[file_name]}\n"
     return msg
 
 
