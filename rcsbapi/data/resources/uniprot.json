@@ -1,1037 +1,1037 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Core UniProt",
-    "type": "object",
-    "required": [
-        "rcsb_uniprot_container_identifiers"
-    ],
-    "properties": {
-        "rcsb_id": {
-            "type": "string",
-            "description": "Primary accession number of a given UniProtKB entry.",
-            "rcsb_search_context": [
-                "exact-match"
-            ]
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Core UniProt",
+  "type": "object",
+  "required": [
+    "rcsb_uniprot_container_identifiers"
+  ],
+  "properties": {
+    "rcsb_id": {
+      "type": "string",
+      "description": "Primary accession number of a given UniProtKB entry.",
+      "rcsb_search_context": [
+        "exact-match"
+      ]
+    },
+    "rcsb_uniprot_container_identifiers": {
+      "type": "object",
+      "properties": {
+        "uniprot_id": {
+          "type": "string",
+          "description": "Primary accession number of a given UniProtKB entry."
         },
-        "rcsb_uniprot_container_identifiers": {
+        "reference_sequence_identifiers": {
+          "type": "array",
+          "items": {
             "type": "object",
             "properties": {
-                "uniprot_id": {
-                    "type": "string",
-                    "description": "Primary accession number of a given UniProtKB entry."
-                },
-                "reference_sequence_identifiers": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "database_accession": {
-                                "type": "string",
-                                "description": "Reference database accession code",
-                                "rcsb_search_context": [
-                                    "exact-match"
-                                ],
-                                "rcsb_full_text_priority": 20,
-                                "rcsb_description": [
-                                    {
-                                        "text": "Reference database accession code",
-                                        "context": "dictionary"
-                                    }
-                                ]
-                            },
-                            "database_isoform": {
-                                "type": "string",
-                                "description": "Reference database identifier for the sequence isoform",
-                                "rcsb_search_context": [
-                                    "exact-match"
-                                ],
-                                "rcsb_full_text_priority": 10,
-                                "rcsb_description": [
-                                    {
-                                        "text": "Reference database identifier for the sequence isoform",
-                                        "context": "dictionary"
-                                    }
-                                ]
-                            },
-                            "database_name": {
-                                "type": "string",
-                                "description": "Reference database name",
-                                "rcsb_search_context": [
-                                    "exact-match"
-                                ],
-                                "rcsb_full_text_priority": 10,
-                                "rcsb_description": [
-                                    {
-                                        "text": "Reference database name",
-                                        "context": "dictionary"
-                                    }
-                                ]
-                            },
-                            "provenance_source": {
-                                "type": "string",
-                                "description": "Source of the reference database assignment",
-                                "rcsb_description": [
-                                    {
-                                        "text": "Source of the reference database assignment",
-                                        "context": "dictionary"
-                                    }
-                                ]
-                            }
-                        },
-                        "additionalProperties": false
-                    },
-                    "uniqueItems": false,
-                    "rcsb_nested_indexing": true
-                }
+              "database_accession": {
+                "type": "string",
+                "description": "Reference database accession code",
+                "rcsb_search_context": [
+                  "exact-match"
+                ],
+                "rcsb_full_text_priority": 20,
+                "rcsb_description": [
+                  {
+                    "text": "Reference database accession code",
+                    "context": "dictionary"
+                  }
+                ]
+              },
+              "database_isoform": {
+                "type": "string",
+                "description": "Reference database identifier for the sequence isoform",
+                "rcsb_search_context": [
+                  "exact-match"
+                ],
+                "rcsb_full_text_priority": 10,
+                "rcsb_description": [
+                  {
+                    "text": "Reference database identifier for the sequence isoform",
+                    "context": "dictionary"
+                  }
+                ]
+              },
+              "database_name": {
+                "type": "string",
+                "description": "Reference database name",
+                "rcsb_search_context": [
+                  "exact-match"
+                ],
+                "rcsb_full_text_priority": 10,
+                "rcsb_description": [
+                  {
+                    "text": "Reference database name",
+                    "context": "dictionary"
+                  }
+                ]
+              },
+              "provenance_source": {
+                "type": "string",
+                "description": "Source of the reference database assignment",
+                "rcsb_description": [
+                  {
+                    "text": "Source of the reference database assignment",
+                    "context": "dictionary"
+                  }
+                ]
+              }
             },
             "additionalProperties": false
+          },
+          "uniqueItems": false,
+          "rcsb_nested_indexing": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "rcsb_uniprot_accession": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of UniProtKB accession numbers where original accession numbers are retained as \u2018secondary\u2019 accession numbers."
+    },
+    "rcsb_uniprot_entry_name": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "A list of unique identifiers (former IDs), often containing biologically relevant information."
+    },
+    "rcsb_uniprot_keyword": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": [
+              "KW-0275",
+              "KW-0597"
+            ],
+            "description": "A unique keyword identifier."
+          },
+          "value": {
+            "type": "string",
+            "examples": [
+              "Lipid metabolism",
+              "Phosphoprotein",
+              "Fatty acid biosynthesis"
+            ],
+            "description": "Human-readable keyword term."
+          }
         },
-        "rcsb_uniprot_accession": {
-            "type": "array",
-            "items": {
-                "type": "string"
+        "additionalProperties": false
+      },
+      "description": "Keywords constitute a controlled vocabulary that summarises the content of a UniProtKB entry."
+    },
+    "rcsb_uniprot_protein": {
+      "type": "object",
+      "properties": {
+        "sequence": {
+          "type": "string",
+          "description": "Protein sequence data for canonical protein sequence."
+        },
+        "name": {
+          "type": "object",
+          "required": [
+            "value",
+            "provenance_code"
+          ],
+          "properties": {
+            "value": {
+              "type": "string",
+              "description": "Name that allows to unambiguously identify a protein.",
+              "rcsb_search_context": [
+                "exact-match",
+                "full-text",
+                "suggest"
+              ],
+              "examples": [
+                "Hemoglobin alpha"
+              ],
+              "rcsb_full_text_priority": 10,
+              "rcsb_description": [
+                {
+                  "text": "UniProt Molecule Name",
+                  "context": "brief"
+                }
+              ],
+              "rcsb_search_group": [
+                {
+                  "group_name": "ID(s) and Keywords",
+                  "priority_order": 35
+                }
+              ]
             },
-            "description": "List of UniProtKB accession numbers where original accession numbers are retained as ‘secondary’ accession numbers."
+            "provenance_code": {
+              "type": "string",
+              "description": "Historical record of the data attribute."
+            }
+          },
+          "additionalProperties": false
         },
-        "rcsb_uniprot_entry_name": {
-            "type": "array",
-            "items": {
-                "type": "string"
+        "function": {
+          "type": "object",
+          "properties": {
+            "details": {
+              "type": "string",
+              "description": "General function(s) of a protein."
             },
-            "description": "A list of unique identifiers (former IDs), often containing biologically relevant information."
+            "provenance_code": {
+              "type": "string",
+              "description": "Historical record of the data attribute."
+            }
+          }
         },
-        "rcsb_uniprot_keyword": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "examples": [
-                            "KW-0275",
-                            "KW-0597"
-                        ],
-                        "description": "A unique keyword identifier."
+        "gene": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "PRIMARY",
+                        "SYNONYM",
+                        "ORDERED_LOCUS",
+                        "ORF"
+                      ],
+                      "type": "string"
                     },
                     "value": {
-                        "type": "string",
-                        "examples": [
-                            "Lipid metabolism",
-                            "Phosphoprotein",
-                            "Fatty acid biosynthesis"
-                        ],
-                        "description": "Human-readable keyword term."
+                      "type": "string"
                     }
-                },
-                "additionalProperties": false
+                  }
+                }
+              }
             },
-            "description": "Keywords constitute a controlled vocabulary that summarises the content of a UniProtKB entry."
+            "additionalProperties": false,
+            "description": "The name(s) of the gene(s) that code for the protein sequence(s) described in the entry."
+          }
         },
-        "rcsb_uniprot_protein": {
+        "source_organism": {
+          "type": "object",
+          "required": [
+            "scientific_name",
+            "provenance_code"
+          ],
+          "properties": {
+            "scientific_name": {
+              "type": "string",
+              "description": "The scientific name of the organism in which a protein occurs."
+            },
+            "taxonomy_id": {
+              "type": "integer",
+              "description": "NCBI Taxonomy identifier for the organism in which a protein occurs."
+            },
+            "provenance_code": {
+              "type": "string",
+              "description": "Historical record of the data attribute."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Taxonomy information on the organism that is the source of the protein sequence."
+        },
+        "ec": {
+          "type": "array",
+          "items": {
             "type": "object",
             "properties": {
-                "sequence": {
-                    "type": "string",
-                    "description": "Protein sequence data for canonical protein sequence."
+              "number": {
+                "type": "string"
+              },
+              "provenance_code": {
+                "type": "string",
+                "description": "Historical record of the data attribute."
+              }
+            },
+            "additionalProperties": false,
+            "description": "Enzyme Commission (EC) number(s)."
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "rcsb_uniprot_feature": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "assignment_version": {
+            "type": "string",
+            "description": "Identifies the version of the feature assignment."
+          },
+          "description": {
+            "type": "string",
+            "description": "A description for the feature."
+          },
+          "feature_id": {
+            "type": "string",
+            "description": "An identifier for the feature."
+          },
+          "name": {
+            "type": "string",
+            "description": "A name for the feature."
+          },
+          "provenance_source": {
+            "type": "string",
+            "description": "Code identifying the individual, organization or program that\n assigned the feature."
+          },
+          "reference_scheme": {
+            "type": "string",
+            "description": "Code residue coordinate system for the assigned feature."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "ACTIVE_SITE",
+              "BINDING_SITE",
+              "CALCIUM_BINDING_REGION",
+              "CHAIN",
+              "COMPOSITIONALLY_BIASED_REGION",
+              "CROSS_LINK",
+              "DNA_BINDING_REGION",
+              "DOMAIN",
+              "GLYCOSYLATION_SITE",
+              "INITIATOR_METHIONINE",
+              "LIPID_MOIETY_BINDING_REGION",
+              "METAL_ION_BINDING_SITE",
+              "MODIFIED_RESIDUE",
+              "MUTAGENESIS_SITE",
+              "NON_CONSECUTIVE_RESIDUES",
+              "NON_TERMINAL_RESIDUE",
+              "NUCLEOTIDE_PHOSPHATE_BINDING_REGION",
+              "PEPTIDE",
+              "PROPEPTIDE",
+              "REGION_OF_INTEREST",
+              "REPEAT",
+              "NON_STANDARD_AMINO_ACID",
+              "SEQUENCE_CONFLICT",
+              "SEQUENCE_VARIANT",
+              "SHORT_SEQUENCE_MOTIF",
+              "SIGNAL_PEPTIDE",
+              "SITE",
+              "SPLICE_VARIANT",
+              "TOPOLOGICAL_DOMAIN",
+              "TRANSIT_PEPTIDE",
+              "TRANSMEMBRANE_REGION",
+              "UNSURE_RESIDUE",
+              "ZINC_FINGER_REGION",
+              "INTRAMEMBRANE_REGION"
+            ],
+            "rcsb_enum_annotated": [
+              {
+                "value": "ACTIVE_SITE",
+                "name": "Active site",
+                "detail": "Amino acid(s) directly involved in the activity of an enzyme"
+              },
+              {
+                "value": "BINDING_SITE",
+                "name": "Binding site",
+                "detail": "Binding site for any chemical group (co-enzyme, prosthetic group, etc.)"
+              },
+              {
+                "value": "CALCIUM_BINDING_REGION",
+                "name": "Calcium binding",
+                "detail": "Position(s) of calcium binding region(s) within the protein (e.g. EF-hand)"
+              },
+              {
+                "value": "CHAIN",
+                "name": "Chain",
+                "detail": "Extent of a polypeptide chain in the mature protein following processing or proteolytic cleavage"
+              },
+              {
+                "value": "COMPOSITIONALLY_BIASED_REGION",
+                "name": "Compositional bias",
+                "detail": "Homopolymeric stretches and large regions of compositional bias in the protein"
+              },
+              {
+                "value": "CROSS_LINK",
+                "name": "Cross-link",
+                "detail": "Residues participating in covalent linkage(s) between proteins"
+              },
+              {
+                "value": "DNA_BINDING_REGION",
+                "name": "DNA binding",
+                "detail": "Experimentally determined and conserved DNA-binding domains defined by the InterPro resources PROSITE, Pfam and SMART (the AP2/ERF domain, the ETS domain, the Fork-Head domain, etc.)"
+              },
+              {
+                "value": "DOMAIN",
+                "name": "Domain",
+                "detail": "Modular protein domains which are self-stabilizing and fold independently of the rest of the protein chain"
+              },
+              {
+                "value": "GLYCOSYLATION_SITE",
+                "name": "Glycosylation",
+                "detail": "Covalently attached glycan group(s) (mono-, di-, or polysaccharide)"
+              },
+              {
+                "value": "INITIATOR_METHIONINE",
+                "name": "Initiator methionine",
+                "detail": "Cleavage of the initiator methionine from the mature protein"
+              },
+              {
+                "value": "LIPID_MOIETY_BINDING_REGION",
+                "name": "Lipidation",
+                "detail": "Covalently attached lipid group(s)"
+              },
+              {
+                "value": "METAL_ION_BINDING_SITE",
+                "name": "Metal binding",
+                "detail": "Binding site for a metal ion"
+              },
+              {
+                "value": "MODIFIED_RESIDUE",
+                "name": "Modified residue",
+                "detail": "Modified residues excluding lipids, glycans and protein cross-links"
+              },
+              {
+                "value": "MUTAGENESIS_SITE",
+                "name": "Mutagenesis",
+                "detail": "Site which has been experimentally altered by mutagenesis"
+              },
+              {
+                "value": "NON_CONSECUTIVE_RESIDUES",
+                "name": "Non-adjacent residues",
+                "detail": "Indicates that two residues in a sequence are not consecutive and that there is an undetermined number of unsequenced residues between them"
+              },
+              {
+                "value": "NON_TERMINAL_RESIDUE",
+                "name": "Non-terminal residue",
+                "detail": "Indicates that a residue is not the terminal residue of the complete protein (the sequence is incomplete)"
+              },
+              {
+                "value": "NUCLEOTIDE_PHOSPHATE_BINDING_REGION",
+                "name": "Nucleotide binding",
+                "detail": "Nucleotide phosphate binding region"
+              },
+              {
+                "value": "PEPTIDE",
+                "name": "Peptide",
+                "detail": "Extent of an active peptide in the mature protein"
+              },
+              {
+                "value": "PROPEPTIDE",
+                "name": "Propeptide",
+                "detail": "Part of a protein that is cleaved during maturation or activation"
+              },
+              {
+                "value": "REGION_OF_INTEREST",
+                "name": "Region of interest",
+                "detail": "Region of interest in the sequence (e.g. different regions in multifunctional enzymes or fusion proteins)"
+              },
+              {
+                "value": "REPEAT",
+                "name": "Repeat",
+                "detail": "Denotes the positions of repeated sequence motifs or repeated domains"
+              },
+              {
+                "value": "NON_STANDARD_AMINO_ACID",
+                "name": "Non-standard residue",
+                "detail": "Occurrences of non-standard amino acids (selenocysteine and pyrrolysine) in the protein sequence"
+              },
+              {
+                "value": "SEQUENCE_CONFLICT",
+                "name": "Sequence conflict",
+                "detail": "Description of sequence discrepancies of unknown origin"
+              },
+              {
+                "value": "SEQUENCE_VARIANT",
+                "name": "Natural variant",
+                "detail": "Description of a natural variant of the protein (polymorphisms, disease-associated mutations, RNA editing events, etc.)"
+              },
+              {
+                "value": "SHORT_SEQUENCE_MOTIF",
+                "name": "Motif",
+                "detail": "Short (up to 20 amino acids) sequence motif of biological interest"
+              },
+              {
+                "value": "SIGNAL_PEPTIDE",
+                "name": "Signal peptide",
+                "detail": "Sequence targeting proteins to the secretory pathway or periplasmic space"
+              },
+              {
+                "value": "SITE",
+                "name": "Site",
+                "detail": "Any interesting single amino acid site on the sequence"
+              },
+              {
+                "value": "SPLICE_VARIANT",
+                "name": "Alternative sequence",
+                "detail": "Amino acid change(s) producing alternate protein isoforms"
+              },
+              {
+                "value": "TOPOLOGICAL_DOMAIN",
+                "name": "Topological domain",
+                "detail": "Location of non-membrane regions of membrane-spanning proteins"
+              },
+              {
+                "value": "TRANSIT_PEPTIDE",
+                "name": "Transit peptide",
+                "detail": "Extent of a transit peptide for organelle targeting"
+              },
+              {
+                "value": "TRANSMEMBRANE_REGION",
+                "name": "Transmembrane",
+                "detail": "Extent of a membrane-spanning region"
+              },
+              {
+                "value": "UNSURE_RESIDUE",
+                "name": "Sequence uncertainty",
+                "detail": "Describes region(s) of a sequence for which the authors are unsure about the sequence assignment"
+              },
+              {
+                "value": "ZINC_FINGER_REGION",
+                "name": "Zinc finger",
+                "detail": "Denotes the position(s) and type(s) of zinc fingers within the protein"
+              },
+              {
+                "value": "INTRAMEMBRANE_REGION",
+                "name": "Intramembrane",
+                "detail": "Extent of a region located in a membrane without crossing it"
+              }
+            ],
+            "description": "A type or category of the feature."
+          },
+          "feature_positions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "beg_comp_id": {
+                  "type": "string",
+                  "description": "An identifier for the monomer(s) corresponding to the feature assignment."
+                },
+                "beg_seq_id": {
+                  "type": "integer",
+                  "description": "An identifier for the monomer at which this segment of the feature begins."
+                },
+                "end_seq_id": {
+                  "type": "integer",
+                  "description": "An identifier for the monomer at which this segment of the feature ends."
+                },
+                "value": {
+                  "type": "number",
+                  "description": "The value for the feature over this monomer segment."
+                },
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "examples": [
+                      5,
+                      0.25
+                    ],
+                    "description": "The value(s) for the feature over this monomer segment.",
+                    "rcsb_description": [
+                      {
+                        "text": "The value(s) for the feature over this monomer segment.",
+                        "context": "dictionary"
+                      }
+                    ]
+                  },
+                  "uniqueItems": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "beg_seq_id"
+              ]
+            },
+            "uniqueItems": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "rcsb_uniprot_annotation": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "annotation_id": {
+            "type": "string",
+            "description": "An identifier for the annotation.",
+            "rcsb_search_context": [
+              "exact-match"
+            ],
+            "rcsb_description": [
+              {
+                "text": "An identifier for the annotation.",
+                "context": "dictionary"
+              },
+              {
+                "text": "Identifier",
+                "context": "brief"
+              }
+            ]
+          },
+          "assignment_version": {
+            "type": "string",
+            "description": "Identifies the version of the annotation assignment.",
+            "rcsb_description": [
+              {
+                "text": "Identifies the version of the annotation assignment.",
+                "context": "dictionary"
+              },
+              {
+                "text": "Annotation version",
+                "context": "brief"
+              }
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "A description for the annotation.",
+            "rcsb_search_context": [
+              "exact-match",
+              "full-text"
+            ],
+            "rcsb_full_text_priority": 10,
+            "rcsb_description": [
+              {
+                "text": "A description for the annotation.",
+                "context": "dictionary"
+              },
+              {
+                "text": "Annotation description",
+                "context": "brief"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "A name for the annotation.",
+            "rcsb_search_context": [
+              "exact-match",
+              "full-text"
+            ],
+            "rcsb_full_text_priority": 10,
+            "rcsb_description": [
+              {
+                "text": "Name",
+                "context": "brief"
+              }
+            ],
+            "rcsb_search_group": [
+              {
+                "group_name": "Polymer Molecular Features",
+                "priority_order": 108
+              }
+            ]
+          },
+          "provenance_source": {
+            "type": "string",
+            "description": "Code identifying the individual, organization or program that\n assigned the annotation.",
+            "rcsb_description": [
+              {
+                "text": "Annotation Source",
+                "context": "brief"
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "disease",
+              "phenotype",
+              "GO",
+              "InterPro"
+            ],
+            "description": "A type or category of the annotation.",
+            "rcsb_search_context": [
+              "exact-match"
+            ],
+            "rcsb_enum_annotated": [
+              {
+                "value": "disease",
+                "detail": "Disease data from OMIM and Disease Ontology represented in Pharos",
+                "name": "Pharos Disease"
+              },
+              {
+                "value": "phenotype",
+                "detail": "Phenotypic data including mouse phenotypes, mouse/human orthologs and GWAS results represented in IMPC",
+                "name": "IMPC Phenotype"
+              },
+              {
+                "value": "InterPro",
+                "detail": "InterPro Protein Family",
+                "name": "InterPro Protein Family"
+              },
+              {
+                "value": "GO",
+                "detail": "Gene Ontology",
+                "name": "Gene Ontology"
+              }
+            ],
+            "rcsb_description": [
+              {
+                "text": "A type or category of the annotation.",
+                "context": "dictionary"
+              },
+              {
+                "text": "Annotation Type",
+                "context": "brief"
+              }
+            ]
+          },
+          "annotation_lineage": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "depth": {
+                  "type": "integer",
+                  "description": "Members of the annotation lineage as parent lineage depth (1-N)",
+                  "rcsb_search_context": [
+                    "default-match"
+                  ],
+                  "rcsb_description": [
+                    {
+                      "text": "Lineage Depth",
+                      "context": "brief"
+                    }
+                  ]
+                },
+                "id": {
+                  "type": "string",
+                  "description": "Members of the annotation lineage as parent class identifiers.",
+                  "rcsb_search_context": [
+                    "exact-match"
+                  ],
+                  "rcsb_full_text_priority": 10,
+                  "rcsb_description": [
+                    {
+                      "text": "Lineage Identifier",
+                      "context": "brief"
+                    }
+                  ],
+                  "rcsb_search_group": [
+                    {
+                      "group_name": "Polymer Molecular Features",
+                      "priority_order": 111
+                    }
+                  ]
                 },
                 "name": {
-                    "type": "object",
-                    "required": [
-                        "value",
-                        "provenance_code"
-                    ],
-                    "properties": {
-                        "value": {
-                            "type": "string",
-                            "description": "Name that allows to unambiguously identify a protein.",
-                            "rcsb_search_context": [
-                                "exact-match",
-                                "full-text",
-                                "suggest"
-                            ],
-                            "examples": [
-                                "Hemoglobin alpha"
-                            ],
-                            "rcsb_full_text_priority": 10,
-                            "rcsb_description": [
-                                {
-                                    "text": "UniProt Molecule Name",
-                                    "context": "brief"
-                                }
-                            ],
-                            "rcsb_search_group": [
-                                {
-                                    "group_name": "ID(s) and Keywords",
-                                    "priority_order": 35
-                                }
-                            ]
-                        },
-                        "provenance_code": {
-                            "type": "string",
-                            "description": "Historical record of the data attribute."
-                        }
-                    },
-                    "additionalProperties": false
-                },
-                "function": {
-                    "type": "object",
-                    "properties": {
-                        "details": {
-                            "type": "string",
-                            "description": "General function(s) of a protein."
-                        },
-                        "provenance_code": {
-                            "type": "string",
-                            "description": "Historical record of the data attribute."
-                        }
+                  "type": "string",
+                  "description": "Members of the annotation lineage as parent class names.",
+                  "rcsb_search_context": [
+                    "exact-match",
+                    "full-text"
+                  ],
+                  "rcsb_full_text_priority": 10,
+                  "rcsb_description": [
+                    {
+                      "text": "Lineage Name",
+                      "context": "brief"
                     }
-                },
-                "gene": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "type": {
-                                            "enum": [
-                                                "PRIMARY",
-                                                "SYNONYM",
-                                                "ORDERED_LOCUS",
-                                                "ORF"
-                                            ],
-                                            "type": "string"
-                                        },
-                                        "value": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "additionalProperties": false,
-                        "description": "The name(s) of the gene(s) that code for the protein sequence(s) described in the entry."
+                  ],
+                  "rcsb_search_group": [
+                    {
+                      "group_name": "Polymer Molecular Features",
+                      "priority_order": 116
                     }
-                },
-                "source_organism": {
-                    "type": "object",
-                    "required": [
-                        "scientific_name",
-                        "provenance_code"
-                    ],
-                    "properties": {
-                        "scientific_name": {
-                            "type": "string",
-                            "description": "The scientific name of the organism in which a protein occurs."
-                        },
-                        "taxonomy_id": {
-                            "type": "integer",
-                            "description": "NCBI Taxonomy identifier for the organism in which a protein occurs."
-                        },
-                        "provenance_code": {
-                            "type": "string",
-                            "description": "Historical record of the data attribute."
-                        }
-                    },
-                    "additionalProperties": false,
-                    "description": "Taxonomy information on the organism that is the source of the protein sequence."
-                },
-                "ec": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "number": {
-                                "type": "string"
-                            },
-                            "provenance_code": {
-                                "type": "string",
-                                "description": "Historical record of the data attribute."
-                            }
-                        },
-                        "additionalProperties": false,
-                        "description": "Enzyme Commission (EC) number(s)."
-                    },
-                    "minItems": 1,
-                    "uniqueItems": true
+                  ]
                 }
+              },
+              "additionalProperties": false
             },
-            "additionalProperties": false
-        },
-        "rcsb_uniprot_feature": {
+            "uniqueItems": false,
+            "rcsb_nested_indexing": true
+          },
+          "additional_properties": {
             "type": "array",
             "items": {
-                "type": "object",
-                "properties": {
-                    "assignment_version": {
-                        "type": "string",
-                        "description": "Identifies the version of the feature assignment."
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "A description for the feature."
-                    },
-                    "feature_id": {
-                        "type": "string",
-                        "description": "An identifier for the feature."
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "A name for the feature."
-                    },
-                    "provenance_source": {
-                        "type": "string",
-                        "description": "Code identifying the individual, organization or program that\n assigned the feature."
-                    },
-                    "reference_scheme": {
-                        "type": "string",
-                        "description": "Code residue coordinate system for the assigned feature."
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "ACTIVE_SITE",
-                            "BINDING_SITE",
-                            "CALCIUM_BINDING_REGION",
-                            "CHAIN",
-                            "COMPOSITIONALLY_BIASED_REGION",
-                            "CROSS_LINK",
-                            "DNA_BINDING_REGION",
-                            "DOMAIN",
-                            "GLYCOSYLATION_SITE",
-                            "INITIATOR_METHIONINE",
-                            "LIPID_MOIETY_BINDING_REGION",
-                            "METAL_ION_BINDING_SITE",
-                            "MODIFIED_RESIDUE",
-                            "MUTAGENESIS_SITE",
-                            "NON_CONSECUTIVE_RESIDUES",
-                            "NON_TERMINAL_RESIDUE",
-                            "NUCLEOTIDE_PHOSPHATE_BINDING_REGION",
-                            "PEPTIDE",
-                            "PROPEPTIDE",
-                            "REGION_OF_INTEREST",
-                            "REPEAT",
-                            "NON_STANDARD_AMINO_ACID",
-                            "SEQUENCE_CONFLICT",
-                            "SEQUENCE_VARIANT",
-                            "SHORT_SEQUENCE_MOTIF",
-                            "SIGNAL_PEPTIDE",
-                            "SITE",
-                            "SPLICE_VARIANT",
-                            "TOPOLOGICAL_DOMAIN",
-                            "TRANSIT_PEPTIDE",
-                            "TRANSMEMBRANE_REGION",
-                            "UNSURE_RESIDUE",
-                            "ZINC_FINGER_REGION",
-                            "INTRAMEMBRANE_REGION"
-                        ],
-                        "rcsb_enum_annotated": [
-                            {
-                                "value": "ACTIVE_SITE",
-                                "name": "Active site",
-                                "detail": "Amino acid(s) directly involved in the activity of an enzyme"
-                            },
-                            {
-                                "value": "BINDING_SITE",
-                                "name": "Binding site",
-                                "detail": "Binding site for any chemical group (co-enzyme, prosthetic group, etc.)"
-                            },
-                            {
-                                "value": "CALCIUM_BINDING_REGION",
-                                "name": "Calcium binding",
-                                "detail": "Position(s) of calcium binding region(s) within the protein (e.g. EF-hand)"
-                            },
-                            {
-                                "value": "CHAIN",
-                                "name": "Chain",
-                                "detail": "Extent of a polypeptide chain in the mature protein following processing or proteolytic cleavage"
-                            },
-                            {
-                                "value": "COMPOSITIONALLY_BIASED_REGION",
-                                "name": "Compositional bias",
-                                "detail": "Homopolymeric stretches and large regions of compositional bias in the protein"
-                            },
-                            {
-                                "value": "CROSS_LINK",
-                                "name": "Cross-link",
-                                "detail": "Residues participating in covalent linkage(s) between proteins"
-                            },
-                            {
-                                "value": "DNA_BINDING_REGION",
-                                "name": "DNA binding",
-                                "detail": "Experimentally determined and conserved DNA-binding domains defined by the InterPro resources PROSITE, Pfam and SMART (the AP2/ERF domain, the ETS domain, the Fork-Head domain, etc.)"
-                            },
-                            {
-                                "value": "DOMAIN",
-                                "name": "Domain",
-                                "detail": "Modular protein domains which are self-stabilizing and fold independently of the rest of the protein chain"
-                            },
-                            {
-                                "value": "GLYCOSYLATION_SITE",
-                                "name": "Glycosylation",
-                                "detail": "Covalently attached glycan group(s) (mono-, di-, or polysaccharide)"
-                            },
-                            {
-                                "value": "INITIATOR_METHIONINE",
-                                "name": "Initiator methionine",
-                                "detail": "Cleavage of the initiator methionine from the mature protein"
-                            },
-                            {
-                                "value": "LIPID_MOIETY_BINDING_REGION",
-                                "name": "Lipidation",
-                                "detail": "Covalently attached lipid group(s)"
-                            },
-                            {
-                                "value": "METAL_ION_BINDING_SITE",
-                                "name": "Metal binding",
-                                "detail": "Binding site for a metal ion"
-                            },
-                            {
-                                "value": "MODIFIED_RESIDUE",
-                                "name": "Modified residue",
-                                "detail": "Modified residues excluding lipids, glycans and protein cross-links"
-                            },
-                            {
-                                "value": "MUTAGENESIS_SITE",
-                                "name": "Mutagenesis",
-                                "detail": "Site which has been experimentally altered by mutagenesis"
-                            },
-                            {
-                                "value": "NON_CONSECUTIVE_RESIDUES",
-                                "name": "Non-adjacent residues",
-                                "detail": "Indicates that two residues in a sequence are not consecutive and that there is an undetermined number of unsequenced residues between them"
-                            },
-                            {
-                                "value": "NON_TERMINAL_RESIDUE",
-                                "name": "Non-terminal residue",
-                                "detail": "Indicates that a residue is not the terminal residue of the complete protein (the sequence is incomplete)"
-                            },
-                            {
-                                "value": "NUCLEOTIDE_PHOSPHATE_BINDING_REGION",
-                                "name": "Nucleotide binding",
-                                "detail": "Nucleotide phosphate binding region"
-                            },
-                            {
-                                "value": "PEPTIDE",
-                                "name": "Peptide",
-                                "detail": "Extent of an active peptide in the mature protein"
-                            },
-                            {
-                                "value": "PROPEPTIDE",
-                                "name": "Propeptide",
-                                "detail": "Part of a protein that is cleaved during maturation or activation"
-                            },
-                            {
-                                "value": "REGION_OF_INTEREST",
-                                "name": "Region of interest",
-                                "detail": "Region of interest in the sequence (e.g. different regions in multifunctional enzymes or fusion proteins)"
-                            },
-                            {
-                                "value": "REPEAT",
-                                "name": "Repeat",
-                                "detail": "Denotes the positions of repeated sequence motifs or repeated domains"
-                            },
-                            {
-                                "value": "NON_STANDARD_AMINO_ACID",
-                                "name": "Non-standard residue",
-                                "detail": "Occurrences of non-standard amino acids (selenocysteine and pyrrolysine) in the protein sequence"
-                            },
-                            {
-                                "value": "SEQUENCE_CONFLICT",
-                                "name": "Sequence conflict",
-                                "detail": "Description of sequence discrepancies of unknown origin"
-                            },
-                            {
-                                "value": "SEQUENCE_VARIANT",
-                                "name": "Natural variant",
-                                "detail": "Description of a natural variant of the protein (polymorphisms, disease-associated mutations, RNA editing events, etc.)"
-                            },
-                            {
-                                "value": "SHORT_SEQUENCE_MOTIF",
-                                "name": "Motif",
-                                "detail": "Short (up to 20 amino acids) sequence motif of biological interest"
-                            },
-                            {
-                                "value": "SIGNAL_PEPTIDE",
-                                "name": "Signal peptide",
-                                "detail": "Sequence targeting proteins to the secretory pathway or periplasmic space"
-                            },
-                            {
-                                "value": "SITE",
-                                "name": "Site",
-                                "detail": "Any interesting single amino acid site on the sequence"
-                            },
-                            {
-                                "value": "SPLICE_VARIANT",
-                                "name": "Alternative sequence",
-                                "detail": "Amino acid change(s) producing alternate protein isoforms"
-                            },
-                            {
-                                "value": "TOPOLOGICAL_DOMAIN",
-                                "name": "Topological domain",
-                                "detail": "Location of non-membrane regions of membrane-spanning proteins"
-                            },
-                            {
-                                "value": "TRANSIT_PEPTIDE",
-                                "name": "Transit peptide",
-                                "detail": "Extent of a transit peptide for organelle targeting"
-                            },
-                            {
-                                "value": "TRANSMEMBRANE_REGION",
-                                "name": "Transmembrane",
-                                "detail": "Extent of a membrane-spanning region"
-                            },
-                            {
-                                "value": "UNSURE_RESIDUE",
-                                "name": "Sequence uncertainty",
-                                "detail": "Describes region(s) of a sequence for which the authors are unsure about the sequence assignment"
-                            },
-                            {
-                                "value": "ZINC_FINGER_REGION",
-                                "name": "Zinc finger",
-                                "detail": "Denotes the position(s) and type(s) of zinc fingers within the protein"
-                            },
-                            {
-                                "value": "INTRAMEMBRANE_REGION",
-                                "name": "Intramembrane",
-                                "detail": "Extent of a region located in a membrane without crossing it"
-                            }
-                        ],
-                        "description": "A type or category of the feature."
-                    },
-                    "feature_positions": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "beg_comp_id": {
-                                    "type": "string",
-                                    "description": "An identifier for the monomer(s) corresponding to the feature assignment."
-                                },
-                                "beg_seq_id": {
-                                    "type": "integer",
-                                    "description": "An identifier for the monomer at which this segment of the feature begins."
-                                },
-                                "end_seq_id": {
-                                    "type": "integer",
-                                    "description": "An identifier for the monomer at which this segment of the feature ends."
-                                },
-                                "value": {
-                                    "type": "number",
-                                    "description": "The value for the feature over this monomer segment."
-                                },
-                                "values": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "number",
-                                        "examples": [
-                                            5,
-                                            0.25
-                                        ],
-                                        "description": "The value(s) for the feature over this monomer segment.",
-                                        "rcsb_description": [
-                                            {
-                                                "text": "The value(s) for the feature over this monomer segment.",
-                                                "context": "dictionary"
-                                            }
-                                        ]
-                                    },
-                                    "uniqueItems": false
-                                }
-                            },
-                            "additionalProperties": false,
-                            "required": [
-                                "beg_seq_id"
-                            ]
-                        },
-                        "uniqueItems": false
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "enum": [
+                    "INTERPRO_TYPE"
+                  ],
+                  "examples": [
+                    "INTERPRO_TYPE"
+                  ],
+                  "description": "The additional property name",
+                  "rcsb_enum_annotated": [
+                    {
+                      "value": "INTERPRO_TYPE",
+                      "detail": "Describes the type of InterPro annotations: annotations for individual protein families, domains, important sites, etc."
                     }
-                },
-                "additionalProperties": false
-            },
-            "minItems": 1,
-            "uniqueItems": true
-        },
-        "rcsb_uniprot_annotation": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "annotation_id": {
-                        "type": "string",
-                        "description": "An identifier for the annotation.",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "An identifier for the annotation.",
-                                "context": "dictionary"
-                            },
-                            {
-                                "text": "Identifier",
-                                "context": "brief"
-                            }
-                        ]
-                    },
-                    "assignment_version": {
-                        "type": "string",
-                        "description": "Identifies the version of the annotation assignment.",
-                        "rcsb_description": [
-                            {
-                                "text": "Identifies the version of the annotation assignment.",
-                                "context": "dictionary"
-                            },
-                            {
-                                "text": "Annotation version",
-                                "context": "brief"
-                            }
-                        ]
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "A description for the annotation.",
-                        "rcsb_search_context": [
-                            "exact-match",
-                            "full-text"
-                        ],
-                        "rcsb_full_text_priority": 10,
-                        "rcsb_description": [
-                            {
-                                "text": "A description for the annotation.",
-                                "context": "dictionary"
-                            },
-                            {
-                                "text": "Annotation description",
-                                "context": "brief"
-                            }
-                        ]
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "A name for the annotation.",
-                        "rcsb_search_context": [
-                            "exact-match",
-                            "full-text"
-                        ],
-                        "rcsb_full_text_priority": 10,
-                        "rcsb_description": [
-                            {
-                                "text": "Name",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Polymer Molecular Features",
-                                "priority_order": 108
-                            }
-                        ]
-                    },
-                    "provenance_source": {
-                        "type": "string",
-                        "description": "Code identifying the individual, organization or program that\n assigned the annotation.",
-                        "rcsb_description": [
-                            {
-                                "text": "Annotation Source",
-                                "context": "brief"
-                            }
-                        ]
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "disease",
-                            "phenotype",
-                            "GO",
-                            "InterPro"
-                        ],
-                        "description": "A type or category of the annotation.",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_enum_annotated": [
-                            {
-                                "value": "disease",
-                                "detail": "Disease data from OMIM and Disease Ontology represented in Pharos",
-                                "name": "Pharos Disease"
-                            },
-                            {
-                                "value": "phenotype",
-                                "detail": "Phenotypic data including mouse phenotypes, mouse/human orthologs and GWAS results represented in IMPC",
-                                "name": "IMPC Phenotype"
-                            },
-                            {
-                                "value": "InterPro",
-                                "detail": "InterPro Protein Family",
-                                "name": "InterPro Protein Family"
-                            },
-                            {
-                                "value": "GO",
-                                "detail": "Gene Ontology",
-                                "name": "Gene Ontology"
-                            }
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "A type or category of the annotation.",
-                                "context": "dictionary"
-                            },
-                            {
-                                "text": "Annotation Type",
-                                "context": "brief"
-                            }
-                        ]
-                    },
-                    "annotation_lineage": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "depth": {
-                                    "type": "integer",
-                                    "description": "Members of the annotation lineage as parent lineage depth (1-N)",
-                                    "rcsb_search_context": [
-                                        "default-match"
-                                    ],
-                                    "rcsb_description": [
-                                        {
-                                            "text": "Lineage Depth",
-                                            "context": "brief"
-                                        }
-                                    ]
-                                },
-                                "id": {
-                                    "type": "string",
-                                    "description": "Members of the annotation lineage as parent class identifiers.",
-                                    "rcsb_search_context": [
-                                        "exact-match"
-                                    ],
-                                    "rcsb_full_text_priority": 10,
-                                    "rcsb_description": [
-                                        {
-                                            "text": "Lineage Identifier",
-                                            "context": "brief"
-                                        }
-                                    ],
-                                    "rcsb_search_group": [
-                                        {
-                                            "group_name": "Polymer Molecular Features",
-                                            "priority_order": 111
-                                        }
-                                    ]
-                                },
-                                "name": {
-                                    "type": "string",
-                                    "description": "Members of the annotation lineage as parent class names.",
-                                    "rcsb_search_context": [
-                                        "exact-match",
-                                        "full-text"
-                                    ],
-                                    "rcsb_full_text_priority": 10,
-                                    "rcsb_description": [
-                                        {
-                                            "text": "Lineage Name",
-                                            "context": "brief"
-                                        }
-                                    ],
-                                    "rcsb_search_group": [
-                                        {
-                                            "group_name": "Polymer Molecular Features",
-                                            "priority_order": 116
-                                        }
-                                    ]
-                                }
-                            },
-                            "additionalProperties": false
-                        },
-                        "uniqueItems": false,
-                        "rcsb_nested_indexing": true
-                    },
-                    "additional_properties": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "name": {
-                                    "type": "string",
-                                    "enum": [
-                                        "INTERPRO_TYPE"
-                                    ],
-                                    "examples": [
-                                        "INTERPRO_TYPE"
-                                    ],
-                                    "description": "The additional property name",
-                                    "rcsb_enum_annotated": [
-                                        {
-                                            "value": "INTERPRO_TYPE",
-                                            "detail": "Describes the type of InterPro annotations: annotations for individual protein families, domains, important sites, etc."
-                                        }
-                                    ],
-                                    "rcsb_description": [
-                                        {
-                                            "text": "The additional property name",
-                                            "context": "dictionary"
-                                        }
-                                    ]
-                                },
-                                "values": {
-                                    "type": "array",
-                                    "items": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "integer"
-                                            },
-                                            {
-                                                "type": "number"
-                                            }
-                                        ],
-                                        "description": "The value(s) of the additional property",
-                                        "rcsb_description": [
-                                            {
-                                                "text": "The value(s) of the additional property",
-                                                "context": "dictionary"
-                                            }
-                                        ]
-                                    },
-                                    "uniqueItems": false
-                                }
-                            },
-                            "additionalProperties": false
-                        },
-                        "uniqueItems": false
+                  ],
+                  "rcsb_description": [
+                    {
+                      "text": "The additional property name",
+                      "context": "dictionary"
                     }
+                  ]
                 },
-                "additionalProperties": false
-            },
-            "minItems": 1,
-            "uniqueItems": true,
-            "rcsb_nested_indexing": true,
-            "rcsb_nested_indexing_context": [
-                {
-                    "category_name": "annotation_type",
-                    "category_path": "rcsb_uniprot_annotation.type",
-                    "context_attributes": [
-                        {
-                            "context_value": "disease",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        "MONDO:0100118",
-                                        "MONDO:0002051"
-                                    ],
-                                    "path": "rcsb_uniprot_annotation.annotation_lineage.id"
-                                },
-                                {
-                                    "examples": [
-                                        "hepatocellular carcinoma",
-                                        "tuberculosis"
-                                    ],
-                                    "path": "rcsb_uniprot_annotation.annotation_lineage.name"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "phenotype",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        "immune system phenotype",
-                                        "mortality/aging"
-                                    ],
-                                    "path": "rcsb_uniprot_annotation.name"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "GO",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        "GO:0005575",
-                                        "GO:0005622"
-                                    ],
-                                    "path": "rcsb_uniprot_annotation.annotation_lineage.id"
-                                },
-                                {
-                                    "examples": [
-                                        "cellular_component",
-                                        "intracellular"
-                                    ],
-                                    "path": "rcsb_uniprot_annotation.annotation_lineage.name"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "InterPro",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        "IPR022352",
-                                        "IPR004825"
-                                    ],
-                                    "path": "rcsb_uniprot_annotation.annotation_lineage.id"
-                                },
-                                {
-                                    "examples": [
-                                        "Insulin family",
-                                        "Insulin"
-                                    ],
-                                    "path": "rcsb_uniprot_annotation.annotation_lineage.name"
-                                }
-                            ]
-                        }
+                "values": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ],
+                    "description": "The value(s) of the additional property",
+                    "rcsb_description": [
+                      {
+                        "text": "The value(s) of the additional property",
+                        "context": "dictionary"
+                      }
                     ]
+                  },
+                  "uniqueItems": false
                 }
-            ]
-        },
-        "rcsb_uniprot_external_reference": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "reference_id": {
-                        "type": "string"
-                    },
-                    "reference_name": {
-                        "type": "string",
-                        "enum": [
-                            "IMPC",
-                            "GTEX",
-                            "PHAROS"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_enum_annotated": [
-                            {
-                                "value": "IMPC",
-                                "name": "IMPC",
-                                "detail": "Knockout Mouse Phenotyping Program (IMPC)"
-                            },
-                            {
-                                "value": "GTEX",
-                                "name": "GTEx",
-                                "detail": "Genotype-Tissue Expression (GTEx) Project Portal"
-                            },
-                            {
-                                "value": "PHAROS",
-                                "name": "Pharos",
-                                "detail": "PHAROS Portal to the Illuminating the Druggable Genome"
-                            }
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "UniProt-mapped Resource",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Linked External Resources",
-                                "priority_order": 10
-                            }
-                        ]
-                    },
-                    "provenance_source": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "rcsb_uniprot_alignments": {
-            "type": "object",
-            "description": "UniProt pairwise sequence alignments.",
-            "properties": {
-                "core_entity_alignments": {
-                    "type": "array",
-                    "description": "List of alignments with core_entity canonical sequences",
-                    "items": {
-                        "type": "object",
-                        "required": [
-                            "scores",
-                            "aligned_regions"
-                        ],
-                        "properties": {
-                            "scores": {
-                                "type": "object",
-                                "description": "Alignment scores",
-                                "required": [
-                                    "target_coverage",
-                                    "query_coverage",
-                                    "target_length",
-                                    "query_length"
-                                ],
-                                "properties": {
-                                    "target_coverage": {
-                                        "type": "integer"
-                                    },
-                                    "query_coverage": {
-                                        "type": "integer"
-                                    },
-                                    "target_length": {
-                                        "type": "integer"
-                                    },
-                                    "query_length": {
-                                        "type": "integer"
-                                    }
-                                }
-                            },
-                            "aligned_regions": {
-                                "type": "array",
-                                "description": "Aligned sequence regions",
-                                "items": {
-                                    "type": "object",
-                                    "description": "Aligned region",
-                                    "required": [
-                                        "target_begin",
-                                        "query_begin",
-                                        "length"
-                                    ],
-                                    "properties": {
-                                        "target_begin": {
-                                            "type": "integer",
-                                            "description": "NCBI sequence start position"
-                                        },
-                                        "query_begin": {
-                                            "type": "integer",
-                                            "description": "Entity seqeunce start position"
-                                        },
-                                        "length": {
-                                            "type": "integer",
-                                            "description": "Aligned region length"
-                                        }
-                                    }
-                                }
-                            },
-                            "core_entity_identifiers": {
-                                "type": "object",
-                                "description": "core_entity identifiers",
-                                "required": [
-                                    "entity_id",
-                                    "entry_id"
-                                ],
-                                "properties": {
-                                    "entry_id": {
-                                        "type": "string"
-                                    },
-                                    "entity_id": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+              },
+              "additionalProperties": false
             },
-            "additionalProperties": false
+            "uniqueItems": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "rcsb_nested_indexing": true,
+      "rcsb_nested_indexing_context": [
+        {
+          "category_name": "annotation_type",
+          "category_path": "rcsb_uniprot_annotation.type",
+          "context_attributes": [
+            {
+              "context_value": "disease",
+              "attributes": [
+                {
+                  "examples": [
+                    "MONDO:0100118",
+                    "MONDO:0002051"
+                  ],
+                  "path": "rcsb_uniprot_annotation.annotation_lineage.id"
+                },
+                {
+                  "examples": [
+                    "hepatocellular carcinoma",
+                    "tuberculosis"
+                  ],
+                  "path": "rcsb_uniprot_annotation.annotation_lineage.name"
+                }
+              ]
+            },
+            {
+              "context_value": "phenotype",
+              "attributes": [
+                {
+                  "examples": [
+                    "immune system phenotype",
+                    "mortality/aging"
+                  ],
+                  "path": "rcsb_uniprot_annotation.name"
+                }
+              ]
+            },
+            {
+              "context_value": "GO",
+              "attributes": [
+                {
+                  "examples": [
+                    "GO:0005575",
+                    "GO:0005622"
+                  ],
+                  "path": "rcsb_uniprot_annotation.annotation_lineage.id"
+                },
+                {
+                  "examples": [
+                    "cellular_component",
+                    "intracellular"
+                  ],
+                  "path": "rcsb_uniprot_annotation.annotation_lineage.name"
+                }
+              ]
+            },
+            {
+              "context_value": "InterPro",
+              "attributes": [
+                {
+                  "examples": [
+                    "IPR022352",
+                    "IPR004825"
+                  ],
+                  "path": "rcsb_uniprot_annotation.annotation_lineage.id"
+                },
+                {
+                  "examples": [
+                    "Insulin family",
+                    "Insulin"
+                  ],
+                  "path": "rcsb_uniprot_annotation.annotation_lineage.name"
+                }
+              ]
+            }
+          ]
         }
+      ]
     },
-    "additionalProperties": false
+    "rcsb_uniprot_external_reference": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "reference_id": {
+            "type": "string"
+          },
+          "reference_name": {
+            "type": "string",
+            "enum": [
+              "IMPC",
+              "GTEX",
+              "PHAROS"
+            ],
+            "rcsb_search_context": [
+              "exact-match"
+            ],
+            "rcsb_enum_annotated": [
+              {
+                "value": "IMPC",
+                "name": "IMPC",
+                "detail": "Knockout Mouse Phenotyping Program (IMPC)"
+              },
+              {
+                "value": "GTEX",
+                "name": "GTEx",
+                "detail": "Genotype-Tissue Expression (GTEx) Project Portal"
+              },
+              {
+                "value": "PHAROS",
+                "name": "Pharos",
+                "detail": "PHAROS Portal to the Illuminating the Druggable Genome"
+              }
+            ],
+            "rcsb_description": [
+              {
+                "text": "UniProt-mapped Resource",
+                "context": "brief"
+              }
+            ],
+            "rcsb_search_group": [
+              {
+                "group_name": "Linked External Resources",
+                "priority_order": 10
+              }
+            ]
+          },
+          "provenance_source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "rcsb_uniprot_alignments": {
+      "type": "object",
+      "description": "UniProt pairwise sequence alignments.",
+      "properties": {
+        "core_entity_alignments": {
+          "type": "array",
+          "description": "List of alignments with core_entity canonical sequences",
+          "items": {
+            "type": "object",
+            "required": [
+              "scores",
+              "aligned_regions"
+            ],
+            "properties": {
+              "scores": {
+                "type": "object",
+                "description": "Alignment scores",
+                "required": [
+                  "target_coverage",
+                  "query_coverage",
+                  "target_length",
+                  "query_length"
+                ],
+                "properties": {
+                  "target_coverage": {
+                    "type": "integer"
+                  },
+                  "query_coverage": {
+                    "type": "integer"
+                  },
+                  "target_length": {
+                    "type": "integer"
+                  },
+                  "query_length": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "aligned_regions": {
+                "type": "array",
+                "description": "Aligned sequence regions",
+                "items": {
+                  "type": "object",
+                  "description": "Aligned region",
+                  "required": [
+                    "target_begin",
+                    "query_begin",
+                    "length"
+                  ],
+                  "properties": {
+                    "target_begin": {
+                      "type": "integer",
+                      "description": "NCBI sequence start position"
+                    },
+                    "query_begin": {
+                      "type": "integer",
+                      "description": "Entity seqeunce start position"
+                    },
+                    "length": {
+                      "type": "integer",
+                      "description": "Aligned region length"
+                    }
+                  }
+                }
+              },
+              "core_entity_identifiers": {
+                "type": "object",
+                "description": "core_entity identifiers",
+                "required": [
+                  "entity_id",
+                  "entry_id"
+                ],
+                "properties": {
+                  "entry_id": {
+                    "type": "string"
+                  },
+                  "entity_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
 }

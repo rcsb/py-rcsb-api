@@ -23,7 +23,10 @@
         },
         "formula_weight": {
           "type": "number",
-          "examples": [120.12, 450.1],
+          "examples": [
+            120.12,
+            450.1
+          ],
           "description": "Formula mass of the chemical component.",
           "rcsb_search_context": [
             "default-match"
@@ -45,7 +48,7 @@
               "priority_order": 70
             }
           ],
-          "rcsb_current_maximum_value": 12016,
+          "rcsb_current_maximum_value": 12016.0,
           "rcsb_current_minimum_value": 2.014
         },
         "id": {
@@ -3130,8 +3133,8 @@
                       "context": "brief"
                     }
                   ],
-                  "rcsb_current_maximum_value": 18,
-                  "rcsb_current_minimum_value": 1
+                  "rcsb_current_maximum_value": 18.0,
+                  "rcsb_current_minimum_value": 1.0
                 },
                 "id": {
                   "type": "string",
@@ -3571,8 +3574,8 @@
               "priority_order": 80
             }
           ],
-          "rcsb_current_maximum_value": 52,
-          "rcsb_current_minimum_value": 0
+          "rcsb_current_maximum_value": 52.0,
+          "rcsb_current_minimum_value": 0.0
         },
         "atom_count_heavy": {
           "type": "integer",
@@ -3596,8 +3599,8 @@
               "priority_order": 75
             }
           ],
-          "rcsb_current_maximum_value": 352,
-          "rcsb_current_minimum_value": 0
+          "rcsb_current_maximum_value": 352.0,
+          "rcsb_current_minimum_value": 0.0
         },
         "bond_count": {
           "type": "integer",
@@ -3621,8 +3624,8 @@
               "priority_order": 85
             }
           ],
-          "rcsb_current_maximum_value": 727,
-          "rcsb_current_minimum_value": 0
+          "rcsb_current_maximum_value": 727.0,
+          "rcsb_current_minimum_value": 0.0
         },
         "bond_count_aromatic": {
           "type": "integer",
@@ -3646,8 +3649,8 @@
               "priority_order": 90
             }
           ],
-          "rcsb_current_maximum_value": 116,
-          "rcsb_current_minimum_value": 0
+          "rcsb_current_maximum_value": 116.0,
+          "rcsb_current_minimum_value": 0.0
         },
         "comp_id": {
           "type": "string",
@@ -3679,8 +3682,8 @@
               "context": "brief"
             }
           ],
-          "rcsb_current_maximum_value": 1726704000000,
-          "rcsb_current_minimum_value": 711158400000
+          "rcsb_current_maximum_value": 1728345600000.0,
+          "rcsb_current_minimum_value": 711158400000.0
         },
         "initial_release_date": {
           "type": "string",
@@ -3708,8 +3711,8 @@
               "priority_order": 20
             }
           ],
-          "rcsb_current_maximum_value": 1727827200000,
-          "rcsb_current_minimum_value": 105235200000
+          "rcsb_current_maximum_value": 1729036800000.0,
+          "rcsb_current_minimum_value": 105235200000.0
         },
         "release_status": {
           "type": "string",
@@ -4009,7 +4012,10 @@
               "context_value": "COD",
               "attributes": [
                 {
-                  "examples": [2236573, 7229993],
+                  "examples": [
+                    2236573,
+                    7229993
+                  ],
                   "path": "rcsb_chem_comp_related.resource_accession_code"
                 }
               ]
@@ -4030,7 +4036,10 @@
               "context_value": "PubChem",
               "attributes": [
                 {
-                  "examples": [3082729, 5289380],
+                  "examples": [
+                    3082729,
+                    5289380
+                  ],
                   "path": "rcsb_chem_comp_related.resource_accession_code"
                 }
               ]
@@ -4912,8 +4921,8 @@
                     "priority_order": 55
                   }
                 ],
-                "rcsb_current_maximum_value": 2543011200000,
-                "rcsb_current_minimum_value": -1072915200000
+                "rcsb_current_maximum_value": 2543011200000.0,
+                "rcsb_current_minimum_value": -1072915200000.0
               },
               "name": {
                 "type": "string",
@@ -4986,8 +4995,8 @@
                     "priority_order": 50
                   }
                 ],
-                "rcsb_current_maximum_value": 3376684800000,
-                "rcsb_current_minimum_value": -2840140800000
+                "rcsb_current_maximum_value": 3376684800000.0,
+                "rcsb_current_minimum_value": -2840140800000.0
               }
             },
             "additionalProperties": false
