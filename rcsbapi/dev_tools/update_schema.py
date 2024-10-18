@@ -59,7 +59,7 @@ def update_schema(
 
     with open(path, "wt", encoding="utf-8") as file:
         new_schema = SEARCH_SCHEMA._fetch_schema(url)
-        json.dump(new_schema, file, indent=2)
+        json.dump(new_schema, file, indent=4)
         if "$comment" in new_schema:
             if package == "search":
                 version = new_schema["$comment"].lower().replace("schema version: ", "")
