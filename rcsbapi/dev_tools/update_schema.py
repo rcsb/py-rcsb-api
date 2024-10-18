@@ -134,7 +134,7 @@ if __name__ == "__main__":
     data_file_list = list(data_version_dict.keys())
     update_msg = make_changelog_msg(
         file_list=data_file_list,
-        package="search",
+        package="data",
         current_ver_dict=data_current_ver_dict,
         new_ver_dict=data_version_dict
     )
