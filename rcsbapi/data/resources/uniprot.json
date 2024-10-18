@@ -91,7 +91,7 @@
             "items": {
                 "type": "string"
             },
-            "description": "List of UniProtKB accession numbers where original accession numbers are retained as ‘secondary’ accession numbers."
+            "description": "List of UniProtKB accession numbers where original accession numbers are retained as \u2018secondary\u2019 accession numbers."
         },
         "rcsb_uniprot_entry_name": {
             "type": "array",

@@ -1433,7 +1433,7 @@
                                 "priority_order": 100
                             }
                         ],
-                        "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Schönflies notation. Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry."
+                        "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Sch\u00f6nflies notation. Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry."
                     },
                     "type": {
                         "type": "string",
