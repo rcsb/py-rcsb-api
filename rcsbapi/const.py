@@ -6,7 +6,6 @@ including API endpoints, search services, and schema URLs. The values are
 immutable and protected from modification during runtime.
 """
 
-from typing import Dict
 from dataclasses import dataclass
 from types import MappingProxyType
 
@@ -16,10 +15,6 @@ class Const:
     # Search API constants
     STRUCTURE_INDEX: int = 0
     CHEMICAL_INDEX: int = 0
-    STRUCTURE_ATTRIBUTE_SCHEMA_URL: str = "http://search.rcsb.org/rcsbsearch/v2/metadata/schema"
-    STRUCTURE_ATTRIBUTE_SCHEMA_FILE: str = "resources/metadata_schema.json"
-    CHEMICAL_ATTRIBUTE_SCHEMA_URL: str = "https://search.rcsb.org/rcsbsearch/v2/metadata/chemical/schema"
-    CHEMICAL_ATTRIBUTE_SCHEMA_FILE: str = "resources/chemical_schema.json"
     SEARCH_SCHEMA_URL: str = "https://search.rcsb.org/schema/search/request/json-schema-rcsb_search_query.json"
     SEARCH_OPENAPI_SCHEMA_URL: str = "https://search.rcsb.org/openapi.json"
     STRUCTURE_ATTRIBUTE_SEARCH_SERVICE: str = "text"
@@ -37,11 +32,40 @@ class Const:
     RCSB_SEARCH_API_QUERY_URL: str = "https://search.rcsb.org/rcsbsearch/v2/query"
     UPLOAD_URL: str = "https://user-upload.rcsb.org/v1/putMultipart"
     RETURN_UP_URL: str = "https://user-upload.rcsb.org/v1/download/"
-    #
+
+    SEARCH_API_SCHEMA_DIR = "search/resources"
+    SEARCH_API_SCHEMA_BASE_URL = "http://search.rcsb.org/rcsbsearch/v2/metadata/"
+    STRUCTURE_SCHEMA_FILE_NAME = "structure_schema.json"
+    CHEMICAL_SCHEMA_FILE_NAME = "chemical_schema.json"
+    SEARCH_API_SCHEMA_FILE_TO_ENDPOINT = MappingProxyType({
+        STRUCTURE_SCHEMA_FILE_NAME: "schema",
+        CHEMICAL_SCHEMA_FILE_NAME: "chemical/schema",
+    })
+    STRUCTURE_ATTRIBUTE_SCHEMA_URL: str = SEARCH_API_SCHEMA_BASE_URL + SEARCH_API_SCHEMA_FILE_TO_ENDPOINT[STRUCTURE_SCHEMA_FILE_NAME]
+    STRUCTURE_ATTRIBUTE_SCHEMA_FILE: str = SEARCH_API_SCHEMA_DIR + "/" + STRUCTURE_SCHEMA_FILE_NAME
+    CHEMICAL_ATTRIBUTE_SCHEMA_URL: str = SEARCH_API_SCHEMA_BASE_URL + SEARCH_API_SCHEMA_FILE_TO_ENDPOINT[CHEMICAL_SCHEMA_FILE_NAME]
+    CHEMICAL_ATTRIBUTE_SCHEMA_FILE: str = SEARCH_API_SCHEMA_DIR + "/" + CHEMICAL_SCHEMA_FILE_NAME
+
     # Data API constants
     DATA_API_ENDPOINT: str = "https://data.rcsb.org/graphql"
-    #
-    SINGULAR_TO_PLURAL: Dict[str, str] = MappingProxyType({
+    DATA_API_SCHEMA_DIR: str = "data/resources"
+    DATA_API_SCHEMA_BASE_URL: str = "https://data.rcsb.org/rest/v1/schema/"
+    DATA_API_SCHEMA_FILE_TO_ENDPOINT = MappingProxyType({
+        "entry.json": "entry",
+        "polymer_entity.json": "polymer_entity",
+        "branched_entity.json": "branched_entity",
+        "nonpolymer_entity.json": "nonpolymer_entity",
+        "polymer_entity_instance.json": "polymer_entity_instance",
+        "branched_entity_instance.json": "branched_entity_instance",
+        "nonpolymer_entity_instance.json": "nonpolymer_entity_instance",
+        "assembly.json": "assembly",
+        "chem_comp.json": "chem_comp",
+        "pubmed.json": "pubmed",
+        "uniprot.json": "uniprot",
+        "drugbank.json": "drugbank",
+    })
+
+    SINGULAR_TO_PLURAL = MappingProxyType({
         "entry": "entries",
         "polymer_entity": "polymer_entities",
         "branched_entity": "branched_entities",
@@ -59,7 +83,7 @@ class Const:
         "group_provenance": ""
     })
     #
-    ID_TO_SEPARATOR: Dict[str, str] = MappingProxyType({
+    ID_TO_SEPARATOR = MappingProxyType({
         "entity_id": "_",
         "asym_id": ".",
         "assembly_id": "-",

@@ -5,7 +5,7 @@ Provides access to all valid attributes for search queries.
 
 import json
 import logging
-import pkgutil
+from pathlib import Path
 import re
 import warnings
 from typing import List, Union
@@ -222,8 +222,10 @@ class SearchSchema:
 
     def _load_json_schema(self, schema_file):
         logger.info("Loading attribute schema from file")
-        latest = pkgutil.get_data(__package__, schema_file)
-        return json.loads(latest)
+        path = Path(__file__).parent.parent.joinpath(schema_file)
+        with open(path, "r", encoding="utf-8") as file:
+            latest = json.load(file)
+        return latest
 
     def _make_group(self, fullname: str, nodeL: List):
         """Represent this node of the schema as a python object

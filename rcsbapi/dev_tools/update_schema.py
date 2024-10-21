@@ -1,5 +1,15 @@
 """Update the distribution json files; for developer use only
-This is currently not in use. """
+
+This script updates the search and data API schema files.
+After updating, it prints a message about which schemas were updated along with version numbers.
+
+Run this before releasing a new version of the rcsb-api package and
+copy/paste the printed message into the CHANGELOG if any schemas were updated.
+
+The endpoints for requesting online schemas and paths for writing the new schema files
+are in the .const file.
+"""
+
 import json
 from pathlib import Path
 from typing import Dict, Literal, List
@@ -11,31 +21,12 @@ except Exception:
     pass
 
 from rcsbapi.const import const
-SEARCH_API_SCHEMAS = {
-    "metadata_schema.json": const.STRUCTURE_ATTRIBUTE_SCHEMA_URL,
-    "chemical_schema.json": const.CHEMICAL_ATTRIBUTE_SCHEMA_URL
-}
-
-DATA_API_SCHEMAS = {
-    "entry.json": "https://data.rcsb.org/rest/v1/schema/entry",
-    "polymer_entity.json": "https://data.rcsb.org/rest/v1/schema/polymer_entity",
-    "branched_entity.json": "https://data.rcsb.org/rest/v1/schema/branched_entity",
-    "nonpolymer_entity.json": "https://data.rcsb.org/rest/v1/schema/nonpolymer_entity",
-    "polymer_entity_instance.json": "https://data.rcsb.org/rest/v1/schema/polymer_entity_instance",
-    "branched_entity_instance.json": "https://data.rcsb.org/rest/v1/schema/branched_entity_instance",
-    "nonpolymer_entity_instance.json": "https://data.rcsb.org/rest/v1/schema/nonpolymer_entity_instance",
-    "assembly.json": "https://data.rcsb.org/rest/v1/schema/assembly",
-    "chem_comp.json": "https://data.rcsb.org/rest/v1/schema/chem_comp",
-    "pubmed.json": "https://data.rcsb.org/rest/v1/schema/pubmed",
-    "uniprot.json": "https://data.rcsb.org/rest/v1/schema/uniprot",
-    "drugbank.json": "https://data.rcsb.org/rest/v1/schema/drugbank",
-}
 
 
 def make_version_dict(file_list: List[str], package: Literal["search", "data"]) -> Dict:
     current_version_dict = {}
-    for file_name in file_list:
-        path = Path(__file__).parent.parent.joinpath(package, "resources", file_name)
+    for f_name in file_list:
+        path = Path(__file__).parent.parent.joinpath(package, "resources", f_name)
         with open(path, "r", encoding="utf-8") as file:
             schema = json.load(file)
             if "$comment" in schema:
@@ -43,22 +34,21 @@ def make_version_dict(file_list: List[str], package: Literal["search", "data"]) 
                     version = schema["$comment"].lower().replace("schema version: ", "")
                 else:
                     version = schema["$comment"].lower().replace("schema_version: ", "")
-                current_version_dict[file_name] = version
+                current_version_dict[f_name] = version
             else:
-                current_version_dict[file_name] = ""
+                current_version_dict[f_name] = ""
     return current_version_dict
 
 
 def update_schema(
-    file_name: str,
-    url: str,
+    f_name: str,
+    file_url: str,
     package: Literal["search", "data"],
 ) -> str:
     # Define path: py-rcsb-api/rcsbapi/<package>/resources/<file_name>
-    path = Path(__file__).parent.parent.joinpath(package, "resources", file_name)
-
+    path = Path(__file__).parent.parent.joinpath(package, "resources", f_name)
     with open(path, "wt", encoding="utf-8") as file:
-        new_schema = SEARCH_SCHEMA._fetch_schema(url)
+        new_schema = SEARCH_SCHEMA._fetch_schema(file_url)
         json.dump(new_schema, file, indent=4)
         if "$comment" in new_schema:
             if package == "search":
@@ -77,31 +67,45 @@ def make_changelog_msg(
     new_ver_dict: Dict[str, str],
 ) -> str:
     msg = ""
-    for file_name in file_list:
-        if (current_ver_dict[file_name] == new_ver_dict[file_name]) or (current_ver_dict[file_name] == ""):
+    for f_name in file_list:
+        if (current_ver_dict[f_name] == new_ver_dict[f_name]) or (current_ver_dict[f_name] == ""):
             continue
 
         if not msg:
             msg = f"Update {package} schemas: \n"
-        msg += f"  {file_name.replace('.json', '')} schema {current_ver_dict[file_name]} --> {new_ver_dict[file_name]}\n"
+        msg += f"  {f_name.replace('.json', '')} schema {current_ver_dict[f_name]} --> {new_ver_dict[f_name]}\n"
     return msg
 
 
 if __name__ == "__main__":
     # Find current schema versions
-    search_current_ver_dict = make_version_dict(file_list=list(SEARCH_API_SCHEMAS.keys()), package="search")
-    data_current_ver_dict = make_version_dict(file_list=list(DATA_API_SCHEMAS.keys()), package="data")
+    search_current_ver_dict = make_version_dict(
+        file_list=list(const.SEARCH_API_SCHEMA_FILE_TO_ENDPOINT),
+        package="search"
+    )
+    data_current_ver_dict = make_version_dict(
+        file_list=list(const.DATA_API_SCHEMA_FILE_TO_ENDPOINT),
+        package="data"
+    )
 
     # Update Search API schemas
     search_version_dict: dict[str, str] = {}
-    for file_name, url in SEARCH_API_SCHEMAS.items():
-        search_version = update_schema(file_name=file_name, url=url, package="search")
+    for file_name, endpoint in const.SEARCH_API_SCHEMA_FILE_TO_ENDPOINT.items():
+        search_version = update_schema(
+            f_name=file_name,
+            file_url=const.SEARCH_API_SCHEMA_BASE_URL + endpoint,
+            package="search"
+        )
         search_version_dict[file_name] = search_version
 
     # Update Data API schemas
     data_version_dict: dict[str, str] = {}
-    for file_name, url in DATA_API_SCHEMAS.items():
-        data_version = update_schema(file_name=file_name, url=url, package="data")
+    for file_name, endpoint in const.DATA_API_SCHEMA_FILE_TO_ENDPOINT.items():
+        data_version = update_schema(
+            f_name=file_name,
+            file_url=const.DATA_API_SCHEMA_BASE_URL + endpoint,
+            package="data"
+        )
         data_version_dict[file_name] = data_version
 
     # Check if search schema version numbers are the same as each other
