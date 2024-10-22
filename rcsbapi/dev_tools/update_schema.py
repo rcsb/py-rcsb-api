@@ -13,6 +13,7 @@ are in the .const file.
 import json
 from pathlib import Path
 from typing import Dict, Literal, List
+import requests
 
 try:
     from rcsbapi.search.search_query import SEARCH_SCHEMA  # instance of SearchSchema
@@ -21,6 +22,7 @@ except Exception:
     pass
 
 from rcsbapi.const import const
+from rcsbapi.config import config
 
 
 def make_version_dict(file_list: List[str], package: Literal["search", "data"]) -> Dict:
@@ -80,33 +82,45 @@ def make_changelog_msg(
 if __name__ == "__main__":
     # Find current schema versions
     search_current_ver_dict = make_version_dict(
-        file_list=list(const.SEARCH_API_SCHEMA_FILE_TO_ENDPOINT),
+        file_list=[const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME, const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME],
         package="search"
     )
     data_current_ver_dict = make_version_dict(
-        file_list=list(const.DATA_API_SCHEMA_FILE_TO_ENDPOINT),
+        file_list=list(const.DATA_API_SCHEMA_ENDPOINT_TO_FILE.values()),
         package="data"
     )
 
     # Update Search API schemas
+    search_url_to_file = {
+        const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL: const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME,
+        const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL: const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME,
+    }
     search_version_dict: dict[str, str] = {}
-    for file_name, endpoint in const.SEARCH_API_SCHEMA_FILE_TO_ENDPOINT.items():
+    for url, file_name in search_url_to_file.items():
         search_version = update_schema(
             f_name=file_name,
-            file_url=const.SEARCH_API_SCHEMA_BASE_URL + endpoint,
+            file_url=url,
             package="search"
         )
         search_version_dict[file_name] = search_version
 
     # Update Data API schemas
     data_version_dict: dict[str, str] = {}
-    for file_name, endpoint in const.DATA_API_SCHEMA_FILE_TO_ENDPOINT.items():
+    for endpoint, file_name in const.DATA_API_SCHEMA_ENDPOINT_TO_FILE.items():
         data_version = update_schema(
             f_name=file_name,
             file_url=const.DATA_API_SCHEMA_BASE_URL + endpoint,
             package="data"
         )
         data_version_dict[file_name] = data_version
+
+    # Update full GraphQL Data API schema
+    query = const.DATA_API_SCHEMA_INTROSPECTION
+    schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT)
+    assert schema_response.status_code == 200
+    data_schema_path = Path(__file__).parent.parent.joinpath(const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
+    with open(data_schema_path, "wt", encoding="utf-8") as file:
+        json.dump(schema_response.json(), file, indent=4)
 
     # Check if search schema version numbers are the same as each other
     version_list = list(search_version_dict.values())

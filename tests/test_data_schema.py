@@ -40,7 +40,7 @@ logger.setLevel(logging.INFO)
 class SchemaTests(unittest.TestCase):
     def test_schema_version(self):
         with self.subTest(msg="1. Compare entry schema"):
-            entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "data", "resources", "entry.json")
+            entry_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_ENDPOINT_TO_FILE["entry"])
             with open(entry_schema_path, "r", encoding="utf-8") as f:
                 schema_data = json.load(f)
             local_schema_version = schema_data.get("$comment").split(": ")[1]
@@ -54,7 +54,7 @@ class SchemaTests(unittest.TestCase):
             self.assertEqual(local_major_minor_version, online_major_minor_version)
 
         with self.subTest(msg="2. Compare polymer_entity schema"):
-            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "data", "resources", "polymer_entity.json")
+            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_ENDPOINT_TO_FILE["polymer_entity"])
             with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
                 schema_data = json.load(f)
             local_schema_version = schema_data.get("$comment").split(": ")[1]
@@ -68,7 +68,13 @@ class SchemaTests(unittest.TestCase):
             self.assertEqual(local_major_minor_version, online_major_minor_version)
 
         with self.subTest(msg="3. Compare polymer_entity_instance schema"):
-            polymer_entity_schema_path = os.path.join(os.path.dirname(__file__), "..", "rcsbapi", "data", "resources", "polymer_entity_instance.json")
+            polymer_entity_schema_path = os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "rcsbapi",
+                const.DATA_API_SCHEMA_DIR,
+                const.DATA_API_SCHEMA_ENDPOINT_TO_FILE["polymer_entity_instance"]
+            )
             with open(polymer_entity_schema_path, "r", encoding="utf-8") as f:
                 schema_data = json.load(f)
             local_schema_version = schema_data.get("$comment").split(": ")[1]
@@ -235,7 +241,11 @@ class SchemaTests(unittest.TestCase):
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. regex for assemblies"):
-            query = DATA_SCHEMA._construct_query_rustworkx(input_type="assemblies", return_data_list=["rcsb_struct_symmetry_lineage"], input_ids=["4HHB-1", "MA_MACOFFESLACC100000G1I2-2"])
+            query = DATA_SCHEMA._construct_query_rustworkx(
+                input_type="assemblies",
+                return_data_list=["rcsb_struct_symmetry_lineage"],
+                input_ids=["4HHB-1", "MA_MACOFFESLACC100000G1I2-2"]
+            )
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="5. regex for interfaces"):
@@ -247,6 +257,7 @@ class SchemaTests(unittest.TestCase):
         with self.subTest(msg="6. regex with a singular type"):
             query = DATA_SCHEMA._construct_query_rustworkx(input_type="entry", return_data_list=["exptl"], input_ids=["4HHB"])
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT).json()
+            self.assertNotIn("errors", response_json.keys())
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="7. wrong format for CSM entry id"):
             with self.assertRaises(ValueError):

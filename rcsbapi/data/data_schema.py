@@ -216,108 +216,12 @@ class DataSchema:
         Returns:
             Dict: JSON response of introspection request
         """
-        query = """
-            query IntrospectionQuery {
-            __schema {
-
-                queryType { name }
-                types {
-                ...FullType
-                }
-                directives {
-                name
-                description
-
-                locations
-                args {
-                    ...InputValue
-                }
-                }
-            }
-            }
-
-            fragment FullType on __Type {
-            kind
-            name
-            description
-
-            fields(includeDeprecated: true) {
-                name
-                description
-                args {
-                ...InputValue
-                }
-                type {
-                ...TypeRef
-                }
-                isDeprecated
-                deprecationReason
-            }
-            inputFields {
-                ...InputValue
-            }
-            interfaces {
-                ...TypeRef
-            }
-            enumValues(includeDeprecated: true) {
-                name
-                description
-                isDeprecated
-                deprecationReason
-            }
-            possibleTypes {
-                ...TypeRef
-            }
-            }
-
-            fragment InputValue on __InputValue {
-            name
-            description
-            type { ...TypeRef }
-            defaultValue
-
-
-            }
-
-            fragment TypeRef on __Type {
-            kind
-            name
-            ofType {
-                kind
-                name
-                ofType {
-                kind
-                name
-                ofType {
-                    kind
-                    name
-                    ofType {
-                    kind
-                    name
-                    ofType {
-                        kind
-                        name
-                        ofType {
-                        kind
-                        name
-                        ofType {
-                            kind
-                            name
-                        }
-                        }
-                    }
-                    }
-                }
-                }
-            }
-            }
-        """
+        query = const.DATA_API_SCHEMA_INTROSPECTION
         schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=self.pdb_url, timeout=self.timeout)
         if schema_response.status_code == 200:
             return schema_response.json()
         logger.info("Loading data schema from file")
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        json_file_path = os.path.join(current_dir, "resources", "data_api_schema.json")
+        json_file_path = os.path.join("..", const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
         with open(json_file_path, "r", encoding="utf-8") as schema_file:
             return json.load(schema_file)
 
@@ -602,30 +506,26 @@ class DataSchema:
         ]
 
         for single_id in input_ids:
-            if (input_type in entities) and re.match(r"^(MA|AF)_.*_[0-9]+$", single_id):
+            if (input_type in entities) and re.match("|".join(const.DATA_API_INPUT_TYPE_TO_REGEX["entity"]), single_id):
                 if len(input_ids) == 1:
-                    input_dict["entry_id"] = str(re.findall(r"^[^_]*_[^_]*", input_ids[0])[0])
-                    input_dict["entity_id"] = str(re.findall(r"^(?:[^_]*_){2}(.*)", input_ids[0])[0])
-            elif (input_type in instances) and (re.match(r"^(MA|AF)_.*\.[A-Z]$", single_id) or re.match(r"^[A-Z0-9]{4}\.[A-Z]$", single_id)):
+                    input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
+                    input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
+            elif (input_type in instances) and re.match("|".join(const.DATA_API_INPUT_TYPE_TO_REGEX["instance"]), single_id):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^.]+", input_ids[0])[0])
                     input_dict["asym_id"] = str(re.findall(r"(?<=\.).*", input_ids[0])[0])
-            elif (input_type in ["assemblies", "assembly"]) and (re.match(r"^(MA|AF)_.*-[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+$", single_id)):
+            elif (input_type in ["assemblies", "assembly"]) and re.match("|".join(const.DATA_API_INPUT_TYPE_TO_REGEX["assembly"]), single_id):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     input_dict["assembly_id"] = str(re.findall(r"[^-]+$", input_ids[0])[0])
-            elif (input_type in ["interfaces", "interface"]) and (re.match(r"^(MA|AF)_.*-[0-9]+\.[0-9]+$", single_id) or re.match(r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$", single_id)):
+            elif (input_type in ["interfaces", "interface"]) and re.match("|".join(const.DATA_API_INPUT_TYPE_TO_REGEX["interface"]), single_id):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(re.findall(r"^[^-]+", input_ids[0])[0])
                     input_dict["assembly_id"] = str(re.findall(r"-(.*)\.", input_ids[0])[0])
                     input_dict["interface_id"] = str(re.findall(r"[^.]+$", input_ids[0])[0])
-            elif (input_type in ["entries", "entry"]) and (re.match(r"^(MA|AF)_[A-Za-z0-9]*$", single_id) or re.match(r"^[A-Z0-9]{4}$", single_id)):
+            elif (input_type in ["entries", "entry"]) and re.match("|".join(const.DATA_API_INPUT_TYPE_TO_REGEX["entry"]), single_id):
                 if len(input_ids) == 1:
                     input_dict["entry_id"] = str(input_ids[0])
-            elif (input_type in entities) and re.match(r"^[A-Z0-9]{4}_[0-9]+$", single_id):
-                if len(input_ids) == 1:
-                    input_dict["entry_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
-                    input_dict["entity_id"] = str(re.findall(r"[^_]+$", input_ids[0])[0])
             elif input_type in ["chem_comp", "chem_comps"]:
                 if len(input_ids) == 1:
                     input_dict["comp_id"] = str(re.findall(r"^[^_]+", input_ids[0])[0])
@@ -635,8 +535,7 @@ class DataSchema:
             elif input_type in ["polymer_entity_group", "polymer_entity_groups"]:
                 if len(input_ids) == 1:
                     input_dict["group_id"] = str(input_ids[0])
-            # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
-            elif (input_type == "uniprot") and re.match(r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}", single_id):
+            elif (input_type == "uniprot") and re.match("|".join(const.DATA_API_INPUT_TYPE_TO_REGEX["uniprot"]), single_id):
                 if len(input_ids) == 1:
                     input_dict["uniprot_id"] = str(input_ids[0])
                 else:

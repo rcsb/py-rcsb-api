@@ -26,7 +26,7 @@ import time
 import unittest
 import requests
 
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.data import DataSchema, DataQuery
 from rcsbapi.config import config
 from rcsbapi.const import const

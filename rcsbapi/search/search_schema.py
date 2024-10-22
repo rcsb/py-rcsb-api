@@ -2,7 +2,7 @@
 
 Provides access to all valid attributes for search queries.
 """
-
+import os
 import json
 import logging
 from pathlib import Path
@@ -64,7 +64,7 @@ class SearchSchemaGroup:
 
         return leaves(self, self.Attr)
 
-    def get_attribute_details(self, attribute: str) -> str:
+    def get_attribute_details(self, attribute: str):
         """Return attribute information given full or partial attribute name
 
         Args:
@@ -162,10 +162,10 @@ class SearchSchema:
         refetch=True,
         use_fallback=True,
         reload=True,
-        struct_attr_schema_url=const.STRUCTURE_ATTRIBUTE_SCHEMA_URL,
-        struct_attr_schema_file=const.STRUCTURE_ATTRIBUTE_SCHEMA_FILE,
-        chem_attr_schema_url=const.CHEMICAL_ATTRIBUTE_SCHEMA_URL,
-        chem_attr_schema_file=const.CHEMICAL_ATTRIBUTE_SCHEMA_FILE,
+        struct_attr_schema_url=const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL,
+        struct_attr_schema_file=os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME),
+        chem_attr_schema_url=const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL,
+        chem_attr_schema_file=os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME),
     ):
         """Initialize SearchSchema object with all known RCSB PDB attributes.
 
@@ -173,28 +173,28 @@ class SearchSchema:
         strings. For example,
         ::
 
-            rcsb_attributes.rcsb_nonpolymer_instance_feature_summary.chem_id
+            search_attributes.rcsb_nonpolymer_instance_feature_summary.chem_id
 
         is equivalent to
         ::
 
             Attr('rcsb_nonpolymer_instance_feature_summary.chem_id')
 
-        All attributes in `rcsb_attributes` can be iterated over.
+        All attributes in `search_attributes` can be iterated over.
 
-            >>> [a for a in rcsb_attributes if "stoichiometry" in a.attribute]
+            >>> [a for a in search_attributes if "stoichiometry" in a.attribute]
             [Attr(attribute='rcsb_struct_symmetry.stoichiometry')]
 
         Attributes matching a regular expression can also be filtered:
 
-            >>> list(rcsb_attributes.search('rcsb.*stoichiometry'))
+            >>> list(search_attributes.search('rcsb.*stoichiometry'))
             [Attr(attribute='rcsb_struct_symmetry.stoichiometry')]a
         """
         self.Attr = attr_type
         if reload:
             self.struct_schema = self._reload_schema(struct_attr_schema_url, struct_attr_schema_file, refetch, use_fallback)
             self.chem_schema = self._reload_schema(chem_attr_schema_url, chem_attr_schema_file, refetch, use_fallback)
-        self.rcsb_attributes = self._make_schema_group()
+        self.search_attributes = self._make_schema_group()
 
     def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=True):
         sD = {}
@@ -283,7 +283,7 @@ class SearchSchema:
                     # adding to SearchSchemaGroup as a dict allows for determining search service by attribute name with O(1) lookup
                     group[childname] = childgroup
 
-                    # adding to SearchSchemaGroup as an attribute allows for tab-completion for rcsb_attributes/attrs
+                    # adding to SearchSchemaGroup as an attribute allows for tab-completion for search_attributes/attrs
                     setattr(group, childname, childgroup)
             else:
                 raise TypeError(f"Unrecognized node type {node['type']!r} of {fullname}")
