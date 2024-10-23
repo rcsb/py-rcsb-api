@@ -96,7 +96,7 @@ class SchemaTests(unittest.TestCase):
         logger.info("Completed %s at %s (%.4f seconds)", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
     def testFetch(self):
-        fetched_schema = DATA_SCHEMA.fetch_schema()
+        fetched_schema = DATA_SCHEMA._fetch_schema()[1]
         self.assertNotIn("errors", fetched_schema.keys())
 
     def testConstructRootDict(self):

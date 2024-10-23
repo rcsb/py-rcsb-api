@@ -115,7 +115,7 @@ class DataSchema:
         """
         self.pdb_url: str = const.DATA_API_ENDPOINT
         self.timeout: int = config.DATA_API_TIMEOUT
-        self._introspect_query, self.schema = self.fetch_schema()
+        self._introspect_query, self.schema = self._fetch_schema()
         """Introspection query used to request full GraphQL schema and
         JSON resulting from full introspection"""
 
@@ -210,7 +210,7 @@ class DataSchema:
                 root_dict[root_name].append({"name": arg_name, "description": arg_description, "kind": arg_kind, "type": arg_type})
         return root_dict
 
-    def fetch_schema(self) -> Tuple:
+    def _fetch_schema(self) -> Tuple:
         """Make an introspection query to get full Data API query.
         Can also be found in resources folder as "data_api_schema.json"
 
