@@ -115,7 +115,7 @@ class DataSchema:
         """
         self.pdb_url: str = const.DATA_API_ENDPOINT
         self.timeout: int = config.DATA_API_TIMEOUT
-        self.schema = self._fetch_schema()
+        self.schema: Dict = self._fetch_schema()
         """JSON resulting from full introspection of GraphQL query"""
 
         self._use_networkx: bool = use_networkx
