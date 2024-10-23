@@ -1,6 +1,6 @@
 import re
 import logging
-from typing import List, Dict, Union, Any, Optional
+from typing import List, Dict, Tuple, Union, Any, Optional
 import json
 import os
 import requests
@@ -115,8 +115,9 @@ class DataSchema:
         """
         self.pdb_url: str = const.DATA_API_ENDPOINT
         self.timeout: int = config.DATA_API_TIMEOUT
-        self.schema: Dict = self.fetch_schema()
-        """JSON resulting from full introspection of the GraphQL schema"""
+        self._introspect_query, self.schema = self.fetch_schema()
+        """Introspection query used to request full GraphQL schema and
+        JSON resulting from full introspection"""
 
         self._use_networkx: bool = use_networkx
         # if use_networkx:
@@ -209,21 +210,116 @@ class DataSchema:
                 root_dict[root_name].append({"name": arg_name, "description": arg_description, "kind": arg_kind, "type": arg_type})
         return root_dict
 
-    def fetch_schema(self) -> Dict:
+    def fetch_schema(self) -> Tuple:
         """Make an introspection query to get full Data API query.
         Can also be found in resources folder as "data_api_schema.json"
 
         Returns:
-            Dict: JSON response of introspection request
+            Tuple: Tuple of introspection query string and JSON response of introspection request
         """
-        query = const.DATA_API_SCHEMA_INTROSPECTION
+        query = """
+        query IntrospectionQuery {
+        __schema {
+
+            queryType { name }
+            types {
+            ...FullType
+            }
+            directives {
+            name
+            description
+
+            locations
+            args {
+                ...InputValue
+            }
+            }
+        }
+        }
+
+        fragment FullType on __Type {
+        kind
+        name
+        description
+
+        fields(includeDeprecated: true) {
+            name
+            description
+            args {
+            ...InputValue
+            }
+            type {
+            ...TypeRef
+            }
+            isDeprecated
+            deprecationReason
+        }
+        inputFields {
+            ...InputValue
+        }
+        interfaces {
+            ...TypeRef
+        }
+        enumValues(includeDeprecated: true) {
+            name
+            description
+            isDeprecated
+            deprecationReason
+        }
+        possibleTypes {
+            ...TypeRef
+        }
+        }
+
+        fragment InputValue on __InputValue {
+        name
+        description
+        type { ...TypeRef }
+        defaultValue
+
+
+        }
+
+        fragment TypeRef on __Type {
+        kind
+        name
+        ofType {
+            kind
+            name
+            ofType {
+            kind
+            name
+            ofType {
+                kind
+                name
+                ofType {
+                kind
+                name
+                ofType {
+                    kind
+                    name
+                    ofType {
+                    kind
+                    name
+                    ofType {
+                        kind
+                        name
+                    }
+                    }
+                }
+                }
+            }
+            }
+        }
+        }
+        """
         schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=self.pdb_url, timeout=self.timeout)
         if schema_response.status_code == 200:
-            return schema_response.json()
+            return (query, schema_response.json())
         logger.info("Loading data schema from file")
         json_file_path = os.path.join("..", const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
         with open(json_file_path, "r", encoding="utf-8") as schema_file:
-            return json.load(schema_file)
+            return (query, json.load(schema_file))
 
     def _construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         """Construct dictionary of GraphQL types and their associated fields.

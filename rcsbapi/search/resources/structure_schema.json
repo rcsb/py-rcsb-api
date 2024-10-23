@@ -4044,7 +4044,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1722902400000.0,
+                        "rcsb_current_maximum_value": 1725667200000.0,
                         "rcsb_current_minimum_value": -29926281600000.0
                     },
                     "pdbx_frequency": {
@@ -14051,7 +14051,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1728345600000.0,
+                    "rcsb_current_maximum_value": 1729036800000.0,
                     "rcsb_current_minimum_value": 82339200000.0
                 },
                 "has_released_experimental_data": {
@@ -14113,7 +14113,7 @@
                             "priority_order": 25
                         }
                     ],
-                    "rcsb_current_maximum_value": 1729036800000.0,
+                    "rcsb_current_maximum_value": 1729641600000.0,
                     "rcsb_current_minimum_value": 201312000000.0
                 },
                 "major_revision": {
@@ -14163,7 +14163,7 @@
                             "priority_order": 30
                         }
                     ],
-                    "rcsb_current_maximum_value": 1729036800000.0,
+                    "rcsb_current_maximum_value": 1729641600000.0,
                     "rcsb_current_minimum_value": 996710400000.0
                 },
                 "status_code": {
@@ -23268,7 +23268,7 @@
                             "priority_order": 18
                         }
                     ],
-                    "rcsb_current_maximum_value": 39383864.0,
+                    "rcsb_current_maximum_value": 39414813.0,
                     "rcsb_current_minimum_value": 5.0
                 }
             },
@@ -23416,7 +23416,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1076370.0,
+                        "rcsb_current_maximum_value": 1076504.0,
                         "rcsb_current_minimum_value": 1.0
                     },
                     "identity": {
@@ -32016,7 +32016,7 @@
                             }
                         ],
                         "rcsb_current_maximum_value": 7.726,
-                        "rcsb_current_minimum_value": 0.001
+                        "rcsb_current_minimum_value": 0.0
                     },
                     "alt_id": {
                         "type": "string",

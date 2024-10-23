@@ -21,6 +21,7 @@ except Exception:
     # ignore errors that may occur parsing the schema
     pass
 
+from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.const import const
 from rcsbapi.config import config
 
@@ -75,7 +76,7 @@ def make_changelog_msg(
 
         if not msg:
             msg = f"Update {package} schemas: \n"
-        msg += f"  {f_name.replace('.json', '')} schema {current_ver_dict[f_name]} --> {new_ver_dict[f_name]}\n"
+        msg += f"  {f_name.replace('.json', '')} schema {current_ver_dict[f_name]} -> {new_ver_dict[f_name]}\n"
     return msg
 
 
@@ -115,12 +116,12 @@ if __name__ == "__main__":
         data_version_dict[file_name] = data_version
 
     # Update full GraphQL Data API schema
-    query = const.DATA_API_SCHEMA_INTROSPECTION
+    query = DATA_SCHEMA._introspect_query
     schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT)
     assert schema_response.status_code == 200
     data_schema_path = Path(__file__).parent.parent.joinpath(const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
-    with open(data_schema_path, "wt", encoding="utf-8") as file:
-        json.dump(schema_response.json(), file, indent=4)
+    with open(data_schema_path, "wt", encoding="utf-8") as f:
+        json.dump(schema_response.json(), f, indent=4)
 
     # Check if search schema version numbers are the same as each other
     version_list = list(search_version_dict.values())
@@ -130,7 +131,7 @@ if __name__ == "__main__":
         and all(curr_ver == curr_ver_list[0] for curr_ver in curr_ver_list)
     ):
         if not all(curr_ver == version_list[0] for curr_ver in list(search_current_ver_dict.values())):
-            print(f"Update search schemas: {curr_ver_list[0]} --> {version_list[0]}")
+            print(f"Update search schemas: {curr_ver_list[0]} -> {version_list[0]}")
         else:
             print("Search schemas are up-to-date")
     else:

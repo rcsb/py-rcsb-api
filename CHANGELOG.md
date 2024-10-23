@@ -14,6 +14,7 @@
     - `Range` -> `FacetRange`
     - `rcsb_query_editor_url` -> `get_editor_link`
     - `rcsb_query_builder_url` -> `get_query_builder_link`
+  - renamed `rcsb_attributes` -> `search_attributes`
 - Renamed several files and classes to prevent overlap with future developments:
   - `data/query.py` -> `data/data_query.py`
   - `data/schema.py` -> `data/schema_query.py`
@@ -22,8 +23,10 @@
   - `search/search.py` -> `search/search_query.py`
   - `search/schema.py` -> `search/search_schema.py`
 - Automatically change singular "input_type" to plural when possible
+- Automatically capitalize input_ids
 - Add warning message if fully qualified field path not provided
 - Update documentation
+- Added dev_tools and updated `update_schema.py`
 
 ## v0.3.0 (2024-08-23)
 

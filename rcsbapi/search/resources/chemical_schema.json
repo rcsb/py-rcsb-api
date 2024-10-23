@@ -3682,7 +3682,7 @@
                             "context": "brief"
                         }
                     ],
-                    "rcsb_current_maximum_value": 1728345600000.0,
+                    "rcsb_current_maximum_value": 1728864000000.0,
                     "rcsb_current_minimum_value": 711158400000.0
                 },
                 "initial_release_date": {
@@ -3711,7 +3711,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1729036800000.0,
+                    "rcsb_current_maximum_value": 1729641600000.0,
                     "rcsb_current_minimum_value": 105235200000.0
                 },
                 "release_status": {
