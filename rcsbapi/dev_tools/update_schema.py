@@ -116,7 +116,7 @@ if __name__ == "__main__":
         data_version_dict[file_name] = data_version
 
     # Update full GraphQL Data API schema
-    query = DATA_SCHEMA._introspect_query
+    query = DATA_SCHEMA._get_introspection_query()
     schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT)
     assert schema_response.status_code == 200
     data_schema_path = Path(__file__).parent.parent.joinpath(const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)

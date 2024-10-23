@@ -115,9 +115,8 @@ class DataSchema:
         """
         self.pdb_url: str = const.DATA_API_ENDPOINT
         self.timeout: int = config.DATA_API_TIMEOUT
-        self._introspect_query, self.schema = self._fetch_schema()
-        """Introspection query used to request full GraphQL schema and
-        JSON resulting from full introspection"""
+        self.schema = self._fetch_schema()
+        """JSON resulting from full introspection of GraphQL query"""
 
         self._use_networkx: bool = use_networkx
         # if use_networkx:
@@ -217,7 +216,18 @@ class DataSchema:
         Returns:
             Tuple: Tuple of introspection query string and JSON response of introspection request
         """
-        query = """
+        query = self._get_introspection_query()
+        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=self.pdb_url, timeout=self.timeout)
+        if schema_response.status_code == 200:
+            return schema_response.json()
+        logger.info("Loading data schema from file")
+        json_file_path = os.path.join("..", const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
+        with open(json_file_path, "r", encoding="utf-8") as schema_file:
+            return json.load(schema_file)
+
+    def _get_introspection_query(self):
+        """Returns introspection query that retrieves whole schema"""
+        introspect_query = """
         query IntrospectionQuery {
         __schema {
 
@@ -313,13 +323,7 @@ class DataSchema:
         }
         }
         """
-        schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=self.pdb_url, timeout=self.timeout)
-        if schema_response.status_code == 200:
-            return (query, schema_response.json())
-        logger.info("Loading data schema from file")
-        json_file_path = os.path.join("..", const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
-        with open(json_file_path, "r", encoding="utf-8") as schema_file:
-            return (query, json.load(schema_file))
+        return introspect_query
 
     def _construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         """Construct dictionary of GraphQL types and their associated fields.
