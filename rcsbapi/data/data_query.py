@@ -97,6 +97,9 @@ class DataQuery:
                 # If not converted, retrieve id list from dictionary
                 input_ids = list(input_ids[DATA_SCHEMA._root_dict[input_type][0]["name"]])
 
+        # Make all input_ids uppercase
+        input_ids = [id.upper() for id in input_ids]
+
         assert isinstance(input_ids, list)
         return (input_type, input_ids)
 

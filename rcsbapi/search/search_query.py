@@ -431,7 +431,7 @@ class Attr:
     Rather than their normal bool return values, operators return Terminals.
 
     Pre-instantiated attributes are available from the
-    :py:data:`rcsbapi.search.rcsb_attributes` object. These are generally easier to use
+    :py:data:`rcsbapi.search.search_attributes` object. These are generally easier to use
     than constructing Attr objects by hand. A complete list of valid attributes is
     available in the `schema <https://search.rcsb.org/rcsbsearch/v2/metadata/schema>`_.
 
@@ -709,7 +709,7 @@ class AttributeQuery(Terminal):
         if value is not None:
             paramsD.update({"value": value})
         if not service:
-            service = SEARCH_SCHEMA.rcsb_attributes.get_attribute_type(attribute)
+            service = SEARCH_SCHEMA.search_attributes.get_attribute_type(attribute)
 
         if isinstance(service, list):
             error_msg = ""

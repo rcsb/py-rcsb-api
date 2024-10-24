@@ -15,7 +15,7 @@ Here is an example from the [RCSB PDB Search API](http://search.rcsb.org/#search
 This query finds symmetric dimers having a twofold rotation with the DNA-binding domain of a heat-shock transcription factor.
 ```python
 from rcsbapi.search import TextQuery
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 
 # Create terminals for each query
 q1 = TextQuery("heat-shock transcription factor")
@@ -23,7 +23,7 @@ q2 = attrs.rcsb_struct_symmetry.symbol == "C2"
 q3 = attrs.rcsb_struct_symmetry.kind == "Global Symmetry"
 q4 = attrs.rcsb_entry_info.polymer_entity_count_DNA >= 1
 ```
-Attributes are available from the `rcsb_attributes` object and can be tab-completed. 
+Attributes are available from the `search_attributes` object and can be tab-completed. 
 They can additionally be constructed from strings using the `Attr` (attribute) constructor. 
 
 List of supported comparative operators:
@@ -272,10 +272,10 @@ list(q2())
 
 The `operator` can be one of a number of options, depending on the attribute type being queried. For example, `contains_phrase` or `exact_match` can be used to compare the attribute to a value, or the `exists` operator may be used to check if the attribute exists for a given structure. Refer to the [Search Attributes](https://search.rcsb.org/structure-search-attributes.html) and [Chemical Attributes](https://search.rcsb.org/chemical-search-attributes.html) documentation for a full list of attributes and applicable operators.
 
-Alternatively, you can also construct attribute queries with comparative operators (e.g., `==`, `>`, or `<`) using the `rcsb_attributes` object (which also allows for names to be tab-completed):
+Alternatively, you can also construct attribute queries with comparative operators (e.g., `==`, `>`, or `<`) using the `search_attributes` object (which also allows for names to be tab-completed):
 
 ```python
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 
 # Search for structures from humans
 query = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"

@@ -41,7 +41,7 @@ To perform a search for all structures from humans associated with the term "Hem
 
 ```python
 from rcsbapi.search import AttributeQuery, TextQuery
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 
 # Construct a "full-text" sub-query for structures associated with the term "Hemoglobin"
 q1 = TextQuery(value="Hemoglobin")

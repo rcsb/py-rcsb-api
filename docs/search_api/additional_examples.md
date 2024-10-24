@@ -688,7 +688,7 @@ Since group_by_return_type is specified as "representatives", one representative
 
 ```python
 from rcsbapi.search import AttributeQuery, TextQuery
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import GroupBy
 
 q1 = TextQuery("interleukin")
@@ -711,7 +711,7 @@ The method used to group search hits on the basis of protein sequence clusters t
 This example groups together identical human sequences from high-resolution (1.0-2.0Å) structures determined by X-ray crystallography. Among the resulting groups, there is a cluster of human glutathione transferases in complex with different substrates.
 ```python
 from rcsbapi.search import AttributeQuery
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import GroupBy, RankingCriteriaType
 
 q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Homo sapiens"
@@ -740,7 +740,7 @@ This example demonstrates how to use `matching_uniprot_accession` grouping to ge
 
 ```python
 from rcsbapi.search import AttributeQuery
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import GroupBy, RankingCriteriaType
 
 q1 = AttributeQuery(

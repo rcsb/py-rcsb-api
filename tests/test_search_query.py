@@ -26,7 +26,7 @@ import os
 from itertools import islice
 import requests
 from rcsbapi.const import const
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group
@@ -507,8 +507,11 @@ class SearchTests(unittest.TestCase):
         logger.info("Sequence query results correctly displays ids: (%r)", ok)
 
         # Sequence query (id: 4HHB) with custom parameters
-        q1 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
-                           evalue_cutoff=0.01, identity_cutoff=0.9)
+        q1 = SeqSimilarityQuery(
+            "VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+            evalue_cutoff=0.01,
+            identity_cutoff=0.9
+        )
         result = list(q1())
         result_len = len(result)
         ok = result_len > 0  # this query displays 313 ids in pdb website search function

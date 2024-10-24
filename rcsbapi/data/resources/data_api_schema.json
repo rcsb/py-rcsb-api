@@ -5069,7 +5069,7 @@
                         },
                         {
                             "name": "rcsb_uniprot_accession",
-                            "description": "List of UniProtKB accession numbers where original accession numbers are retained as ‘secondary’ accession numbers.",
+                            "description": "List of UniProtKB accession numbers where original accession numbers are retained as \u2018secondary\u2019 accession numbers.",
                             "args": [],
                             "type": {
                                 "kind": "LIST",
@@ -29495,7 +29495,7 @@
                     "fields": [
                         {
                             "name": "repository_content_types",
-                            "description": "The list of content types associated with this entry.\n\nAllowable values:\n2fo-fc Map, Combined NMR data (NEF), Combined NMR data (NMR-STAR), FASTA sequence, Map Coefficients, NMR chemical shifts, NMR restraints V1, NMR restraints V2, assembly PDB, assembly mmCIF, entry PDB, entry PDB bundle, entry PDBML, entry mmCIF, fo-fc Map, structure factors, validation data mmCIF, validation report, validation slider image\n",
+                            "description": "The list of content types associated with this entry.\n\nAllowable values:\n2fo-fc Map, Combined NMR data (NEF), Combined NMR data (NMR-STAR), FASTA sequence, Map Coefficients, NMR chemical shifts, NMR restraints V1, NMR restraints V2, assembly PDB, assembly mmCIF, entry PDB, entry PDB bundle, entry PDBML, entry mmCIF, fo-fc Map, structure factors, validation 2fo-fc coefficients, validation data mmCIF, validation fo-fc coefficients, validation report, validation slider image\n",
                             "args": [],
                             "type": {
                                 "kind": "LIST",
@@ -29732,7 +29732,7 @@
                         },
                         {
                             "name": "symbol",
-                            "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Schönflies notation. Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry.\n\nExamples:\nC1, D3, H\n",
+                            "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Sch\u00f6nflies notation. Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry.\n\nExamples:\nC1, D3, H\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",

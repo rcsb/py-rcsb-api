@@ -6,7 +6,7 @@ from .search_query import Attr, AttributeQuery, TextQuery
 from .search_query import SeqSimilarityQuery, SeqMotifQuery, ChemSimilarityQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from .search_query import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 
-rcsb_attributes = SEARCH_SCHEMA.rcsb_attributes
+search_attributes = SEARCH_SCHEMA.search_attributes
 
 
 def __dir__() -> List[str]:
@@ -14,7 +14,7 @@ def __dir__() -> List[str]:
 
 
 __all__ = [
-    "rcsb_attributes",
+    "search_attributes",
     "Attr",
     "TextQuery",
     "AttributeQuery",
