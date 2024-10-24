@@ -1,6 +1,6 @@
 import re
 import logging
-from typing import List, Dict, Tuple, Union, Any, Optional
+from typing import List, Dict, Union, Any, Optional
 import json
 import os
 import requests
@@ -209,12 +209,12 @@ class DataSchema:
                 root_dict[root_name].append({"name": arg_name, "description": arg_description, "kind": arg_kind, "type": arg_type})
         return root_dict
 
-    def _fetch_schema(self) -> Tuple:
+    def _fetch_schema(self) -> Dict:
         """Make an introspection query to get full Data API query.
         Can also be found in resources folder as "data_api_schema.json"
 
         Returns:
-            Tuple: Tuple of introspection query string and JSON response of introspection request
+            Dict: JSON response of introspection request
         """
         query = self._get_introspection_query()
         schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=self.pdb_url, timeout=self.timeout)
