@@ -6,6 +6,7 @@
 - Renamed `rcsb_attributes` -> `search_attributes`
 - Automatically capitalize input_ids
 - Added `dev_tools` directory and updated `update_schema.py`
+- Search API `chemical_schema` and `structure_schema` at v1.47.6
 - Update documentation
 
 ## v0.4.0 (2024-10-15)
