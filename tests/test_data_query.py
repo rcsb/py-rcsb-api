@@ -26,9 +26,10 @@ import time
 import unittest
 import requests
 
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.data import DataSchema, DataQuery
-from rcsbapi.config import ApiSettings
+from rcsbapi.config import config
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -59,6 +60,38 @@ class QueryTests(unittest.TestCase):
             query_obj.exec()
             # assert that the batch and merge functions are called
             # assert len of results is same as num of input ids
+
+    def testLowercaseIds(self):
+        with self.subTest(msg="1. List of IDs"):
+            try:
+                query_obj = DataQuery(input_type="entries", input_ids=["4hhb"], return_data_list=["exptl.method"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="2. Dictionary of IDs"):
+            try:
+                query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": ["4hhb", "1iye"]}, return_data_list=["exptl"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="2. IDs with separators"):
+            try:
+                query_obj = DataQuery(input_type="interfaces", input_ids=["4hhb-1.1"], return_data_list=["rcsb_interface_info.interface_area"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="3. Pubmed IDs"):
+            try:
+                query_obj = DataQuery(input_type="pubmed", input_ids=["6726807"], return_data_list=["rcsb_pubmed_doi"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="3. UniProt IDs"):
+            try:
+                query_obj = DataQuery(input_type="uniprot", input_ids=["p68871"], return_data_list=["rcsb_id"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
 
     def testParseGQLError(self):
         pass
@@ -288,7 +321,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. Making Queries"):
             try:
@@ -398,6 +431,9 @@ class QueryTests(unittest.TestCase):
 
 def buildQuery():
     suiteSelect = unittest.TestSuite()
+    suiteSelect.addTest(QueryTests("testGetEditorLink"))
+    suiteSelect.addTest(QueryTests("testExec"))
+    suiteSelect.addTest(QueryTests("testLowercaseIds"))
     suiteSelect.addTest(QueryTests("testBatchIDs"))
     suiteSelect.addTest(QueryTests("testDocs"))
     suiteSelect.addTest(QueryTests("testAddExamples"))

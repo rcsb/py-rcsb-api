@@ -22,10 +22,11 @@ import platform
 import resource
 import time
 import unittest
+import os
 
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import SEARCH_SCHEMA
-from rcsbapi.const import Const
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -52,8 +53,8 @@ class SchemaTests(unittest.TestCase):
 
     def testSchemaVersion(self):
         # Check structure attribute schema version
-        webSchema = SEARCH_SCHEMA._fetch_schema(Const.STRUCTURE_ATTRIBUTE_SCHEMA_URL.value)
-        localSchema = SEARCH_SCHEMA._load_json_schema(Const.STRUCTURE_ATTRIBUTE_SCHEMA_FILE.value)
+        webSchema = SEARCH_SCHEMA._fetch_schema(const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL)
+        localSchema = SEARCH_SCHEMA._load_json_schema(os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME))
         webVer = webSchema.get("$comment").split()[-1]
         localVer = localSchema.get("$comment").split()[-1]
         ok = len(localVer.split(".")) == 3 and len(webVer.split(".")) == 3
@@ -66,8 +67,8 @@ class SchemaTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Metadata schema tests results: local version (%r) and web version (%s)", localVer, webVer)
         # Check chemical attribute schema version
-        webSchema = SEARCH_SCHEMA._fetch_schema(Const.CHEMICAL_ATTRIBUTE_SCHEMA_URL.value)
-        localSchema = SEARCH_SCHEMA._load_json_schema(Const.CHEMICAL_ATTRIBUTE_SCHEMA_FILE.value)
+        webSchema = SEARCH_SCHEMA._fetch_schema(const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL)
+        localSchema = SEARCH_SCHEMA._load_json_schema(os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME))
         webVer = webSchema.get("$comment").split()[-1]
         localVer = localSchema.get("$comment").split()[-1]
         ok = len(localVer.split(".")) == 3 and len(webVer.split(".")) == 3
@@ -82,11 +83,11 @@ class SchemaTests(unittest.TestCase):
 
     def testFetchSchema(self):
         # check fetching of structure attribute schema
-        fetchSchema = SEARCH_SCHEMA._fetch_schema(Const.STRUCTURE_ATTRIBUTE_SCHEMA_URL.value)
+        fetchSchema = SEARCH_SCHEMA._fetch_schema(const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL)
         ok = fetchSchema is not None
         logger.info("ok is %r", ok)
         self.assertTrue(ok)
-        fetchSchema = SEARCH_SCHEMA._fetch_schema(Const.CHEMICAL_ATTRIBUTE_SCHEMA_URL.value)
+        fetchSchema = SEARCH_SCHEMA._fetch_schema(const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL)
         ok = fetchSchema is not None
         logger.info("ok is %r", ok)
         self.assertTrue(ok)
