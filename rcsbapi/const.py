@@ -93,8 +93,53 @@ class Const:
         "assembly": [r"^(MA|AF|ma|af)_[A-Z0-9]*-[0-9]+$", r"^[A-Z0-9]{4}-[0-9]+$"],
         "interface": [r"^(MA|AF|ma|af)_[A-Z0-9]*-[0-9]+\.[0-9]+$", r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$"],
         # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
-        "uniprot": [r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"]
+        "uniprot": [r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"],
+        "chem_comp": [r"^[A-Za-z]{3,5}$"],
     })
 
 
+@dataclass(frozen=True)
+class FileConst:
+    CONTENT_TYPE_TO_EXTENSION: MappingProxyType[str, str] = MappingProxyType({
+        # Sequence
+        "FASTA sequence": "",  # no extension, request from a different endpoint
+        "entry mmCIF": ".cif.gz",
+        "entry bCIF": ".bcif.gz",  # not listed in rcsb_holdings, but added to support bCIF
+        "ligand mmCIF": ".cif",  # not listed in rcsb_holdings
+        "entry PDBML": ".xml.gz",
+        "entry PDB": ".pdb.gz",
+
+        # Not supported currently
+        "assembly mmCIF": ".cif.gz",
+        "assembly PDB": ".gz",  # extension is .pdb<assembly id>.gz, so the number must be assigned dynamically in code
+        "validation data mmCIF": ".cif.gz",
+        "validation report": ".pdf",
+        "Combined NMR data (NEF)": ".nef.gz",
+        "Combined NMR data (NMR-STAR)": ".str.gz",
+        "NMR restraints V1": ".mr.gz",
+        "NMR restraints V2": ".str.gz",
+        "structure factors": ".cif.gz",
+        "fo-fc Map": "",
+        "2fo-fc Map": "",
+        "NMR chemical shifts": ".str",  # or .str.gz
+        # Unknown
+        "validation slider image": "",
+        "Map Coefficients": "",  # might have been removed
+        "entry PDB bundle": "",
+        "validation 2fo-fc coefficients": "",
+        "validation fo-fc coefficients": "",
+    })
+
+    FILE_DOWNLOAD_ENDPOINT = "https://files.rcsb.org/download/"
+
+    # For examples of download urls go to docs:
+    # https://www.rcsb.org/docs/programmatic-access/file-download-services
+    EXCEPTION_TYPE_TO_BASE_URL: MappingProxyType[str, str] = MappingProxyType({
+        "FASTA sequence": "https://www.rcsb.org/fasta/entry/",
+        "ligand mmCIF": "https://files.rcsb.org/ligands/download/",
+        "entry bCIF": "https://models.rcsb.org/",
+    })
+
+
+file_const = FileConst()
 const = Const()
