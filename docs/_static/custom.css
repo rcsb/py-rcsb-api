@@ -1,0 +1,6 @@
+/* Custom css for automatically fitting tables to screen width*/
+
+table {
+    white-space: normal !important;
+    width: 100% !important;
+}

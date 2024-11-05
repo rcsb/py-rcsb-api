@@ -731,6 +731,7 @@ query = q1 & q2 & q3 & q4
 
 list(query(
     # "sequence_identity" aggregation method must use return_type "polymer_entity"
+    # If not return_type will be changed and a warning will be raised.
     return_type="polymer_entity",
     group_by=GroupBy(
         aggregation_method="sequence_identity",
@@ -761,7 +762,9 @@ q2 = attrs.rcsb_accession_info.initial_release_date > "2020-01-01"
 
 query = q1 & q2
 list(query(
-    return_type="polymer_entity",  # "matching_uniprot_accession" must use return type "polymer_entity"
+    # "matching_uniprot_accession" aggregation method
+    # must use return type "polymer_entity"
+    return_type="polymer_entity",
     group_by=GroupBy(
         aggregation_method="matching_uniprot_accession",
         ranking_criteria_type= RankingCriteriaType(
