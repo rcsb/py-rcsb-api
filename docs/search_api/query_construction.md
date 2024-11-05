@@ -375,6 +375,7 @@ q1 = StructSimilarityQuery(
 for rid in q1("assembly"):
     print(rid)
 ```
+<div style="width:750px">
 
 |Arguments              | Description                                                                |Default      |
 |-----------------------|----------------------------------------------------------------------------|-------------|
@@ -387,7 +388,9 @@ for rid in q1("assembly"):
 |assembly_id            |If input_type is "assembly_id", the assembly id number                      |"1"          |
 |chain_id               |If input_type is "chain_id", the chain id letter                            |             |
 |operator               |Search mode ("strict_shape_match" or "relaxed_shape_match")                 |"strict_shape_match"|
-|target_search_space    |Target objects against which the <br> query will be compared for shape similarity|"assembly"   |
+|target_search_space    |Target objects against which the query will be compared for shape similarity|"assembly"   |
+
+</div>
 
 If you provide an entry_id, you must provide either an assembly_id or chain_id
 

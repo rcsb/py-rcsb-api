@@ -1,6 +1,0 @@
-/* Custom css for automatically fitting tables to screen width*/
-
-.docutils table {
-    white-space: normal !important;
-    width: 100% !important;
-}
