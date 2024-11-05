@@ -223,8 +223,8 @@ There are many additional parameters that Structure Motif Query supports. These 
 
 Below will demonstrate how to define these parameters using non-positional arguments:
 ```python
-# specifying backbone distance tolerance: 0-3, default is 1
-# allowed backbone distance tolerance in Angstrom. 
+# Specifying backbone distance tolerance: 0-3, default is 1
+# Allowed backbone distance tolerance in Angstrom. 
 backbone = StructMotifQuery(
     entry_id="2MNR",
     backbone_distance_tolerance=2,
@@ -232,8 +232,8 @@ backbone = StructMotifQuery(
 )
 list(backbone())
 
-# specifying sidechain distance tolerance: 0-3, default is 1
-# allowed side-chain distance tolerance in Angstrom.
+# Specifying sidechain distance tolerance: 0-3, default is 1
+# Allowed side-chain distance tolerance in Angstrom.
 sidechain = StructMotifQuery(
     entry_id="2MNR",
     side_chain_distance_tolerance=2,
@@ -241,8 +241,8 @@ sidechain = StructMotifQuery(
 )
 list(sidechain())
 
-# specifying angle tolerance: 0-3, default is 1
-# allowed angle tolerance in multiples of 20 degrees. 
+# Specifying angle tolerance: 0-3, default is 1
+# Allowed angle tolerance in multiples of 20 degrees. 
 angle = StructMotifQuery(
     entry_id="2MNR",
     angle_tolerance=2,
@@ -250,7 +250,7 @@ angle = StructMotifQuery(
 )
 list(angle())
 
-# specifying RMSD cutoff: >=0, default is 2
+# Specifying RMSD cutoff: >=0, default is 2
 # Threshold above which hits will be filtered by RMSD
 rmsd = StructMotifQuery(
     entry_id="2MNR",
@@ -259,7 +259,7 @@ rmsd = StructMotifQuery(
 )
 list(rmsd())
 
-# specifying limit: >=0, default excluded
+# Specifying limit: >=0, default excluded
 # Stop accepting results after this many hits. 
 limit = StructMotifQuery(
     entry_id="2MNR",
@@ -268,9 +268,9 @@ limit = StructMotifQuery(
 )
 list(limit())
 
-# specifying atom pairing scheme, default = "SIDE_CHAIN"
+# Specifying atom pairing scheme, default = "SIDE_CHAIN"
 # ENUM: "ALL", "BACKBONE", "SIDE_CHAIN", "PSUEDO_ATOMS"
-# this is typechecked by a literal. 
+# This is typechecked by a literal. 
 # Which atoms to consider to compute RMSD scores and transformations. 
 atom = StructMotifQuery(
     entry_id="2MNR",
@@ -279,9 +279,9 @@ atom = StructMotifQuery(
 )
 list(atom())
 
-# specifying motif pruning strategy, default = "KRUSKAL"
+# Specifying motif pruning strategy, default = "KRUSKAL"
 # ENUM: "NONE", "KRUSKAL"
-# this is typechecked by a literal in the package. 
+# This is typechecked by a literal in the package. 
 # Specifies how many query motifs are "pruned".
 # KRUSKAL leads to less stringent queries, and faster results.
 pruning = StructMotifQuery(
@@ -291,9 +291,9 @@ pruning = StructMotifQuery(
 )
 list(pruning())
 
-# specifying allowed structures, default excluded
-# specify the structures you wish to allow in the return result. As an example,
-# we could only allow the results from the limited query we ran earlier. 
+# Specifying allowed structures, default excluded
+# Specify the structures you wish to allow in the return result. As an example,
+# We could only allow the results from the limited query we ran earlier. 
 allowed = StructMotifQuery(
     entry_id="2MNR",
     allowed_structures=list(limit()),
@@ -301,9 +301,9 @@ allowed = StructMotifQuery(
 )
 list(allowed())
 
-# specifying structures to exclude, default excluded
-# specify structures to exclude from a query. We could, for example,
-# exclude the results of the previous allowed query. 
+# Specifying structures to exclude, default excluded
+# Specify structures to exclude from a query. We could, for example,
+# Exclude the results of the previous allowed query. 
 excluded = StructMotifQuery(
     entry_id="2MNR",
     excluded_structures=list(allowed()),
@@ -394,7 +394,7 @@ q(facets=Facet(name="Methods", aggregation_type="terms", attribute="exptl.method
 ```
 
 ### Terms Facets
-Terms faceting is a multi-bucket aggregation where buckets are dynamically built - one per unique value. We can specify the minimum count (`>= 0`) for a bucket to be returned using the parameter `min_interval_population` (default value `1`). We can also control the number of buckets returned (`<= 65336`) using the parameter `max_num_intervals` (default value `65336`).
+Terms faceting is a multi-bucket aggregation where buckets are dynamically built - one per unique value. We can specify the minimum count (`>= 0`) for a bucket to be returned using the parameter `min_interval_population` (default value `1`). We can also control the number of buckets returned using the parameter `max_num_intervals` (default value `65336`).
 ```python
 from rcsbapi.search import AttributeQuery
 from rcsbapi.search import Facet
@@ -573,7 +573,9 @@ q(
 ```
 
 ### Filter Facets
-Filters allow us to filter documents that contribute to bucket count. Similar to queries, we can group several `TerminalFilter`s into a single `GroupFilter`. We can combine a filter with a facet using the `FilterFacet` class. Terminal filters should specify an `attribute` and `operator`, as well as possible a `value` and whether or not it should be a `negation` and/or `case_sensitive`. Group filters should specify a `logical_operator` (which should be either `"and"` or `"or"`) and a list of filters (`nodes`) that should be combined. Finally, the `FilterFacet` should be provided with a filter and a (list of) facet(s). Here are some examples:
+Filters allow us to filter documents that contribute to bucket count. Similar to queries, we can group several `TerminalFilter`s into a single `GroupFilter`. We can combine a filter with a facet using the `FilterFacet` class. Terminal filters should specify an `attribute` and `operator`, as well as possible a `value` and whether or not it should be a `negation` and/or `case_sensitive`. Group filters should specify a `logical_operator` (which should be either `"and"` or `"or"`) and a list of filters (`nodes`) that should be combined. Finally, the `FilterFacet` should be provided with a filter and a (list of) facet(s).
+
+Here is an example that filters only protein chains which adopt 2 different beta propeller arrangements according to the CATH classification.
 ```python
 from rcsbapi.search import AttributeQuery
 from rcsbapi.search import TerminalFilter, GroupFilter, FilterFacet, Facet
@@ -609,6 +611,9 @@ q(
     facets=FilterFacet(filter=tf1, facets=ff2
 )).facets
 ```
+
+This example shows how to get assembly counts per symmetry types, further broken down by Enzyme Classification (EC) classes.
+The assemblies are first filtered to homo-oligomers only.
 ```python
 from rcsbapi.search import AttributeQuery
 from rcsbapi.search import TerminalFilter, GroupFilter, FilterFacet, Facet
@@ -645,6 +650,8 @@ q2 = AttributeQuery(
 q = q1 & q2
 q(return_type="assembly", facets=ff).facets
 ```
+
+This example shows how to get the number of distinct protein sequences in the PDB archive.
 ```python
 from rcsbapi.search import AttributeQuery
 from rcsbapi.search import TerminalFilter, GroupFilter, FilterFacet, Facet
@@ -700,7 +707,8 @@ query = q1 & q2 & (q3 | q4)
 list(
     query(
         group_by=GroupBy(aggregation_method="matching_deposit_group_id"),
-        group_by_return_type="representatives"  # only a single search hit is returned per group
+        # "representatives" means that only a single search hit is returned per group
+        group_by_return_type="representatives"
     )
 )
 ```
@@ -722,7 +730,8 @@ q4 = attrs.rcsb_entry_info.resolution_combined <= 2
 query = q1 & q2 & q3 & q4
 
 list(query(
-    return_type="polymer_entity", # "sequence_identity" must use return type "polymer_entity"
+    # "sequence_identity" aggregation method must use return_type "polymer_entity"
+    return_type="polymer_entity",
     group_by=GroupBy(
         aggregation_method="sequence_identity",
         similarity_cutoff=100,  # 100, 95, 90, 70, 50, or 30
