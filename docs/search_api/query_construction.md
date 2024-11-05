@@ -376,7 +376,6 @@ for rid in q1("assembly"):
     print(rid)
 ```
 
-<div >
 |Arguments              | Description                                                                |Default      |
 |-----------------------|----------------------------------------------------------------------------|-------------|
 |structure_search_type  |How to find given structure ("entry_id", "file_url", "file_path")           |"entry_id"   |
@@ -389,7 +388,6 @@ for rid in q1("assembly"):
 |chain_id               |If input_type is "chain_id", the chain id letter                            |             |
 |operator               |Search mode ("strict_shape_match" or "relaxed_shape_match")                 |"strict_shape_match"|
 |target_search_space    |Target objects against which the <br> query will be compared for shape similarity|"assembly"   |
-</div>
 
 If you provide an entry_id, you must provide either an assembly_id or chain_id
 
@@ -504,7 +502,6 @@ list(q1())
 |match_subset           |no      |If "formula", return chemical components/structures that contain the formula as a subset|False        |
 |match_type             |no      |If "descriptor", type of matches to find and return (see below)                         |             |
 
-</div>
 
 | match_type                        |                                           |
 |-----------------------------------|-------------------------------------------|
