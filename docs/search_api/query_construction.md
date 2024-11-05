@@ -462,8 +462,6 @@ list(q1())
 |excluded_structures         |If the list of structure identifiers is specified, the search will exclude those structures from the search space||
 |limit                       |Stop after accepting this many hits                               |             |
 
-</div>
-
 If you provide an entry_id, the other optional parameters can be ignored.
 
 If you provide a file_url, you must also provide a file_extension.
