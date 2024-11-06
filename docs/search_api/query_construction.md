@@ -36,9 +36,8 @@ List of supported comparative operators:
 |>=      |greater than or equal to|
 |<       |less than               |
 |<=      |less than or equal to   |
-|in      |contains phrase/contains words|
 
-To use the `exists` operator, create an [AttributeQuery](quickstart.md#attribute-search)
+To use the `exists`, `contains_phrase`, or `contains_words` operator, create an [AttributeQuery](quickstart.md#attribute-search)
 
 For methods to search and find details on attributes within this package, go to the [attributes page](attributes.md)
 For a full list of attributes, please refer to the [RCSB PDB schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema).
@@ -263,13 +262,13 @@ q2 = AttributeQuery(
 list(q2())
 ```
 
-|Arguments  |Required| Description                                 |Default               |
-|-----------|--------|---------------------------------------------|----------------------|
-|attribute  |yes     |Full attribute name                          |                      |
-|operator   |yes     |Operation for query                          |                      |
-|value      |no      |Search term(s)                               |                      |
-|service    |no      |Specify structure or chemical search service |                      |
-|negation   |no      |Indicates if the operator is negated         |False                 |
+|Arguments    |Required| Description                                 |Default               |
+|-------------|--------|---------------------------------------------|----------------------|
+|`attribute`  |yes     |Full attribute name                          |                      |
+|`operator`   |yes     |Operation for query                          |                      |
+|`value`      |no      |Search term(s)                               |                      |
+|`service`    |no      |Specify structure or chemical search service |                      |
+|`negation`   |no      |Indicates if the operator is negated         |False                 |
 
 
 The `operator` can be one of a number of options, depending on the attribute type being queried. For example, `contains_phrase` or `exact_match` can be used to compare the attribute to a value, or the `exists` operator may be used to check if the attribute exists for a given structure. Refer to the [Search Attributes](https://search.rcsb.org/structure-search-attributes.html) and [Chemical Attributes](https://search.rcsb.org/chemical-search-attributes.html) documentation for a full list of attributes and applicable operators.
@@ -295,8 +294,6 @@ The full list of supported comparative operators:
 |>=      |greater than or equal to|
 |<       |less than               |
 |<=      |less than or equal to   |
-|in      |contains phrase or contains words|
-
 
 ### Sequence Similarity Search
 Below is an example from the [RCSB PDB Search API](https://search.rcsb.org/#search-example-3) page, using the sequence search function. This query finds macromolecular PDB entities that share 90% sequence identity with GTPase HRas protein from *Gallus gallus* (*Chicken*).
@@ -321,12 +318,12 @@ for polyid in query("polymer_entity"):
     print(polyid)
 ```
 
-|Arguments      |Required| Description                                         |Default               |
-|---------------|--------|-----------------------------------------------------|----------------------|
-|value          |yes     |Protein or nucleotide sequence                       |                      |
-|evalue_cutoff  |no      |Upper cutoff for E-value (lower is more significant) |0.1                   |
-|identity_cutoff|no      |Lower cutoff for sequence identity (0-1)             |0                     |
-|sequence_type  |no      |Type of biological sequence ("protein", "dna", "rna")|"protein"             |
+|Arguments        |Required| Description                                         |Default               |
+|-----------------|--------|-----------------------------------------------------|----------------------|
+|`value`          |yes     |Protein or nucleotide sequence                       |                      |
+|`evalue_cutoff`  |no      |Upper cutoff for E-value (lower is more significant) |0.1                   |
+|`identity_cutoff`|no      |Lower cutoff for sequence identity (0-1)             |0                     |
+|`sequence_type`  |no      |Type of biological sequence ("protein", "dna", "rna")|"protein"             |
 
 ### Sequence Motif Search
 Below is an example from the [RCSB PDB Search API](https://search.rcsb.org/#search-example-6) page, using the sequence motif search function. This query retrieves occurrences of the His<sub>2</sub>/Cys<sub>2</sub> Zinc Finger DNA-binding domain as represented by its PROSITE signature.
@@ -346,11 +343,11 @@ for polyid in query("polymer_entity"):
     print(polyid)
 ```
 
-|Arguments      |Required| Description                                         |Default               |
-|---------------|--------|-----------------------------------------------------|----------------------|
-|value          |yes     |Motif to search                                      |                      |
-|pattern_type   |no      |Motif syntax ("simple", "prosite", "regex")          |"simple"              |
-|sequence_type  |no      |Type of biological sequence ("protein", "dna", "rna")|"protein"             |
+|Arguments        |Required| Description                                         |Default               |
+|-----------------|--------|-----------------------------------------------------|----------------------|
+|`value`          |yes     |Motif to search                                      |                      |
+|`pattern_type`   |no      |Motif syntax ("simple", "prosite", "regex")          |"simple"              |
+|`sequence_type`  |no      |Type of biological sequence ("protein", "dna", "rna")|"protein"             |
 
 See [Sequence Motif Search Examples](additional_examples.md#Sequence-Motif-Search-Examples) for more use cases.
 
@@ -378,18 +375,18 @@ for rid in q1("assembly"):
     print(rid)
 ```
 
-|Arguments              | Description                                                                |Default      |
-|-----------------------|----------------------------------------------------------------------------|-------------|
-|structure_search_type  |How to find given structure ("entry_id", "file_url", "file_path")           |"entry_id"   |
-|entry_id               |If "entry_id" specified, PDB ID or CSM ID                                   |             |
-|file_url               |If "file_url" specified, url to file                                        |             |
-|file_path              |If "file_path" specified, path to file                                      |             |
-|file_format            |If "file_url" or "file_path" specified, type of file (ex: "cif")            |             |
-|structure_input_type   |Type of the given structure                                                 |"assembly_id"|
-|assembly_id            |If input_type is "assembly_id", the assembly id number                      |"1"          |
-|chain_id               |If input_type is "chain_id", the chain id letter                            |             |
-|operator               |Search mode ("strict_shape_match" or "relaxed_shape_match")                 |"strict_shape_match"|
-|target_search_space    |Target objects against which the query will be compared for shape similarity|"assembly"   |
+|Arguments                | Description                                                                |Default      |
+|-------------------------|----------------------------------------------------------------------------|-------------|
+|`structure_search_type`  |How to find given structure ("entry_id", "file_url", "file_path")           |"entry_id"   |
+|`entry_id`               |If "entry_id" specified, PDB ID or CSM ID                                   |             |
+|`file_url`               |If "file_url" specified, url to file                                        |             |
+|`file_path`              |If "file_path" specified, path to file                                      |             |
+|`file_format`            |If "file_url" or "file_path" specified, type of file (ex: "cif")            |             |
+|`structure_input_type`   |Type of the given structure                                                 |"assembly_id"|
+|`assembly_id`            |If input_type is "assembly_id", the assembly id number                      |"1"          |
+|`chain_id`               |If input_type is "chain_id", the chain id letter                            |             |
+|`operator`               |Search mode ("strict_shape_match" or "relaxed_shape_match")                 |"strict_shape_match"|
+|`target_search_space`    |Target objects against which the query will be compared for shape similarity|"assembly"   |
 
 
 If you provide an entry_id, you must provide either an assembly_id or chain_id
@@ -445,23 +442,23 @@ q1 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
 list(q1())
 ```
 
-|Arguments                   | Description                                                      |Default      |
-|----------------------------|------------------------------------------------------------------|-------------|
-|structure_search_type       |How to find given structure ("entry_id", "url", "file_path")      |"entry_id"   |
-|backbone_distance_tolerance |Tolerance for distance between Cα atoms (in Å)                    |1            |
-|side_chain_distance_tolerance|Tolerance for distance between Cβ atoms (in Å)                   |1            |
-|angle_tolerance             |Angle between CαCβ vectors (in multiples of 20 degrees)           |1            |
-|entry_id                    |If "entry_id" specified, PDB ID or CSM ID                         |             |
-|url                         |If "file_url" specified, url to file                              |             |
-|file_path                   |If "file_path" specified, path to file                            |             |
-|file_extension              |If "file_url" specified, type of file linked to (ex: "cif")       |             |
-|residue_ids                 |List of StructMotifResidue objects                                |             |
-|rmsd_cutoff                 |Upper cutoff for root-mean-square deviation (RMSD) score          |2            |
-|atom_pairing_scheme         |Which atoms to consider to compute RMSD scores and transformations.|"SIDE_CHAIN" |
-|motif_pruning_strategy      |Specifies how query motifs are pruned (i.e. simplified)           |"KRUSKAL"    |
-|allowed_structures          |If the list of structure identifiers is specified, the search will only consider those structures (ex: ["HIS", "LYS"])||
-|excluded_structures         |If the list of structure identifiers is specified, the search will exclude those structures from the search space||
-|limit                       |Stop after accepting this many hits                               |             |
+|Arguments                     | Description                                                      |Default      |
+|------------------------------|------------------------------------------------------------------|-------------|
+|`structure_search_type`       |How to find given structure ("entry_id", "url", "file_path")      |"entry_id"   |
+|`backbone_distance_tolerance` |Tolerance for distance between Cα atoms (in Å)                    |1            |
+|`side_chain_distance_tolerance`|Tolerance for distance between Cβ atoms (in Å)                   |1            |
+|`angle_tolerance`             |Angle between CαCβ vectors (in multiples of 20 degrees)           |1            |
+|`entry_id`                    |If "entry_id" specified, PDB ID or CSM ID                         |             |
+|`url`                         |If "file_url" specified, url to file                              |             |
+|`file_path`                   |If "file_path" specified, path to file                            |             |
+|`file_extension`              |If "file_url" specified, type of file linked to (ex: "cif")       |             |
+|`residue_ids`                 |List of StructMotifResidue objects                                |             |
+|`rmsd_cutoff`                 |Upper cutoff for root-mean-square deviation (RMSD) score          |2            |
+|`atom_pairing_scheme`         |Which atoms to consider to compute RMSD scores and transformations.|"SIDE_CHAIN" |
+|`motif_pruning_strategy`      |Specifies how query motifs are pruned (i.e. simplified)           |"KRUSKAL"    |
+|`allowed_structures`          |If the list of structure identifiers is specified, the search will only consider those structures (ex: ["HIS", "LYS"])||
+|`excluded_structures`         |If the list of structure identifiers is specified, the search will exclude those structures from the search space||
+|`limit`                       |Stop after accepting this many hits                               |             |
 
 If you provide an entry_id, the other optional parameters can be ignored.
 
@@ -493,13 +490,13 @@ q1 = ChemSimilarityQuery(
 list(q1())
 ```
 
-|Arguments              |Required|Description                                                                             |Default      |
-|-----------------------|--------|----------------------------------------------------------------------------------------|-------------|
+|Arguments                |Required|Description                                                                             |Default      |
+|-------------------------|--------|----------------------------------------------------------------------------------------|-------------|
 |`value`                  |yes     |Chemical formula or descriptor (SMILES or InChI)                                        |             |
-|query_type             |no      |"formula" or "descriptor"                                                               |"formula"    |
-|descriptor_type        |no      |If "descriptor", whether it's "SMILES" or "InCHI"                                       |             |
-|match_subset           |no      |If "formula", return chemical components/structures that contain the formula as a subset|False        |
-|match_type             |no      |If "descriptor", type of matches to find and return (see below)                         |             |
+|`query_type`             |no      |"formula" or "descriptor"                                                               |"formula"    |
+|`descriptor_type`        |no      |If "descriptor", whether it's "SMILES" or "InCHI"                                       |             |
+|`match_subset`           |no      |If "formula", return chemical components/structures that contain the formula as a subset|False        |
+|`match_type`             |no      |If "descriptor", type of matches to find and return (see below)                         |             |
 
 
 | match_type                        |                                           |

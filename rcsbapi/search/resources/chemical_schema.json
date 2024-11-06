@@ -91,6 +91,7 @@
                     ],
                     "description": "The full name of the component.",
                     "rcsb_search_context": [
+                        "exact-match",
                         "full-text",
                         "suggest"
                     ],
@@ -506,6 +507,7 @@
                         "enum": [
                             "Create component",
                             "Initial release",
+                            "Modify PCM",
                             "Modify aromatic_flag",
                             "Modify atom id",
                             "Modify backbone",
@@ -3682,7 +3684,7 @@
                             "context": "brief"
                         }
                     ],
-                    "rcsb_current_maximum_value": 1728864000000.0,
+                    "rcsb_current_maximum_value": 1730246400000.0,
                     "rcsb_current_minimum_value": 711158400000.0
                 },
                 "initial_release_date": {
@@ -3711,7 +3713,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1729641600000.0,
+                    "rcsb_current_maximum_value": 1730851200000.0,
                     "rcsb_current_minimum_value": 105235200000.0
                 },
                 "release_status": {
@@ -5161,5 +5163,5 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Chemical Text Service Metadata",
     "description": "",
-    "$comment": "Schema version: 1.47.6"
+    "$comment": "Schema version: 1.47.7"
 }

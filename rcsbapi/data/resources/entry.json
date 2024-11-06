@@ -886,13 +886,23 @@
                         ],
                         "description": "Y/N if using serial crystallography experiment in which multiple crystals contribute to each diffraction frame in the experiment.",
                         "rcsb_search_context": [
-                            "full-text"
+                            "exact-match"
                         ],
-                        "rcsb_full_text_priority": 1,
+                        "rcsb_full_text_priority": 10,
                         "rcsb_description": [
                             {
                                 "text": "Y/N if using serial crystallography experiment in which multiple crystals contribute to each diffraction frame in the experiment.",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "Diffraction Serial Crystal Experiment",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "X-ray Data Collection Details",
+                                "priority_order": 55
                             }
                         ]
                     }
@@ -4408,6 +4418,7 @@
                             "LEICA PLUNGER",
                             "REICHERT-JUNG PLUNGER",
                             "SPOTITON",
+                            "SPT LABTECH CHAMELEON",
                             "ZEISS PLUNGE FREEZER CRYOBOX"
                         ],
                         "description": "The type of instrument used in the vitrification process.",
@@ -7023,7 +7034,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -7094,7 +7105,7 @@
                         "WDRN"
                     ],
                     "examples": [
-                        "PROC  = Processing in progress\n     WAIT  = Awaiting author approval\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted and replaced by another entry\n     WDRN  = Entry has been withdrawn by depositor"
+                        "PROC  = Processing in progress\n     WAIT  = Awaiting author approval\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted\n     WDRN  = Entry has been withdrawn by depositor"
                     ],
                     "description": "Code for status of chemical shift data file.",
                     "rcsb_enum_annotated": [
@@ -7116,7 +7127,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -7171,7 +7182,7 @@
                         "WDRN"
                     ],
                     "examples": [
-                        "PROC  = To be processed\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted and replaced by another entry\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
+                        "PROC  = To be processed\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
                     ],
                     "description": "Code for status of NMR constraints file.",
                     "rcsb_enum_annotated": [
@@ -7193,7 +7204,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -7247,7 +7258,7 @@
                         "WDRN"
                     ],
                     "examples": [
-                        "PROC  = To be processed\n     REL   = Released\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted and replaced by another entry\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
+                        "PROC  = To be processed\n     REL   = Released\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
                     ],
                     "description": "Code for status of structure factor file.",
                     "rcsb_enum_annotated": [
@@ -7265,7 +7276,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -8856,10 +8867,14 @@
                             "AVANCE III HD",
                             "WH",
                             "WM",
+                            "AC+",
+                            "Alpha",
                             "AM",
                             "AMX",
+                            "AMX II",
                             "DMX",
                             "DRX",
+                            "DSX",
                             "MSL",
                             "OMEGA",
                             "OMEGA PSG",
@@ -8871,10 +8886,15 @@
                             "EX",
                             "LA",
                             "ECP",
-                            "VXRS",
+                            "Infinityplus",
+                            "Mercury",
+                            "VNMRS",
+                            "VXR",
                             "UNITY",
+                            "UNITY INOVA",
                             "UNITYPLUS",
-                            "INOVA"
+                            "INOVA",
+                            "home-built"
                         ],
                         "description": "The model of the NMR spectrometer.",
                         "rcsb_search_context": [
@@ -11077,7 +11097,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "X-ray Data Collection Details",
-                            "priority_order": 60
+                            "priority_order": 65
                         }
                     ]
                 },
@@ -11101,7 +11121,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "X-ray Data Collection Details",
-                            "priority_order": 55
+                            "priority_order": 60
                         }
                     ]
                 },
@@ -16151,5 +16171,5 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Core Entry",
     "description": "JSON schema for entry level core data. Combines Exchange DB schema: json-schema-min-pdbx_core_entry.json and RCSB Data Warehouse schema: json-schema-core_entry.json",
-    "$comment": "schema_version: 9.0.2"
+    "$comment": "schema_version: 9.0.3"
 }
