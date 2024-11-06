@@ -32,7 +32,7 @@ for polyid in results("polymer_entity"):
 ```
 
 All 3 of these pattern types can be used to search for DNA and RNA sequences as well.
-Demonstrated are 2 queries, one DNA and one RNA, using the simple pattern type:
+These are two queries, one DNA and one RNA, using the `simple` pattern type:
 ```python
 from rcsbapi.search import SeqMotifQuery
 
@@ -94,12 +94,36 @@ Like with Structure Similarity Queries, a `file_url` or `file_path` can also be 
 
 For a `file_url` query, you *must* provide both a valid file URL (a string) and the file's file extension (also as a string). Failure to provide these elements will cause the package to throw an `AssertionError`. 
 
-Below is an example of the same query as above, only this time providing a file url:
+Below is an example of the same query as shown in [Query Construction](query_construction.md#sequence-motif-search), only this time providing a file url:
 ```python
+from rcsbapi.search import StructMotifQuery, StructMotifResidue
+
+# Construct a Residue with:
+# Chain ID of A, an operator of 1, residue number 192, and Exchanges of "LYS" and "HIS".
+# As for what is a valid "Exchange", the package provides these as a literal,
+# and they should be type checked. 
+Res1 = StructMotifResidue(
+    struct_oper_id="1",
+    chain_id="A",
+    exchanges=["LYS", "HIS"],  # exchanges are optional
+    label_seq_id=192
+)
+
+Res2 = StructMotifResidue(
+    struct_oper_id="1",
+    chain_id="A",
+    label_seq_id=162
+)
+
+# After declaring a minimum of 2 and as many as 10 residues,
+# they can be passed into a list for use in the query itself:
+ResList = [Res1, Res2]
+
 link = "https://files.rcsb.org/view/2MNR.cif"
 q2 = StructMotifQuery(
     structure_search_type="file_url",
-    url=link, file_extension="cif",
+    url=link,
+    file_extension="cif",
     residue_ids=ResList
 )
 # structure_search_type MUST be provided. A mismatched query type will cause an error. 
@@ -108,6 +132,8 @@ list(q2())
 
 A query using `file_path` would look something like this:
 ```python
+from rcsbapi.search import StructMotifQuery
+
 file_path = "/absolute/path/to/file.cif"
 q3 = StructMotifQuery(
     structure_search_type="file_upload",
@@ -121,6 +147,8 @@ There are many additional parameters that Structure Motif Query supports. These 
 
 Below will demonstrate how to define these parameters:
 ```python
+from rcsbapi.search import StructMotifQuery
+
 # Specifying backbone distance tolerance: 0-3, default is 1
 # Allowed backbone distance tolerance in Angstrom. 
 backbone = StructMotifQuery(
@@ -211,6 +239,8 @@ list(excluded())
 ```
 The Structure Motif Query can be used to make some very specific queries. Below is an example of a query that retrieves occurrences of the enolase superfamily, a group of proteins diverse in sequence and structure that are all capable of abstracting a proton from a carboxylic acid. Position-specific exchanges are crucial to represent this superfamily accurately.
 ```python
+from rcsbapi.search import StructMotifResidue
+
 Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
 Res2 = StructMotifResidue("A", "1", 193)
 Res3 = StructMotifResidue("A", "1", 219)
