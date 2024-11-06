@@ -1,45 +1,10 @@
 # Additional Examples
+For a walk through of each query type go to [Query Construction](query_construction.md)
 
-## Sequence Search Examples
-
-Below is an example from the [RCSB PDB Search API](https://search.rcsb.org/#search-example-3) page, 
-using the sequence search function.
-This query finds macromolecular PDB entities that share 90% sequence identity with
-GTPase HRas protein from *Gallus gallus* (*Chicken*).
-```python
-from rcsbapi.search import SeqSimilarityQuery
-
-# Use SeqSimilarityQuery class and add parameters
-results = SeqSimilarityQuery("MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET" +
-                        "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI" +
-                        "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ" +
-                        "GVEDAFYTLVREIRQHKLRKLNPPDESGPGCMNCKCVIS", 1, 0.9)
-    
-# results("polymer_entity") produces an iterator of IDs with return type - polymer entities
-for polyid in results("polymer_entity"):
-    print(polyid)
-```
 ## Sequence Motif Search Examples
 
-Below is an example from the [RCSB PDB Search API](https://search.rcsb.org/#search-example-6) page,
-using the sequence motif search function. 
-This query retrives occurences of the His2/Cys2 Zinc Finger DNA-binding domain as
-represented by its PROSITE signature. 
-```python
-from rcsbapi.search import SeqMotifQuery
-
-# Use SeqMotifQuery class and add parameters
-results = SeqMotifQuery("C-x(2,4)-C-x(3)-[LIVMFYWC]-x(8)-H-x(3,5)-H.",
-                        pattern_type="prosite",
-                        sequence_type="protein")
-
-# results("polymer_entity") produces an iterator of IDs with return type - polymer entities
-for polyid in results("polymer_entity"):
-    print(polyid)
-```
-
-You can also use a regular expression (RegEx) to make a sequence motif search.
-As an example, here is a query for the zinc finger motif that binds Zn in a DNA-binding domain:
+In [Query Construction](query_construction.md#sequence-motif-search), you saw an example query using a PROSITE signature.
+You can also use a regular expression (RegEx) to make a sequence motif search. As an example, here is a query for the zinc finger motif that binds Zn in a DNA-binding domain:
 ```python
 from rcsbapi.search import SeqMotifQuery
 
@@ -85,30 +50,7 @@ for polyid in rna("polymer_entity"):
     print(polyid)
 ```
 ## Structure Similarity Search Examples
-
-The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input or parameter, A chain ID or assembly ID must be specified, whether the input structure data should be compared to Assemblies or Polymer Entity Instance (Chains) is required, and defining the search type as either strict or relaxed is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/structure-similarity-search) page.
-```python
-from rcsbapi.search import StructSimilarityQuery
-
-# Basic query:
-# Querying using entry ID and default values assembly ID "1",
-# operator "strict", target search space "Assemblies"
-q1 = StructSimilarityQuery(entry_id="4HHB")
-
-# Same example but with parameters explicitly specified
-q1 = StructSimilarityQuery(
-    structure_search_type="entry_id",
-    entry_id="4HHB",
-    structure_input_type="assembly_id",
-    assembly_id="1",
-    operator="strict_shape_match",
-    target_search_space="assembly"
-)
-for rid in q1("assembly"):
-    print(rid)
-```
-Below is a more complex example that utilizes chain ID, relaxed search operator, and polymer entity instance or target search space. Specifying whether the input structure
-type is chain id or assembly id is very important. For example, specifying chain ID as the input structure type but inputting an assembly ID can lead to
+This is a more complex example that utilizes `chain_id`, the `relaxed_shape_match` operator, and a `target_search_space` of `polymer_entity_instance`. Specifying whether the input structure type is `chain_id` or `assembly_id` is very important. For example, specifying `chain_id` as the input structure type but inputting an assembly ID can lead to
 an error.
 ```python
 from rcsbapi.search import StructSimilarityQuery
@@ -125,10 +67,11 @@ q2 = StructSimilarityQuery(
 )
 list(q2())
 ```
-Structure similarity queries also allow users to upload a file from their local computer or input a file url from the website to query the PDB archive for similar proteins. The file represents a target protein structure in the file formats "cif", "bcif", "pdb", "cif.gz", or "pdb.gz". If a user wants to use a file url for queries, the user must specify the structure search type, the value (being the url), and the file format of the file. This is also the same case for file upload, except the value is the absolute path leading to the file that is in the local machine. An example for file url is below for 4HHB (hemoglobin).
+Structure similarity queries also allow users to upload a file from their local computer or input a file url from the website to query the PDB archive for similar proteins. The file represents a target protein structure in the file formats "cif", "bcif", "pdb", "cif.gz", or "pdb.gz". If a user wants to use a file url for queries, the user must specify the `structure_search_type`, the `file_url`, and the `file_format` of the file. This is the same case for file upload, except the user must provide the absolute path leading to the file that is in the local machine.
 ```python
 from rcsbapi.search import StructSimilarityQuery
 
+# Using file_url
 q3 = StructSimilarityQuery(
     structure_search_type="file_url",
     file_url="https://files.rcsb.org/view/4HHB.cif",
@@ -136,7 +79,7 @@ q3 = StructSimilarityQuery(
 )
 list(q3())
 
-# To upload your own structure file, use the `file_path` parameter:
+# Using `file_path`
 q4 = StructSimilarityQuery(
     structure_search_type="file_upload",
     file_path="/PATH/TO/FILE.cif",  # specify local model file path
@@ -147,53 +90,9 @@ list(q4())
 
 ## Structure Motif Search Examples
 
-The PDB Archive can also be queried by using a "motif" found in these 3D structures. To perform this type of query, an entry_id or a file URL/path must be provided, along with residues (which are parts of 3D structures.) This is the bare minimum needed to make a search, but there are lots of other parameters that can be added to a Structure Motif Query (see [full search schema](https://search.rcsb.org/redoc/index.html)).
+Like with Structure Similarity Queries, a `file_url` or `file_path` can also be provided to the program. These can take the place of an entry_id. 
 
-To make a Structure Motif Query, you must first define anywhere from 2-10 "residues" that will be used in the query. Each individual residue has a Chain ID, Operator, Residue Number, and Exchanges (optional) that can be declared in that order using positonal arguments, or using the "chain_id", "struct_oper_id", and "label_seq_id" to define what parameter you are passing through. All 3 of the required parameters must be included, or the package will throw an AssertionError. 
-
-Each residue can only have a maximum of 4 Exchanges, and each query can only have 16 exchanges total. Violating any of these rules will cause the package to throw an AssertionError. 
-
-Examples of how to instantiate Residues can be found below. These can then be put into a list and passed through to a Structure Motif Query.
-```python
-from rcsbapi.search import StructMotifResidue
-
-# Construct a Residue with a Chain ID of A, an operator of 1, a residue 
-# number of 192, and Exchanges of "LYS" and "HIS"
-Res1 = StructMotifResidue("A", "1", 192, ["LYS", "HIS"])
-# As for what is a valid "Exchange", the package provides these as a literal,
-# and they should be type checked. 
-
-# You can also specify the arguments:
-# This query is the same as above. 
-Res2 = StructMotifResidue(
-    struct_oper_id="1",
-    chain_id="A",
-    exchanges=["LYS", "HIS"],
-    label_seq_id=192
-)
-
-# After declaring a minimum of 2 and as many as 10 residues,
-# they can be passed into a list for use in the query itself:
-Res3 = StructMotifResidue("A", "1", 162)  # exchanges are optional
-
-ResList = [Res1, Res3]
-```
-From there, these Residues can be used in a query. As stated before, you can only include 2 - 10 residues in a query. If you fail to provide residues for a query, or provide the wrong amount, the package will throw a ValueError. 
-
-For a Structure Motif Query using an entry_id, the only other necessary value that must be passed into the query is the residue list. The default type of query is an entry_id query. 
-
-As this type of query has a lot of optional parameters, do *not* use positional arguments as more than likely an error will occur. 
-
-Below is an example of a basic entry_id Structure Motif Query, with the residues declared earlier:
-```python
-from rcsbapi.search import StructMotifQuery
-
-q1 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
-list(q1())
-```
-Like with Structure Similarity Queries, a file url or filepath can also be provided to the program. These can take the place of an entry_id. 
-
-For a file url query, you *must* provide both a valid file URL (a string), and the file's file extension (also as a string). Failure to provide these elements correctly will cause the package to throw an AssertionError. 
+For a `file_url` query, you *must* provide both a valid file URL (a string) and the file's file extension (also as a string). Failure to provide these elements will cause the package to throw an `AssertionError`. 
 
 Below is an example of the same query as above, only this time providing a file url:
 ```python
@@ -206,22 +105,21 @@ q2 = StructMotifQuery(
 # structure_search_type MUST be provided. A mismatched query type will cause an error. 
 list(q2())
 ```
-Like with Structure Similarity Queries, a filepath to a file may also be provided. This file must be a valid file accepted by the search API. A file extension must also be provided with the file upload. 
 
-The query would look something like this:
+A query using `file_path` would look something like this:
 ```python
-filepath = "/absolute/path/to/file.cif"
+file_path = "/absolute/path/to/file.cif"
 q3 = StructMotifQuery(
     structure_search_type="file_upload",
-    file_path=filepath,
+    file_path=file_path,
     file_extension="cif",
     residue_ids=ResList
 )
 list(q3())
 ```
-There are many additional parameters that Structure Motif Query supports. These include a variety of features such as backbone distance tolerance, side chain distance tolerance, angle tolerance, RMSD cutoff, limits (stop searching after this many hits), atom pairing schemes, motif pruning strategy, allowed structures, and excluded structures. These can be mixed and matched as needed to make accurate and useful queries. All of these have some default value which is used when a parameter isn't provided. These parameters conform to the defaults used by the Search API. 
+There are many additional parameters that Structure Motif Query supports. These include a variety of features such as `backbone_distance_tolerance`, `side_chain_distance_tolerance`, `angle_tolerance`, `rmsd_cutoff`, `limit` (stop searching after this many hits), `atom_pairing_scheme`, `motif_pruning_strategy`, `allowed_structures`, and `excluded_structures`. These can be mixed and matched as needed to make accurate and useful queries. All of these have some default value which is used when a parameter isn't provided (See [Query Construction](query_construction.md#structure-motif-search)). These parameters conform to the defaults used by the Search API. 
 
-Below will demonstrate how to define these parameters using non-positional arguments:
+Below will demonstrate how to define these parameters:
 ```python
 # Specifying backbone distance tolerance: 0-3, default is 1
 # Allowed backbone distance tolerance in Angstrom. 
@@ -327,15 +225,6 @@ list(query())
 ```
 ## Chemical Similarity Search Examples
 
-When you have unique chemical information (e.g., a chemical formula or descriptor) you can use this information to find chemical components (e.g., drugs, inhibitors, modified residues, or building blocks such as amino acids, nucleotides, or sugars), so that it is similar to the formula or descriptor used in the query (perhaps one or two atoms/groups are different), is part of a larger molecule (i.e., the specified formula/descriptor is a substructure), or is exactly or very closely matches the formula or descriptor used in the query. 
-
-The search can also be used to identify PDB structures that include the chemical component(s) which match or are similar to the query. These structures can then be examined to learn about the interactions of the component within the structure. More information on Chemical Similarity Queries can be found on the [RCSB PDB Chemical Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/chemical-similarity-search) page.
-
-To do a Chemical Similarity query, you must first specify one of two possible query options which are formula and descriptors. Formula allows queries to be made by providing a chemical formula. Descriptors allow you to search by chemical notations for example. Each Query option has its own distinct set of parameters, but both options require a value.
-
-The formula query option comes with a match subset parameter which allows users to search chemical components whose formula exactly match the query or matches any portion of the query. The descriptor query option comes with a descriptor type parameter and match type parameter. The descriptor type parameter specifies what type of descriptor the input value is. There are two options which are SMILES (Simplified Molecular Input Line Entry Specification) and InChI (International Chemical Identifier). The match type parameter has six options which are Similar Ligands (Quick Screen), Similar Ligands (Stereospecific), Similar Ligands (including Stereoisomers), Substructure (Stereospecific), Substructure (including Stereoisomers), and Exact match.
-
-When doing Chemical Similarity Queries in this tool, it is important to note that by default the query option is set to formula and match subset is set to False. An example of how that looks like is below.
 ```python
 from rcsbapi.search import ChemSimilarityQuery
 
@@ -350,12 +239,12 @@ q1 = ChemSimilarityQuery(
 )
 list(q1())
 ```
-Below is are two examples of using query option descriptor. Both descriptor type parameters are also used.
+Below are two examples of using the query option `descriptor`. Both `descriptor_type`s are shown.
 ```python
 from rcsbapi.search import ChemSimilarityQuery
 
-# Query with type = descriptor, descriptor type = SMILES,
-# match type = similar ligands (sterospecific) or graph-relaxed-stereo
+# Query with descriptor_type SMILES,
+# match_type = "graph-relaxed-stereo" (similar ligands (stereospecific))
 q2 = ChemSimilarityQuery(
     value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
     query_type="descriptor",
@@ -367,8 +256,8 @@ list(q2())
 ```python
 from rcsbapi.search import ChemSimilarityQuery
 
-# Query with type = descriptor, descriptor type = InChI,
-# match type = substructure (sterospecific) or sub-struct-graph-relaxed-stereo
+# Query descriptor_type InChI,
+# match_type = "sub-struct-graph-relaxed-stereo" (substructure (stereospecific))
 q3 = ChemSimilarityQuery(
     value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
     query_type="descriptor",
@@ -379,19 +268,6 @@ list(q3())
 ```
 ## Faceted Query Examples
 For more details on arguments, see the [API reference](api.rst)
-
-In order to group and perform calculations and statistics on PDB data by using a simple search query, you can use a faceted query (or facets). Facets arrange search results into categories (buckets) based on the requested field values. More information on Faceted Queries can be found [here](https://search.rcsb.org/#using-facets). All facets should be provided with `name`, `aggregation_type`, and `attribute` values. Depending on the aggregation type, other parameters must also be specified. The `facets()` function runs the query `q` using the specified facet(s), and returns a list of dictionaries:
-```python
-from rcsbapi.search import AttributeQuery
-from rcsbapi.search import Facet
-
-q = AttributeQuery(
-    attribute="rcsb_accession_info.initial_release_date",
-    operator="greater",
-    value="2019-08-20"
-)
-q(facets=Facet(name="Methods", aggregation_type="terms", attribute="exptl.method")).facets
-```
 
 ### Terms Facets
 Terms faceting is a multi-bucket aggregation where buckets are dynamically built - one per unique value. We can specify the minimum count (`>= 0`) for a bucket to be returned using the parameter `min_interval_population` (default value `1`). We can also control the number of buckets returned using the parameter `max_num_intervals` (default value `65336`).
@@ -688,10 +564,10 @@ For more details on arguments to create `RequestOption` objects, see the [API re
 Sequence Identity and Matching Uniprot Accession examples from [Search API Documentation](https://search.rcsb.org/#group-by-return-type).
 
 ### Matching Deposit Group ID
-Grouping on the basis of common identifier for a group of entries deposited as a collection.
+Aggregation method `matching_deposit_group_id` groups on the basis of a common identifier for a group of entries deposited as a collection.
 
 This example searches for entries associated with "interleukin" from humans with investigational or experimental drugs bound.
-Since group_by_return_type is specified as "representatives", one representative structure per group is returned.
+Since `group_by_return_type` is specified as `representatives`, one representative structure per group is returned.
 
 ```python
 from rcsbapi.search import AttributeQuery, TextQuery
@@ -714,7 +590,7 @@ list(
 ```
 
 ### Sequence Identity
-The method used to group search hits on the basis of protein sequence clusters that meet a predefined identity threshold.
+Aggregation method `sequence_identity` is used to group search hits on the basis of protein sequence clusters that meet a predefined identity threshold.
 
 This example groups together identical human sequences from high-resolution (1.0-2.0Å) structures determined by X-ray crystallography. Among the resulting groups, there is a cluster of human glutathione transferases in complex with different substrates.
 ```python
@@ -746,7 +622,7 @@ list(query(
 ```
 
 ### Matching Uniprot Accession
-This example demonstrates how to use `matching_uniprot_accession` grouping to get distinct Spike protein S1 proteins released from the beginning of 2020 with. Here, all entities are represented by distinct groups of SARS-CoV, SARS-CoV-2 and Pangolin coronavirus spike proteins.
+This example demonstrates how to use `matching_uniprot_accession` grouping to get distinct Spike protein S1 proteins released from the beginning of 2020. Here, all entities are represented by distinct groups of SARS-CoV, SARS-CoV-2 and Pangolin coronavirus spike proteins.
 
 ```python
 from rcsbapi.search import AttributeQuery
@@ -776,7 +652,7 @@ list(query(
 ```
 
 ## Sort Example
-The `sort` request option can be used to control sorting of results. By default, results are sorted by "score" in descending order.
+The `sort` request option can be used to control sorting of results. By default, results are sorted by `score` in descending order.
 You can also sort by attribute name and apply filters.
 
 Example from [RCSB PDB Search API](https://search.rcsb.org/#sorting) page.
