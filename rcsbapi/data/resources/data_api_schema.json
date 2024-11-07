@@ -8525,7 +8525,7 @@
                         },
                         {
                             "name": "instrument",
-                            "description": "The type of instrument used in the vitrification process.\n\nAllowable values:\nCRYOSOL VITROJET, EMS-002 RAPID IMMERSION FREEZER, FEI VITROBOT MARK I, FEI VITROBOT MARK II, FEI VITROBOT MARK III, FEI VITROBOT MARK IV, GATAN CRYOPLUNGE 3, HOMEMADE PLUNGER, LEICA EM CPC, LEICA EM GP, LEICA KF80, LEICA PLUNGER, REICHERT-JUNG PLUNGER, SPOTITON, ZEISS PLUNGE FREEZER CRYOBOX\n",
+                            "description": "The type of instrument used in the vitrification process.\n\nAllowable values:\nCRYOSOL VITROJET, EMS-002 RAPID IMMERSION FREEZER, FEI VITROBOT MARK I, FEI VITROBOT MARK II, FEI VITROBOT MARK III, FEI VITROBOT MARK IV, GATAN CRYOPLUNGE 3, HOMEMADE PLUNGER, LEICA EM CPC, LEICA EM GP, LEICA KF80, LEICA PLUNGER, REICHERT-JUNG PLUNGER, SPOTITON, SPT LABTECH CHAMELEON, ZEISS PLUNGE FREEZER CRYOBOX\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -11164,7 +11164,7 @@
                     "fields": [
                         {
                             "name": "action_type",
-                            "description": "The action associated with this audit record.\n\nAllowable values:\nCreate component, Initial release, Modify aromatic_flag, Modify atom id, Modify backbone, Modify charge, Modify component atom id, Modify component comp_id, Modify coordinates, Modify descriptor, Modify formal charge, Modify formula, Modify identifier, Modify internal type, Modify leaving atom flag, Modify linking type, Modify model coordinates code, Modify name, Modify one letter code, Modify parent residue, Modify processing site, Modify subcomponent list, Modify synonyms, Modify value order, Obsolete component, Other modification\n",
+                            "description": "The action associated with this audit record.\n\nAllowable values:\nCreate component, Initial release, Modify PCM, Modify aromatic_flag, Modify atom id, Modify backbone, Modify charge, Modify component atom id, Modify component comp_id, Modify coordinates, Modify descriptor, Modify formal charge, Modify formula, Modify identifier, Modify internal type, Modify leaving atom flag, Modify linking type, Modify model coordinates code, Modify name, Modify one letter code, Modify parent residue, Modify processing site, Modify subcomponent list, Modify synonyms, Modify value order, Obsolete component, Other modification\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -13137,7 +13137,7 @@
                         },
                         {
                             "name": "model",
-                            "description": "The model of the NMR spectrometer.\n\nExamples:\nAVANCE, AVANCE II, AVANCE III, AVANCE III HD, WH, WM, AM, AMX, DMX, DRX, MSL, OMEGA, OMEGA PSG, GX, GSX, A, AL, EC, EX, LA, ECP, VXRS, UNITY, UNITYPLUS, INOVA\n",
+                            "description": "The model of the NMR spectrometer.\n\nExamples:\nAVANCE, AVANCE II, AVANCE III, AVANCE III HD, WH, WM, AC+, Alpha, AM, AMX, AMX II, DMX, DRX, DSX, MSL, OMEGA, OMEGA PSG, GX, GSX, A, AL, EC, EX, LA, ECP, Infinityplus, Mercury, VNMRS, VXR, UNITY, UNITY INOVA, UNITYPLUS, INOVA, home-built\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",

@@ -34,7 +34,7 @@ print(attrs.get_attribute_details("rcsb_entity_source_organism"))
 ```
 
 ### get_attribute_type()
-Given a full attribute name, return the search service type ("text" for structure attributes and "text_chem" for chemical attributes).
+Given a full attribute name, return the search service type (`text` for structure attributes and `text_chem` for chemical attributes).
 
 ```python
 from rcsbapi.search import search_attributes as attrs
