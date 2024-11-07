@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.0.0 (2024-11-6)
+
+- Release version 1.0.0 of package
+- Update search schemas: 1.47.6 -> 1.47.7
+- Update data schemas: 
+  - entry schema 9.0.2 -> 9.0.3
+  - chem_comp schema 7.1.3 -> 7.1.4
+- Update documentation
+
 ## v0.5.0 (2024-10-28)
 
 - Separate out package-wide settings into immutable constants (`const.py`) and configurable parameters (`config.py`)

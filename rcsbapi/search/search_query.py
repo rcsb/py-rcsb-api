@@ -422,8 +422,6 @@ class Attr:
     +--------------------+---------------------+
     | exists             |                     |
     +--------------------+---------------------+
-    | in\\_              |                     |
-    +--------------------+---------------------+
 
     Previously, __bool__ was overloaded to run the exists function, but __bool__ can't be overloaded to return non-boolean value.
     Method overloading bool was deleted.
@@ -647,23 +645,6 @@ class Attr:
         if isinstance(value, Value):
             value = value.value
         return self.greater_or_equal(value)
-
-    def __contains__(self, value: Union[str, List[str], "Value[str]", "Value[List[str]]"]) -> Terminal:
-        """Maps to contains_words or contains_phrase depending on the value passed.
-
-        * `"value" in attr` maps to `attr.contains_phrase("value")` for simple values.
-        * `["value"] in attr` maps to `attr.contains_words(["value"])` for lists and
-          tuples.
-        """
-        if isinstance(value, Value):
-            value = value.value
-        if isinstance(value, list):
-            if len(value) == 0 or isinstance(value[0], str):
-                return self.contains_words(value)
-            else:
-                return NotImplemented
-        else:
-            return self.contains_phrase(value)
 
 
 SEARCH_SCHEMA = SearchSchema(Attr)
@@ -1286,10 +1267,6 @@ class PartialQuery:
 
     @_attr_delegate(Attr.__ge__)
     def __ge__(self, value: TNumberLike) -> SearchQuery:
-        ...
-
-    @_attr_delegate(Attr.__contains__)
-    def __contains__(self, value: Union[str, List[str], "Value[str]", "Value[List[str]]"]) -> SearchQuery:
         ...
 
 
