@@ -168,8 +168,6 @@ Performs the following GraphQL query:
     }
     pdbx_entity_branch_descriptor {
       type
-    }
-    pdbx_entity_branch_descriptor {
       descriptor
     }
   }
@@ -217,7 +215,7 @@ Performs the following GraphQL query:
 ### Reference Sequence Identifiers
 This example shows how to access identifiers related to entries (cross-references) and found in data collections other than PDB. Each cross-reference is described by the database name and the database accession. A single entry can have cross-references to several databases, e.g. UniProt and GenBank in 7NHM, or no cross-references, e.g. 5L2G:
 ```python
-from rcsbapi.data import DataQuery as 
+from rcsbapi.data import DataQuery as Query
 
 query = Query(
     input_type="entries",

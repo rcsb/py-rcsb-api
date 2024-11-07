@@ -37,7 +37,7 @@ List of supported comparative operators:
 |<       |less than               |
 |<=      |less than or equal to   |
 
-To use the `exists`, `contains_phrase`, or `contains_words` operator, create an [AttributeQuery](quickstart.md#attribute-search)
+To use the `"exists"`, `"contains_phrase"`, or `"contains_words"` operator, create an [AttributeQuery](quickstart.md#attribute-search)
 
 For methods to search and find details on attributes within this package, go to the [attributes page](attributes.md)
 For a full list of attributes, please refer to the [RCSB PDB schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema).
@@ -238,7 +238,7 @@ results = list(query())  # construct a list from query results
 print(results)
 ```
 
-As Structure Attributes and Chemical Attributes are almost all unique, the package is usually able to automatically determine the search `service` required. However, for attributes that are both Structure and Chemical Attributes (e.g., `rcsb_id`), specifying a search service is required (Structure Attribute service: `text`, Chemical Attribute service: `text_chem`).
+As Structure Attributes and Chemical Attributes are almost all unique, the package is usually able to automatically determine the search `service` required. However, for attributes that are both Structure and Chemical Attributes (e.g., `"rcsb_id"`), specifying a search service is required (Structure Attribute service: `"text"`, Chemical Attribute service: `"text_chem"`).
 ```python
 # "rcsb_id" is both a Structure Attribute and Chemical Attribute
 #  so search `service` must be specified
@@ -271,7 +271,7 @@ list(q2())
 |`negation`   |no      |Indicates if the operator is negated         |False                 |
 
 
-The `operator` can be one of a number of options, depending on the attribute type being queried. For example, `contains_phrase` or `exact_match` can be used to compare the attribute to a value, or the `exists` operator may be used to check if the attribute exists for a given structure. Refer to the [Search Attributes](https://search.rcsb.org/structure-search-attributes.html) and [Chemical Attributes](https://search.rcsb.org/chemical-search-attributes.html) documentation for a full list of attributes and applicable operators.
+The `operator` can be one of a number of options, depending on the attribute type being queried. For example, `"contains_phrase"` or `"exact_match"` can be used to compare the attribute to a value, or the `"exists"` operator may be used to check if the attribute exists for a given structure. Refer to the [Search Attributes](https://search.rcsb.org/structure-search-attributes.html) and [Chemical Attributes](https://search.rcsb.org/chemical-search-attributes.html) documentation for a full list of attributes and applicable operators.
 
 Alternatively, you can also construct attribute queries with comparative operators (e.g., `==`, `>`, or `<`) using the `search_attributes` object (which also allows for names to be tab-completed):
 
@@ -352,7 +352,7 @@ for polyid in query("polymer_entity"):
 See [Sequence Motif Search Examples](additional_examples.md#Sequence-Motif-Search-Examples) for more use cases.
 
 ### Structure Similarity Search
-The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input or parameter, a chain ID or assembly ID must be specified, whether the input structure data should be compared to `assembly` or `polymer_entity_instance` (Chains) is required, and defining the search type as either `strict` or `relaxed` is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/structure-similarity-search) page.
+The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input, a `chain_id` or `assembly_id` must be specified, whether the input structure data should be compared to `assembly` or `polymer_entity_instance` (Chains) is required, and defining the search type as either `strict` or `relaxed` is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/structure-similarity-search) page.
 
 ```python
 from rcsbapi.search import StructSimilarityQuery
@@ -389,16 +389,16 @@ for rid in q1("assembly"):
 |`target_search_space`    |Target objects against which the query will be compared for shape similarity|"assembly"   |
 
 
-If you provide an entry_id, you must provide either an assembly_id or chain_id
+If you provide an `entry_id`, you must provide either an `assembly_id` or `chain_id`
 
-If you provide a file_url or file_path, you must also provide a file_format.
+If you provide a `file_url` or `file_path`, you must also provide a `file_format`.
 
 See [Structure Similarity Search Examples](additional_examples.md#Structure-Similarity-Search-Examples) for more use cases.
 
 ### Structure Motif Search
-The PDB Archive can also be queried by using a "motif" found in 3D structures. To perform this type of query, an entry_id or a file URL/path must be provided, along with residues (which are parts of 3D structures). This is the bare minimum needed to make a search, but there are lots of other parameters that can be added to a Structure Motif Query (see [Search API reference](https://search.rcsb.org/redoc/index.html)).
+The PDB Archive can also be queried by using a "motif" found in 3D structures. To perform this type of query, an entry id or a file URL/path must be provided, along with residues (which are parts of 3D structures). This is the bare minimum needed to make a search, but there are lots of other parameters that can be added to a Structure Motif Query (see [Search API reference](https://search.rcsb.org/redoc/index.html)).
 
-To make a Structure Motif Query, you must first define anywhere from 2-10 "residues" that will be used in the query. Each individual residue has a Chain ID, Operator, Residue Number, and Exchanges (optional) that can be declared in that order using positional arguments, or using the `chain_id`, `struct_oper_id`, and `label_seq_id` to define what parameter you are passing through. All 3 of the required parameters must be included, or the package will throw an `AssertionError`. 
+To make a Structure Motif Query, you must first define anywhere from 2-10 "residues" that will be used in the query. Each individual residue has a chain ID, operator, residue number, and exchanges (optional) that can be declared in that order using positional arguments, or using the `chain_id`, `struct_oper_id`, and `label_seq_id` to define what parameter you are passing through. All 3 of the required parameters must be included, or the package will throw an `AssertionError`. 
 
 Each residue can only have a maximum of 4 Exchanges, and each query can only have 16 exchanges total. Violating any of these rules will cause the package to throw an `AssertionError`. 
 
@@ -460,11 +460,11 @@ list(q1())
 |`excluded_structures`         |If the list of structure identifiers is specified, the search will exclude those structures from the search space||
 |`limit`                       |Stop after accepting this many hits                               |             |
 
-If you provide an entry_id, the other optional parameters can be ignored.
+If you provide an `entry_id`, the other optional parameters can be ignored.
 
-If you provide a file_url, you must also provide a file_extension.
+If you provide a `file_url`, you must also provide a `file_extension`.
 
-If you provide a file_path, you must also provide a file_extension.
+If you provide a `file_path`, you must also provide a `file_extension`.
 
 See [Structure Motif Search Examples](additional_examples.md#Structure-Motif-Search-Examples) for more use cases.
 
@@ -475,7 +475,7 @@ The search can also be used to identify PDB structures that include the chemical
 
 To do a Chemical Similarity query, you must first specify one of two possible query options: `formula` or `descriptor`. `formula` allows queries to be made by providing a chemical formula. `descriptor` allows you to search by chemical notations. Each query option has its own distinct set of parameters, but both options require a `value`.
 
-The `formula` query option comes with a `match_subset` parameter which allows users to search chemical components whose formula exactly match the query or matches any portion of the query. The `descriptor` query option comes with a `descriptor_type` parameter and `match_type` parameter. The `descriptor_type` parameter specifies what type of descriptor the input value is. There are two options which are `SMILES` (Simplified Molecular Input Line Entry Specification) and `InChI` (International Chemical Identifier). The `match_type` parameter has six options which are shown in the table below.
+The `formula` query option comes with a `match_subset` parameter which allows users to search chemical components whose formula exactly match the query or matches any portion of the query. The `descriptor` query option comes with a `descriptor_type` parameter and `match_type` parameter. The `descriptor_type` parameter specifies what type of descriptor the input value is. There are two options: `SMILES` (Simplified Molecular Input Line Entry Specification) and `InChI` (International Chemical Identifier). The `match_type` parameter has six options which are shown in the table below.
 
 When doing Chemical Similarity queries in this package, it is important to note that by default the query option is set to `formula` and `match_subset` is set to `False`. An example of how that looks like is below.
 ```python
@@ -513,7 +513,7 @@ See [Chemical Similarity Search Examples](additional_examples.md#Chemical-Simila
 ## Request Options
 
 ### Return Types
-A search query can return different results when a `return_type` is specified. Below are Structure Attribute query examples specifying return types `polymer_entity`, `non_polymer_entity`, `polymer_instance`, and `mol_definition`. More information on return types can be found in the [RCSB PDB Search API](https://search.rcsb.org/#return-type) page.
+A search query can return different results when a `return_type` is specified. Below are Structure Attribute query examples specifying return types `"polymer_entity"`, `"non_polymer_entity"`, `"polymer_instance"`, and `"mol_definition"`. More information on return types can be found in the [RCSB PDB Search API](https://search.rcsb.org/#return-type) page.
 
 ```python
 from rcsbapi.search import AttributeQuery
@@ -558,9 +558,9 @@ list(q2)
 ```
 
 ### Results Verbosity
-Results can be returned alongside additional metadata, including result scores. To return this metadata, set the `results_verbosity` parameter to `verbose` (all metadata), `minimal` (scores only), or `compact` (default, no metadata). If set to `verbose` or `minimal`, results will be returned as a list of dictionaries. 
+Results can be returned alongside additional metadata, including result scores. To return this metadata, set the `results_verbosity` parameter to `"verbose"` (all metadata), `"minimal"` (scores only), or `"compact"` (default, no metadata). If set to `"verbose"` or `"minimal"`, results will be returned as a list of dictionaries. 
 
-For example, here we get all experimental models associated with "hemoglobin", along with their scores, by setting verbosity to `minimal`.
+For example, here we get all experimental models associated with "hemoglobin", along with their scores, by setting verbosity to `"minimal"`.
 
 ```python
 from rcsbapi.search import TextQuery

@@ -21,40 +21,40 @@ print(query.get_response())
 ```
 
 ### input_type
-Specifies which data hierarchy level from which you are starting your query (e.g., "entry", "polymer_entity", etc.).
+Specifies which data hierarchy level from which you are starting your query (e.g., `"entry"`, `"polymer_entity"`, etc.).
 
-Also called "root fields", these represent designated points from which you can begin querying. This includes `entries`, `polymer_entities`, `polymer_entity_instances`, etc. Singular input_types are automatically converted to their plural form when possible to allow for more flexibility in `input_ids`. For the full list of `input_type`s see below:
+Also called "root fields", these represent designated points from which you can begin querying. This includes `"entries"`, `"polymer_entities"`, `"polymer_entity_instances"`, etc. Singular input_types are automatically converted to their plural form when possible to allow for more flexibility in `input_ids`. For the full list of `input_type`s see below:
 
 <details open>
   <summary>Full list of input_types</summary>
 
-- `entry`
-- `entries`
-- `polymer_entity`
-- `polymer_entities`
-- `branched_entity`
-- `branched_entities`
-- `nonpolymer_entity`
-- `nonpolymer_entities`
-- `polymer_entity_instance`
-- `polymer_entity_instances`
-- `nonpolymer_entity_instance`
-- `nonpolymer_entity_instances`
-- `branched_entity_instance`
-- `branched_entity_instances`
-- `assembly`
-- `assemblies`
-- `interface`
-- `interfaces`
-- `uniprot`
-- `pubmed`
-- `chem_comp`
-- `chem_comps`
-- `entry_group`
-- `entry_groups`
-- `polymer_entity_group`
-- `polymer_entity_groups`
-- `group_provenance`
+- `"entry"`
+- `"entries"`
+- `"polymer_entity"`
+- `"polymer_entities"`
+- `"branched_entity"`
+- `"branched_entities"`
+- `"nonpolymer_entity"`
+- `"nonpolymer_entities"`
+- `"polymer_entity_instance"`
+- `"polymer_entity_instances"`
+- `"nonpolymer_entity_instance"`
+- `"nonpolymer_entity_instances"`
+- `"branched_entity_instance"`
+- `"branched_entity_instances"`
+- `"assembly"`
+- `"assemblies"`
+- `"interface"`
+- `"interfaces"`
+- `"uniprot"`
+- `"pubmed"`
+- `"chem_comp"`
+- `"chem_comps"`
+- `"entry_group"`
+- `"entry_groups"`
+- `"polymer_entity_group"`
+- `"polymer_entity_groups"`
+- `"group_provenance"`
 
 </details>
 

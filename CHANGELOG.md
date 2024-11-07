@@ -2,6 +2,7 @@
 
 ## v1.0.0 (2024-11-6)
 
+- Release version 1.0.0 of package
 - Update search schemas: 1.47.6 -> 1.47.7
 - Update data schemas: 
   - entry schema 9.0.2 -> 9.0.3

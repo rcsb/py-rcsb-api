@@ -479,7 +479,7 @@ q(
 ```
 
 ### Filter Facets
-Filters allow us to filter documents that contribute to bucket count. Similar to queries, we can group several `TerminalFilter`s into a single `GroupFilter`. We can combine a filter with a facet using the `FilterFacet` class. Terminal filters should specify an `attribute` and `operator`, as well as possible a `value` and whether or not it should be a `negation` and/or `case_sensitive`. Group filters should specify a `logical_operator` (which should be either `"and"` or `"or"`) and a list of filters (`nodes`) that should be combined. Finally, the `FilterFacet` should be provided with a filter and a (list of) facet(s).
+Filters allow us to filter documents that contribute to bucket count. Similar to queries, we can group several `TerminalFilter`s into a single `GroupFilter`. We can combine a filter with a facet using the `FilterFacet` class. Terminal filters should specify an `attribute` and `operator`, as well as a `value`. The `negation` and `case_sensitive` parameters are `False` by default, but can be set. Group filters should specify a `logical_operator` (which should be either `"and"` or `"or"`) and a list of filters (`nodes`) that should be combined. Finally, the `FilterFacet` should be provided with a filter and a (list of) facet(s).
 
 Here is an example that filters only protein chains which adopt 2 different beta propeller arrangements according to the CATH classification.
 ```python
