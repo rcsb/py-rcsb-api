@@ -8,7 +8,7 @@ immutable and protected from modification during runtime.
 
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import List
+from typing import List, Any
 
 
 @dataclass(frozen=True)
@@ -134,11 +134,13 @@ class FileConst:
 
     # For examples of download urls go to docs:
     # https://www.rcsb.org/docs/programmatic-access/file-download-services
-    EXCEPTION_TYPE_TO_BASE_URL: MappingProxyType[str, str] = MappingProxyType({
-        "FASTA sequence": "https://www.rcsb.org/fasta/entry/",
-        "ligand mmCIF": "https://files.rcsb.org/ligands/download/",
-        "entry bCIF": "https://models.rcsb.org/",
-    })
+    EXCEPTION_TYPE_TO_BASE_URL: MappingProxyType[str, MappingProxyType[str, Any]] = MappingProxyType(
+        {
+            "FASTA sequence": MappingProxyType({"endpoint": "https://www.rcsb.org/fasta/entry/", "rate_limit": 100}),  # rate limit is 10 per second, scaled to 10 secs?
+            "ligand mmCIF": MappingProxyType({"endpoint": "https://files.rcsb.org/ligands/download/", "rate_limit": ""}),
+            "entry bCIF": MappingProxyType({"endpoint": "https://models.rcsb.org/", "rate_limit": 15}),  # rate limit is 15 per 10 seconds
+        }
+    )
 
 
 file_const = FileConst()

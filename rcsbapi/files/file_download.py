@@ -1,7 +1,8 @@
-from typing import List, Tuple, Literal
+from typing import List, Tuple, Literal, Optional, Any
 import typing
 import re
 import os
+import time
 import multiprocessing
 import gzip
 import urllib
@@ -9,6 +10,7 @@ import json
 import requests
 
 from rcsbapi.const import const, file_const
+# from rcsbapi.config import config  # TODO: eventually use config to set timeout?
 
 FileType = Literal["mmCIF", "bCIF", "PDB", "PDBML", "FASTA"]
 
@@ -29,9 +31,9 @@ def build_url(pdb_id: str, file_type: str) -> str:
         file_extension = file_const.CONTENT_TYPE_TO_EXTENSION[full_file_type]
     file_name = pdb_id.lower()
 
-    # Special case for FASTA because it's a difference endpoint
+    # Special case for file types with different endpoints
     if full_file_type in ["FASTA sequence", "ligand mmCIF", "entry bCIF"]:
-        return file_const.EXCEPTION_TYPE_TO_BASE_URL[full_file_type] + file_name + file_extension
+        return file_const.EXCEPTION_TYPE_TO_BASE_URL[full_file_type]["endpoint"] + file_name + file_extension
     return file_const.FILE_DOWNLOAD_ENDPOINT + file_name + file_extension
 
 
@@ -113,7 +115,7 @@ def make_id_file_tuples(
     compressed: bool,
 ) -> List[Tuple[str, FileType, str, bool]]:
     """Make tuples of (pdb_id, file_type, download_dir, compressed) which will be passed
-    into download_file while multiprocessing
+    into _download_file while multiprocessing
 
     Args:
         id_batch (List[str]): Batch of PDB ID
@@ -196,7 +198,12 @@ def check_file_types(file_type_list: List[FileType]):
         )
 
 
-def download_file(pdb_id: str, file_type: FileType, download_dir: str, compressed: bool) -> str:
+def _download_file(
+    pdb_id: str,
+    file_type: FileType,
+    download_dir: str,
+    compressed: bool,
+) -> str:
     """Download an individual file
 
     Args:
@@ -210,6 +217,7 @@ def download_file(pdb_id: str, file_type: FileType, download_dir: str, compresse
         str: If successful, returns empty string. If download fails, returns PDB id
     """
     url = build_url(pdb_id, file_type)
+    print(url)
     file_name = os.path.basename(url)
 
     # Special case for FASTA because url doesn't contain file extension
@@ -230,7 +238,7 @@ def download_file(pdb_id: str, file_type: FileType, download_dir: str, compresse
 
     response = requests.get(url, stream=True, timeout=60)
     if response.status_code == 200:
-        path = os.path.join(download_dir, file_name)
+        path = os.path.join("..", download_dir, file_name)
         with open(path, 'wb') as f:
             # set chunk_size to 1 MB (1024 * 1024 bytes)
             for chunk in response.iter_content(chunk_size=1024 * 1024):
@@ -238,6 +246,17 @@ def download_file(pdb_id: str, file_type: FileType, download_dir: str, compresse
                     f.write(chunk)
         if compressed is False:
             unzip_gz(path)  # TODO: Think about efficiency, I think it's slow rn
+
+        # Not in use currently. For enforcing rate limit:
+        # with lock:  # ensure atomic increments
+        #     request_counter.value += 1
+        #     if request_counter.value % 2 == 0:
+        #         time.sleep(1.0)
+
+        # For enforcing rate limit
+        # download_time = time.time()
+        # check_rate_limit(download_time, prev_download_time)
+
         return ""
     else:
         return f"{pdb_id}: response code {response.status_code}"
@@ -248,6 +267,7 @@ def download(
     file_type_list: List[FileType] = ["mmCIF"],
     download_dir: str = ".",
     compressed: bool = True,
+    num_processors: Optional[int] = None,
 ):
     """Download a list of ids in the formats listed in file_type_list
 
@@ -256,7 +276,9 @@ def download(
         file_type (List[str], optional): List of file types to download. Defaults to ["mmCIF"]
         dir (str, optional): Directory to download files into. Defaults to "."
         compressed (bool, optional): Whether to decompress downloaded files
-        (which are downloaded compressed when possible). Defaults to True
+            (which are downloaded compressed when possible). Defaults to True
+        num_processors (int, optional): number of workers to use for multiprocessing
+
     """
     # Apply correct capitalization to file_types
     file_type_list = apply_capitalization(file_type_list)
@@ -275,22 +297,33 @@ def download(
     if invalid_ids:
         raise ValueError(f"Invalid PDB Entry IDs: {invalid_ids}")
 
-    cpu_count = os.cpu_count()
-    assert isinstance(cpu_count, int)
-    num_workers: int = min((len(pdb_ids) * len(file_type_list)), cpu_count)
-    # Make tuples of arguments to pass into download_file(), required for multiprocessing
+    if not num_processors:
+        cpu_count = os.cpu_count()
+        assert isinstance(cpu_count, int)
+        num_processors = min((len(pdb_ids) * len(file_type_list)), cpu_count - 1)
+
+    # Not in use currently. Shared counter for tracking number of requests.
+    # Context manager needs to contain rest of function?
+    # with multiprocessing.Manager() as manager:
+        # Used to ensure requests remain below rate limit
+        # request_counter = manager.Value("i", 0)
+        # lock = manager.Lock()  # for syncing counter across processes
+        # prev_download_time = manager.Value("time", time.time())
+        # time_lock = manager.Lock()
+
+    # Make tuples of arguments to pass into _download_file(), required for multiprocessing
     id_file_arg_list: List[Tuple[str, FileType, str, bool]] = make_id_file_tuples(
         id_list=pdb_ids,
         file_type_list=file_type_list,
         download_dir=download_dir,
         compressed=compressed
     )
+
     # Calculate approximate size of each batch of tasks,
     # remaining tasks will be distributed amongst workers
-    chunk_size = max(1, len(id_file_arg_list) // num_workers)
-
-    with multiprocessing.Pool(processes=num_workers) as pool:
-        error_msg_list = [error_msg for error_msg in pool.starmap(download_file, id_file_arg_list, chunksize=chunk_size) if error_msg]
+    chunk_size = max(1, len(id_file_arg_list) // num_processors)
+    with multiprocessing.Pool(processes=num_processors) as pool:
+        error_msg_list = [error_msg for error_msg in pool.starmap(_download_file, id_file_arg_list, chunksize=chunk_size) if error_msg]
     if error_msg_list:
         raise ValueError(
             "Failed Downloads\n    " +
