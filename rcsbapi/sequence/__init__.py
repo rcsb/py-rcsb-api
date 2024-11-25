@@ -1,13 +1,16 @@
 """RCSB PDB Sequence Coordinates API"""
-from .schema import CoordSchema
+from .schema import SeqSchema
 
-COORD_SCHEMA = CoordSchema()
+SEQ_SCHEMA = SeqSchema()
 
-from .query import alignments, annotations, AnnotationFilterInput  # noqa:E402 (ignore that import is not at top)
+from .query import alignments, group_alignments, annotations, group_annotations, group_annotations_summary, AnnotationFilterInput  # noqa:E402
 
 __all__ = [
-    "CoordSchema",
+    "SeqSchema",
     "alignments",
     "annotations",
+    "group_alignments",
+    "group_annotations",
+    "group_annotations_summary",
     "AnnotationFilterInput",
 ]

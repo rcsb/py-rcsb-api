@@ -103,7 +103,7 @@ class TypeNode:
         self.field_list = field_list
 
 
-class CoordSchema:
+class SeqSchema:
     """
     GraphQL schema defining available fields, types, and how they are connected.
     """
@@ -112,7 +112,7 @@ class CoordSchema:
         """
         GraphQL schema defining available fields, types, and how they are connected.
         """
-        self.pdb_url: str = seq_const.API_ENDPOINT
+        self.pdb_url: str = seq_const.API_ENDPOINT + "/graphql"
         self.timeout: int = config.DATA_API_TIMEOUT  # TODO: change?
         self.schema: Dict = self.fetch_schema()
         """JSON resulting from full introspection of the GraphQL schema"""
@@ -151,8 +151,8 @@ class CoordSchema:
             Dict: JSON response of introspection request
         """
         root_query = {"query": """query IntrospectionQuery{ __schema{ queryType{ fields{ name args
-        { name description type{ ofType{ name kind ofType{ inputFields {name type { ofType { kind ofType { ofType { kind name } } } } } kind name ofType{ name kind
-         } } } } } } } } }"""}
+        { name description type{ kind ofType{ name kind ofType{ inputFields {name type { kind ofType { name kind ofType { ofType { kind name ofType {kind name}} } } } }
+        kind name ofType{name kind} } } } } } } } }"""}
         response = requests.post(headers={"Content-Type": "application/json"}, json=root_query, url=self.pdb_url, timeout=self.timeout)
         return response.json()
 
@@ -163,7 +163,7 @@ class CoordSchema:
             Dict[str, List[Dict]]: Dict where keys are the type names.
             Values are lists of dictionaries with information about arguments.
 
-            ex: {"entry": [{'name': 'entry_id', 'description': '', 'kind': 'SCALAR', 'type': 'String'}]}
+            ex: {"alignments": [{'name': 'from', 'description': 'Query sequence database'...}, ...], ...}
         """
         response = self._root_introspection
         root_dict: Dict[str, List[Dict[str, str]]] = {}
@@ -174,22 +174,25 @@ class CoordSchema:
             for arg_dict in arg_dict_list:
                 arg_name = arg_dict["name"]
                 arg_description = arg_dict["description"]
-                arg_kind = arg_dict["type"]["ofType"]["kind"]
+                arg_kind = arg_dict["type"]["kind"]
                 arg_of_kind = ""
-                arg_of_kind_name = ""
-                if arg_kind == 'LIST':
-                    arg_of_kind = arg_dict["type"]["ofType"]["ofType"]["kind"]
-                    arg_of_kind_name = arg_dict["type"]["ofType"]["ofType"]["name"]
-                arg_type = self._find_type_name(arg_dict["type"]["ofType"])
+                arg_of_type = ""
+                if arg_kind == "LIST" or arg_kind == "NON_NULL":
+                    arg_of_kind = arg_dict["type"]["ofType"]["kind"]
+                    arg_of_type = self._find_type_name(arg_dict["type"]["ofType"])
+                input_fields = ""
+                if ("ofType" in arg_dict["type"]["ofType"]) and (arg_dict["type"]["ofType"]["ofType"] is not None):
+                    if ("inputFields" in arg_dict["type"]["ofType"]["ofType"]) and (arg_dict["type"]["ofType"]["ofType"]["inputFields"] is not None):
+                        input_fields = arg_dict["type"]["ofType"]["ofType"]["inputFields"]
                 if root_name not in root_dict:
                     root_dict[root_name] = []
                 root_dict[root_name].append({
                     "name": arg_name,
                     "description": arg_description,
-                    "type": arg_type,
                     "kind": arg_kind,
                     "of_kind": arg_of_kind,
-                    "of_kind_name": arg_of_kind_name
+                    "of_type": arg_of_type,
+                    "input_fields": input_fields
                 })
         return root_dict
 
@@ -222,7 +225,7 @@ class CoordSchema:
             return schema_response.json()
         logger.info("Loading data schema from file")
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        json_file_path = os.path.join(current_dir, "../", "resources", "data_api_schema.json")
+        json_file_path = os.path.join(current_dir, "resources", "seq_api_schema.json")
         with open(json_file_path, "r", encoding="utf-8") as schema_file:
             return json.load(schema_file)
 
@@ -499,7 +502,7 @@ class CoordSchema:
     def construct_query(
         self,
         query_type: str,
-        query_args: Union[Dict[str, Dict], Dict[str, str]],
+        query_args: Union[Dict[str, str], Dict[str, list]],
         return_data_list: List[str],
         suppress_autocomplete_warning=False
     ) -> Dict:
@@ -552,7 +555,7 @@ class CoordSchema:
     def _construct_query_rustworkx(
         self,
         query_type: str,
-        query_args: Union[Dict[str, Dict], Dict[str, str]],
+        query_args: Union[Dict[str, str], Dict[str, list]],
         return_data_list: List[str],
         suppress_autocomplete_warning: bool = False,
     ) -> Dict:
@@ -754,7 +757,7 @@ class CoordSchema:
         json_query = {"query": f"{query}"}
         return json_query
 
-    def format_args(self, arg_dict: Dict[str, str], input_value: str) -> str:
+    def format_args(self, arg_dict: Union[Dict[str, list], Dict[str, str]], input_value: Union[str, List[str]]) -> str:
         """Add double quotes or omit quotes around a single GraphQL argument
 
         Args:
@@ -765,18 +768,19 @@ class CoordSchema:
             str: returns input value formatted with quotes, no quotes, or as a list
         """
         format_arg = ""
-        if arg_dict["type"] == "String":
-            # If arg type is string, add double quotes around value
-            format_arg += f'{arg_dict["name"]}: "{input_value}"'
-        elif arg_dict["kind"] == "LIST":
-            if ["of_kind_name"] == "String":
+        if arg_dict["kind"] == "LIST" or arg_dict["of_kind"] == "LIST":
+            if arg_dict["of_type"] == "String":
                 # Add double quotes around each item
                 format_arg += f'{arg_dict["name"]}: {str(input_value).replace("'", '"')}'
             else:
-                # Remove single quotes
+                # Remove single quotes if not string
                 format_arg += f'{arg_dict["name"]}: {str(input_value).replace("'", "")}'
+        elif arg_dict["of_type"] == "String":
+            # If arg type is string, add double quotes around value
+            format_arg += f'{arg_dict["name"]}: "{input_value}"'
         else:
-            format_arg += f'{arg_dict["name"]}: {input_value}'
+            assert isinstance(input_value, str)
+            format_arg += f"{arg_dict["name"]}: {input_value}"
         return format_arg
 
     def _find_idx_path(self, dot_path: List[str], idx_list: List[int], node_idx: int) -> List[int]:
@@ -964,3 +968,62 @@ class CoordSchema:
             return description_dict
         dot_paths.sort()
         return dot_paths
+
+    def read_enum(self, type_name: str) -> List[str]:
+        """parse given type name into a list of enumeration values
+
+        Args:
+            type_name (str): GraphQL type name
+        """
+        for type_dict in self.schema["data"]["__schema"]["types"]:
+            if type_dict["name"] == type_name:
+                enum_values = []
+                for value in type_dict["enumValues"]:
+                    enum_values.append(value["name"])
+        return enum_values
+
+    def check_typing(self, query_type: str, enum_types, args: Dict[str, Any]):
+        """Check that arguments match typing specified in schema
+
+        Args:
+            query_type (str): Name of query field (annotations, alignments, etc)
+            enum_types (Enum): Enum class of GraphQL types that are enumerations.
+                Values are lists of valid strings corresponding to enumerations
+            kwargs**: key word arguments corresponding to query-specific arguments
+        """
+        error_list = []
+        arg_dict_list = self._root_dict[query_type]
+        for arg_dict in arg_dict_list:
+            arg_type = arg_dict["of_type"]
+            arg_name = arg_dict["name"]
+
+            if arg_name not in args:
+                continue
+
+            if arg_dict["kind"] == "NON_NULL":
+                if arg_dict["of_kind"] == "ENUM":
+                    if args[arg_name] not in enum_types[arg_type].value:
+                        error_list.append(
+                            f"Invalid value '{args[arg_name]}' for '{arg_name}': valid values are {enum_types[arg_type].value}"
+                        )
+
+            if arg_dict["kind"] == "LIST":
+                if not isinstance(args[arg_name], list):
+                    error_list.append(
+                        f"'{arg_name}' must be a list"
+                    )
+
+            # List of ENUMs
+            if arg_dict["kind"] == "NON_NULL":
+                if arg_dict["of_kind"] == "LIST":
+                    mismatch_type = [item for item in args[arg_name] if item not in enum_types[arg_type].value]
+                    if mismatch_type:
+                        raise ValueError(
+                            f"Invalid value(s) {mismatch_type} for '{arg_name}': valid values are {enum_types[arg_type].value}"
+                        )
+
+        if error_list:
+            raise ValueError(
+                "\n" + "  " +
+                "\n  ".join(error_list)
+            )
