@@ -26,14 +26,14 @@ import unittest
 # import rustworkx as rx
 # import networkx as nx
 
-from rcsbapi.sequence.query import alignments, group_alignments, annotations, group_annotations, group_annotations_summary, AnnotationFilterInput
+from rcsbapi.sequence.seq_query import Alignments, GroupAlignments, Annotations, GroupAnnotations, GroupAnnotationsSummary, AnnotationFilterInput
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
 class SeqTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__startTime = time.time()
         logger.info("Starting %s at %s", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
 
@@ -44,7 +44,7 @@ class SeqTests(unittest.TestCase):
     def testAnnotations(self) -> None:
         with self.subTest(msg="1. Annotations query with filter"):
             try:
-                query_obj = annotations(
+                query_obj = Annotations(
                     reference="NCBI_GENOME",
                     sources=["PDB_INSTANCE"],
                     queryId="NC_000001",
@@ -65,10 +65,22 @@ class SeqTests(unittest.TestCase):
     def testAlignments(self) -> None:
         with self.subTest(msg="1. Alignments query without filter"):
             try:
-                query_obj = alignments(
+                query_obj = Alignments(
                     from_="NCBI_PROTEIN",
                     to="PDB_ENTITY",
                     queryId="XP_642496",
+                    return_data_list=["target_id"]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="2. Alignments query with range"):
+            try:
+                query_obj = Alignments(
+                    from_="NCBI_PROTEIN",
+                    to="PDB_ENTITY",
+                    queryId="XP_642496",
+                    range=[1, 10],
                     return_data_list=["target_id"]
                 )
                 query_obj.exec()
@@ -78,7 +90,7 @@ class SeqTests(unittest.TestCase):
     def testGroupAlignments(self) -> None:
         with self.subTest(msg="1. group_alignments query without filter"):
             try:
-                query_obj = group_alignments(
+                query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
                     return_data_list=["target_id"],
@@ -88,7 +100,7 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="2. group_alignments query with filter"):
             try:
-                query_obj = group_alignments(
+                query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
                     return_data_list=["target_id"],
@@ -101,7 +113,7 @@ class SeqTests(unittest.TestCase):
     def testGroupAnnotations(self) -> None:
         with self.subTest(msg="1. group_annotations query without filter"):
             try:
-                query_obj = group_annotations(
+                query_obj = GroupAnnotations(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
                     sources=["PDB_ENTITY"],
@@ -112,7 +124,7 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="2. group_annotations query with filter"):
             try:
-                query_obj = group_annotations(
+                query_obj = GroupAnnotations(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
                     sources=["PDB_ENTITY"],
@@ -130,10 +142,10 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testGroupAnnotationsSummary(self):
+    def testGroupAnnotationsSummary(self) -> None:
         with self.subTest(msg="1. group_annotations_summary query without filter"):
             try:
-                query_obj = group_annotations_summary(
+                query_obj = GroupAnnotationsSummary(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
                     sources=["PDB_INSTANCE"],
@@ -144,7 +156,7 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="2. group_annotations_summary query with filter"):
             try:
-                query_obj = group_annotations_summary(
+                query_obj = GroupAnnotationsSummary(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
                     sources=["PDB_INSTANCE"],
@@ -163,11 +175,13 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
 
 
-def buildQuery():
+def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SeqTests("testAnnotations"))
     suiteSelect.addTest(SeqTests("testAlignments"))
     suiteSelect.addTest(SeqTests("testGroupAlignments"))
+    suiteSelect.addTest(SeqTests("testGroupAnnotations"))
+    suiteSelect.addTest(SeqTests("testGroupAnnotationsSummary"))
     return suiteSelect
 
 

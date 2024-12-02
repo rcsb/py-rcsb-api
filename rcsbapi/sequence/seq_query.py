@@ -71,26 +71,27 @@ class Query(ABC):
 
         return query
 
-    def exec(self) -> Dict:
+    def exec(self) -> Dict[str, Any]:
         """execute given query and return JSON response"""
         # Assert attribute exists for mypy
         assert hasattr(self, "_query"), \
             f"{self.__class__.__name__} must define '_query' attribute."
-
+        print(self._query)
         response_json = requests.post(
             json=dict(self._query),
             url=seq_const.API_ENDPOINT + "/graphql",
             timeout=config.DATA_API_TIMEOUT
         ).json()
         self._parse_gql_error(response_json)
-        return response_json
+        return dict(response_json)
 
-    def get_editor_link(self):
+    def get_editor_link(self) -> str:
         """Get link to GraphiQL editor with given query populated"""
         editor_base_link = str(seq_const.API_ENDPOINT) + "/graphiql" + "/index.html?query="
+        assert hasattr(self, "_query")  # for mypy
         return editor_base_link + urllib.parse.quote(str(self._query["query"]))
 
-    def _parse_gql_error(self, response_json: Dict[str, Any]):
+    def _parse_gql_error(self, response_json: Dict[str, Any]) -> None:
         """Look through responses to see if there are errors. If so, throw an HTTP error, """
         if "errors" in response_json.keys():
             error = response_json["errors"][0]
@@ -101,7 +102,7 @@ class Query(ABC):
 
 
 @dataclass(frozen=True)
-class alignments(Query):
+class Alignments(Query):
     """
     Get sequence alignments
 
@@ -119,18 +120,20 @@ class alignments(Query):
     return_data_list: List[str]
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType = MappingProxyType({})
+    _query: MappingProxyType[str, Any] = MappingProxyType({})
+    offset: Optional[int] = None
+    first: Optional[int] = None
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         query = super().construct_query("alignments")
         object.__setattr__(self, "_query", query)
 
 
 @dataclass(frozen=True)
-class annotations(Query):
+class Annotations(Query):
     """
     Get sequence annotations
 
@@ -150,18 +153,18 @@ class annotations(Query):
     filters: Optional[list["AnnotationFilterInput"]] = None
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType = MappingProxyType({})
+    _query: MappingProxyType[str, Any] = MappingProxyType({})
 
     def to_dict(self) -> Dict:
         return super().to_dict()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         query = super().construct_query("annotations")
         object.__setattr__(self, "_query", query)
 
 
 @dataclass(frozen=True)
-class group_alignments(Query):
+class GroupAlignments(Query):
     """
     Get alignments for structures in groups
 
@@ -176,7 +179,9 @@ class group_alignments(Query):
     return_data_list: list[str]
     filter: Optional[list[str]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType = MappingProxyType({})
+    _query: MappingProxyType[str, Any] = MappingProxyType({})
+    offset: Optional[int] = None
+    first: Optional[int] = None
 
     def to_dict(self) -> Dict:
         return super().to_dict()
@@ -187,7 +192,7 @@ class group_alignments(Query):
 
 
 @dataclass(frozen=True)
-class group_annotations(Query):
+class GroupAnnotations(Query):
     """
     Get annotations for structures in groups
 
@@ -216,7 +221,7 @@ class group_annotations(Query):
 
 
 @dataclass(frozen=True)
-class group_annotations_summary(Query):
+class GroupAnnotationsSummary(Query):
     """
     Get a positional summary of group annotations
 
@@ -268,7 +273,7 @@ class AnnotationFilterInput:
         self.values = values
         self.source = source
 
-    def to_string(self):
+    def to_string(self) -> str:
         """Generate string to insert in GraphQL query based on GraphQL schema"""
 
         input_field_specs = []
