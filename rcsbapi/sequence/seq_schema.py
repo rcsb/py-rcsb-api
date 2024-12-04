@@ -3,6 +3,7 @@
 from __future__ import annotations
 import logging
 import json
+import re
 from typing import Any
 from pathlib import Path
 import requests
@@ -439,7 +440,6 @@ class SeqSchema:
         for target_idx, idx_path in fields.items():
             mapped_path = field_map.get(target_idx, [target_idx])
             mapped_path = mapped_path[: mapped_path.index(target_idx) + 1]  # Only take the path up to the field itself
-            print(f"mapped path: {self._idx_path_to_name_path(mapped_path)}")
             for idx, subfield in enumerate(mapped_path):
                 query_str += " " + self._idx_to_name(subfield)
                 if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
@@ -458,7 +458,7 @@ class SeqSchema:
             for idx, subfield in enumerate(mapped_path):
                 if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
                     query_str += " " + "} "
-        return query_str        
+        return query_str
 
     def _idx_dict_to_name_dict(self, idx_fields: dict[Any, Any] | list[int] | int) -> dict[str, Any] | list[str] | str:
         """Format descendant fields into dictionary that can be easily converted to GraphQL string"""
@@ -475,7 +475,7 @@ class SeqSchema:
         else:
             return self._idx_to_name(idx_fields)
 
-    def _idx_list_to_query(
+    def _idxs_to_query(
             self,
             idx_list: list[int],
             autopopulated_fields: list[int | dict[int, Any]],
@@ -489,27 +489,30 @@ class SeqSchema:
             return partial_query
         # Add autopopulated fields
         if len(idx_list) == 1:
-            return {self._idx_to_name(idx_list[0]): [autopopulated_fields]}
+            return {self._idx_to_name(idx_list[0]): [self._idx_dict_to_name_dict(autopopulated_fields)]}
         # Create a query with correct nesting
         else:
-            return {self._idx_to_name(idx_list[0]): [self._idx_list_to_query(idx_list[1:], autopopulated_fields=autopopulated_fields)]}
+            return {self._idx_to_name(idx_list[0]): [self._idxs_to_query(idx_list[1:], autopopulated_fields=autopopulated_fields)]}
 
     def _query_dict_to_graphql_string(self, query_dict: dict[str, Any]) -> str:  # TODO: should take a full dict query
-        return (
+        formatted_str = (
             # format the dict as a GraphQL query
-            str(query_dict)
+            str(json.dumps(query_dict, indent=2))
             .replace("'", "")
             .replace("[", "")
             .replace("]", "")
-            .replace(",", "")
-            .replace("{", " ")
-            .replace(":", "{")
+            .replace(",", " ")
+            .replace("{", "")
+            .replace(": ", "{")
         )
+        formatted_str = "\n".join(line for line in formatted_str.splitlines() if line.strip())
+        return formatted_str
 
-    def _get_descendant_fields(self, node_idx: int, field_name: str, visited: None | set[int] = None) -> list[int | dict[int, Any]]:
+    def _get_descendant_fields(self, node_idx: int, visited: None | set[int] = None) -> list[int | dict[int, Any]]:
         if visited is None:
             visited = set()
 
+        field_name = self._idx_to_name(node_idx)
         result: list[int | dict[int, Any]] = []
         children_idx = list(self._schema_graph.neighbors(node_idx))
 
@@ -523,7 +526,7 @@ class SeqSchema:
             assert isinstance(child_data.index, int)  # noqa: S101 (needed for mypy)
 
             if isinstance(child_data, FieldNode):
-                child_descendants = self._get_descendant_fields(idx, field_name, visited)
+                child_descendants = self._get_descendant_fields(idx, visited)
                 # If further subfields append as dictionary. ex: {field index: [subfield1, subfield2, ...]}
                 if child_descendants:
                     result.append({child_data.index: child_descendants})
@@ -531,7 +534,7 @@ class SeqSchema:
                 else:
                     result.append(child_data.index)
             elif isinstance(child_data, TypeNode):
-                type_descendants = self._get_descendant_fields(idx, field_name, visited)
+                type_descendants = self._get_descendant_fields(idx, visited)
                 # If further subfields, append the list of descendants (indices and index dicts)
                 if type_descendants:
                     result.extend(type_descendants)
@@ -630,26 +633,30 @@ class SeqSchema:
         query_args: dict[str, str] | dict[str, list[Any]],
         return_data_list: list[str],
         suppress_autocomplete_warning: bool = False
-    ) -> None:
+    ) -> str:
         # Build first line of query where arguments are given
         arg_list = self._root_dict[query_type]
         arg_value_list = [self.format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args]
 
         # Build query body
         start_idx = self._root_to_idx[query_type]
-        return_data_path_dict = self._make_path_dict(start_idx, query_type, return_data_list)
-        query_body = {}
-        each_return_field_query = []
-        for return_field, path in return_data_path_dict:
-            each_return_field_query.append(self._path_to_graphql_str())
-        # print(return_data_path_dict)
-        # query_body = 
+        return_data_path_dict: dict[int, list[int]] = self._make_path_dict(start_idx, query_type, return_data_list)
+        return_field_query_list = []
+        for return_field_idx, path in return_data_path_dict.items():
+            return_field_query_dict = self._idxs_to_query(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
+            return_field_query_list.append(return_field_query_dict)
+        
+        # TODO: in idxs_to_query, add arguments to keys
+        # TODO: merge partial queries in list to full query
+        query_body = self._query_dict_to_graphql_string(return_field_query_list[0])  # TODO: needs to be changed
         query = (
-            f"query {{{query_type}({str(arg_value_list).replace("[", "(").replace("]", ")")}"
+            f"query{{{query_type}{str(arg_value_list).replace("[", "(").replace("]", ")").replace("'", "")}"
+            f"{{"
             f"{query_body}"
             f"}}"
         )
-    
+        return query
+
     def _make_path_dict(
         self,
         start_idx: int,
@@ -908,7 +915,7 @@ class SeqSchema:
 
         final_fields = {}
         for target_idx in return_data_paths:
-            final_fields[target_idx] = self._get_descendant_fields(node_idx=target_idx, field_name=self._schema_graph[target_idx].name)
+            final_fields[target_idx] = self._get_descendant_fields(node_idx=target_idx)
 
         field_names: dict[Any, Any] = {}
         paths: dict[Any, Any] = {}
@@ -944,11 +951,9 @@ class SeqSchema:
                 query += ", "
 
         query += ") { "
-        print(f"field_names: {self._fields_to_string(field_names)}")
         query += self._recurse_fields(final_fields, field_names)
         query += " } }"
         json_query = {"query": f"{query}"}
-        print(query)
         return json_query  # noqa: RET504
 
     def format_args(self, arg_dict: dict[str, list[Any]] | dict[str, str], input_value: str | list[str]) -> str:

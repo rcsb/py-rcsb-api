@@ -68,6 +68,9 @@ class Query(ABC):
             return_data_list=self.return_data_list,
             suppress_autocomplete_warning=self.suppress_autocomplete_warning,
         )
+        print("COMPARE")
+        print(f"old query:\n {query}")
+        print(f"new query:\n {SEQ_SCHEMA._construct_query_new(query_type, self.to_dict(), return_data_list=self.return_data_list)}")
 
         return query
 
@@ -76,7 +79,6 @@ class Query(ABC):
         # Assert attribute exists for mypy
         assert hasattr(self, "_query"), \
             f"{self.__class__.__name__} must define '_query' attribute."
-        print(self._query)
         response_json = requests.post(
             json=dict(self._query),
             url=seq_const.API_ENDPOINT + "/graphql",
