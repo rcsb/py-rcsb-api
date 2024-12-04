@@ -439,6 +439,7 @@ class SeqSchema:
         for target_idx, idx_path in fields.items():
             mapped_path = field_map.get(target_idx, [target_idx])
             mapped_path = mapped_path[: mapped_path.index(target_idx) + 1]  # Only take the path up to the field itself
+            print(f"mapped path: {self._idx_path_to_name_path(mapped_path)}")
             for idx, subfield in enumerate(mapped_path):
                 query_str += " " + self._idx_to_name(subfield)
                 if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
@@ -457,7 +458,7 @@ class SeqSchema:
             for idx, subfield in enumerate(mapped_path):
                 if idx < len(mapped_path) - 1 or (isinstance(idx_path, list) and idx_path):
                     query_str += " " + "} "
-        return query_str
+        return query_str        
 
     def _idx_dict_to_name_dict(self, idx_fields: dict[Any, Any] | list[int] | int) -> dict[str, Any] | list[str] | str:
         query_dict = {}
@@ -475,7 +476,6 @@ class SeqSchema:
 
     def _fields_to_string(self, idx_fields: dict[str, Any]) -> str:
         name_dict = self._idx_dict_to_name_dict(idx_fields)
-        print(name_dict)
         return (
             # format the dict as a GraphQL query
             str(name_dict)
@@ -604,6 +604,122 @@ class SeqSchema:
     # ):  # Incomplete function
     #     query = ""
     #     return query
+
+    def _construct_query_new(
+        self,
+        query_type: str,
+        query_args: dict[str, str] | dict[str, list[Any]],
+        return_data_list: list[str],
+        suppress_autocomplete_warning: bool = False
+    ) -> None:
+        # Build first line of query where arguments are given
+        arg_list = self._root_dict[query_type]
+        arg_value_list = [self.format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args]
+
+        # Build query body
+        start_idx = self._root_to_idx[query_type]
+        return_data_path_dict = self._make_path_dict(start_idx, query_type, return_data_list)
+        print(return_data_path_dict)
+        # query_body = 
+        query = (
+            f"query {{{query_type}({str(arg_value_list).replace("[", "(").replace("]", ")")}"
+            f"{query_body}"
+            f"}}"
+        )
+    
+    def _make_path_dict(
+        self,
+        start_idx: int,
+        query_type: str,
+        return_data_list: list[str],
+    ) -> dict[int, list[int]]:
+        return_data_paths: dict[int, list[int]] = {}
+        complete_path: int = 0
+
+        for field in return_data_list:
+            # Generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
+            path_list = field.split(".")
+            possible_paths = self.find_paths(query_type, path_list[-1])
+            matching_paths: list[str] = []
+            for path in possible_paths:
+                possible_path_list = path.split(".")
+                possible_path_list.insert(0, str(query_type))
+
+                # If there is an exact path match,
+                # the path is fully specified and other possible_paths can be removed and loop can stop.
+                # Iterate complete path, so warning can be raised if autocompletion is used
+                path_list_with_input = [query_type, *path_list]
+                if possible_path_list in (path_list, path_list_with_input):
+                    matching_paths = [".".join(possible_path_list)]
+                    complete_path += 1
+                    break
+                # Else, check for matching path segments.
+                for i in range(len(possible_path_list)):
+                    if possible_path_list[i: i + len(path_list)] == path_list:
+                        matching_paths.append(".".join(possible_path_list))
+
+            idx_paths: list[list[int]] = []
+            if len(matching_paths) > 0:
+                for path in matching_paths:
+                    idx_paths.extend(self._parse_dot_path(path))
+
+            # remove paths not beginning with input_type
+            full_idx_paths: list[list[int]] = list(idx_paths)
+            input_type_idx = self._root_to_idx[query_type]
+            for idx_path in idx_paths:
+                if idx_path[0] != input_type_idx:
+                    full_idx_paths.remove(idx_path)
+            idx_paths = full_idx_paths
+
+            if len(idx_paths) > 1:
+                # Print error message that doesn't include input_type at beginning
+                # But keep input_type in matching_paths for query construction reasons
+                num_paths_to_print = 10
+                path_choice_msg = "  " + "\n  ".join([".".join(path.split(".")[1:]) for path in matching_paths[:10]])
+                len_path = min(len(matching_paths), num_paths_to_print)
+
+                if len(matching_paths) > num_paths_to_print:
+                    error_msg = (
+                        f'Given path "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
+                        f"{len_path} of {len(matching_paths)} possible paths:\n"
+                        f"{path_choice_msg}"
+                        f"\n  ...\n\n"
+                        f"For all paths run:\n"
+                        f"  from rcsbapi.data import Schema\n"
+                        f"  schema = Schema()\n"
+                        f'  schema.find_paths("{query_type}", "{path_list[-1]}")'
+                    )
+                    raise ValueError(error_msg)
+
+                error_msg = (
+                    f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
+                    f"{len_path} of {len(matching_paths)} possible paths:\n"
+                    f"{path_choice_msg}"
+                )
+                raise ValueError(error_msg)
+
+            # If path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
+            if len(idx_paths) == 0:
+                possible_dot_paths: list[list[int]] = self._parse_dot_path(field)  # Throws an error if path is invalid
+                shortest_full_paths: list[list[int]] = self._compare_paths(start_idx, possible_dot_paths)
+                if len(shortest_full_paths) > 1:
+                    shortest_name_paths = [".".join([self._idx_to_name(idx) for idx in path[1:] if isinstance(self._schema_graph[idx], FieldNode)]) for path in shortest_full_paths]
+                    shortest_name_paths.sort()
+                    path_choice_msg = ""
+                    for name_path in shortest_name_paths:
+                        path_choice_msg += "  " + name_path + "\n"
+                    error_msg = (
+                        "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n\n"
+                        f"{path_choice_msg}\n"
+                        "Please note that this list may not be complete. "
+                        "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
+                    )
+                    raise ValueError(error_msg)
+                idx_paths = shortest_full_paths
+            final_idx: int = idx_paths[0][-1]
+            shortest_path: list[int] = idx_paths[0][1:]
+            return_data_paths[final_idx] = shortest_path
+        return return_data_paths
 
     def _construct_query_rustworkx(
         self,
@@ -805,7 +921,7 @@ class SeqSchema:
                 query += ", "
 
         query += ") { "
-        print(self._fields_to_string(final_fields))
+        print(f"field_names: {self._fields_to_string(field_names)}")
         query += self._recurse_fields(final_fields, field_names)
         query += " } }"
         json_query = {"query": f"{query}"}
