@@ -461,6 +461,7 @@ class SeqSchema:
         return query_str        
 
     def _idx_dict_to_name_dict(self, idx_fields: dict[Any, Any] | list[int] | int) -> dict[str, Any] | list[str] | str:
+        """Format descendant fields into dictionary that can be easily converted to GraphQL string"""
         query_dict = {}
         if isinstance(idx_fields, dict):
             for field_idx, subfield in idx_fields.items():
@@ -474,11 +475,29 @@ class SeqSchema:
         else:
             return self._idx_to_name(idx_fields)
 
-    def _fields_to_string(self, idx_fields: dict[str, Any]) -> str:
-        name_dict = self._idx_dict_to_name_dict(idx_fields)
+    def _idx_list_to_query(
+            self,
+            idx_list: list[int],
+            autopopulated_fields: list[int | dict[int, Any]],
+            partial_query: dict[Any, Any] | None = None,
+        ) -> dict[str, Any]:
+        if partial_query is None:
+            partial_query = {}
+        # Base case
+        if len(idx_list) == 0:
+            assert isinstance(partial_query, dict)  # for mypy
+            return partial_query
+        # Add autopopulated fields
+        if len(idx_list) == 1:
+            return {self._idx_to_name(idx_list[0]): [autopopulated_fields]}
+        # Create a query with correct nesting
+        else:
+            return {self._idx_to_name(idx_list[0]): [self._idx_list_to_query(idx_list[1:], autopopulated_fields=autopopulated_fields)]}
+
+    def _query_dict_to_graphql_string(self, query_dict: dict[str, Any]) -> str:  # TODO: should take a full dict query
         return (
             # format the dict as a GraphQL query
-            str(name_dict)
+            str(query_dict)
             .replace("'", "")
             .replace("[", "")
             .replace("]", "")
@@ -619,7 +638,11 @@ class SeqSchema:
         # Build query body
         start_idx = self._root_to_idx[query_type]
         return_data_path_dict = self._make_path_dict(start_idx, query_type, return_data_list)
-        print(return_data_path_dict)
+        query_body = {}
+        each_return_field_query = []
+        for return_field, path in return_data_path_dict:
+            each_return_field_query.append(self._path_to_graphql_str())
+        # print(return_data_path_dict)
         # query_body = 
         query = (
             f"query {{{query_type}({str(arg_value_list).replace("[", "(").replace("]", ")")}"
