@@ -460,7 +460,7 @@ class SeqSchema:
                     query_str += " " + "} "
         return query_str
 
-    def _idx_dict_to_name_dict(self, idx_fields: dict[Any, Any] | list[int] | int) -> dict[str, Any] | list[str] | str:
+    def _idx_dict_to_name_dict(self, idx_fields: list[dict[int, Any] | int] | dict[int, Any] | int) -> dict[str, Any] | list[str] | str:
         """Format descendant fields into dictionary that can be easily converted to GraphQL string"""
         query_dict = {}
         if isinstance(idx_fields, dict):
@@ -475,12 +475,12 @@ class SeqSchema:
         else:
             return self._idx_to_name(idx_fields)
 
-    def _idxs_to_query(
+    def _idxs_to_idx_dict(
             self,
             idx_list: list[int],
             autopopulated_fields: list[int | dict[int, Any]],
             partial_query: dict[Any, Any] | None = None,
-        ) -> dict[str, Any]:
+        ) -> dict[int, Any] | list[dict[int, Any] | int]:
         if partial_query is None:
             partial_query = {}
         # Base case
@@ -489,24 +489,31 @@ class SeqSchema:
             return partial_query
         # Add autopopulated fields
         if len(idx_list) == 1:
-            return {self._idx_to_name(idx_list[0]): [self._idx_dict_to_name_dict(autopopulated_fields)]}
+            if not autopopulated_fields:
+                return [idx_list[0]]
+            return {idx_list[0]: autopopulated_fields}
         # Create a query with correct nesting
         else:
-            return {self._idx_to_name(idx_list[0]): [self._idxs_to_query(idx_list[1:], autopopulated_fields=autopopulated_fields)]}
+            return {idx_list[0]: self._idxs_to_idx_dict(idx_list[1:], autopopulated_fields=autopopulated_fields)}
 
-    def _query_dict_to_graphql_string(self, query_dict: dict[str, Any]) -> str:  # TODO: should take a full dict query
-        formatted_str = (
+    def query_dict_to_graphql_string(self, query_dict: dict[str, Any]) -> str:
+        first_line = next(iter(query_dict["query"]))
+        print(f"FIRST LINE: {first_line}")
+        query_body = query_dict["query"][first_line]
+        formatted_query_body = (
             # format the dict as a GraphQL query
-            str(json.dumps(query_dict, indent=2))
-            .replace("'", "")
+            json.dumps(query_body, indent=2)
+            .replace('"', "")
+            .replace("'", '"')
             .replace("[", "")
             .replace("]", "")
             .replace(",", " ")
             .replace("{", "")
             .replace(": ", "{")
         )
-        formatted_str = "\n".join(line for line in formatted_str.splitlines() if line.strip())
-        return formatted_str
+        formatted_query_body = "\n".join(line for line in formatted_query_body.splitlines() if line.strip())
+        query = f"query{{{first_line}{{\n{formatted_query_body}}}}}"
+        return query
 
     def _get_descendant_fields(self, node_idx: int, visited: None | set[int] = None) -> list[int | dict[int, Any]]:
         if visited is None:
@@ -633,31 +640,62 @@ class SeqSchema:
         query_args: dict[str, str] | dict[str, list[Any]],
         return_data_list: list[str],
         suppress_autocomplete_warning: bool = False
-    ) -> str:
+    ) -> dict[str, Any]:
         # Build first line of query where arguments are given
         arg_list = self._root_dict[query_type]
-        arg_value_list = [self.format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args]
+        arg_value_list = tuple(self.format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args)
+        query_args_str = f"{query_type}{str(arg_value_list).replace("'", '')}"
 
         # Build query body
         start_idx = self._root_to_idx[query_type]
-        return_data_path_dict: dict[int, list[int]] = self._make_path_dict(start_idx, query_type, return_data_list)
+        return_data_path_dict: dict[int, list[int]] = self.return_fields_to_paths(start_idx, query_type, return_data_list)
         return_field_query_list = []
         for return_field_idx, path in return_data_path_dict.items():
-            return_field_query_dict = self._idxs_to_query(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
+            return_field_query_dict = self._idxs_to_idx_dict(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
             return_field_query_list.append(return_field_query_dict)
-        
-        # TODO: in idxs_to_query, add arguments to keys
-        # TODO: merge partial queries in list to full query
-        query_body = self._query_dict_to_graphql_string(return_field_query_list[0])  # TODO: needs to be changed
-        query = (
-            f"query{{{query_type}{str(arg_value_list).replace("[", "(").replace("]", ")").replace("'", "")}"
-            f"{{"
-            f"{query_body}"
-            f"}}"
-        )
-        return query
 
-    def _make_path_dict(
+        # TODO: in idxs_to_query, add arguments to keys
+        idx_query_body = self._merge_query_list(return_field_query_list)
+        name_query_body = self._idx_dict_to_name_dict(idx_query_body)
+        query = self.query_dict_to_graphql_string({"query": {query_args_str: name_query_body}})
+        return {"query": query}
+
+    def _merge_query(
+        self,
+        query_1: dict[int, Any] | list[int],
+        query_2: dict[int, Any] | list[int]
+    ) -> list[int | dict[int, Any]] | list[dict[int, Any]] | list[int]:
+        if isinstance(query_1, dict) and isinstance(query_2, dict):
+            for key in query_1.keys():
+                if (key in query_2):
+                    return [{key: self._merge_query(query_1[key], query_2[key])}]
+                return [query_1, query_2]
+        elif isinstance(query_1, list) and isinstance(query_2, dict):
+            return query_1 + [query_2]
+        elif isinstance(query_1, dict) and isinstance(query_2, list):
+            return [query_1] + query_2
+        elif isinstance(query_1, list) and isinstance(query_2, list):
+            return query_1 + query_2
+        raise ValueError("Invalid query input")
+
+    def _merge_query_list(self, query_list: list[dict[int, Any] | int]) -> list[dict[int, Any] | int]:
+        result = [query_list[0]]
+        for path in query_list[1:]:
+            for partial_path in result:
+                result = self._merge_query(partial_path, path)
+        return result
+
+    def _idx_query_to_name_query(self, idx_query: dict[int, Any] | list[int] | int) -> dict[str, Any] | list[str] | str:
+        if isinstance(idx_query, dict):
+            assert len(idx_query) == 1
+            for key, value in idx_query.items():
+                field_name = self._idx_to_name(key)
+                return {field_name: self._idx_query_to_name_query(value)}
+        elif isinstance(idx_query, list):
+            return [self._idx_query_to_name_query(idx) for idx in idx_query]
+        return self._idx_to_name(idx_query)
+
+    def return_fields_to_paths(
         self,
         start_idx: int,
         query_type: str,

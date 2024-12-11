@@ -62,15 +62,12 @@ class Query(ABC):
             args=self.to_dict(),
         )
 
-        query = SEQ_SCHEMA.construct_query(
+        query = SEQ_SCHEMA._construct_query_new(
             query_type=query_type,
             query_args=self.to_dict(),
             return_data_list=self.return_data_list,
             suppress_autocomplete_warning=self.suppress_autocomplete_warning,
         )
-        print("COMPARE")
-        print(f"old query:\n {query}")
-        print(f"new query:\n {SEQ_SCHEMA._construct_query_new(query_type, self.to_dict(), return_data_list=self.return_data_list)}")
 
         return query
 
