@@ -62,7 +62,7 @@ class Query(ABC):
             args=self.to_dict(),
         )
 
-        query = SEQ_SCHEMA._construct_query_new(
+        query = SEQ_SCHEMA.construct_query(
             query_type=query_type,
             query_args=self.to_dict(),
             return_data_list=self.return_data_list,
