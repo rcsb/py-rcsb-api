@@ -3,7 +3,6 @@
 from __future__ import annotations
 import logging
 import json
-import re
 from typing import Any
 from pathlib import Path
 import requests
@@ -39,7 +38,7 @@ class FieldNode:
         index (int): graph index
     """
 
-    def __init__(self, kind: str, node_type: str, name: str, description: str) -> None:
+    def __init__(self, kind: str, node_type: str, name: str, description: str, args: list[dict[str, str | None]]) -> None:
         """
         Initialize FieldNodes.
 
@@ -55,6 +54,7 @@ class FieldNode:
         self.kind: str = kind
         self.of_kind: str = ""
         self.type: str = node_type
+        self.args: list[dict[str, str | None]] = args
         self.index: None | int = None
 
     def __str__(self) -> str:
@@ -142,7 +142,7 @@ class SeqSchema:
         """Dict where keys are type names and the values are their associated fields"""
         self._field_names_list = self._construct_name_list()
         """list of all field names"""
-        self._root_dict: dict[str, list[dict[str, str]]] = self._construct_root_dict()
+        self._root_dict: dict[str, list[dict[str, Any]]] = self._construct_root_dict()
         self._schema_graph: rx.PyDiGraph[FieldNode | TypeNode, None | int] = rx.PyDiGraph()
         self._schema_graph = self._recurse_build_schema(self._schema_graph, "Query")
         self._root_to_idx: dict[str, int] = self._make_root_to_idx()
@@ -164,7 +164,7 @@ class SeqSchema:
         response = requests.post(headers={"Content-Type": "application/json"}, json=root_query, url=self.pdb_url, timeout=self.timeout)
         return dict(response.json())
 
-    def _construct_root_dict(self) -> dict[str, list[dict[str, str]]]:
+    def _construct_root_dict(self) -> dict[str, list[dict[str, Any]]]:
         """Build a dictionary to organize information about schema root types.
 
         Returns:
@@ -196,7 +196,7 @@ class SeqSchema:
                 if root_name not in root_dict:
                     root_dict[root_name] = []
                 root_dict[root_name].append(
-                    {"name": arg_name, "description": arg_description, "kind": arg_kind, "of_kind": arg_of_kind, "of_type": arg_of_type, "input_fields": input_fields}
+                    {"name": arg_name, "description": arg_description, "kind": arg_kind, "ofKind": arg_of_kind, "ofType": arg_of_type, "inputFields": input_fields}
                 )
         return root_dict
 
@@ -250,7 +250,9 @@ class SeqSchema:
             field_dict = {}
             if fields is not None:
                 for field in fields:
-                    field_dict[str(field["name"])] = dict(field["type"])
+                    info_dict = field["type"]
+                    info_dict["args"] = field["args"]
+                    field_dict[str(field["name"])] = info_dict
             type_fields_dict[type_name] = field_dict
         return type_fields_dict
 
@@ -287,7 +289,11 @@ class SeqSchema:
         type_node.set_field_list(field_node_list)
         return type_node
 
-    def _recurse_build_schema(self, schema_graph: rx.PyDiGraph[FieldNode | TypeNode, None | int], type_name: str) -> rx.PyDiGraph:
+    def _recurse_build_schema(
+        self,
+        schema_graph: rx.PyDiGraph[FieldNode | TypeNode, None | int],
+        type_name: str
+    ) -> rx.PyDiGraph[FieldNode | TypeNode, None | int]:
         """Build the API schema by iterating through the fields of the given type and building subgraphs for each one recursively until a scalar (leaf) is reached.
 
         Args:
@@ -351,32 +357,13 @@ class SeqSchema:
         type_node.set_index(index)
         return type_node
 
-    def _find_kind(self, field_dict: dict[str, Any]) -> Any | str:  # noqa: ANN401
-        if field_dict["name"] is not None:
-            return field_dict["kind"]
-        return self._find_kind(field_dict["ofType"])
-
-    def _find_type_name(self, field_dict: dict[str, Any]) -> Any | str:  # noqa: ANN401
-        if field_dict:
-            if field_dict["name"] is not None:
-                return field_dict["name"]
-            return self._find_type_name(field_dict["ofType"])
-        return ""
-
-    def _find_description(self, type_name: str, field_name: str) -> str:
-        for type_dict in self.schema["data"]["__schema"]["types"]:
-            if type_dict["name"] == type_name:
-                for field in type_dict["fields"]:
-                    if (field["name"] == field_name) and isinstance(field["description"], str):
-                        return field["description"]
-        return ""
-
     def _make_field_node(self, parent_type: str, field_name: str) -> FieldNode:
         kind = self._type_fields_dict[parent_type][field_name]["kind"]
         field_type_dict: dict[str, Any] = self._type_fields_dict[parent_type][field_name]
         return_type = self._find_type_name(field_type_dict)
         description = self._find_description(parent_type, field_name)
-        field_node = FieldNode(kind, return_type, field_name, description)
+        args = [self._make_args_dict(args) for args in self._type_fields_dict[parent_type][field_name]["args"]]
+        field_node = FieldNode(kind, return_type, field_name, description, args)
         if kind in {"LIST", "NON_NULL"}:
             of_kind = self._find_kind(field_type_dict)
             field_node.set_of_kind(of_kind)
@@ -401,6 +388,38 @@ class SeqSchema:
 
         return field_node
 
+    def _find_kind(self, field_dict: dict[str, Any]) -> Any | str:  # noqa: ANN401
+        if field_dict["name"] is not None:
+            return field_dict["kind"]
+        return self._find_kind(field_dict["ofType"])
+
+    def _find_type_name(self, field_dict: dict[str, Any]) -> Any | str:  # noqa: ANN401
+        if field_dict:
+            if field_dict["name"] is not None:
+                return field_dict["name"]
+            return self._find_type_name(field_dict["ofType"])
+        return ""
+
+    def _find_description(self, type_name: str, field_name: str) -> str:
+        for type_dict in self.schema["data"]["__schema"]["types"]:
+            if type_dict["name"] == type_name:
+                for field in type_dict["fields"]:
+                    if (field["name"] == field_name) and isinstance(field["description"], str):
+                        return field["description"]
+        return ""
+
+    def _make_args_dict(self, args: dict[str, Any]) -> dict[str, str | None]:
+        name = args["name"]
+        ofType = args["type"]["ofType"]
+        kind = args["type"]["kind"]
+        # ofKind is only needed for Lists.
+        # Currently no field args are lists. If that changes, this code may need correcting
+        ofKind = None
+        if (ofType) and ("kind" in ofType):
+            ofKind = args["type"]["ofType"]["kind"]
+
+        return {"name": name, "ofType": ofType, "kind": kind, "ofKind": ofKind}
+
     def _make_root_to_idx(self) -> dict[str, int]:
         root_to_idx: dict[str, int] = {}
         # Assumes 0 is the index for root Query node.
@@ -409,86 +428,6 @@ class SeqSchema:
             assert isinstance(root_node.index, int)  # for mypy
             root_to_idx[root_node.name] = root_node.index
         return root_to_idx
-
-    def get_input_id_dict(self, input_type: str) -> dict[str, str]:
-        """Get keys input dictionary for given input_type.
-
-        Args:
-            input_type (str): GraphQL input_type (ex: alignments)
-
-        Raises:
-            ValueError: _description_
-
-        Returns:
-            dict[str, str]: _description_
-        """
-        if input_type not in self._root_dict:
-            error_msg = "Not a valid input_type, no available input_id dictionary"
-            raise ValueError(error_msg)
-        root_dict_entry = self._root_dict[input_type]
-        input_dict = {}
-        for arg in root_dict_entry:
-            name = arg["name"]
-            description = arg["description"]
-            if (len(root_dict_entry) == 1) and root_dict_entry[0]["name"] == "entry_id":
-                description = "ID"
-            input_dict[name] = description
-        return input_dict
-
-    def _idx_dict_to_name_dict(self, idx_fields: list[dict[int, Any] | int] | dict[int, Any] | int) -> dict[str, Any] | list[str] | str:
-        """Format descendant fields into dictionary that can be easily converted to GraphQL string"""
-        query_dict = {}
-        if isinstance(idx_fields, dict):
-            for field_idx, subfield in idx_fields.items():
-                field_name = self._idx_to_name(field_idx)
-                query_dict[field_name] = self._idx_dict_to_name_dict(subfield)
-            return query_dict
-        elif isinstance(idx_fields, list):
-            return [self._idx_dict_to_name_dict(field) for field in idx_fields]
-        elif not idx_fields:
-            return ""
-        else:
-            return self._idx_to_name(idx_fields)
-
-    def _idxs_to_idx_dict(
-            self,
-            idx_list: list[int],
-            autopopulated_fields: list[int | dict[int, Any]],
-            partial_query: dict[Any, Any] | None = None,
-        ) -> dict[int, Any] | list[dict[int, Any] | int]:
-        if partial_query is None:
-            partial_query = {}
-        # Base case
-        if len(idx_list) == 0:
-            assert isinstance(partial_query, dict)  # for mypy
-            return partial_query
-        # Add autopopulated fields
-        if len(idx_list) == 1:
-            if not autopopulated_fields:
-                return [idx_list[0]]
-            return {idx_list[0]: autopopulated_fields}
-        # Create a query with correct nesting
-        else:
-            return {idx_list[0]: self._idxs_to_idx_dict(idx_list[1:], autopopulated_fields=autopopulated_fields)}
-
-    def query_dict_to_graphql_string(self, query_dict: dict[str, Any]) -> str:
-        first_line = next(iter(query_dict["query"]))
-        print(f"FIRST LINE: {first_line}")
-        query_body = query_dict["query"][first_line]
-        formatted_query_body = (
-            # format the dict as a GraphQL query
-            json.dumps(query_body, indent=2)
-            .replace('"', "")
-            .replace("'", '"')
-            .replace("[", "")
-            .replace("]", "")
-            .replace(",", " ")
-            .replace("{", "")
-            .replace(": ", "{")
-        )
-        formatted_query_body = "\n".join(line for line in formatted_query_body.splitlines() if line.strip())
-        query = f"query{{{first_line}{{\n{formatted_query_body}}}}}"
-        return query
 
     def _get_descendant_fields(self, node_idx: int, visited: None | set[int] = None) -> list[int | dict[int, Any]]:
         if visited is None:
@@ -522,142 +461,6 @@ class SeqSchema:
                     result.extend(type_descendants)
                 # Skips appending if no further subfields (ENUMS)
         return result
-
-    def find_field_names(self, search_string: str) -> list[str]:
-        """Find field names that fully or partially match the search string.
-
-        Args:
-            search_string (str): string to search field names for
-
-        Raises:
-            ValueError: thrown when a type other than string is passed in for search_string
-            ValueError: thrown when no fields match search_string
-
-        Returns:
-            list[str]: list of matching field names
-        """
-        if not isinstance(search_string, str):
-            error_msg = f"Please input a string instead of {type(search_string)}"  # type: ignore[unreachable]
-            raise TypeError(error_msg)
-
-        field_names = [key for key in self._field_to_idx_dict if search_string.lower() in key.lower()]
-        if not field_names:
-            error_msg = f"No fields found matching '{search_string}'"
-            raise ValueError(error_msg)
-        return field_names
-
-    def construct_query(
-        self, query_type: str, query_args: dict[str, str] | dict[str, list[Any]], return_data_list: list[str], suppress_autocomplete_warning: bool = False
-    ) -> dict[str, Any]:
-        """
-        Construct a GraphQL query. Currently only uses rustworkx.
-
-        Args:
-            query_type (str): root type ("alignments", "annotations")
-            query_args (dict[str, str] | dict[str, list]): dictionary where keys are argument names and
-                values are input values
-            return_data_list (list[str]): list of fields to request data for
-            suppress_autocomplete_warning (bool, optional): Whether to suppress warning for autocompletion of paths.
-                Defaults to False.
-
-        Raises:
-            ValueError: unknown field in the return_data_list
-
-        Returns:
-            dict: GraphQL query in JSON format
-        """
-        unknown_return_list: list[str] = []
-        for field in return_data_list:
-            if "." in field:
-                separate_fields = field.split(".")
-                for sep_field in separate_fields:
-                    if sep_field not in self._field_names_list:
-                        unknown_return_list.append(sep_field)  # noqa: PERF401
-            elif field not in self._field_names_list:
-                unknown_return_list.append(field)
-        if unknown_return_list:
-            error_msg = f"Unknown item in return_data_list: {unknown_return_list}"
-            raise ValueError(error_msg)
-        # if use_networkx:
-        #     query = self._construct_query_networkx(
-        #         input_type=input_type,
-        #         input_ids=input_ids,
-        #         return_data_list=return_data_list,
-        #         suppress_autocomplete_warning=suppress_autocomplete_warning
-        #     )
-        # else:
-        # query = self._construct_query_rustworkx(
-        #     input_type=input_type,
-        #     input_ids=input_ids,
-        #     return_data_list=return_data_list,
-        #     add_rcsb_id=add_rcsb_id,
-        #     suppress_autocomplete_warning=suppress_autocomplete_warning
-        # )
-        query = self._construct_query_rustworkx(
-            query_type=query_type, query_args=query_args, return_data_list=return_data_list, suppress_autocomplete_warning=suppress_autocomplete_warning
-        )
-        return query  # noqa: RET504
-
-    def _construct_query_rustworkx(
-        self,
-        query_type: str,
-        query_args: dict[str, str] | dict[str, list[Any]],
-        return_data_list: list[str],
-        suppress_autocomplete_warning: bool = False
-    ) -> dict[str, Any]:
-        # Build first line of query where arguments are given
-        arg_list = self._root_dict[query_type]
-        arg_value_list = tuple(self.format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args)
-        query_args_str = f"{query_type}{str(arg_value_list).replace("'", '')}"
-
-        # Build query body
-        start_idx = self._root_to_idx[query_type]
-        return_data_path_dict: dict[int, list[int]] = self.return_fields_to_paths(start_idx, query_type, return_data_list)
-        return_field_query_list = []
-        for return_field_idx, path in return_data_path_dict.items():
-            return_field_query_dict = self._idxs_to_idx_dict(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
-            return_field_query_list.append(return_field_query_dict)
-
-        # TODO: in idxs_to_query, add arguments to keys
-        idx_query_body = self._merge_query_list(return_field_query_list)
-        name_query_body = self._idx_dict_to_name_dict(idx_query_body)
-        query = self.query_dict_to_graphql_string({"query": {query_args_str: name_query_body}})
-        return {"query": query}
-
-    def _merge_query(
-        self,
-        query_1: dict[int, Any] | list[int],
-        query_2: dict[int, Any] | list[int]
-    ) -> list[int | dict[int, Any]] | list[dict[int, Any]] | list[int]:
-        if isinstance(query_1, dict) and isinstance(query_2, dict):
-            for key in query_1.keys():
-                if (key in query_2):
-                    return [{key: self._merge_query(query_1[key], query_2[key])}]
-                return [query_1, query_2]
-        elif isinstance(query_1, list) and isinstance(query_2, dict):
-            return query_1 + [query_2]
-        elif isinstance(query_1, dict) and isinstance(query_2, list):
-            return [query_1] + query_2
-        elif isinstance(query_1, list) and isinstance(query_2, list):
-            return query_1 + query_2
-        raise ValueError("Invalid query input")
-
-    def _merge_query_list(self, query_list: list[dict[int, Any] | int]) -> list[dict[int, Any] | int]:
-        result = [query_list[0]]
-        for path in query_list[1:]:
-            for partial_path in result:
-                result = self._merge_query(partial_path, path)
-        return result
-
-    def _idx_query_to_name_query(self, idx_query: dict[int, Any] | list[int] | int) -> dict[str, Any] | list[str] | str:
-        if isinstance(idx_query, dict):
-            assert len(idx_query) == 1
-            for key, value in idx_query.items():
-                field_name = self._idx_to_name(key)
-                return {field_name: self._idx_query_to_name_query(value)}
-        elif isinstance(idx_query, list):
-            return [self._idx_query_to_name_query(idx) for idx in idx_query]
-        return self._idx_to_name(idx_query)
 
     def return_fields_to_paths(
         self,
@@ -753,7 +556,7 @@ class SeqSchema:
             return_data_paths[final_idx] = shortest_path
         return return_data_paths
 
-    def format_args(self, arg_dict: dict[str, list[Any]] | dict[str, str], input_value: str | list[str]) -> str:
+    def _format_args(self, arg_dict: dict[str, list[Any]] | dict[str, str], input_value: str | list[str] | int) -> str:
         """Add double quotes or omit quotes around a single GraphQL argument.
 
         Args:
@@ -764,18 +567,18 @@ class SeqSchema:
             str: returns input value formatted with quotes, no quotes, or as a list
         """
         format_arg = ""
-        if arg_dict["kind"] == "LIST" or arg_dict["of_kind"] == "LIST":
-            if arg_dict["of_type"] == "String":
+        if arg_dict["kind"] == "LIST" or arg_dict["ofKind"] == "LIST":
+            if arg_dict["ofType"] == "String":
                 # Add double quotes around each item
                 format_arg += f'{arg_dict["name"]}: {str(input_value).replace("'", '"')}'
             else:
                 # Remove single quotes if not string
                 format_arg += f'{arg_dict["name"]}: {str(input_value).replace("'", "")}'
-        elif arg_dict["of_type"] == "String":
+        elif arg_dict["ofType"] == "String":
             # If arg type is string, add double quotes around value
             format_arg += f'{arg_dict["name"]}: "{input_value}"'
         else:
-            assert isinstance(input_value, str)
+            assert isinstance(input_value, str) or isinstance(input_value, int)
             format_arg += f"{arg_dict["name"]}: {input_value}"
         return format_arg
 
@@ -793,7 +596,7 @@ class SeqSchema:
         if len(dot_path) == 0:
             idx_list.append(node_idx)
             return idx_list
-        if (self._schema_graph[node_idx].kind == "SCALAR") or (self._schema_graph[node_idx].of_kind == "SCALAR"):
+        if (getattr(self._schema_graph[node_idx], "kind") == "SCALAR") or (getattr(self._schema_graph[node_idx], "of_kind") == "SCALAR"):
             return self._find_idx_path(dot_path[1:], idx_list, node_idx)
         type_node = next(iter(self._schema_graph.successor_indices(node_idx)))
         field_nodes = self._schema_graph.successor_indices(type_node)
@@ -949,7 +752,7 @@ class SeqSchema:
             dot_paths.append(dot_path)
             if descriptions:
                 final_field_idx = path[-1]
-                description = self._schema_graph[final_field_idx].description
+                description = getattr(self._schema_graph[final_field_idx], "description")
                 if description is None:
                     description = ""
                 description_dict[dot_path] = description.replace("\n", " ")
@@ -984,13 +787,13 @@ class SeqSchema:
         error_list = []
         arg_dict_list = self._root_dict[query_type]
         for arg_dict in arg_dict_list:
-            arg_type = arg_dict["of_type"]
+            arg_type = arg_dict["ofType"]
             arg_name = arg_dict["name"]
 
             if arg_name not in args:
                 continue
 
-            if arg_dict["kind"] == "NON_NULL" and arg_dict["of_kind"] == "ENUM" and args[arg_name] not in enum_types[arg_type].value:
+            if arg_dict["kind"] == "NON_NULL" and arg_dict["ofKind"] == "ENUM" and args[arg_name] not in enum_types[arg_type].value:
                 error_list.append(f"Invalid value '{args[arg_name]}' for '{arg_name}': valid values are {enum_types[arg_type].value}")
 
             # If list. Does not do type-checking for items of list.
@@ -1005,7 +808,7 @@ class SeqSchema:
                     error_list.append(f"'{arg_name}' must be list of string(s)")
 
             # if list of ENUMs
-            if arg_dict["kind"] == "NON_NULL" and arg_dict["of_kind"] == "LIST":
+            if arg_dict["kind"] == "NON_NULL" and arg_dict["ofKind"] == "LIST":
                 mismatch_type = [item for item in args[arg_name] if item not in enum_types[arg_type].value]
                 if mismatch_type:
                     error_msg = f"Invalid value(s) {mismatch_type} for '{arg_name}': valid values are {enum_types[arg_type].value}"
@@ -1013,3 +816,232 @@ class SeqSchema:
 
         if error_list:
             raise ValueError("\n" + "  " + "\n  ".join(error_list))
+
+    def construct_query(
+        self, query_type: str, query_args: dict[str, str] | dict[str, list[Any]], return_data_list: list[str], suppress_autocomplete_warning: bool = False
+    ) -> dict[str, Any]:
+        """
+        Construct a GraphQL query. Currently only uses rustworkx.
+
+        Args:
+            query_type (str): root type ("alignments", "annotations")
+            query_args (dict[str, str] | dict[str, list]): dictionary where keys are argument names and
+                values are input values
+            return_data_list (list[str]): list of fields to request data for
+            suppress_autocomplete_warning (bool, optional): Whether to suppress warning for autocompletion of paths.
+                Defaults to False.
+
+        Raises:
+            ValueError: unknown field in the return_data_list
+
+        Returns:
+            dict: GraphQL query in JSON format
+        """
+        unknown_return_list: list[str] = []
+        for field in return_data_list:
+            if "." in field:
+                separate_fields = field.split(".")
+                for sep_field in separate_fields:
+                    if sep_field not in self._field_names_list:
+                        unknown_return_list.append(sep_field)  # noqa: PERF401
+            elif field not in self._field_names_list:
+                unknown_return_list.append(field)
+        if unknown_return_list:
+            error_msg = f"Unknown item in return_data_list: {unknown_return_list}"
+            raise ValueError(error_msg)
+        # if use_networkx:
+        #     query = self._construct_query_networkx(
+        #         input_type=input_type,
+        #         input_ids=input_ids,
+        #         return_data_list=return_data_list,
+        #         suppress_autocomplete_warning=suppress_autocomplete_warning
+        #     )
+        # else:
+        # query = self._construct_query_rustworkx(
+        #     input_type=input_type,
+        #     input_ids=input_ids,
+        #     return_data_list=return_data_list,
+        #     add_rcsb_id=add_rcsb_id,
+        #     suppress_autocomplete_warning=suppress_autocomplete_warning
+        # )
+        query = self._construct_query_rustworkx(
+            query_type=query_type, query_args=query_args, return_data_list=return_data_list, suppress_autocomplete_warning=suppress_autocomplete_warning
+        )
+        return query  # noqa: RET504
+
+    def _construct_query_rustworkx(
+        self,
+        query_type: str,
+        query_args: dict[str, str] | dict[str, list[Any]],
+        return_data_list: list[str],
+        suppress_autocomplete_warning: bool = False
+    ) -> dict[str, Any]:
+        # Build first line of query where arguments are given
+        arg_list = self._root_dict[query_type]
+        arg_value_list = tuple(self._format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args)
+        first_line = f"{query_type}{str(arg_value_list).replace("'", '')}"
+
+        # Build query body
+        start_idx = self._root_to_idx[query_type]
+        return_data_path_dict: dict[int, list[int]] = self.return_fields_to_paths(start_idx, query_type, return_data_list)
+        return_field_query_list = []
+        for return_field_idx, path in return_data_path_dict.items():
+            return_field_query_dict = self._idxs_to_idx_dict(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
+            return_field_query_list.append(return_field_query_dict)
+
+        idx_query_body = self._merge_query_list(return_field_query_list)
+        name_query_body = self._idx_dict_to_name_dict(idx_query_body, query_args)
+        query = self.query_dict_to_graphql_string(first_line, name_query_body)
+        return {"query": query}
+
+    def _merge_query_list(self, query_list: list[dict[int, Any] | int]) -> list[dict[int, Any] | int]:
+        result = [query_list[0]]
+        for path in query_list[1:]:
+            for partial_path in result:
+                result = self._merge_query(partial_path, path)
+        return result
+
+    def _merge_query(
+        self,
+        query_1: dict[int, Any] | list[int],
+        query_2: dict[int, Any] | list[int]
+    ) -> list[int | dict[int, Any]] | list[dict[int, Any]] | list[int]:
+        if isinstance(query_1, dict) and isinstance(query_2, dict):
+            for key in query_1.keys():
+                if (key in query_2):
+                    return [{key: self._merge_query(query_1[key], query_2[key])}]
+                return [query_1, query_2]
+        elif isinstance(query_1, list) and isinstance(query_2, dict):
+            return query_1 + [query_2]
+        elif isinstance(query_1, dict) and isinstance(query_2, list):
+            return [query_1] + query_2
+        elif isinstance(query_1, list) and isinstance(query_2, list):
+            return query_1 + query_2
+        raise ValueError("Invalid query input")
+
+    def _idxs_to_idx_dict(
+            self,
+            idx_list: list[int],
+            autopopulated_fields: list[int | dict[int, Any]],
+            partial_query: dict[Any, Any] | None = None,
+        ) -> dict[int, Any] | list[int] | list[dict[int, Any] | int]:
+        if partial_query is None:
+            partial_query = {}
+        # Base case
+        if len(idx_list) == 0:
+            assert isinstance(partial_query, dict)  # for mypy
+            return partial_query
+        # Add autopopulated fields
+        if len(idx_list) == 1:
+            if not autopopulated_fields:
+                return [idx_list[0]]
+            return {idx_list[0]: autopopulated_fields}
+        # Create a query with correct nesting
+        else:
+            return {idx_list[0]: self._idxs_to_idx_dict(idx_list[1:], autopopulated_fields=autopopulated_fields)}
+
+    def _idx_dict_to_name_dict(
+        self,
+        idx_fields: list[dict[int, Any] | int] | dict[int, Any] | int,
+        query_args: dict[str, Any]
+    ) -> dict[str, Any] | list[str] | str:
+        """Turn dictionary of indices to dictionary of field names and add arguments if applicable."""
+        query_dict = {}
+        if isinstance(idx_fields, dict):
+            for field_idx, subfield in idx_fields.items():
+                field_name = self._idx_to_name(field_idx)
+                args = getattr(self._schema_graph[field_idx], "args")
+                if args:
+                    field_name = self.add_field_args(field_name, args, query_args)
+                query_dict[field_name] = self._idx_dict_to_name_dict(subfield, query_args)
+            return query_dict
+        elif isinstance(idx_fields, list):
+            return [self._idx_dict_to_name_dict(field, query_args) for field in idx_fields]
+        elif not idx_fields:
+            return ""
+        else:
+            return self._idx_to_name(idx_fields)
+
+    def add_field_args(self, field_name: str, args: list[dict[str, Any]], query_args: dict[str, Any]) -> str:
+        """Add arguments to a field, returning the fieldname and args as a formatted string.
+
+        Args:
+            args (list[dict[str, Any]]): _description_
+            query_args (dict[str, Any]): _description_
+
+        Returns:
+            str: _description_
+        """
+        formatted_args = []
+        for arg in args:
+            arg_name = arg["name"]
+            if arg_name in query_args:
+                formatted_args.append(self._format_args(arg, query_args[arg_name]))
+        if formatted_args:
+            return f"{field_name}{str(tuple(formatted_args)).replace("'", "")}"
+        else:
+            return field_name
+
+    def query_dict_to_graphql_string(self, first_line: str, query_body: dict[str, Any]) -> str:
+        formatted_query_body = (
+            # format the dict as a GraphQL query
+            # TODO: bit janky, change?
+            json.dumps(query_body, indent=2, separators=(" ", "~"))
+            .replace('"', "")
+            .replace("'", '"')
+            .replace("[", "")
+            .replace("]", "")
+            .replace("{", "")
+            .replace("~", "{")
+        )
+        formatted_query_body = "\n".join(line for line in formatted_query_body.splitlines() if line.strip())
+        query = f"query{{{first_line}{{\n{formatted_query_body}}}}}"
+        return query
+
+    def get_input_id_dict(self, input_type: str) -> dict[str, str]:
+        """Get keys input dictionary for given input_type.
+
+        Args:
+            input_type (str): GraphQL input_type (ex: alignments)
+
+        Raises:
+            ValueError: _description_
+
+        Returns:
+            dict[str, str]: _description_
+        """
+        if input_type not in self._root_dict:
+            error_msg = "Not a valid input_type, no available input_id dictionary"
+            raise ValueError(error_msg)
+        root_dict_entry = self._root_dict[input_type]
+        input_dict = {}
+        for arg in root_dict_entry:
+            name = arg["name"]
+            description = arg["description"]
+            if (len(root_dict_entry) == 1) and root_dict_entry[0]["name"] == "entry_id":
+                description = "ID"
+            input_dict[name] = description
+        return input_dict
+
+    def find_field_names(self, search_string: str) -> list[str]:
+        """Find field names that fully or partially match the search string.
+
+        Args:
+            search_string (str): string to search field names for
+
+        Raises:
+            ValueError: thrown when a type other than string is passed in for search_string
+            ValueError: thrown when no fields match search_string
+
+        Returns:
+            list[str]: list of matching field names
+        """
+        if not isinstance(search_string, str):
+            error_msg = f"Please input a string instead of {type(search_string)}"  # type: ignore[unreachable]
+            raise TypeError(error_msg)
+
+        field_names = [key for key in self._field_to_idx_dict if search_string.lower() in key.lower()]
+        if not field_names:
+            error_msg = f"No fields found matching '{search_string}'"
+            raise ValueError(error_msg)
+        return field_names

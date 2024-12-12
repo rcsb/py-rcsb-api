@@ -26,9 +26,9 @@ class Query(ABC):
     """Base class for all query types"""
 
     @abstractmethod
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         """Get dictionary represented query and attributes, skips values of None"""
-        request_dict: Dict = {}
+        request_dict: Dict[str, Any] = {}
         for field in fields(self):
             field_name = field.name
             field_value = getattr(self, field_name)
@@ -43,7 +43,7 @@ class Query(ABC):
                 request_dict[field_name] = field_value
         return request_dict
 
-    def construct_query(self, query_type: str) -> Dict:
+    def construct_query(self, query_type: str) -> Dict[str, Any]:
         """type check based on the GraphQL schema, then construct the GraphQL query"""
         # Assert attributes exists for mypy.
         # Can't be defined in Query class because
@@ -154,7 +154,7 @@ class Annotations(Query):
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
 
     def __post_init__(self) -> None:
@@ -182,10 +182,10 @@ class GroupAlignments(Query):
     offset: Optional[int] = None
     first: Optional[int] = None
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         query = super().construct_query("group_alignments")
         object.__setattr__(self, "_query", query)
 
@@ -209,12 +209,12 @@ class GroupAnnotations(Query):
     return_data_list: list[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType = MappingProxyType({})
+    _query: MappingProxyType[str, Any] = MappingProxyType({})
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         query = super().construct_query("group_annotations")
         object.__setattr__(self, "_query", query)
 
@@ -238,12 +238,12 @@ class GroupAnnotationsSummary(Query):
     return_data_list: list[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType = MappingProxyType({})
+    _query: MappingProxyType[str, Any] = MappingProxyType({})
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         query = super().construct_query("group_annotations_summary")
         object.__setattr__(self, "_query", query)
 
@@ -275,10 +275,10 @@ class AnnotationFilterInput:
     def to_string(self) -> str:
         """Generate string to insert in GraphQL query based on GraphQL schema"""
 
-        input_field_specs = []
+        input_field_specs: list[Any] = []
         for arg_dict in SEQ_SCHEMA._root_dict["annotations"]:
             if arg_dict["name"] == "filters":
-                input_field_specs = arg_dict["input_fields"]
+                input_field_specs = arg_dict["inputFields"]
         assert len(input_field_specs) > 0, '"filters" key not found in arg_dict'
 
         args = set()

@@ -74,6 +74,7 @@ class SeqTests(unittest.TestCase):
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
+
         with self.subTest(msg="2. Alignments query with range"):
             try:
                 query_obj = Alignments(
@@ -82,6 +83,21 @@ class SeqTests(unittest.TestCase):
                     queryId="XP_642496",
                     range=[1, 10],
                     return_data_list=["target_id"]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest(msg="3. Alignments query with target_alignments args"):
+            try:
+                query_obj = Alignments(
+                    from_="NCBI_PROTEIN",
+                    to="PDB_ENTITY",
+                    queryId="XP_642496",
+                    range=[1, 10],
+                    return_data_list=["target_alignments"],
+                    first=1,
+                    offset=10
                 )
                 query_obj.exec()
             except Exception as error:
