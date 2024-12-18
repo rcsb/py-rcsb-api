@@ -120,6 +120,15 @@ class Alignments(Query):
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
+    """
+    `offset` and `first` are field arguments (currently the only ones).
+    Making them class attributes (below) would not work if there
+    were redundant field arg names. Other options:
+    1. Use a string in `return_data_list` and parse later
+            return_data_list = ["target_alignments(first:0, offset:5)"]
+    2. Create an attribute `field_args` and pass in args as a dict
+            field_args = {"target_alignments": {first:0, offset:5}, ...}
+    """
     offset: Optional[int] = None
     first: Optional[int] = None
 

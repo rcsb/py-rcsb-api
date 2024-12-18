@@ -190,6 +190,95 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
+    def testDocExamples(self) -> None:
+        # These examples come from:
+        # https://sequence-coordinates.rcsb.org/#examples
+
+        with self.subTest(msg="1. UniProt - PDB Entity alignment"):
+            try:
+                query_obj = Alignments(
+                    from_="UNIPROT",
+                    to="PDB_ENTITY",
+                    queryId="P01112",
+                    # TODO: This errors because "target_alignments" contains "aligned_regions" fields.
+                    # Can I fix it so that both set of fields remain in the query without repeat?
+                    return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest(msg="2. Computed Structure Model - NCBI protein alignment"):
+            try:
+                query_obj = Alignments(
+                    from_="PDB_ENTITY",
+                    to="NCBI_PROTEIN",
+                    queryId="AF_AFP68871F1_1",
+                    return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest(msg="3. Mapping UniProt annotations to a PDB Instance"):
+            try:
+                query_obj = Annotations(  # type: ignore
+                    reference="PDB_INSTANCE",
+                    sources=["UNIPROT"],
+                    queryId="2UZI.C",
+                    return_data_list=["target_id", "features"]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest(msg="4. Human Chromosome 1 - PDB Entity alignment"):
+            try:
+                query_obj = Alignments(
+                    from_="NCBI_GENOME",
+                    to="PDB_ENTITY",
+                    queryId="NC_000001",
+                    return_data_list=[
+                        "target_alignments.target_id",
+                        "target_alignments.orientation",
+                        "target_alignments.aligned_regions"
+                    ]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest(msg="5. Mapping PDB Instance ligands binding sites to Human Chromosome 1"):
+            try:
+                query_obj = Annotations(  # type: ignore
+                    reference="NCBI_GENOME",
+                    sources=["PDB_INSTANCE"],
+                    queryId="NC_000001",
+                    filters=[
+                        AnnotationFilterInput(
+                            field="TYPE",
+                            operation="EQUALS",
+                            values=["BINDING_SITE"],
+                        )
+                    ],
+                    return_data_list=["target_id", "features"]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest(msg="6. Mapping a PDB Instance to NCBI RefSeq proteins"):
+            try:
+                query_obj = Alignments(
+                    from_="PDB_INSTANCE",
+                    to="NCBI_PROTEIN",
+                    queryId="4Z36.A",
+                    return_data_list=["query_sequence", "target_alignments"]
+                )
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
 
 def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
@@ -198,6 +287,7 @@ def buildQuery() -> unittest.TestSuite:
     suiteSelect.addTest(SeqTests("testGroupAlignments"))
     suiteSelect.addTest(SeqTests("testGroupAnnotations"))
     suiteSelect.addTest(SeqTests("testGroupAnnotationsSummary"))
+    suiteSelect.addTest(SeqTests("testDocExamples"))
     return suiteSelect
 
 
