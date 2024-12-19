@@ -906,12 +906,11 @@ class SeqSchema:
 
         # Merge all the queries in merge_query_list so there are no redundant paths
         idx_query_body = self._merge_query_list(return_data_query_list)
-        # print(f"return_data_query_list: {return_data_query_list}")
         name_query_body = self._idx_dict_to_name_dict(idx_query_body, query_args)
         query = self._query_dict_to_graphql_string(first_line, name_query_body)
         return {"query": query}
 
-    def _merge_query_list(self, query_list: list[dict[int, Any] | int]) -> list[dict[int, Any] | int]:
+    def _merge_query_list(self, query_list: list[dict[int, Any] | list[int]]) -> list[dict[int, Any] | int]:
         """Merge a list of query dicts, returning a merged query with unique indices/index dictionaries.
 
         Args:
@@ -921,23 +920,72 @@ class SeqSchema:
         Returns:
             list[dict[int, Any] | int]: List of indices and index dicts representing the merged query
         """
-        print(f"query_list: {query_list}")
+        # print(f"query_list: {query_list}")
+        if isinstance(query_list[0], list):
+            result = query_list[0]
         result = [query_list[0]]
+
         for path in query_list[1:]:
-            result = self._merge_query(result, path)
-        print(f"FINAL: {result}")
+            for i, result_path in enumerate(result):
+                merged_query = self._merge_query(result_path, path)
+                if merged_query:
+                    result.pop(i)
+                    result.extend(merged_query)
+                    break
+            if not merged_query and isinstance(path, dict):
+                result.append(path)
+            # print(f"result: {result}")
+
+        # print(f"FINAL: {result}")
         return result
 
-    def _merge_query_2(
+    def _merge_query(
         self,
-        query_1: dict[int, Any] | list[int | dict[int, Any]] | int,
-        query_2: dict[int, Any] | list[int | dict[int, Any]] | int
+        query_1: dict[int, Any] | list[int | dict[int, Any]] | list[int] | int,
+        query_2: dict[int, Any] | list[int | dict[int, Any]] | list[int] | int
     ) -> list[dict[int, Any] | int] | list[dict[int, Any]] | list[int]:
         """Merge two queries if possible, else return empty list
 
+        Returns:
+            list[dict[int, Any] | int] | list[dict[int, Any]] | list[int]: _description_
+        """
+        # Case where both queries are dicts:
+        #   If share keys --> merge values
+        #   If dicts are equal --> return one dict
+        #   Else: return both dicts in list
+        if isinstance(query_1, dict) and isinstance(query_2, dict):
+            for key in query_1.keys():
+                if (key in query_2):
+                    return [{key: self._merge_dicts(query_1[key], query_2[key])}]
+        # Cases where one query is a list and one is a dict
+        #   If query is already in the other query, return only more general query
+        #   Else: return list with both queries
+        elif isinstance(query_1, list) and isinstance(query_2, dict):
+            if query_2 in query_1:
+                return query_1
+        elif isinstance(query_1, dict) and isinstance(query_2, list):
+            if query_1 in query_2:
+                return query_2
+        # Case where both queries are lists
+        #   Merge lists, checking if items are unique
+        elif isinstance(query_1, list) and isinstance(query_2, list):
+            unique_query_1 = [path for path in query_1 if path not in query_2]
+            if unique_query_1 != query_1:
+                return unique_query_1 + query_2
+        return []
+
+    def _merge_dicts(
+        self,
+        dict_1: dict[int, Any] | list[int | dict[int, Any]] | int,
+        dict_2: dict[int, Any] | list[int | dict[int, Any]] | int,
+    ) -> list[dict[int, Any] | int] | list[dict[int, Any]] | list[int]:
+        """Merge two dictionaries without overwriting values.
+        #TODO: This is very similar to _merge_query in logic, but I had to make it separate to recursively
+        merge dictionaries (above func will return empty list if no merge can be made) Can this be cleaned up?
+
         Args:
-            query_1 (dict[int, Any] | list[int  |  dict[int, Any]] | int): _description_
-            query_2 (dict[int, Any] | list[int  |  dict[int, Any]] | int): _description_
+            dict_1 (dict[int, Any] | list[int  |  dict[int, Any]] | int): _description_
+            dict_2 (dict[int, Any] | list[int  |  dict[int, Any]] | int): _description_
 
         Raises:
             ValueError: _description_
@@ -945,72 +993,23 @@ class SeqSchema:
         Returns:
             list[dict[int, Any] | int] | list[dict[int, Any]] | list[int]: _description_
         """
-        if isinstance(query_1, dict) and isinstance(query_2, dict):
-            for key in query_1.keys():
-                if (key in query_2):
-                    return [{key: self._merge_query(query_1[key], query_2[key])}]
-                return [query_1, query_2]
-        elif isinstance(query_1, list) and isinstance(query_2, dict):
-            return query_1 + [query_2]
-        elif isinstance(query_1, dict) and isinstance(query_2, list):
-            return [query_1] + query_2
-        elif isinstance(query_1, list) and isinstance(query_2, list):
-            return query_1 + query_2
-        raise ValueError("Invalid query input")
-
-    def _merge_query(
-        self,
-        query_1: dict[int, Any] | list[int | dict[int, Any]] | int,
-        query_2: dict[int, Any] | list[int | dict[int, Any]] | int
-    ) -> list[dict[int, Any] | int] | list[dict[int, Any]] | list[int]:
-        """Merge two queries, removing redundancy.
-
-        Returns:
-            list[dict[int, Any] | int] | list[dict[int, Any]]: merged query
-        """
-        # Case where both queries are dicts:
-        #   If share keys --> merge values
-        #   If dicts are equal --> return one dict
-        #   Else: return both dicts in list
-        if (isinstance(query_1, dict) and isinstance(query_2, dict)):
-            for key in query_1.keys():
-                if (key in query_2):
-                    return [{key: self._merge_query(query_1[key], query_2[key])}]
-                if query_1 == query_2:
-                    return [query_1]
-                return [query_1, query_2]
-
-        elif isinstance(query_1, (int, dict)) and isinstance(query_2, (int, dict)):
-            if query_1 == query_2:
-                return [query_1]
-            return [query_1, query_2]
-
-        # Cases where one query is a list and one is a dict
-        #   If query is already in the other query, return only more general query
-        #   Else: return list with both queries
-        elif (
-            (isinstance(query_1, list) and isinstance(query_2, dict))
-            or (isinstance(query_1, list) and isinstance(query_2, int))
-        ):
-            if query_2 in query_1:
-                return query_1
-            return query_1 + [query_2]
-
-        elif (
-            (isinstance(query_1, dict) and isinstance(query_2, list))
-            or (isinstance(query_1, int) and isinstance(query_2, list))
-        ):
-            if query_1 in query_2:
-                return query_2
-            return [query_1] + query_2
-
-        # Case where both queries are lists
-        #   Merge lists, checking if items are unique
-        elif isinstance(query_1, list) and isinstance(query_2, list):
-            unique_query_1 = [path for path in query_1 if path not in query_2]
-            return unique_query_1 + query_2
-
-        raise ValueError("Invalid query input")
+        if isinstance(dict_1, dict) and isinstance(dict_2, dict):
+            for key in dict_1.keys():
+                if (key in dict_2):
+                    return [{key: self._merge_dicts(dict_1[key], dict_2[key])}]
+                return [dict_1, dict_2]
+        elif isinstance(dict_1, list) and isinstance(dict_2, dict):
+            if dict_2 in dict_1:
+                return dict_1
+            return dict_1 + [dict_2]
+        elif isinstance(dict_1, dict) and isinstance(dict_2, list):
+            if dict_1 in dict_2:
+                return dict_2
+            return [dict_1] + dict_2
+        elif isinstance(dict_1, list) and isinstance(dict_2, list):
+            unique_query_1 = [path for path in dict_1 if path not in dict_2]
+            return unique_query_1 + dict_2
+        raise ValueError("Invalid dictionary input")
 
     def _idxs_to_idx_dict(
             self,
