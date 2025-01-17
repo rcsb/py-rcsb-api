@@ -6,6 +6,7 @@ including API endpoints, search services, and schema URLs. The values are
 immutable and protected from modification during runtime.
 """
 
+from __future__ import annotations
 from dataclasses import dataclass
 from types import MappingProxyType
 from typing import List
