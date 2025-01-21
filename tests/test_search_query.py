@@ -880,6 +880,8 @@ class SearchTests(unittest.TestCase):
         ok = len(result) > 0
         logger.info("Basic query with default values results: result length : (%d), ok : (%r)", len(result), ok)
 
+        time.sleep((0.5))
+
         # query with type = formula and match subset = True
         q2 = ChemSimilarityQuery(value="C12 H28 O4",
                                  query_type="formula",
@@ -887,6 +889,8 @@ class SearchTests(unittest.TestCase):
         result = list(q2())
         ok = len(result) > 0
         logger.info("Query with type = formula and match subset = True results: result length : (%d), ok : (%r)", len(result), ok)
+
+        time.sleep((0.5))
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (sterospecific) or graph-relaxed-stereo
         q3 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -897,6 +901,8 @@ class SearchTests(unittest.TestCase):
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and graph-relaxed-stereo results: result length : (%d), ok : (%r)", len(result), ok)
 
+        time.sleep((0.5))
+
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (including stereoisomers) or graph-relaxed
         q4 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
                                  query_type="descriptor",
@@ -905,6 +911,8 @@ class SearchTests(unittest.TestCase):
         result = list(q4())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and graph-relaxed results: result length : (%d), ok : (%r)", len(result), ok)
+
+        time.sleep((0.5))
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (quick screen) or fingerprint-similarity
         q5 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -915,6 +923,8 @@ class SearchTests(unittest.TestCase):
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and fingerprint-similarity results: result length : (%d), ok : (%r)", len(result), ok)
 
+        time.sleep((0.5))
+
         # Query with type = descriptor, descriptor type = InChI, match type = substructure (sterospecific) or sub-struct-graph-relaxed-stereo
         q6 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
                                  query_type="descriptor",
@@ -923,6 +933,8 @@ class SearchTests(unittest.TestCase):
         result = list(q6())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and sub-struct-graph-relaxed-stereo results: result length : (%d), ok : (%r)", len(result), ok)
+
+        time.sleep((0.5))
 
         # Query with type = descriptor, descriptor type = InChI, match type = substructure (including stereoisomers) or sub-struct-graph-relaxed
         q7 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
@@ -933,6 +945,8 @@ class SearchTests(unittest.TestCase):
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and sub-struct-graph-relaxed results: result length : (%d), ok : (%r)", len(result), ok)
 
+        time.sleep((0.5))
+
         # Query with type = descriptor, descriptor type = InChI, match type = exact match or graph-exact
         q8 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
                                  query_type="descriptor",
@@ -941,6 +955,8 @@ class SearchTests(unittest.TestCase):
         result = list(q8())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and graph-exact results: result length : (%d), ok : (%r)", len(result), ok)
+
+        time.sleep((0.5))
 
         # Invalid query with invalid parameters
         ok = False
