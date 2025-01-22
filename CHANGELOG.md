@@ -1,4 +1,8 @@
 # Changelog
+## v1.0.1 (2025-01-17)
+
+- Add import to `const.py` for compatibility with Python 3.8
+- Update search schemas: 1.47.7 -> 1.48.0
 
 ## v1.0.0 (2024-11-6)
 
