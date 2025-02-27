@@ -154,24 +154,28 @@ class DataQuery:
         editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
         return editor_base_link + urllib.parse.quote(self._query)
 
-    def exec(self) -> Dict[str, Any]:
+    def exec(self, progress_bar: bool = False) -> Dict[str, Any]:
         """POST a GraphQL query and get response
 
         Returns:
             Dict[str, Any]: JSON object
         """
-        batch_size = 50
+        batch_size = 5000
         if len(self._input_ids) > batch_size:
             batched_ids = self._batch_ids(batch_size)
             response_json: Dict[str, Any] = {}
-            # count = 0
+
+            if progress_bar is True:
+                from tqdm import tqdm  # type: ignore
+                batched_ids = tqdm(batched_ids)
+
             for id_batch in batched_ids:
                 query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
                 part_response = requests.post(
                     headers={"Content-Type": "application/graphql"},
                     data=query,
                     url=const.DATA_API_ENDPOINT,
-                    timeout=config.DATA_API_TIMEOUT
+                    timeout=config.API_TIMEOUT
                 ).json()
                 self._parse_gql_error(part_response)
                 time.sleep(0.2)
@@ -184,7 +188,7 @@ class DataQuery:
                 headers={"Content-Type": "application/graphql"},
                 data=self._query,
                 url=const.DATA_API_ENDPOINT,
-                timeout=config.DATA_API_TIMEOUT
+                timeout=config.API_TIMEOUT
             ).json()
             self._parse_gql_error(response_json)
         if "data" in response_json.keys():

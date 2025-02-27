@@ -8,6 +8,7 @@ immutable and protected from modification during runtime.
 
 from __future__ import annotations
 from dataclasses import dataclass
+import requests
 from types import MappingProxyType
 from typing import List
 
@@ -96,6 +97,9 @@ class Const:
         # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
         "uniprot": [r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"]
     })
+
+    # why does this keep failing 
+    ALL_STRUCTURES = eval(requests.get("https://data.rcsb.org/rest/v1/holdings/current/entry_ids").text)
 
 
 const = Const()

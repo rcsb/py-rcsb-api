@@ -130,7 +130,7 @@ def fileUpload(filepath: str, fmt: str = "cif") -> str:
     should then be passed through as part of the value parameter,
     along with the format of the file."""
     with open(filepath, mode="rb") as f:
-        res = requests.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=None)
+        res = requests.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=config.API_TIMEOUT)
         try:
             spec = res.json()["key"]
         except KeyError:
@@ -1737,7 +1737,7 @@ class Session(Iterable[str]):
         "Fires a single query"
         params = self._make_params(start)
         logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=None)
+        response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=config.API_TIMEOUT)
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
             return response.json()
