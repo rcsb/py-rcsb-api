@@ -96,8 +96,7 @@ class SearchTests(unittest.TestCase):
         logger.info("Single query test results: ok : (%r)", ok)
 
     def testIquery(self):
-        """Tests the iquery function, which evaluates a query with a progress bar.
-        The progress bar requires tqdm to run. """
+        """Tests the iquery function, which evaluates a query with a progress bar."""
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
         session = Session(q1)
         result = session.iquery()

@@ -184,8 +184,7 @@ session.get_query_builder_link()
 
 #### Progress Bar
 The `iquery()` `Session` method provides a progress bar indicating the number of API
-requests being made. It requires the `tqdm` package be installed to track the
-progress of the query interactively.
+requests being made.
 ```python
 results = query().iquery()
 ```

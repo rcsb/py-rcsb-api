@@ -4,6 +4,8 @@ import re
 import time
 from typing import Any, Union, List, Dict, Optional, Tuple
 import requests
+from tqdm import tqdm
+from rcsbapi.data import ALL_STRUCTURES
 from rcsbapi.data import DATA_SCHEMA
 from ..config import config
 from ..const import const
@@ -36,14 +38,16 @@ class DataQuery:
             add_rcsb_id (bool, optional): whether to automatically add <input_type>.rcsb_id to queries. Defaults to True.
         """
         suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
-        input_id_limit = 200
-        if isinstance(input_ids, list):
-            if len(input_ids) > input_id_limit:
-                logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
-        if isinstance(input_ids, dict):
-            for value in input_ids.values():
-                if len(value) > input_id_limit:
+
+        if input_ids != ALL_STRUCTURES:
+            input_id_limit = 5000
+            if isinstance(input_ids, list):
+                if len(input_ids) > input_id_limit:
                     logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+            if isinstance(input_ids, dict):
+                for value in input_ids.values():
+                    if len(value) > input_id_limit:
+                        logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
@@ -162,11 +166,10 @@ class DataQuery:
         """
         batch_size = 5000
         if len(self._input_ids) > batch_size:
-            batched_ids = self._batch_ids(batch_size)
+            batched_ids: List[List[str]] | tqdm[list[str]] = self._batch_ids(batch_size)
             response_json: Dict[str, Any] = {}
 
             if progress_bar is True:
-                from tqdm import tqdm  # type: ignore
                 batched_ids = tqdm(batched_ids)
 
             for id_batch in batched_ids:

@@ -38,9 +38,10 @@ if sys.version_info > (3, 8):
 else:
     from typing_extensions import Literal
 
+from tqdm import trange
+
 logger = logging.getLogger(__name__)
 
-# tqdm is optional
 # Allowed return types for searches. https://search.rcsb.org/#return-type
 ReturnType = Literal["entry", "assembly", "polymer_entity", "non_polymer_entity", "polymer_instance", "mol_definition"]
 ReturnContentType = Literal["experimental", "computational"]  # results_content_type parameter list values
@@ -1798,11 +1799,7 @@ class Session(Iterable[str]):
 
     def iquery(self, limit: Optional[int] = None) -> List[str]:
         """Evaluate the query and display an interactive progress bar.
-
-        Requires tqdm.
         """
-        from tqdm import trange  # type: ignore
-
         response = self._single_query(start=0)
         if response is None:
             return []
