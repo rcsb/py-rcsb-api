@@ -43,11 +43,11 @@ class DataQuery:
             input_id_limit = 5000
             if isinstance(input_ids, list):
                 if len(input_ids) > input_id_limit:
-                    logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+                    logger.warning("More than %d input_ids. Query will be slower to complete.", input_id_limit)
             if isinstance(input_ids, dict):
                 for value in input_ids.values():
                     if len(value) > input_id_limit:
-                        logger.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+                        logger.warning("More than %d input_ids. Query will be slower to complete.", input_id_limit)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list

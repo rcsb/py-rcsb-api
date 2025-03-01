@@ -1001,7 +1001,7 @@ class Group(SearchQuery):
     """AND and OR combinations of queries"""
 
     operator: TAndOr
-    nodes: Iterable[SearchQuery] = ()
+    nodes: Iterable[Group | SearchQuery] = ()
 
     def to_dict(self):
         group_dict = dict(
@@ -1020,9 +1020,9 @@ class Group(SearchQuery):
         if self.operator == "and":
             if isinstance(other, Group):
                 if other.operator == "and":
-                    return Group("and", (*self.nodes, *other.nodes))
+                    return Group("and", (self, other))
             elif isinstance(other, SearchQuery):
-                return Group("and", (*self.nodes, other))
+                return Group("and", (self, other))
             else:
                 return NotImplemented
 
