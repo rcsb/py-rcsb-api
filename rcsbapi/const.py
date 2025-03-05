@@ -7,6 +7,7 @@ immutable and protected from modification during runtime.
 """
 
 from __future__ import annotations
+import ast
 from dataclasses import dataclass
 import requests
 from types import MappingProxyType
@@ -98,7 +99,11 @@ class Const:
         "uniprot": [r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"]
     })
 
-    ALL_STRUCTURES = eval(requests.get("https://data.rcsb.org/rest/v1/holdings/current/entry_ids", timeout=30).text)
+    ALL_STRUCTURES: MappingProxyType[str, List[str]] = MappingProxyType({
+        "entries": ast.literal_eval(requests.get("https://data.rcsb.org/rest/v1/holdings/current/entry_ids", timeout=60).text),
+        "chem_comps": ast.literal_eval(requests.get("https://data.rcsb.org/rest/v1/holdings/current/ccd_ids", timeout=60).text)
+        + ast.literal_eval(requests.get("https://data.rcsb.org/rest/v1/holdings/current/prd_ids", timeout=60).text),
+    })
 
 
 const = Const()

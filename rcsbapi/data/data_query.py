@@ -1,3 +1,4 @@
+import ast
 import logging
 import urllib.parse
 import re
@@ -5,7 +6,6 @@ import time
 from typing import Any, Union, List, Dict, Optional, Tuple
 import requests
 from tqdm import tqdm
-from rcsbapi.data import ALL_STRUCTURES
 from rcsbapi.data import DATA_SCHEMA
 from ..config import config
 from ..const import const
@@ -39,7 +39,7 @@ class DataQuery:
         """
         suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
 
-        if input_ids != ALL_STRUCTURES:
+        if input_ids != const.ALL_STRUCTURES:
             if isinstance(input_ids, list):
                 if len(input_ids) > config.INPUT_ID_LIMIT:
                     logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
@@ -64,6 +64,7 @@ class DataQuery:
     def _process_input_ids(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]]) -> Tuple[str, List[str]]:
         """Convert input_type to plural if possible.
         Set input_ids to be a list of ids.
+        If using ALL_STRUCTURES, return the id list corresponding to the input type.
 
         Args:
             input_type (str): query input type
@@ -73,6 +74,15 @@ class DataQuery:
         Returns:
             Tuple[str, List[str]]: returns a tuple of converted input_type and list of input_ids
         """
+        # If input_ids is ALL_STRUCTURES, return appropriate list of ids
+        if input_ids == const.ALL_STRUCTURES:
+            new_input_ids = []
+            if input_type in const.ALL_STRUCTURES:
+                new_input_ids = const.ALL_STRUCTURES[input_type]
+            else:
+                raise ValueError(f"ALL_STRUCTURES is not yet available for {input_type}")
+            return (input_type, new_input_ids)
+
         # Convert _input_type to plural if applicable
         converted = False
         if DATA_SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
