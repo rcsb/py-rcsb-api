@@ -98,7 +98,7 @@ class Const:
         "uniprot": [r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"]
     })
 
-    ALL_STRUCTURES = eval(requests.get("https://data.rcsb.org/rest/v1/holdings/current/entry_ids").text)
+    ALL_STRUCTURES = eval(requests.get("https://data.rcsb.org/rest/v1/holdings/current/entry_ids", timeout=30).text)
 
 
 const = Const()

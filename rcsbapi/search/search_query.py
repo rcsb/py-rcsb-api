@@ -193,23 +193,23 @@ class SearchQuery(ABC):
     def __invert__(self) -> "SearchQuery":
         """Negation: `~a`"""
 
-    def __and__(self, other: "SearchQuery") -> "SearchQuery":
+    def __and__(self, other: "SearchQuery") -> "Group":
         """Intersection: `a & b`"""
         assert isinstance(other, SearchQuery)
         return Group("and", [self, other])
 
-    def __or__(self, other: "SearchQuery") -> "SearchQuery":
+    def __or__(self, other: "SearchQuery") -> "Group":
         """Union: `a | b`"""
         assert isinstance(other, SearchQuery)
         return Group("or", [self, other])
 
-    def __sub__(self, other: "SearchQuery") -> "SearchQuery":
+    def __sub__(self, other: "SearchQuery") -> "Group":
         """Difference: `a - b`"""
         return self & ~other
 
-    def __xor__(self, other: "SearchQuery") -> "SearchQuery":
+    def __xor__(self, other: "SearchQuery") -> "Group":
         """Symmetric difference: `a ^ b`"""
-        return (self & ~other) | (~self & other)
+        return (self & ~other) | (~self & other)  # type: ignore
 
     def exec(
         self,
@@ -1001,7 +1001,18 @@ class Group(SearchQuery):
     """AND and OR combinations of queries"""
 
     operator: TAndOr
-    nodes: Iterable[Group | SearchQuery] = ()
+    nodes: Iterable[Union[Group, SearchQuery]] = ()
+    keep_nested: bool = False
+
+    @staticmethod
+    def group(query: Group):
+        """Add a flag to a Group object so that it will remain grouped when adding more nodes.
+        In __init__, this method is set to be globally accessible.
+
+        Args:
+            query (Group): Group object that will be marked to remain grouped
+        """
+        return Group(query.operator, query.nodes, keep_nested=True)
 
     def to_dict(self):
         group_dict = dict(
@@ -1014,27 +1025,45 @@ class Group(SearchQuery):
     def __invert__(self):
         if self.operator == "and":
             return Group("or", [~node for node in self.nodes])
+        if self.operator == "or":
+            return Group("and", [~node for node in self.nodes])
 
-    def __and__(self, other: SearchQuery) -> SearchQuery:
-        # Combine nodes if possible
+    def __and__(self, other: Union[SearchQuery, Group]) -> Group:
         if self.operator == "and":
             if isinstance(other, Group):
-                if other.operator == "and":
+                # If keep_nested set to True, don't combine groups
+                if (self.keep_nested is True) and (other.keep_nested is True):
                     return Group("and", (self, other))
+                if other.keep_nested is True:
+                    return Group("and", (*self.nodes, other))
+                # Else, combine groups
+                elif other.operator == "and":
+                    return Group("and", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
-                return Group("and", (self, other))
+                # If keep_nested set to True, don't combine groups
+                if self.keep_nested is True:
+                    return Group("and", (self, other))
+                return Group("and", (*self.nodes, other))
             else:
                 return NotImplemented
 
         return super().__and__(other)
 
-    def __or__(self, other: SearchQuery) -> SearchQuery:
-        # Combine nodes if possible
+    def __or__(self, other: SearchQuery) -> Group:
         if self.operator == "or":
             if isinstance(other, Group):
-                if other.operator == "or":
+                # If keep_nested set to True, don't combine groups
+                if (self.keep_nested is True) and (other.keep_nested is True):
+                    return Group("or", (self, other))
+                if other.keep_nested is True:
+                    return Group("or", (*self.nodes, other))
+                # Else, combine groups
+                elif other.operator == "or":
                     return Group("or", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
+                # If keep_nested set to True, don't combine groups
+                if self.keep_nested is True:
+                    return Group("or", (self, other))
                 return Group("or", (*self.nodes, other))
             else:
                 return NotImplemented

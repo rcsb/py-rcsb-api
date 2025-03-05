@@ -140,20 +140,19 @@ Please cite the ``rcsb-api`` package by URL:
 
 You should also cite the RCSB.org API services this package utilizes:
 
-> Yana Rose, Jose M. Duarte, Robert Lowe, Joan Segura, Chunxiao Bi, Charmi
-> Bhikadiya, Li Chen, Alexander S. Rose, Sebastian Bittrich, Stephen K. Burley,
-> John D. Westbrook. RCSB Protein Data Bank: Architectural Advances Towards
-> Integrated Searching and Efficient Access to Macromolecular Structure Data
-> from the PDB Archive, Journal of Molecular Biology, 2020.
-> DOI: [10.1016/j.jmb.2020.11.003](https://doi.org/10.1016/j.jmb.2020.11.003)
-
-
 > Dennis W Piehl, Brinda Vallat, Ivana Truong, Habiba Morsy, Rusham Bhatt, 
 > Santiago Blaumann, Pratyoy Biswas, Yana Rose, Sebastian Bittrich, Jose M. Duarte,
 > Joan Segura, Chunxiao Bi, Douglas Myers-Turnbull, Brian P. Hudson, Christine Zardecki,
 > Stephen K. Burley, Rcsb-Api: Python Toolkit for Streamlining Access to RCSB Protein 
 > Data Bank APIs, Journal of Molecular Biology, 2025.
 > DOI: [10.1016/j.jmb.2025.168970](https://doi.org/10.1016/j.jmb.2025.168970)
+
+> Yana Rose, Jose M. Duarte, Robert Lowe, Joan Segura, Chunxiao Bi, Charmi
+> Bhikadiya, Li Chen, Alexander S. Rose, Sebastian Bittrich, Stephen K. Burley,
+> John D. Westbrook. RCSB Protein Data Bank: Architectural Advances Towards
+> Integrated Searching and Efficient Access to Macromolecular Structure Data
+> from the PDB Archive, Journal of Molecular Biology, 2020.
+> DOI: [10.1016/j.jmb.2020.11.003](https://doi.org/10.1016/j.jmb.2020.11.003)
 
 
 ## Documentation and Support

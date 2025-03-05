@@ -166,34 +166,29 @@ class DataQuery:
         """
         batch_size = 5000
         if len(self._input_ids) > batch_size:
-            batched_ids: List[List[str]] | tqdm[list[str]] = self._batch_ids(batch_size)
-            response_json: Dict[str, Any] = {}
-
-            if progress_bar is True:
-                batched_ids = tqdm(batched_ids)
-
-            for id_batch in batched_ids:
-                query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
-                part_response = requests.post(
-                    headers={"Content-Type": "application/graphql"},
-                    data=query,
-                    url=const.DATA_API_ENDPOINT,
-                    timeout=config.API_TIMEOUT
-                ).json()
-                self._parse_gql_error(part_response)
-                time.sleep(0.2)
-                if not response_json:
-                    response_json = part_response
-                else:
-                    response_json = self._merge_response(response_json, part_response)
+            batched_ids: Union[List[List[str]], tqdm[list[str]]] = self._batch_ids(batch_size)
         else:
-            response_json = requests.post(
+            batched_ids = [self._input_ids]
+        response_json: Dict[str, Any] = {}
+
+        if progress_bar is True:
+            batched_ids = tqdm(batched_ids)
+
+        for id_batch in batched_ids:
+            query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
+            part_response = requests.post(
                 headers={"Content-Type": "application/graphql"},
-                data=self._query,
+                data=query,
                 url=const.DATA_API_ENDPOINT,
                 timeout=config.API_TIMEOUT
             ).json()
-            self._parse_gql_error(response_json)
+            self._parse_gql_error(part_response)
+            time.sleep(0.2)
+            if not response_json:
+                response_json = part_response
+            else:
+                response_json = self._merge_response(response_json, part_response)
+
         if "data" in response_json.keys():
             query_response = response_json["data"][self._input_type]
             if query_response is None:

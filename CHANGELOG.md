@@ -1,4 +1,10 @@
 # Changelog
+## v1.1.0 (2025-03-03)
+
+- Add `ALL_STRUCTURES` object, allowing Data API queries for all structures in the PDB
+- Add `group` function which creates groups of query nodes that will be preserved while constructing the whole query
+- Update README with new citation information
+
 ## v1.0.1 (2025-01-17)
 
 - Add import to `const.py` for compatibility with Python 3.8
