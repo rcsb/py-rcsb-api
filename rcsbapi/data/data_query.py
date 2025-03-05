@@ -40,14 +40,13 @@ class DataQuery:
         suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
 
         if input_ids != ALL_STRUCTURES:
-            input_id_limit = 5000
             if isinstance(input_ids, list):
-                if len(input_ids) > input_id_limit:
-                    logger.warning("More than %d input_ids. Query will be slower to complete.", input_id_limit)
+                if len(input_ids) > config.INPUT_ID_LIMIT:
+                    logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
             if isinstance(input_ids, dict):
                 for value in input_ids.values():
-                    if len(value) > input_id_limit:
-                        logger.warning("More than %d input_ids. Query will be slower to complete.", input_id_limit)
+                    if len(value) > config.INPUT_ID_LIMIT:
+                        logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
@@ -158,15 +157,14 @@ class DataQuery:
         editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
         return editor_base_link + urllib.parse.quote(self._query)
 
-    def exec(self, progress_bar: bool = False) -> Dict[str, Any]:
+    def exec(self, batch_size: int = 5000, progress_bar: bool = False) -> Dict[str, Any]:
         """POST a GraphQL query and get response
 
         Returns:
             Dict[str, Any]: JSON object
         """
-        batch_size = 5000
         if len(self._input_ids) > batch_size:
-            batched_ids: Union[List[List[str]], tqdm[list[str]]] = self._batch_ids(batch_size)
+            batched_ids: Union[List[List[str]], tqdm] = self._batch_ids(batch_size)
         else:
             batched_ids = [self._input_ids]
         response_json: Dict[str, Any] = {}

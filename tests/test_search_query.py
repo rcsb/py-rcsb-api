@@ -571,6 +571,135 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(len(query_4.nodes[0].nodes), 2)
             self.assertEqual(len(query_4.nodes[1].nodes), 2)
 
+    def testSeqSimilarityGroups(self):
+        q1 = TextQuery("heat-shock transcription factor")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Homo sapiens")
+        q3 = SeqSimilarityQuery(
+            "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET"
+            + "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI"
+            + "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ"
+            + "GVEDAFYTLVREIRQHKLRKLNPPDESGPGCMNCKCVIS"
+        )
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testSeqMotifGroups(self):
+        q1 = TextQuery("Phage dUTPases")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Dubowvirus dv80alpha")
+        q3 = SeqMotifQuery("MQTIF")
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testStructSimilarityGroups(self):
+        q1 = TextQuery("Phage dUTPases")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Dubowvirus dv80alpha")
+        q3 = StructSimilarityQuery(entry_id="3ZEZ")
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testStructMotifGroups(self):
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
+        ResList = [Res1, Res2]
+
+        q1 = AttributeQuery("exptl.method", "exact_match", "X-RAY DIFFRACTION")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Pseudomonas putida")
+        q3 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def ChemSimilarityGroups(self):
+        q1 = attrs.drugbank_info.drug_groups == "investigational"
+        q2 = attrs.drugbank_info.drug_groups == "experimental"
+        q3 = ChemSimilarityQuery(
+            value="CC(Cc1ccc(cc1)C(C(=O)O)C)C",
+            query_type="descriptor",
+            descriptor_type="SMILES",
+            match_type="graph-relaxed-stereo"
+        )
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
     def testOperators(self):
         """Test operators such as contain and in. """
         q1 = attrs.rcsb_entry_container_identifiers.rcsb_id.in_(["4HHB", "2GS2"])  # test in
@@ -1696,6 +1825,11 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testOperators"))
     suiteSelect.addTest(SearchTests("testPartialQuery"))
     suiteSelect.addTest(SearchTests("testAttributeAndTextGroups"))
+    suiteSelect.addTest(SearchTests("testSeqSimilarityGroups"))
+    suiteSelect.addTest(SearchTests("testSeqMotifGroups"))
+    suiteSelect.addTest(SearchTests("testStructSimilarityGroups"))
+    suiteSelect.addTest(SearchTests("testStructMotifGroups"))
+    suiteSelect.addTest(SearchTests("ChemSimilarityGroups"))
     suiteSelect.addTest(SearchTests("testFreeText"))
     suiteSelect.addTest(SearchTests("testAttribute"))
     suiteSelect.addTest(SearchTests("exampleQuery1"))
