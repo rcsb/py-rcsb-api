@@ -88,6 +88,26 @@ input_ids=["4HHB.A", "4HHB.B"]
 input_ids={"instance_ids": ["4HHB.A", "4HHB.B"]}
 ```
 
+While it is generally more efficient and easier to interpret results if you use a refined list of IDs, if you would like to request a set of data for all IDs within an `input_type`, you can use the `ALL_STRUCTURES` variable. This will set `input_ids` to all IDs for the given `input_type` if supported.
+
+```python
+from rcsbapi.data import DataQuery as Query
+from rcsbapi.data import ALL_STRUCTURES
+
+# Using `ALL_STRUCTURES` with `input_type` "entries"
+# will use all experimentally-determined entry IDs
+query = Query(
+    input_type="entries",
+    input_ids=ALL_STRUCTURES,
+    return_data_list=["exptl.method"]
+)
+
+# Executing the query with a progress bar
+query.exec(progress_bar=True)
+
+print(query.get_response())
+```
+
 ### return_data_list
 These are the data that you are requesting (or "fields").
 
@@ -152,6 +172,29 @@ print(result_dict)
     ]
   }
 }
+```
+
+### Executing Large Queries
+When executing large queries, the package will batch the `input_ids` before requesting and merge the responses into one JSON object. The default batch size is 5,000, but this value can be adjusted in the `exec` method. To see a progress bar that tracks which batches have been completed, you can set `progress_bar` to `True`.
+
+```python
+from rcsbapi.data import DataQuery as Query
+from rcsbapi.data import ALL_STRUCTURES
+
+query = Query(
+    input_type="entries",
+    input_ids=ALL_STRUCTURES,
+    return_data_list=["exptl.method"]
+)
+
+# Executing query with larger batch size
+# and progress bar
+query.exec(
+  batch_size=7000,
+  progress_bar=True
+)
+
+print(query.get_response())
 ```
 
 ## Helpful Methods
