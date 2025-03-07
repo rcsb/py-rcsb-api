@@ -21,7 +21,10 @@ def __getattr__(name: str):
     # Edit global variable _all_structures
     global _all_structures
 
+    # When user tries to import ALL_STRUCTURES, below branch is entered
     if name == "ALL_STRUCTURES":
+        # If _all_structures is None, create ALL_STRUCTURES dictionary and assign to _all_structures
+        # ALL_STRUCTURES dict keys are `input_type`s and values are lists of corresponding IDs
         if _all_structures is None:
             ALL_STRUCTURES = {}
             for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
@@ -29,10 +32,12 @@ def __getattr__(name: str):
                 for endpoint in endpoints:
                     all_ids.extend(ast.literal_eval(requests.get(endpoint, timeout=60).text))
                 ALL_STRUCTURES[input_type] = all_ids
+            # Since ALL_STRUCTURES is assigned to _all_structures, IDs will be available next time ALL_STRUCTURES is used
             setattr(sys.modules[__name__], "_all_structures", ALL_STRUCTURES)
+
         return _all_structures
 
-    # keep
+    # keep functionality of original __getattr__
     raise AttributeError(f"Module {repr(__name__)} has no attribute {repr(name)}")
 
 
