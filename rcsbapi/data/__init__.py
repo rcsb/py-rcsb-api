@@ -1,7 +1,7 @@
 """RCSB PDB Data API"""
 import sys
 import requests
-import ast
+import json
 from typing import Optional, Dict, List
 from ..const import const
 from .data_schema import DataSchema
@@ -19,7 +19,7 @@ def __getattr__(name: str):
         name (str): attribute name
     """
     # Edit global variable _all_structures
-    global _all_structures
+    global _all_structures  # pylint: disable=W0602
 
     # When user tries to import ALL_STRUCTURES, below branch is entered
     if name == "ALL_STRUCTURES":
@@ -28,9 +28,13 @@ def __getattr__(name: str):
         if _all_structures is None:
             ALL_STRUCTURES = {}
             for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
-                all_ids = []
+                all_ids: List[str] = []
                 for endpoint in endpoints:
-                    all_ids.extend(ast.literal_eval(requests.get(endpoint, timeout=60).text))
+                    response = requests.get(endpoint, timeout=60)
+                    if response.status_code == 200:
+                        all_ids.extend(json.loads(response.text))
+                    else:
+                        response.raise_for_status()
                 ALL_STRUCTURES[input_type] = all_ids
             # Since ALL_STRUCTURES is assigned to _all_structures, IDs will be available next time ALL_STRUCTURES is used
             setattr(sys.modules[__name__], "_all_structures", ALL_STRUCTURES)

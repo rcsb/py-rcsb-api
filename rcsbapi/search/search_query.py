@@ -1032,16 +1032,16 @@ class Group(SearchQuery):
         if self.operator == "and":
             if isinstance(other, Group):
                 # If keep_nested set to True, don't combine groups
-                if (self.keep_nested is True) and (other.keep_nested is True):
+                if (self.keep_nested) and (other.keep_nested):
                     return Group("and", (self, other))
-                if other.keep_nested is True:
+                if other.keep_nested:
                     return Group("and", (*self.nodes, other))
                 # Else, combine groups
                 elif other.operator == "and":
                     return Group("and", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
                 # If keep_nested set to True, don't combine groups
-                if self.keep_nested is True:
+                if self.keep_nested:
                     return Group("and", (self, other))
                 return Group("and", (*self.nodes, other))
             else:
@@ -1053,16 +1053,16 @@ class Group(SearchQuery):
         if self.operator == "or":
             if isinstance(other, Group):
                 # If keep_nested set to True, don't combine groups
-                if (self.keep_nested is True) and (other.keep_nested is True):
+                if (self.keep_nested) and (other.keep_nested):
                     return Group("or", (self, other))
-                if other.keep_nested is True:
+                if other.keep_nested:
                     return Group("or", (*self.nodes, other))
                 # Else, combine groups
                 elif other.operator == "or":
                     return Group("or", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
                 # If keep_nested set to True, don't combine groups
-                if self.keep_nested is True:
+                if self.keep_nested:
                     return Group("or", (self, other))
                 return Group("or", (*self.nodes, other))
             else:
