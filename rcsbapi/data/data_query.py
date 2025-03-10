@@ -11,8 +11,6 @@ from ..config import config
 from ..const import const
 
 logger = logging.getLogger(__name__)
-# PARENT_MODULE_NAME, _, _ = __name__.rpartition(".")
-# PARENT_MODULE = sys.modules.get(PARENT_MODULE_NAME)
 
 
 class DataQuery:
@@ -41,9 +39,7 @@ class DataQuery:
         """
         suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
 
-        # if isinstance(input_ids, AllStructures):
-        #     all_input_ids = input_ids.getAllIds(input_type)
-        if input_ids != getattr(PARENT_MODULE, "_all_structures"):
+        if not isinstance(input_ids, AllStructures):
             if isinstance(input_ids, list):
                 if len(input_ids) > config.INPUT_ID_LIMIT:
                     logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
@@ -79,14 +75,8 @@ class DataQuery:
             Tuple[str, List[str]]: returns a tuple of converted input_type and list of input_ids
         """
         # If input_ids is ALL_STRUCTURES, return appropriate list of ids
-        all_structures = getattr(PARENT_MODULE, "_all_structures")
-        # if isinstance(input_ids, AllStructures):
-        if input_ids == all_structures:
-            new_input_ids = []
-            if input_type in all_structures:
-                new_input_ids = all_structures[input_type]
-            else:
-                raise ValueError(f"ALL_STRUCTURES is not yet available for {input_type}")
+        if isinstance(input_ids, AllStructures):
+            new_input_ids = input_ids.get_all_ids(input_type)
             return (input_type, new_input_ids)
 
         # Convert _input_type to plural if applicable
@@ -264,7 +254,7 @@ class AllStructures:
     def __init__(self):
         self.ALL_STRUCTURES = self.reload()
 
-    def reload(self):
+    def reload(self) -> dict[str, List[str]]:
         ALL_STRUCTURES = {}
         for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
             all_ids: List[str] = []
@@ -278,5 +268,8 @@ class AllStructures:
 
         return ALL_STRUCTURES
 
-    def getAllIds(self, input_type):
-        return self.ALL_STRUCTURES[input_type]
+    def get_all_ids(self, input_type) -> List[str]:
+        if input_type in self.ALL_STRUCTURES:
+            return self.ALL_STRUCTURES[input_type]
+        else:
+            raise ValueError(f"ALL_STRUCTURES is not yet available for {input_type}")
