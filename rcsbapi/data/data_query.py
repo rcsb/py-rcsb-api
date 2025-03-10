@@ -1,9 +1,9 @@
 import logging
-import sys
 import urllib.parse
 import re
 import time
 from typing import Any, Union, List, Dict, Optional, Tuple
+import json
 import requests
 from tqdm import tqdm
 from rcsbapi.data import DATA_SCHEMA
@@ -11,8 +11,8 @@ from ..config import config
 from ..const import const
 
 logger = logging.getLogger(__name__)
-PARENT_MODULE_NAME, _, _ = __name__.rpartition(".")
-PARENT_MODULE = sys.modules.get(PARENT_MODULE_NAME)
+# PARENT_MODULE_NAME, _, _ = __name__.rpartition(".")
+# PARENT_MODULE = sys.modules.get(PARENT_MODULE_NAME)
 
 
 class DataQuery:
@@ -41,6 +41,8 @@ class DataQuery:
         """
         suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
 
+        # if isinstance(input_ids, AllStructures):
+        #     all_input_ids = input_ids.getAllIds(input_type)
         if input_ids != getattr(PARENT_MODULE, "_all_structures"):
             if isinstance(input_ids, list):
                 if len(input_ids) > config.INPUT_ID_LIMIT:
@@ -78,6 +80,7 @@ class DataQuery:
         """
         # If input_ids is ALL_STRUCTURES, return appropriate list of ids
         all_structures = getattr(PARENT_MODULE, "_all_structures")
+        # if isinstance(input_ids, AllStructures):
         if input_ids == all_structures:
             new_input_ids = []
             if input_type in all_structures:
@@ -255,3 +258,25 @@ class DataQuery:
         combined_response = merge_into_response
         combined_response["data"][self._input_type] += to_merge_response["data"][self._input_type]
         return combined_response
+
+
+class AllStructures:
+    def __init__(self):
+        self.ALL_STRUCTURES = self.reload()
+
+    def reload(self):
+        ALL_STRUCTURES = {}
+        for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
+            all_ids: List[str] = []
+            for endpoint in endpoints:
+                response = requests.get(endpoint, timeout=60)
+                if response.status_code == 200:
+                    all_ids.extend(json.loads(response.text))
+                else:
+                    response.raise_for_status()
+                ALL_STRUCTURES[input_type] = all_ids
+
+        return ALL_STRUCTURES
+
+    def getAllIds(self, input_type):
+        return self.ALL_STRUCTURES[input_type]
