@@ -65,6 +65,118 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "pdbx_vrpt_summary_entity_fit_to_map": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "PDB_model_num": {
+                        "type": "integer",
+                        "description": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                        "rcsb_description": [
+                            {
+                                "text": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Q_score": {
+                        "type": "number",
+                        "description": "The calculated average Q-score.",
+                        "rcsb_description": [
+                            {
+                                "text": "The calculated average Q-score.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "average_residue_inclusion": {
+                        "type": "number",
+                        "description": "The average of the residue inclusions for all residues in this instance",
+                        "rcsb_description": [
+                            {
+                                "text": "The average of the residue inclusions for all residues in this instance",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "pdbx_vrpt_summary_entity_geometry": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "PDB_model_num": {
+                        "type": "integer",
+                        "description": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                        "rcsb_description": [
+                            {
+                                "text": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "angles_RMSZ": {
+                        "type": "number",
+                        "description": "The overall root mean square of the Z-score for deviations of bond angles in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall root mean square of the Z-score for deviations of bond angles in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "average_residue_inclusion": {
+                        "type": "number",
+                        "description": "The average of the residue inclusions for all residues in this instance",
+                        "rcsb_description": [
+                            {
+                                "text": "The average of the residue inclusions for all residues in this instance",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "bonds_RMSZ": {
+                        "type": "number",
+                        "description": "The overall root mean square of the Z-score for deviations of bond lengths in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall root mean square of the Z-score for deviations of bond lengths in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_angles_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond angles compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond angles compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_bonds_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond lengths compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond lengths compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
         "rcsb_nonpolymer_entity_instance_container_identifiers": {
             "type": "object",
             "properties": {
@@ -309,7 +421,9 @@
                         "enum": [
                             "HAS_COVALENT_LINKAGE",
                             "HAS_METAL_COORDINATION_LINKAGE",
-                            "HAS_NO_COVALENT_LINKAGE"
+                            "HAS_NO_COVALENT_LINKAGE",
+                            "IS_RSCC_OUTLIER",
+                            "IS_RSRZ_OUTLIER"
                         ],
                         "examples": [
                             "HAS_COVALENT_LINKAGE"
@@ -334,6 +448,16 @@
                                 "value": "HAS_NO_COVALENT_LINKAGE",
                                 "detail": "Ligands with no inter-molecular covalent interactions, but may be involved in metal coordination or other non-bonded interactions",
                                 "name": "Has No Covalent Linkage"
+                            },
+                            {
+                                "value": "IS_RSCC_OUTLIER",
+                                "detail": "Non-polymer is a real space density correlation value outlier (< 0.65)",
+                                "name": "Real space density correlation value outlier"
+                            },
+                            {
+                                "value": "IS_RSRZ_OUTLIER",
+                                "detail": "Non-polymer is a real space R-value Z score outlier (> 2)",
+                                "name": "Real space R-value Z score outlier"
                             }
                         ],
                         "rcsb_description": [
@@ -568,11 +692,17 @@
                         "enum": [
                             "HAS_COVALENT_LINKAGE",
                             "HAS_METAL_COORDINATION_LINKAGE",
+                            "MODELED_ATOMS",
                             "MOGUL_ANGLE_OUTLIER",
+                            "MOGUL_ANGLE_OUTLIERS",
                             "MOGUL_BOND_OUTLIER",
+                            "MOGUL_BOND_OUTLIERS",
+                            "MOGUL_RING_OUTLIERS",
+                            "MOGUL_TORSION_OUTLIERS",
                             "RSCC_OUTLIER",
                             "RSRZ_OUTLIER",
-                            "STEREO_OUTLIER"
+                            "STEREO_OUTLIER",
+                            "STEREO_OUTLIERS"
                         ],
                         "examples": [
                             "RSRZ_OUTLIER",
@@ -589,12 +719,32 @@
                                 "detail": "Has a metal coordination attachment"
                             },
                             {
+                                "value": "MODELED_ATOMS",
+                                "detail": "Number of modeled atoms"
+                            },
+                            {
                                 "value": "MOGUL_ANGLE_OUTLIER",
                                 "detail": "Mogul bond angle outlier"
                             },
                             {
+                                "value": "MOGUL_ANGLE_OUTLIERS",
+                                "detail": "Number of angle outliers as reported by MOGUL"
+                            },
+                            {
                                 "value": "MOGUL_BOND_OUTLIER",
                                 "detail": "Mogul bond distance outlier"
+                            },
+                            {
+                                "value": "MOGUL_BOND_OUTLIERS",
+                                "detail": "Number of bond outliers as reported by MOGUL"
+                            },
+                            {
+                                "value": "MOGUL_RING_OUTLIERS",
+                                "detail": "Number of ring outliers as reported by MOGUL"
+                            },
+                            {
+                                "value": "MOGUL_TORSION_OUTLIERS",
+                                "detail": "Number of torsion outliers as reported by MOGUL"
                             },
                             {
                                 "value": "RSCC_OUTLIER",
@@ -607,6 +757,10 @@
                             {
                                 "value": "STEREO_OUTLIER",
                                 "detail": "Stereochemical/chirality outlier"
+                            },
+                            {
+                                "value": "STEREO_OUTLIERS",
+                                "detail": "Number of stereo outliers"
                             }
                         ],
                         "rcsb_description": [
@@ -791,10 +945,6 @@
                     "comp_id": {
                         "type": "string",
                         "description": "Component identifier for non-polymer entity instance.",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_full_text_priority": 10,
                         "rcsb_description": [
                             {
                                 "text": "Component identifier for non-polymer entity instance.",
@@ -805,17 +955,24 @@
                     "count": {
                         "type": "integer",
                         "description": "The feature count.",
-                        "rcsb_search_context": [
-                            "default-match"
-                        ],
                         "rcsb_description": [
                             {
                                 "text": "The feature count.",
                                 "context": "dictionary"
-                            },
+                            }
+                        ]
+                    },
+                    "coverage": {
+                        "type": "number",
+                        "examples": [
+                            0.5,
+                            0.95
+                        ],
+                        "description": "The fractional feature coverage relative to the full entity sequence.",
+                        "rcsb_description": [
                             {
-                                "text": "Feature Count",
-                                "context": "brief"
+                                "text": "The fractional feature coverage relative to the full entity sequence.",
+                                "context": "dictionary"
                             }
                         ]
                     },
@@ -872,21 +1029,23 @@
                         "enum": [
                             "HAS_COVALENT_LINKAGE",
                             "HAS_METAL_COORDINATION_LINKAGE",
+                            "MODELED_ATOMS",
                             "MOGUL_ANGLE_OUTLIER",
+                            "MOGUL_ANGLE_OUTLIERS",
                             "MOGUL_BOND_OUTLIER",
+                            "MOGUL_BOND_OUTLIERS",
+                            "MOGUL_RING_OUTLIERS",
+                            "MOGUL_TORSION_OUTLIERS",
                             "RSCC_OUTLIER",
                             "RSRZ_OUTLIER",
-                            "STEREO_OUTLIER"
+                            "STEREO_OUTLIER",
+                            "STEREO_OUTLIERS"
                         ],
                         "examples": [
                             "RSRZ_OUTLIER",
                             "MOGUL_BOND_OUTLIER"
                         ],
                         "description": "Type or category of the feature.",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_full_text_priority": 10,
                         "rcsb_enum_annotated": [
                             {
                                 "value": "HAS_COVALENT_LINKAGE",
@@ -897,12 +1056,32 @@
                                 "detail": "Has a metal coordination attachment"
                             },
                             {
+                                "value": "MODELED_ATOMS",
+                                "detail": "Number of modeled atoms"
+                            },
+                            {
                                 "value": "MOGUL_ANGLE_OUTLIER",
                                 "detail": "Mogul bond angle outlier"
                             },
                             {
+                                "value": "MOGUL_ANGLE_OUTLIERS",
+                                "detail": "Number of angle outliers as reported by MOGUL"
+                            },
+                            {
                                 "value": "MOGUL_BOND_OUTLIER",
                                 "detail": "Mogul bond distance outlier"
+                            },
+                            {
+                                "value": "MOGUL_BOND_OUTLIERS",
+                                "detail": "Number of bond outliers as reported by MOGUL"
+                            },
+                            {
+                                "value": "MOGUL_RING_OUTLIERS",
+                                "detail": "Number of ring outliers as reported by MOGUL"
+                            },
+                            {
+                                "value": "MOGUL_TORSION_OUTLIERS",
+                                "detail": "Number of torsion outliers as reported by MOGUL"
                             },
                             {
                                 "value": "RSCC_OUTLIER",
@@ -915,16 +1094,16 @@
                             {
                                 "value": "STEREO_OUTLIER",
                                 "detail": "Stereochemical/chirality outlier"
+                            },
+                            {
+                                "value": "STEREO_OUTLIERS",
+                                "detail": "Number of stereo outliers"
                             }
                         ],
                         "rcsb_description": [
                             {
                                 "text": "Type or category of the feature.",
                                 "context": "dictionary"
-                            },
-                            {
-                                "text": "Feature Type",
-                                "context": "brief"
                             }
                         ]
                     }
@@ -932,88 +1111,7 @@
                 "additionalProperties": false
             },
             "minItems": 1,
-            "uniqueItems": true,
-            "rcsb_nested_indexing": true,
-            "rcsb_nested_indexing_context": [
-                {
-                    "category_name": "feature_summary",
-                    "category_path": "rcsb_nonpolymer_instance_feature_summary.type",
-                    "context_attributes": [
-                        {
-                            "context_value": "HAS_COVALENT_LINKAGE",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        1,
-                                        5
-                                    ],
-                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "HAS_METAL_COORDINATION_LINKAGE",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        1,
-                                        5
-                                    ],
-                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "MOGUL_ANGLE_OUTLIER",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        1,
-                                        5
-                                    ],
-                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "MOGUL_BOND_OUTLIER",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        1,
-                                        5
-                                    ],
-                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "RSCC_OUTLIER",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        1,
-                                        5
-                                    ],
-                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "RSRZ_OUTLIER",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        1,
-                                        5
-                                    ],
-                                    "path": "rcsb_nonpolymer_instance_feature_summary.count"
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
+            "uniqueItems": true
         },
         "rcsb_nonpolymer_instance_validation_score": {
             "type": "array",
@@ -1240,14 +1338,14 @@
                             7.22,
                             1.16
                         ],
-                        "description": "The root-mean-square value of the Z-scores of bond angles for the residue in degrees\nobtained from a CCDC Mogul survey of bond angles in the CSD small molecule crystal structure database.",
+                        "description": "The root-mean-square value of the Z-scores of bond angles for the non-polymer instance in degrees\nobtained from a CCDC Mogul survey of bond angles in the CSD small molecule crystal structure database.",
                         "rcsb_search_context": [
                             "default-match"
                         ],
                         "rcsb_units": "degrees",
                         "rcsb_description": [
                             {
-                                "text": "The root-mean-square value of the Z-scores of bond angles for the residue in degrees\nobtained from a CCDC Mogul survey of bond angles in the CSD small molecule crystal structure database.",
+                                "text": "The root-mean-square value of the Z-scores of bond angles for the non-polymer instance in degrees\nobtained from a CCDC Mogul survey of bond angles in the CSD small molecule crystal structure database.",
                                 "context": "dictionary"
                             },
                             {
@@ -1279,19 +1377,49 @@
                             0.69,
                             1.32
                         ],
-                        "description": "The root-mean-square value of the Z-scores of bond lengths for the residue in Angstroms\nobtained from a CCDC Mogul survey of bond lengths in the CSD small molecule crystal structure database.",
+                        "description": "The root-mean-square value of the Z-scores of bond lengths for the nonpolymer instance in Angstroms\nobtained from a CCDC Mogul survey of bond lengths in the CSD small molecule crystal structure database.",
                         "rcsb_search_context": [
                             "default-match"
                         ],
                         "rcsb_units": "angstroms",
                         "rcsb_description": [
                             {
-                                "text": "The root-mean-square value of the Z-scores of bond lengths for the residue in Angstroms\nobtained from a CCDC Mogul survey of bond lengths in the CSD small molecule crystal structure database.",
+                                "text": "The root-mean-square value of the Z-scores of bond lengths for the nonpolymer instance in Angstroms\nobtained from a CCDC Mogul survey of bond lengths in the CSD small molecule crystal structure database.",
                                 "context": "dictionary"
                             },
                             {
                                 "text": "Root-Mean-Aquare Value of the Z-scores for Bond Distances",
                                 "context": "brief"
+                            }
+                        ]
+                    },
+                    "natoms_eds": {
+                        "type": "integer",
+                        "description": "The number of atoms in the non-polymer instance returned by the EDS software.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of atoms in the non-polymer instance returned by the EDS software.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_mogul_angles_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond angles compared to \"standard geometry\" made using the Mogul program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond angles compared to \"standard geometry\" made using the Mogul program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_mogul_bonds_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond lengths compared to \"standard geometry\" made using the Mogul program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond lengths compared to \"standard geometry\" made using the Mogul program.",
+                                "context": "dictionary"
                             }
                         ]
                     },
@@ -2055,5 +2183,5 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Core Nonpolymer Entity Instance",
     "description": "JSON schema for nonpolymer entity instance core.",
-    "$comment": "schema_version: 10.0.0"
+    "$comment": "schema_version: 10.0.1"
 }

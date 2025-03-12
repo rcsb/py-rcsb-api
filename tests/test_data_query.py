@@ -26,9 +26,10 @@ import time
 import unittest
 import requests
 
-from rcsbapi.search import rcsb_attributes as attrs
+from rcsbapi.search import search_attributes as attrs
 from rcsbapi.data import DataSchema, DataQuery
-from rcsbapi.config import ApiSettings
+from rcsbapi.config import config
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -59,6 +60,38 @@ class QueryTests(unittest.TestCase):
             query_obj.exec()
             # assert that the batch and merge functions are called
             # assert len of results is same as num of input ids
+
+    def testLowercaseIds(self):
+        with self.subTest(msg="1. List of IDs"):
+            try:
+                query_obj = DataQuery(input_type="entries", input_ids=["4hhb"], return_data_list=["exptl.method"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="2. Dictionary of IDs"):
+            try:
+                query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": ["4hhb", "1iye"]}, return_data_list=["exptl"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="2. IDs with separators"):
+            try:
+                query_obj = DataQuery(input_type="interfaces", input_ids=["4hhb-1.1"], return_data_list=["rcsb_interface_info.interface_area"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="3. Pubmed IDs"):
+            try:
+                query_obj = DataQuery(input_type="pubmed", input_ids=["6726807"], return_data_list=["rcsb_pubmed_doi"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="3. UniProt IDs"):
+            try:
+                query_obj = DataQuery(input_type="uniprot", input_ids=["p68871"], return_data_list=["rcsb_id"])
+                query_obj.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
 
     def testParseGQLError(self):
         pass
@@ -288,7 +321,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=ApiSettings.API_ENDPOINT.value, timeout=ApiSettings.TIMEOUT.value).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. Making Queries"):
             try:
@@ -395,14 +428,43 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
+    def testAllStructures(self):
+        from rcsbapi.data import ALL_STRUCTURES
+
+        with self.subTest("1. Test entries ALL_STRUCTURES"):
+            try:
+                data_query = DataQuery(
+                    input_type="entries",
+                    input_ids=ALL_STRUCTURES,
+                    return_data_list=["exptl.method"],
+                )
+                data_query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest("2. Test chem_comps ALL_STRUCTURES"):
+            try:
+                data_query = DataQuery(
+                    input_type="chem_comps",
+                    input_ids=ALL_STRUCTURES,
+                    return_data_list=["chem_comps.rcsb_id"],
+                )
+                data_query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
 
 def buildQuery():
     suiteSelect = unittest.TestSuite()
+    suiteSelect.addTest(QueryTests("testGetEditorLink"))
+    suiteSelect.addTest(QueryTests("testExec"))
+    suiteSelect.addTest(QueryTests("testLowercaseIds"))
     suiteSelect.addTest(QueryTests("testBatchIDs"))
     suiteSelect.addTest(QueryTests("testDocs"))
     suiteSelect.addTest(QueryTests("testAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
     suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
 
 

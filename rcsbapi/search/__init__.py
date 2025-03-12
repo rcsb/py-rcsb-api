@@ -1,13 +1,14 @@
 """RCSB PDB Search API"""
 
 from typing import List
-# from .search_query import Terminal, Group, SearchQuery, SEARCH_SCHEMA  # noqa: F401
 from .search_query import SEARCH_SCHEMA  # noqa: F401
 from .search_query import Attr, AttributeQuery, TextQuery
-from .search_query import SequenceQuery, SeqMotifQuery, ChemSimilarityQuery, StructSimilarityQuery, StructureMotifResidue, StructMotifQuery
-from .search_query import Facet, Range, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
+from .search_query import SeqSimilarityQuery, SeqMotifQuery, ChemSimilarityQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
+from .search_query import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
+from .search_query import Group
 
-rcsb_attributes = SEARCH_SCHEMA.rcsb_attributes
+search_attributes = SEARCH_SCHEMA.search_attributes
+group = Group.group
 
 
 def __dir__() -> List[str]:
@@ -15,21 +16,18 @@ def __dir__() -> List[str]:
 
 
 __all__ = [
-    # "SearchQuery",
-    # "Group",
-    "rcsb_attributes",
+    "search_attributes",
     "Attr",
-    # "Terminal",
     "TextQuery",
     "AttributeQuery",
-    "SequenceQuery",
+    "SeqSimilarityQuery",
     "SeqMotifQuery",
     "ChemSimilarityQuery",
     "StructSimilarityQuery",
-    "StructureMotifResidue",  # Change this to StructMotifResidue
+    "StructMotifResidue",
     "StructMotifQuery",
     "Facet",
-    "Range",  # Rename to prevent overlap?
+    "FacetRange",
     "TerminalFilter",
     "GroupFilter",
     "FilterFacet",

@@ -1,7 +1,6 @@
 API Documentation
 *****************
 
-.. automodule:: rcsbapi.data.data_query
+.. automodule:: rcsbapi.data
     :members:
-    :private-members:
     :special-members: __init__

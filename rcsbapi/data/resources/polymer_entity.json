@@ -3380,7 +3380,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "ID(s) and Keywords",
-                                        "priority_order": 30
+                                        "priority_order": 40
                                     }
                                 ]
                             },

@@ -2,15 +2,17 @@
 
 Provides access to all valid attributes for search queries.
 """
-
+import os
 import json
 import logging
-import pkgutil
+from pathlib import Path
 import re
 import warnings
 from typing import List, Union
 import requests
-from ..const import Const
+from ..const import const
+
+logger = logging.getLogger(__name__)
 
 
 class SearchSchemaGroup:
@@ -62,12 +64,12 @@ class SearchSchemaGroup:
 
         return leaves(self, self.Attr)
 
-    def get_attribute_details(self, attribute: str) -> str:
+    def get_attribute_details(self, attribute: str):
         """Return attribute information given full or partial attribute name
 
         Args:
             attribute (str): Full attribute name
-                ex: "rcsb_id", "rcsb_entity_source_organism.scientific_name"
+                (e.g., "rcsb_id", "rcsb_entity_source_organism.scientific_name")
 
         Returns:
             str: Return corresponding attribute description if there's a match
@@ -87,7 +89,7 @@ class SearchSchemaGroup:
                 warnings.warn(f"Attribute path segment '{level}' (for input '{attribute}') not found in schema.", UserWarning)
                 return None
             ptr = ptr[level]
-        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SchemaGroup and Attr are compared as dictionaries
+        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SearchSchemaGroup and Attr are compared as dictionaries
             return ptr
         else:
             return {c for c in leaves(ptr)}
@@ -97,7 +99,7 @@ class SearchSchemaGroup:
 
         Args:
             attribute (str): Full attribute name
-                ex: "rcsb_id", "rcsb_entity_source_organism.scientific_name"
+                (e.g., "rcsb_id", "rcsb_entity_source_organism.scientific_name")
 
         Returns:
             Union[str, None]: Return search service if there's a match.
@@ -112,12 +114,12 @@ class SearchSchemaGroup:
                 warnings.warn(f"Attribute path segment '{level}' (for input '{attribute}') not found in schema.", UserWarning)
                 return None
             ptr = ptr[level]
-        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SchemaGroup and Attr are compared as dictionaries
+        if "attribute" in ptr.__dict__ and getattr(ptr, "attribute") == attribute:  # must be .__dict__ so both SearchSchemaGroup and Attr are compared as dictionaries
             return getattr(ptr, "type")
-        warnings.warn(f"Incomplete attribute path '{attribute}' - must specify fully-qualified path to leaf attribute node.", UserWarning)
+        warnings.warn(f"Incomplete attribute path '{attribute}' - must specify fully qualified path to leaf attribute node.", UserWarning)
         return None
 
-    # Below methods are for making SchemaGroup behave as a Dict (be able to access through keys, etc).
+    # Below methods are for making SearchSchemaGroup behave as a Dict (be able to access through keys, etc).
     # This is used for automatically determining search service based on attribute name.
 
     def __getitem__(self, key):
@@ -160,10 +162,10 @@ class SearchSchema:
         refetch=True,
         use_fallback=True,
         reload=True,
-        struct_attr_schema_url=Const.STRUCTURE_ATTRIBUTE_SCHEMA_URL.value,
-        struct_attr_schema_file=Const.STRUCTURE_ATTRIBUTE_SCHEMA_FILE.value,
-        chem_attr_schema_url=Const.CHEMICAL_ATTRIBUTE_SCHEMA_URL.value,
-        chem_attr_schema_file=Const.CHEMICAL_ATTRIBUTE_SCHEMA_FILE.value,
+        struct_attr_schema_url=const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL,
+        struct_attr_schema_file=os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME),
+        chem_attr_schema_url=const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL,
+        chem_attr_schema_file=os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME),
     ):
         """Initialize SearchSchema object with all known RCSB PDB attributes.
 
@@ -171,28 +173,28 @@ class SearchSchema:
         strings. For example,
         ::
 
-            rcsb_attributes.rcsb_nonpolymer_instance_feature_summary.chem_id
+            search_attributes.rcsb_nonpolymer_instance_feature_summary.chem_id
 
         is equivalent to
         ::
 
             Attr('rcsb_nonpolymer_instance_feature_summary.chem_id')
 
-        All attributes in `rcsb_attributes` can be iterated over.
+        All attributes in `search_attributes` can be iterated over.
 
-            >>> [a for a in rcsb_attributes if "stoichiometry" in a.attribute]
+            >>> [a for a in search_attributes if "stoichiometry" in a.attribute]
             [Attr(attribute='rcsb_struct_symmetry.stoichiometry')]
 
         Attributes matching a regular expression can also be filtered:
 
-            >>> list(rcsb_attributes.search('rcsb.*stoichiometry'))
+            >>> list(search_attributes.search('rcsb.*stoichiometry'))
             [Attr(attribute='rcsb_struct_symmetry.stoichiometry')]a
         """
         self.Attr = attr_type
         if reload:
             self.struct_schema = self._reload_schema(struct_attr_schema_url, struct_attr_schema_file, refetch, use_fallback)
             self.chem_schema = self._reload_schema(chem_attr_schema_url, chem_attr_schema_file, refetch, use_fallback)
-        self.rcsb_attributes = self._make_schema_group()
+        self.search_attributes = self._make_schema_group()
 
     def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=True):
         sD = {}
@@ -203,25 +205,27 @@ class SearchSchema:
         return sD
 
     def _make_schema_group(self) -> SearchSchemaGroup:
-        schemas = [(self.struct_schema, Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value, ""), (self.chem_schema, Const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value, "")]
+        schemas = [(self.struct_schema, const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE, ""), (self.chem_schema, const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE, "")]
         schema = self._make_group("", schemas)
         assert isinstance(schema, SearchSchemaGroup)  # for type checking
         return schema
 
     def _fetch_schema(self, url: str):
         "Request the current schema from the web"
-        logging.info("Requesting %s", url)
+        logger.info("Requesting %s", url)
         response = requests.get(url, timeout=None)
         if response.status_code == 200:
             return response.json()
         else:
-            logging.debug("HTTP response status code %r", response.status_code)
+            logger.debug("HTTP response status code %r", response.status_code)
             return None
 
     def _load_json_schema(self, schema_file):
-        logging.info("Loading attribute schema from file")
-        latest = pkgutil.get_data(__package__, schema_file)
-        return json.loads(latest)
+        logger.info("Loading attribute schema from file")
+        path = Path(__file__).parent.parent.joinpath(schema_file)
+        with open(path, "r", encoding="utf-8") as file:
+            latest = json.load(file)
+        return latest
 
     def _make_group(self, fullname: str, nodeL: List):
         """Represent this node of the schema as a python object
@@ -230,7 +234,7 @@ class SearchSchema:
         - name: full dot-separated attribute name
 
         Returns:
-        An Attr (Leaf nodes) or SchemaGroup (object nodes)
+        An Attr (Leaf nodes) or SearchSchemaGroup (object nodes)
         """
         group = SearchSchemaGroup(self.Attr)
         for node, attrtype, desc in nodeL:
@@ -276,10 +280,10 @@ class SearchSchema:
                         childgroup = self._make_group(fullchildname, [(childnode, attrlist, descriptlist)])
                     else:
                         childgroup = self._make_group(fullchildname, [(childnode, attrtype, childnode.get("description", desc))])
-                    # adding to SchemaGroup as a dict allows for determining search service by attribute name with O(1) lookup
+                    # adding to SearchSchemaGroup as a dict allows for determining search service by attribute name with O(1) lookup
                     group[childname] = childgroup
 
-                    # adding to SchemaGroup as an attribute allows for tab-completion for rcsb_attributes/attrs
+                    # adding to SearchSchemaGroup as an attribute allows for tab-completion for search_attributes/attrs
                     setattr(group, childname, childgroup)
             else:
                 raise TypeError(f"Unrecognized node type {node['type']!r} of {fullname}")

@@ -25,10 +25,11 @@ import unittest
 import os
 from itertools import islice
 import requests
-from rcsbapi.const import Const
-from rcsbapi.search import rcsb_attributes as attrs
-from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SequenceQuery, SeqMotifQuery, StructSimilarityQuery, StructureMotifResidue, StructMotifQuery
-from rcsbapi.search import Facet, Range, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
+from rcsbapi.const import const
+from rcsbapi.search import search_attributes as attrs
+from rcsbapi.search import group
+from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
+from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group
 
 logger = logging.getLogger(__name__)
@@ -96,8 +97,7 @@ class SearchTests(unittest.TestCase):
         logger.info("Single query test results: ok : (%r)", ok)
 
     def testIquery(self):
-        """Tests the iquery function, which evaluates a query with a progress bar.
-        The progress bar requires tqdm to run. """
+        """Tests the iquery function, which evaluates a query with a progress bar."""
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
         session = Session(q1)
         result = session.iquery()
@@ -129,14 +129,14 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Inversion test results: ok : (%r)", ok)
         # Test that seqqueries fail as intended:
-        q4 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q4 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
         ok = False
         try:
             _ = ~q4
         except TypeError:
             ok = True
         self.assertTrue(ok)
-        logger.info("Inversion failed on SequenceQuery: ok : (%r)", ok)
+        logger.info("Inversion failed on SeqSimilarityQuery: ok : (%r)", ok)
 
     def testXor(self):
         """Test the overloaded XOR operator in a query. """
@@ -152,8 +152,8 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Xor test results: ok : (%r)", ok)
         # Test that xor fails when used for seqqueries
-        q4 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
-        q5 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q4 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q5 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
         ok = False
         try:
             _ = q4 ^ q5  # this should fail as xor is not supported behavior for seq queries
@@ -227,9 +227,9 @@ class SearchTests(unittest.TestCase):
 
         # Fluent syntax
         query2 = TextQuery("heat-shock transcription factor").and_(AttributeQuery(attribute="rcsb_struct_symmetry.symbol", operator="exact_match", value="C2")
-                                                                   .and_("rcsb_struct_symmetry.kind", Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value)
+                                                                   .and_("rcsb_struct_symmetry.kind", const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE)
                                                                    .exact_match("Global Symmetry")
-                                                                   .and_("rcsb_entry_info.polymer_entity_count_DNA", Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value)
+                                                                   .and_("rcsb_entry_info.polymer_entity_count_DNA", const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE)
                                                                    .greater_or_equal(1))
         ok = query2 == query
         self.assertTrue(ok)
@@ -364,6 +364,342 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Partial Query results: ok: (%r)", ok)
 
+    def testAttributeAndTextGroups(self):
+        with self.subTest("1. Grouping should not affect results (and)"):
+            q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Homo sapiens"
+            q2 = attrs.exptl.method == "X-RAY DIFFRACTION"
+            q3 = attrs.rcsb_entry_info.resolution_combined >= 1
+            q4 = attrs.rcsb_entry_info.resolution_combined <= 2
+
+            query = q1 & q2 & q3 & q4
+            len_query = len(list(query()))
+
+            # test different groupings
+            grouped_1 = group(q1 & q2) & q3 & q4
+            len_grouped_1 = len(list(grouped_1()))
+            self.assertEqual(len_query, len_grouped_1)
+
+            grouped_2 = q1 & group(q2 & q3) & q4
+            len_grouped_2 = len(list(grouped_2()))
+            self.assertEqual(len_query, len_grouped_2)
+
+            grouped_3 = q1 & q2 & group(q3 & q4)
+            len_grouped_3 = len(list(grouped_3()))
+            self.assertEqual(len_query, len_grouped_3)
+
+            grouped_4 = group(q1 & q2 & q3) & q4
+            len_grouped_4 = len(list(grouped_4()))
+            self.assertEqual(len_query, len_grouped_4)
+
+        with self.subTest("2. Grouping should not affect results (or)"):
+            q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Homo sapiens"
+            q2 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Gallus gallus"
+            q3 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Arabidopsis thaliana"
+            q4 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Mus musculus"
+
+            query = q1 | q2 | q3 | q4
+            len_query = len(list(query()))
+
+            # test different groupings
+            grouped_1 = group(q1 | q2) | q3 | q4
+            len_grouped_1 = len(list(grouped_1()))
+            self.assertEqual(len_query, len_grouped_1)
+
+            grouped_2 = q1 | group(q2 | q3) | q4
+            len_grouped_2 = len(list(grouped_2()))
+            self.assertEqual(len_query, len_grouped_2)
+
+            grouped_3 = q1 | q2 | group(q3 | q4)
+            len_grouped_3 = len(list(grouped_3()))
+            self.assertEqual(len_query, len_grouped_3)
+
+            grouped_4 = group(q1 | q2 | q3) | q4
+            len_grouped_4 = len(list(grouped_4()))
+            self.assertEqual(len_query, len_grouped_4)
+
+        with self.subTest("3. Grouping should not affect results (mixed)"):
+            q1 = TextQuery("interleukin")
+            q2 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q3 = attrs.drugbank_info.drug_groups == "investigational"
+            q4 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query = q1 & q2 & (q3 | q4)
+            len_query = len(list(query()))
+
+            grouped_1 = q1 & q2 & group(q3 | q4)
+            len_grouped_1 = len(list(grouped_1()))
+            self.assertEqual(len_query, len_grouped_1)
+
+            grouped_2 = group(q1 & q2) & group(q3 | q4)
+            len_grouped_2 = len(list(grouped_2()))
+            self.assertEqual(len_query, len_grouped_2)
+
+        with self.subTest("4. Grouping should affect results"):
+            q1 = AttributeQuery("rcsb_binding_affinity.type", "exact_match", "EC50")
+            q2 = AttributeQuery("rcsb_binding_affinity.value", "equals", 2.0)
+            q3 = AttributeQuery("rcsb_entry_info.selected_polymer_entity_types", "exists")
+            q4 = AttributeQuery("rcsb_nonpolymer_entity_container_identifiers.nonpolymer_comp_id", "exists")
+
+            query = q1 & q2 & q3 & q4
+            grouped = group(q1 & q2) & q3 & q4
+
+            len_query = len(list(query()))
+            len_grouped = len(list(grouped()))
+
+            self.assertNotEqual(len_query, len_grouped)
+
+        with self.subTest("5. Check `and` groups are formed correctly"):
+            q1 = TextQuery("interleukin")
+            q2 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q3 = attrs.drugbank_info.drug_groups == "investigational"
+            q4 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query_1 = group(q1 & q2) & q3 & q4
+            len_group_1 = len(query_1.nodes[0].nodes)
+            self.assertEqual(len_group_1, 2)
+            self.assertEqual(len(query_1.nodes), 3)
+
+            query_2 = q1 & group(q2 & q3) & q4
+            len_group_2 = len(query_2.nodes[1].nodes)
+            self.assertEqual(len_group_2, 2)
+            self.assertEqual(len(query_2.nodes), 3)
+
+            query_3 = q1 & q2 & group(q3 & q4)
+            len_group_3 = len(query_3.nodes[2].nodes)
+            self.assertEqual(len_group_3, 2)
+            self.assertEqual(len(query_3.nodes), 3)
+
+            query_4 = group(q1 & q2) & group(q3 & q4)
+            len_group_4 = len(query_4.nodes[0].nodes)
+            self.assertEqual(len_group_4, 2)
+            len_group_4 = len(query_4.nodes[1].nodes)
+            self.assertEqual(len_group_4, 2)
+            self.assertEqual(len(query_4.nodes), 2)
+
+            query_5 = group(q1 & q2 & q3) & q4
+            len_group_5 = len(query_5.nodes[0].nodes)
+            self.assertEqual(len_group_5, 3)
+            self.assertEqual(len(query_5.nodes), 2)
+
+        with self.subTest("6. Check `or` groups are formed correctly"):
+            q1 = TextQuery("interleukin")
+            q2 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q3 = attrs.drugbank_info.drug_groups == "investigational"
+            q4 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query_1 = group(q1 | q2) | q3 | q4
+            len_group_1 = len(query_1.nodes[0].nodes)
+            self.assertEqual(len_group_1, 2)
+            self.assertEqual(len(query_1.nodes), 3)
+
+            query_2 = q1 | group(q2 | q3) | q4
+            len_group_2 = len(query_2.nodes[1].nodes)
+            self.assertEqual(len_group_2, 2)
+            self.assertEqual(len(query_2.nodes), 3)
+
+            query_3 = q1 | q2 | group(q3 | q4)
+            len_group_3 = len(query_3.nodes[2].nodes)
+            self.assertEqual(len_group_3, 2)
+            self.assertEqual(len(query_3.nodes), 3)
+
+            query_4 = group(q1 | q2) | group(q3 | q4)
+            len_group_4 = len(query_4.nodes[0].nodes)
+            self.assertEqual(len_group_4, 2)
+            len_group_4 = len(query_4.nodes[1].nodes)
+            self.assertEqual(len_group_4, 2)
+            self.assertEqual(len(query_4.nodes), 2)
+
+            query_5 = group(q1 | q2 | q3) | q4
+            len_group_5 = len(query_5.nodes[0].nodes)
+            self.assertEqual(len_group_5, 3)
+            self.assertEqual(len(query_5.nodes), 2)
+
+        with self.subTest("7. Check `not` groups are formed correctly"):
+            q1 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q2 = attrs.drugbank_info.drug_groups == "investigational"
+            q3 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query_1 = ~group(q1 | q2)
+            self.assertEqual(query_1.operator, "and")
+
+            query_2 = ~group(q1 | group(q2 | q3))
+            self.assertEqual(query_2.operator, "and")
+            self.assertEqual(query_2.nodes[1].operator, "and")
+            self.assertEqual(len(query_2.nodes[1].nodes), 2)
+            self.assertEqual(len(query_2.nodes), 2)
+
+            query_3 = ~group(q1 & q2)
+            self.assertEqual(query_3.operator, "or")
+
+            query_4 = ~group(q1 & group(q2 & q3))
+            self.assertEqual(query_4.operator, "or")
+            self.assertEqual(query_4.nodes[1].operator, "or")
+            self.assertEqual(len(query_4.nodes[1].nodes), 2)
+            self.assertEqual(len(query_4.nodes), 2)
+
+        with self.subTest("8. Check mixed operator groups are formed correctly"):
+            q1 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q2 = attrs.drugbank_info.drug_groups == "investigational"
+            q3 = attrs.drugbank_info.drug_groups == "experimental"
+            q3 = attrs.drugbank_info.drug_groups == "approved"
+
+            query_1 = q1 & group(q2 | q3)
+            self.assertEqual(query_1.operator, "and")
+            self.assertEqual(query_1.nodes[1].operator, "or")
+            self.assertEqual(len(query_1.nodes), 2)
+            self.assertEqual(len(query_1.nodes[1].nodes), 2)
+
+            query_2 = q1 | group(q2 & q3)
+            self.assertEqual(query_2.operator, "or")
+            self.assertEqual(query_2.nodes[1].operator, "and")
+            self.assertEqual(len(query_2.nodes), 2)
+            self.assertEqual(len(query_2.nodes[1].nodes), 2)
+
+            query_3 = group(q1 & q2) | group(q3 & q4)
+            self.assertEqual(query_3.operator, "or")
+            self.assertEqual(query_3.nodes[0].operator, "and")
+            self.assertEqual(query_3.nodes[1].operator, "and")
+            self.assertEqual(len(query_3.nodes), 2)
+            self.assertEqual(len(query_3.nodes[0].nodes), 2)
+            self.assertEqual(len(query_3.nodes[1].nodes), 2)
+
+            query_4 = group(q1 | q2) & group(q3 | q4)
+            self.assertEqual(query_4.operator, "and")
+            self.assertEqual(query_4.nodes[0].operator, "or")
+            self.assertEqual(query_4.nodes[1].operator, "or")
+            self.assertEqual(len(query_4.nodes), 2)
+            self.assertEqual(len(query_4.nodes[0].nodes), 2)
+            self.assertEqual(len(query_4.nodes[1].nodes), 2)
+
+    def testSeqSimilarityGroups(self):
+        q1 = TextQuery("heat-shock transcription factor")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Homo sapiens")
+        q3 = SeqSimilarityQuery(
+            "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET"
+            + "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI"
+            + "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ"
+            + "GVEDAFYTLVREIRQHKLRKLNPPDESGPGCMNCKCVIS"
+        )
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testSeqMotifGroups(self):
+        q1 = TextQuery("Phage dUTPases")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Dubowvirus dv80alpha")
+        q3 = SeqMotifQuery("MQTIF")
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testStructSimilarityGroups(self):
+        q1 = TextQuery("Phage dUTPases")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Dubowvirus dv80alpha")
+        q3 = StructSimilarityQuery(entry_id="3ZEZ")
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testStructMotifGroups(self):
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
+        ResList = [Res1, Res2]
+
+        q1 = AttributeQuery("exptl.method", "exact_match", "X-RAY DIFFRACTION")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Pseudomonas putida")
+        q3 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def ChemSimilarityGroups(self):
+        q1 = attrs.drugbank_info.drug_groups == "investigational"
+        q2 = attrs.drugbank_info.drug_groups == "experimental"
+        q3 = ChemSimilarityQuery(
+            value="CC(Cc1ccc(cc1)C(C(=O)O)C)C",
+            query_type="descriptor",
+            descriptor_type="SMILES",
+            match_type="graph-relaxed-stereo"
+        )
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
     def testOperators(self):
         """Test operators such as contain and in. """
         q1 = attrs.rcsb_entry_container_identifiers.rcsb_id.in_(["4HHB", "2GS2"])  # test in
@@ -427,7 +763,7 @@ class SearchTests(unittest.TestCase):
         logger.info("Chemical Search Operator Syntax: result length: (%d), ok: (%r), ok2: (%r)", len(result), ok, ok2)
 
         result = TextQuery("Hemoglobin")\
-            .and_("chem_comp.name", Const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value).contains_phrase("adenine")
+            .and_("chem_comp.name", const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE).contains_phrase("adenine")
         # result = set(result("assembly"))
         q1 = TextQuery("Hemoglobin")
         q2 = attrs.chem_comp.name.contains_phrase("adenine")
@@ -449,7 +785,7 @@ class SearchTests(unittest.TestCase):
         Expected failure."""
         try:
             query = TextQuery('"hemoglobin"')\
-                .and_("rcsb_chem_comp.name", Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value).contains_phrase("adenine")\
+                .and_("rcsb_chem_comp.name", const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE).contains_phrase("adenine")\
                 .exec("assembly")
             resultL = list(query)
             ok = len(resultL) < 0  # set this to false as it should fail
@@ -497,18 +833,21 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok2)
         logger.info("Query results with only computed models: ok : (%r) : ok2 : (%s)", ok, ok2)
 
-    def testSequenceQuery(self):
+    def testSeqSimilarityQuery(self):
         """Test firing off a Sequence query"""
         # Sequence query with hemoglobin protein sequence (id: 4HHB). Default parameters
-        q1 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
+        q1 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
         result = list(q1())
         result_len = len(result)
         ok = result_len > 0  # this query displays 706 ids in pdb website search function
         logger.info("Sequence query results correctly displays ids: (%r)", ok)
 
         # Sequence query (id: 4HHB) with custom parameters
-        q1 = SequenceQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
-                           evalue_cutoff=0.01, identity_cutoff=0.9)
+        q1 = SeqSimilarityQuery(
+            "VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR",
+            evalue_cutoff=0.01,
+            identity_cutoff=0.9
+        )
         result = list(q1())
         result_len = len(result)
         ok = result_len > 0  # this query displays 313 ids in pdb website search function
@@ -585,7 +924,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly. This is admittedly rather redundant.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly. This is admittedly rather redundant.
         self.assertTrue(ok)
         logger.info(".cif File Upload check two: (%r)", ok)
 
@@ -595,7 +934,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif.gz File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL in x
         self.assertTrue(ok)
         logger.info(".cif.gz File Upload check two: (%r)", ok)
 
@@ -605,7 +944,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL in x
         self.assertTrue(ok)
         logger.info(".pdb File Upload check two: (%r)", ok)
 
@@ -615,7 +954,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb.gz File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x
+        ok = const.RETURN_UP_URL in x
         self.assertTrue(ok)
         logger.info(".pdb.gz File Upload check two: (%r)", ok)
 
@@ -625,7 +964,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".bcif File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".bcif File Upload check two: (%r)", ok)
 
@@ -635,7 +974,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".cif.gz Assembly File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".cif.gz Assembly File Upload check two: (%r)", ok)
 
@@ -645,7 +984,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb1 File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".pdb1 File Upload check two: (%r)", ok)
 
@@ -655,7 +994,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info(".pdb1.gz File Upload check one: (%r)", ok)
 
-        ok = Const.RETURN_UP_URL.value in x  # check that beginning of URL is formed correctly.
+        ok = const.RETURN_UP_URL in x  # check that beginning of URL is formed correctly.
         self.assertTrue(ok)
         logger.info(".pdb1.gz File Upload check two: (%r)", ok)
 
@@ -781,12 +1120,12 @@ class SearchTests(unittest.TestCase):
 
     def testStructMotifQuery(self):
         # base example, entry ID, residues
-        Res1 = StructureMotifResidue("A", "1", 162, ["LYS", "HIS"])
-        Res2 = StructureMotifResidue("A", "1", 193, ["ASP"])
-        Res3 = StructureMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
-        Res4 = StructureMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
-        Res5 = StructureMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
-        Res6 = StructureMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
+        Res3 = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
+        Res4 = StructMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
+        Res5 = StructMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
+        Res6 = StructMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
         ResList = [Res1, Res2]
 
         q1 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)  # Avoid positionals for StructMotifQuery... way too many things are optional in these queries
@@ -844,7 +1183,7 @@ class SearchTests(unittest.TestCase):
         # make sure max exchanges per residue is 4
         ok = False
         try:
-            _ = StructureMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL", "TYR"])  # not possible
+            _ = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL", "TYR"])  # not possible
         except AssertionError:
             ok = True
         self.assertTrue(ok)
@@ -971,14 +1310,14 @@ class SearchTests(unittest.TestCase):
             "drugbank_info.brand_names",
             "contains_phrase",
             "tylenol",
-            Const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE.value,  # this constant specifies "text_chem" service
+            const.CHEMICAL_ATTRIBUTE_SEARCH_SERVICE,  # this constant specifies "text_chem" service
         )
         result = q3(return_counts=True)
         ok = result == len(list(q3()))
         self.assertTrue(ok)
         logger.info("Counting results of chemical Attribute query: (%d), ok : (%r)", result, ok)
 
-        q4 = SequenceQuery(
+        q4 = SeqSimilarityQuery(
             "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET"
             + "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI"
             + "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ"
@@ -1014,11 +1353,11 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Counting results of Structure similarity query: (%d), ok : (%r)", result, ok)
 
-        Res1 = StructureMotifResidue("A", "1", 162, ["LYS", "HIS"])
-        Res2 = StructureMotifResidue("A", "1", 193)
-        Res3 = StructureMotifResidue("A", "1", 219)
-        Res4 = StructureMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
-        Res5 = StructureMotifResidue("A", "1", 295, ["HIS", "LYS"])
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193)
+        Res3 = StructMotifResidue("A", "1", 219)
+        Res4 = StructMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
+        Res5 = StructMotifResidue("A", "1", 295, ["HIS", "LYS"])
         ResList = [Res1, Res2, Res3, Res4, Res5]
         q7 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
         result = q7(return_counts=True)
@@ -1138,7 +1477,7 @@ class SearchTests(unittest.TestCase):
                 "Resolution Combined",
                 "range",
                 "rcsb_entry_info.resolution_combined",
-                ranges=[Range(None, 2), Range(2, 2.2), Range(2.2, 2.4), Range(4.6, None)]
+                ranges=[FacetRange(None, 2), FacetRange(2, 2.2), FacetRange(2.2, 2.4), FacetRange(4.6, None)]
             )
         ).facets
         ok = len(result) > 0
@@ -1155,7 +1494,7 @@ class SearchTests(unittest.TestCase):
                 "Release Date",
                 "date_range",
                 "rcsb_accession_info.initial_release_date",
-                ranges=[Range(None, "2020-06-01||-12M"), Range("2020-06-01", "2020-06-01||+12M"), Range("2020-06-01||+12M", None)]
+                ranges=[FacetRange(None, "2020-06-01||-12M"), FacetRange("2020-06-01", "2020-06-01||+12M"), FacetRange("2020-06-01||+12M", None)]
             )
         ).facets
         ok = len(result) > 0
@@ -1485,6 +1824,12 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testLargePagination"))
     suiteSelect.addTest(SearchTests("testOperators"))
     suiteSelect.addTest(SearchTests("testPartialQuery"))
+    suiteSelect.addTest(SearchTests("testAttributeAndTextGroups"))
+    suiteSelect.addTest(SearchTests("testSeqSimilarityGroups"))
+    suiteSelect.addTest(SearchTests("testSeqMotifGroups"))
+    suiteSelect.addTest(SearchTests("testStructSimilarityGroups"))
+    suiteSelect.addTest(SearchTests("testStructMotifGroups"))
+    suiteSelect.addTest(SearchTests("ChemSimilarityGroups"))
     suiteSelect.addTest(SearchTests("testFreeText"))
     suiteSelect.addTest(SearchTests("testAttribute"))
     suiteSelect.addTest(SearchTests("exampleQuery1"))
@@ -1499,7 +1844,7 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testChemSearch"))
     suiteSelect.addTest(SearchTests("testMismatch"))
     suiteSelect.addTest(SearchTests("testCSMquery"))
-    suiteSelect.addTest(SearchTests("testSequenceQuery"))
+    suiteSelect.addTest(SearchTests("testSeqSimilarityQuery"))
     suiteSelect.addTest(SearchTests("testSeqMotifQuery"))
     suiteSelect.addTest(SearchTests("testFileUpload"))
     suiteSelect.addTest(SearchTests("testStructSimQuery"))

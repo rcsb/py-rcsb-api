@@ -29,7 +29,8 @@ from typing import (
 )
 
 import requests
-from ..const import Const
+from ..const import const
+from ..config import config
 from .search_schema import SearchSchema
 
 if sys.version_info > (3, 8):
@@ -37,7 +38,10 @@ if sys.version_info > (3, 8):
 else:
     from typing_extensions import Literal
 
-# tqdm is optional
+from tqdm import trange
+
+logger = logging.getLogger(__name__)
+
 # Allowed return types for searches. https://search.rcsb.org/#return-type
 ReturnType = Literal["entry", "assembly", "polymer_entity", "non_polymer_entity", "polymer_instance", "mol_definition"]
 ReturnContentType = Literal["experimental", "computational"]  # results_content_type parameter list values
@@ -127,12 +131,12 @@ def fileUpload(filepath: str, fmt: str = "cif") -> str:
     should then be passed through as part of the value parameter,
     along with the format of the file."""
     with open(filepath, mode="rb") as f:
-        res = requests.post(Const.UPLOAD_URL.value, files={"file": f}, data={"format": fmt}, timeout=None)
+        res = requests.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=config.API_TIMEOUT)
         try:
             spec = res.json()["key"]
         except KeyError:
             raise TypeError("There was an issue processing the file. Check the file format.")
-    return Const.RETURN_UP_URL.value + spec
+    return const.RETURN_UP_URL + spec
 
 
 class SearchQuery(ABC):
@@ -189,23 +193,23 @@ class SearchQuery(ABC):
     def __invert__(self) -> "SearchQuery":
         """Negation: `~a`"""
 
-    def __and__(self, other: "SearchQuery") -> "SearchQuery":
+    def __and__(self, other: "SearchQuery") -> "Group":
         """Intersection: `a & b`"""
         assert isinstance(other, SearchQuery)
         return Group("and", [self, other])
 
-    def __or__(self, other: "SearchQuery") -> "SearchQuery":
+    def __or__(self, other: "SearchQuery") -> "Group":
         """Union: `a | b`"""
         assert isinstance(other, SearchQuery)
         return Group("or", [self, other])
 
-    def __sub__(self, other: "SearchQuery") -> "SearchQuery":
+    def __sub__(self, other: "SearchQuery") -> "Group":
         """Difference: `a - b`"""
         return self & ~other
 
-    def __xor__(self, other: "SearchQuery") -> "SearchQuery":
+    def __xor__(self, other: "SearchQuery") -> "Group":
         """Symmetric difference: `a ^ b`"""
-        return (self & ~other) | (~self & other)
+        return (self & ~other) | (~self & other)  # type: ignore
 
     def exec(
         self,
@@ -300,7 +304,7 @@ class SearchQuery(ABC):
     def and_(self, other: Union[str, "Attr"]) -> "PartialQuery":
         ...
 
-    def and_(self, other: Union[str, "SearchQuery", "Attr"], qtype=Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value) -> Union["SearchQuery", "PartialQuery"]:
+    def and_(self, other: Union[str, "SearchQuery", "Attr"], qtype=const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE) -> Union["SearchQuery", "PartialQuery"]:
         """Extend this query with an additional attribute via an AND"""
         if isinstance(other, SearchQuery):
             return self & other
@@ -319,7 +323,7 @@ class SearchQuery(ABC):
     def or_(self, other: Union[str, "Attr"]) -> "PartialQuery":
         ...
 
-    def or_(self, other: Union[str, "SearchQuery", "Attr"], qtype=Const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE.value) -> Union["SearchQuery", "PartialQuery"]:
+    def or_(self, other: Union[str, "SearchQuery", "Attr"], qtype=const.STRUCTURE_ATTRIBUTE_SEARCH_SERVICE) -> Union["SearchQuery", "PartialQuery"]:
         """Extend this query with an additional attribute via an OR"""
         if isinstance(other, SearchQuery):
             return self | other
@@ -419,8 +423,6 @@ class Attr:
     +--------------------+---------------------+
     | exists             |                     |
     +--------------------+---------------------+
-    | in\\_              |                     |
-    +--------------------+---------------------+
 
     Previously, __bool__ was overloaded to run the exists function, but __bool__ can't be overloaded to return non-boolean value.
     Method overloading bool was deleted.
@@ -428,7 +430,7 @@ class Attr:
     Rather than their normal bool return values, operators return Terminals.
 
     Pre-instantiated attributes are available from the
-    :py:data:`rcsbapi.search.rcsb_attributes` object. These are generally easier to use
+    :py:data:`rcsbapi.search.search_attributes` object. These are generally easier to use
     than constructing Attr objects by hand. A complete list of valid attributes is
     available in the `schema <https://search.rcsb.org/rcsbsearch/v2/metadata/schema>`_.
 
@@ -645,23 +647,6 @@ class Attr:
             value = value.value
         return self.greater_or_equal(value)
 
-    def __contains__(self, value: Union[str, List[str], "Value[str]", "Value[List[str]]"]) -> Terminal:
-        """Maps to contains_words or contains_phrase depending on the value passed.
-
-        * `"value" in attr` maps to `attr.contains_phrase("value")` for simple values.
-        * `["value"] in attr` maps to `attr.contains_words(["value"])` for lists and
-          tuples.
-        """
-        if isinstance(value, Value):
-            value = value.value
-        if isinstance(value, list):
-            if len(value) == 0 or isinstance(value[0], str):
-                return self.contains_words(value)
-            else:
-                return NotImplemented
-        else:
-            return self.contains_phrase(value)
-
 
 SEARCH_SCHEMA = SearchSchema(Attr)
 
@@ -706,7 +691,7 @@ class AttributeQuery(Terminal):
         if value is not None:
             paramsD.update({"value": value})
         if not service:
-            service = SEARCH_SCHEMA.rcsb_attributes.get_attribute_type(attribute)
+            service = SEARCH_SCHEMA.search_attributes.get_attribute_type(attribute)
 
         if isinstance(service, list):
             error_msg = ""
@@ -729,10 +714,10 @@ class TextQuery(Terminal):
         Args:
             value: free-text query
         """
-        super().__init__(service=Const.FULL_TEXT_SEARCH_SERVICE.value, params={"value": value})
+        super().__init__(service=const.FULL_TEXT_SEARCH_SERVICE, params={"value": value})
 
 
-class SequenceQuery(Terminal):
+class SeqSimilarityQuery(Terminal):
     """Special case of a terminal for protein, DNA, or RNA sequence queries"""
 
     def __init__(
@@ -753,13 +738,13 @@ class SequenceQuery(Terminal):
             sequence_type (Optional[SequenceType], optional): type of biological sequence ("protein", "dna", "rna").
                 Defaults to "protein".
         """
-        if len(value) < Const.SEQUENCE_SEARCH_MIN_NUM_OF_RESIDUES.value:  # (placeholder for now) look into deriving constraints from API Schema programatically
+        if len(value) < const.SEQUENCE_SEARCH_MIN_NUM_OF_RESIDUES:  # (placeholder for now) look into deriving constraints from API Schema programatically
             raise ValueError("The sequence must contain at least 25 residues")
         if (identity_cutoff) and (identity_cutoff < 0.0 or identity_cutoff > 1.0):
             raise ValueError("Identity cutoff should be between 0 and 1 (inclusive)")
         else:
             super().__init__(
-                service=Const.SEQUENCE_SEARCH_SERVICE.value,
+                service=const.SEQUENCE_SEARCH_SERVICE,
                 params={"evalue_cutoff": evalue_cutoff, "identity_cutoff": identity_cutoff, "sequence_type": sequence_type, "value": value},
             )
 
@@ -779,10 +764,10 @@ class SeqMotifQuery(Terminal):
             pattern_type (Optional[SeqMode], optional): motif syntax ("simple", "prosite", "regex"). Defaults to "simple".
             sequence_type (Optional[SequenceType], optional): type of biological sequence ("protein", "dna", "rna"). Defaults to "protein".
         """
-        if len(value) < Const.SEQMOTIF_SEARCH_MIN_CHARACTERS.value:
+        if len(value) < const.SEQMOTIF_SEARCH_MIN_CHARACTERS:
             raise ValueError("The sequence motif must contain at least 2 characters")
         else:
-            super().__init__(service=Const.SEQMOTIF_SEARCH_SERVICE.value, params={"value": value, "pattern_type": pattern_type, "sequence_type": sequence_type})
+            super().__init__(service=const.SEQMOTIF_SEARCH_SERVICE, params={"value": value, "pattern_type": pattern_type, "sequence_type": sequence_type})
 
 
 class StructSimilarityQuery(Terminal):
@@ -831,10 +816,10 @@ class StructSimilarityQuery(Terminal):
             assert isinstance(file_format, str)
             parameters["value"] = {"url": fileUpload(file_path, file_format), "format": "bcif"}
 
-        super().__init__(service=Const.STRUCT_SIM_SEARCH_SERVICE.value, params=parameters)
+        super().__init__(service=const.STRUCT_SIM_SEARCH_SERVICE, params=parameters)
 
 
-class StructureMotifResidue:
+class StructMotifResidue:
     """This class is for defining residues. For use with the Structure Motif Search."""
 
     def __init__(
@@ -881,7 +866,7 @@ class StructMotifQuery(Terminal):
         url: Optional[str] = None,
         file_path: Optional[str] = None,
         file_extension: Optional[str] = None,
-        residue_ids: Optional[list] = None,  # List of StructureMotifResidue objects
+        residue_ids: Optional[list] = None,  # List of StructMotifResidue objects
         rmsd_cutoff: int = 2,
         atom_pairing_scheme: StructMotifAtomPairing = "SIDE_CHAIN",
         motif_pruning_strategy: StructMotifPruning = "KRUSKAL",
@@ -899,7 +884,7 @@ class StructMotifQuery(Terminal):
             url (Optional[str], optional): if "file_url" specified, url to file. Defaults to None.
             file_path (Optional[str], optional): if "file_path" specified, path to file. Defaults to None.
             file_extension (Optional[str], optional): if "file_url" specified, type of file linked to (ex: "cif"). Defaults to None.
-            residue_ids (Optional[list], optional): list of StructureMotifResidue objects . Defaults to None.
+            residue_ids (Optional[list], optional): list of StructMotifResidue objects . Defaults to None.
             rmsd_cutoff (int, optional): upper cutoff for root-mean-square deviation (RMSD) score. Defaults to 2.
             atom_pairing_scheme (StructMotifAtomPairing, optional): Which atoms to consider to compute RMSD scores and transformations. Defaults to "SIDE_CHAIN".
             motif_pruning_strategy (StructMotifPruning, optional): specifies how query motifs are pruned (i.e. simplified). Defaults to "KRUSKAL".
@@ -911,7 +896,7 @@ class StructMotifQuery(Terminal):
         # we will construct value, and then pass it through. That's like 95% of this lol
         if not residue_ids:
             raise ValueError("You must include residues in a Structure Motif Query")
-        if len(residue_ids) > Const.STRUCT_MOTIF_MAX_RESIDUES.value or len(residue_ids) < Const.STRUCT_MOTIF_MIN_RESIDUES.value:
+        if len(residue_ids) > const.STRUCT_MOTIF_MAX_RESIDUES or len(residue_ids) < const.STRUCT_MOTIF_MIN_RESIDUES:
             raise ValueError("A Structure Motif Query Must contain 2-10 residues.")
         value: Dict = {}
         if structure_search_type == "entry_id":
@@ -964,7 +949,7 @@ class StructMotifQuery(Terminal):
 
         # now call super
 
-        super().__init__(service=Const.STRUCTMOTIF_SEARCH_SERVICE.value, params=params)
+        super().__init__(service=const.STRUCTMOTIF_SEARCH_SERVICE, params=params)
 
 
 class ChemSimilarityQuery(Terminal):
@@ -1008,7 +993,7 @@ class ChemSimilarityQuery(Terminal):
             parameters["descriptor_type"] = descriptor_type
             parameters["match_type"] = match_type
 
-        super().__init__(service=Const.CHEM_SIM_SEARCH_SERVICE.value, params=parameters)
+        super().__init__(service=const.CHEM_SIM_SEARCH_SERVICE, params=parameters)
 
 
 @dataclass(frozen=True)
@@ -1016,7 +1001,18 @@ class Group(SearchQuery):
     """AND and OR combinations of queries"""
 
     operator: TAndOr
-    nodes: Iterable[SearchQuery] = ()
+    nodes: Iterable[Union[Group, SearchQuery]] = ()
+    keep_nested: bool = False
+
+    @staticmethod
+    def group(query: Group):
+        """Add a flag to a Group object so that it will remain grouped when adding more nodes.
+        In __init__, this method is set to be globally accessible.
+
+        Args:
+            query (Group): Group object that will be marked to remain grouped
+        """
+        return Group(query.operator, query.nodes, keep_nested=True)
 
     def to_dict(self):
         group_dict = dict(
@@ -1029,27 +1025,45 @@ class Group(SearchQuery):
     def __invert__(self):
         if self.operator == "and":
             return Group("or", [~node for node in self.nodes])
+        if self.operator == "or":
+            return Group("and", [~node for node in self.nodes])
 
-    def __and__(self, other: SearchQuery) -> SearchQuery:
-        # Combine nodes if possible
+    def __and__(self, other: Union[SearchQuery, Group]) -> Group:
         if self.operator == "and":
             if isinstance(other, Group):
-                if other.operator == "and":
+                # If keep_nested set to True, don't combine groups
+                if (self.keep_nested) and (other.keep_nested):
+                    return Group("and", (self, other))
+                if other.keep_nested:
+                    return Group("and", (*self.nodes, other))
+                # Else, combine groups
+                elif other.operator == "and":
                     return Group("and", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
+                # If keep_nested set to True, don't combine groups
+                if self.keep_nested:
+                    return Group("and", (self, other))
                 return Group("and", (*self.nodes, other))
             else:
                 return NotImplemented
 
         return super().__and__(other)
 
-    def __or__(self, other: SearchQuery) -> SearchQuery:
-        # Combine nodes if possible
+    def __or__(self, other: SearchQuery) -> Group:
         if self.operator == "or":
             if isinstance(other, Group):
-                if other.operator == "or":
+                # If keep_nested set to True, don't combine groups
+                if (self.keep_nested) and (other.keep_nested):
+                    return Group("or", (self, other))
+                if other.keep_nested:
+                    return Group("or", (*self.nodes, other))
+                # Else, combine groups
+                elif other.operator == "or":
                     return Group("or", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
+                # If keep_nested set to True, don't combine groups
+                if self.keep_nested:
+                    return Group("or", (self, other))
                 return Group("or", (*self.nodes, other))
             else:
                 return NotImplemented
@@ -1285,10 +1299,6 @@ class PartialQuery:
     def __ge__(self, value: TNumberLike) -> SearchQuery:
         ...
 
-    @_attr_delegate(Attr.__contains__)
-    def __contains__(self, value: Union[str, List[str], "Value[str]", "Value[List[str]]"]) -> SearchQuery:
-        ...
-
 
 T = TypeVar("T", bound="TValue")
 
@@ -1369,7 +1379,7 @@ class Value(Generic[T]):
 
 
 @dataclass(frozen=True)
-class Range:
+class FacetRange:
     """
     Primarily for use with "range" and "date_range" aggregations with the Facet class.
     include_upper and include_lower should not be used with Facet queries.
@@ -1467,8 +1477,8 @@ class Facet(RequestOption):
             attribute (str): Specifies the full attribute name to aggregate on.
             interval (Optional[Union[int, str]], optional): Size of the intervals into which a given set of values is divided. Required only for use with
                 "histogram" and "date_histogram" aggregation types (defaults to None if not included).
-            ranges (Optional[List[Range]], optional): A set of ranges, each representing a bucket. Note that this aggregation includes the 'from' value and
-                excludes the 'to' value for each range. Should be a list of Range objects (leave the "include_lower" and "include_upper" fields empty). Required
+            ranges (Optional[List[FacetRange]], optional): A set of ranges, each representing a bucket. Note that this aggregation includes the 'from' value and
+                excludes the 'to' value for each range. Should be a list of FacetRange objects (leave the "include_lower" and "include_upper" fields empty). Required
                 only for use with "range" and "date_range" aggregation types (defaults to None if not included).
             min_interval_population (Optional[int], optional): Minimum number of items (>= 0) in the bin required for the bin to be returned. Only for use with
                 "terms", "histogram", and "date_histogram" facets (defaults to 1 for these aggregation types, otherwise defaults to None).
@@ -1483,7 +1493,7 @@ class Facet(RequestOption):
     aggregation_type: AggregationType
     attribute: str
     interval: Optional[Union[int, str]] = None
-    ranges: Optional[List[Range]] = None
+    ranges: Optional[List[FacetRange]] = None
     min_interval_population: Optional[int] = None
     max_num_intervals: Optional[int] = None
     precision_threshold: Optional[int] = None
@@ -1537,14 +1547,14 @@ class TerminalFilter(RequestOption):
             attribute (str): specify attribute for search (i.e struct.title, exptl.method, rcsb_id). Defaults to None.
             operator (Literal["equals", "greater", "greater_or_equal", "less", "less_or_equal", "range", "exact_match", "in", "exists"]):
                 specify operation to be done for search (i.e "contains_phrase", "exact_match"). Defaults to None.
-            value (Optional[Union[str, int, float, bool, Range, List[str], List[int], List[float]]], optional):
+            value (Optional[Union[str, int, float, bool, FacetRange, List[str], List[int], List[float]]], optional):
                 The search term(s). Can be a single or multiple words, numbers, dates, date math expressions, or ranges.
             negation (bool, optional): logical not. Defaults to False.
             case_sensitive (bool, optional): whether to do case sensitive matching of value. Defaults to False.
     """
     attribute: str
     operator: Literal["equals", "greater", "greater_or_equal", "less", "less_or_equal", "range", "exact_match", "in", "exists"]
-    value: Optional[Union[str, int, float, bool, Range, List[str], List[int], List[float]]] = None
+    value: Optional[Union[str, int, float, bool, FacetRange, List[str], List[int], List[float]]] = None
     negation: bool = False
     case_sensitive: bool = False
 
@@ -1628,7 +1638,7 @@ class Session(Iterable[str]):
     Handles paging the query and parsing results
     """
 
-    url = Const.RCSB_SEARCH_API_QUERY_URL.value
+    url = const.RCSB_SEARCH_API_QUERY_URL
     query_id: str
     query: SearchQuery
     return_type: ReturnType
@@ -1713,13 +1723,16 @@ class Session(Iterable[str]):
 
         if self._group_by:
             if (self._group_by.aggregation_method == "matching_deposit_group_id") and (self.return_type != "entry"):
-                logging.warning('group_by "matching_deposit_group_id" must be used with return_type "entry". '
-                                'Return type has been changed to "entry".')
+                logger.warning(
+                    'group_by "matching_deposit_group_id" must be used with return_type "entry". Return type has been changed to "entry".'
+                )
                 setattr(self, "return_type", "entry")
 
             if (self._group_by.aggregation_method in ["sequence_identity", "matching_uniprot_accession"]) and (self.return_type != "polymer_entity"):
-                logging.warning('group_by "%s" must be used with return_type "polymer_entity". '
-                                'Return type has been changed to "polymer_entity".', self._group_by.aggregation_method)
+                logger.warning(
+                    'group_by "%s" must be used with return_type "polymer_entity". Return type has been changed to "polymer_entity".',
+                    self._group_by.aggregation_method
+                )
                 setattr(self, "return_type", "polymer_entity")
 
             request_options_dict["group_by"] = self._group_by.to_dict()
@@ -1753,8 +1766,8 @@ class Session(Iterable[str]):
     def _single_query(self, start=0) -> Optional[Dict]:
         "Fires a single query"
         params = self._make_params(start)
-        logging.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=None)
+        logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
+        response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=config.API_TIMEOUT)
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
             return response.json()
@@ -1777,7 +1790,7 @@ class Session(Iterable[str]):
         else:
             result_set = []
         start += self.rows
-        logging.debug("Got %s ids", len(result_set))
+        logger.debug("Got %s ids", len(result_set))
 
         if len(result_set) == 0:
             return
@@ -1791,7 +1804,7 @@ class Session(Iterable[str]):
             if not self._group_by:
                 assert len(result_set) == self.rows
             req_count += 1
-            if req_count == Const.REQUESTS_PER_SECOND.value:
+            if req_count == config.SEARCH_API_REQUESTS_PER_SECOND:
                 time.sleep(1.2)  # This prevents the user from bottlenecking the server with requests.
                 req_count = 0
             response = self._single_query(start=start)
@@ -1802,7 +1815,7 @@ class Session(Iterable[str]):
                 result_set = response["group_set"]
             else:
                 result_set = []
-            logging.debug("Got %s ids", len(result_set))
+            logger.debug("Got %s ids", len(result_set))
             start += self.rows
             yield from result_set
 
@@ -1815,11 +1828,7 @@ class Session(Iterable[str]):
 
     def iquery(self, limit: Optional[int] = None) -> List[str]:
         """Evaluate the query and display an interactive progress bar.
-
-        Requires tqdm.
         """
-        from tqdm import trange  # type: ignore
-
         response = self._single_query(start=0)
         if response is None:
             return []
@@ -1837,12 +1846,12 @@ class Session(Iterable[str]):
 
         return result_set[:limit]
 
-    def rcsb_query_editor_url(self) -> str:
+    def get_editor_link(self) -> str:
         """URL to edit this query in the RCSB PDB query editor"""
         data = json.dumps(self._make_params(), separators=(",", ":"))
         return f"https://search.rcsb.org/query-editor.html?json={urllib.parse.quote(data)}"
 
-    def rcsb_query_builder_url(self) -> str:
+    def get_query_builder_link(self) -> str:
         """URL to view this query on the RCSB PDB website query builder"""
         params = self._make_params()
         params["request_options"]["paginate"]["rows"] = 25

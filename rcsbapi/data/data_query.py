@@ -3,16 +3,19 @@ import urllib.parse
 import re
 import time
 from typing import Any, Union, List, Dict, Optional, Tuple
+import json
 import requests
+from tqdm import tqdm
 from rcsbapi.data import DATA_SCHEMA
-from ..config import ApiSettings, SINGULAR_TO_PLURAL, ID_TO_SEPARATOR
+from ..config import config
+from ..const import const
 
 logger = logging.getLogger(__name__)
 
 
 class DataQuery:
     """
-    class for Data API queries.
+    Class for Data API queries.
     """
     def __init__(
         self,
@@ -23,22 +26,27 @@ class DataQuery:
         suppress_autocomplete_warning: bool = False
     ):
         """
+        Query object for Data API requests.
+
         Args:
             input_type (str): query input type
-                ex: "entry", "polymer_entity_instance", etc
-            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list of ids to request information for
-            return_data_list (List[str]): list of data to return (field names)
-                ex: ["rcsb_id", "exptl.method"]
+                (e.g., "entry", "polymer_entity_instance", etc.)
+            input_ids (list or dict): list (or singular dict) of ids for which to request information
+                (e.g., ["4HHB", "2LGI"])
+            return_data_list (list): list of data to return (field names)
+                (e.g., ["rcsb_id", "exptl.method"])
             add_rcsb_id (bool, optional): whether to automatically add <input_type>.rcsb_id to queries. Defaults to True.
         """
-        input_id_limit = 200
-        if isinstance(input_ids, list):
-            if len(input_ids) > input_id_limit:
-                logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
-        if isinstance(input_ids, dict):
-            for value in input_ids.values():
-                if len(value) > input_id_limit:
-                    logging.warning("More than %d input_ids. For a more readable response, reduce number of ids.", input_id_limit)
+        suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
+
+        if not isinstance(input_ids, AllStructures):
+            if isinstance(input_ids, list):
+                if len(input_ids) > config.INPUT_ID_LIMIT:
+                    logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
+            if isinstance(input_ids, dict):
+                for value in input_ids.values():
+                    if len(value) > config.INPUT_ID_LIMIT:
+                        logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
@@ -56,19 +64,25 @@ class DataQuery:
     def _process_input_ids(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]]) -> Tuple[str, List[str]]:
         """Convert input_type to plural if possible.
         Set input_ids to be a list of ids.
+        If using ALL_STRUCTURES, return the id list corresponding to the input type.
 
         Args:
             input_type (str): query input type
-                ex: "entry", "polymer_entity_instance", etc
+                (e.g., "entry", "polymer_entity_instance", etc.)
             input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): list/dict of ids to request information for
 
         Returns:
             Tuple[str, List[str]]: returns a tuple of converted input_type and list of input_ids
         """
+        # If input_ids is ALL_STRUCTURES, return appropriate list of ids
+        if isinstance(input_ids, AllStructures):
+            new_input_ids = input_ids.get_all_ids(input_type)
+            return (input_type, new_input_ids)
+
         # Convert _input_type to plural if applicable
         converted = False
         if DATA_SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
-            plural_type = SINGULAR_TO_PLURAL[input_type]
+            plural_type = const.SINGULAR_TO_PLURAL[input_type]
             if plural_type:
                 input_type = plural_type
                 converted = True
@@ -81,8 +95,8 @@ class DataQuery:
                     join_id = ""
                     for k, v in input_ids.items():
                         assert isinstance(v, str)  # for mypy
-                        if k in ID_TO_SEPARATOR:
-                            join_id += ID_TO_SEPARATOR[k] + v
+                        if k in const.ID_TO_SEPARATOR:
+                            join_id += const.ID_TO_SEPARATOR[k] + v
                         else:
                             join_id += v
 
@@ -91,6 +105,9 @@ class DataQuery:
             else:
                 # If not converted, retrieve id list from dictionary
                 input_ids = list(input_ids[DATA_SCHEMA._root_dict[input_type][0]["name"]])
+
+        # Make all input_ids uppercase
+        input_ids = [id.upper() for id in input_ids]
 
         assert isinstance(input_ids, list)
         return (input_type, input_ids)
@@ -108,7 +125,7 @@ class DataQuery:
 
         Returns:
             str: input_type
-                ex: "entry", "polymer_entity_instance", etc
+                (e.g., "entry", "polymer_entity_instance", etc.)
         """
         return self._input_type
 
@@ -117,7 +134,7 @@ class DataQuery:
 
         Returns:
             List[str]: return_data_list
-                ex: ["rcsb_id", "exptl.method"]
+                (e.g., ["rcsb_id", "exptl.method"])
         """
         return self._return_data_list
 
@@ -143,49 +160,46 @@ class DataQuery:
         Returns:
             str: GraphiQL url
         """
-        editor_base_link = str(ApiSettings.API_ENDPOINT.value) + "/index.html?query="
+        editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
         return editor_base_link + urllib.parse.quote(self._query)
 
-    def exec(self) -> Dict[str, Any]:
+    def exec(self, batch_size: int = 5000, progress_bar: bool = False) -> Dict[str, Any]:
         """POST a GraphQL query and get response
 
         Returns:
             Dict[str, Any]: JSON object
         """
-        batch_size = 50
         if len(self._input_ids) > batch_size:
-            batched_ids = self._batch_ids(batch_size)
-            response_json: Dict[str, Any] = {}
-            # count = 0
-            for id_batch in batched_ids:
-                query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
-                part_response = requests.post(
-                    headers={"Content-Type": "application/graphql"},
-                    data=query,
-                    url=ApiSettings.API_ENDPOINT.value,
-                    timeout=ApiSettings.TIMEOUT.value
-                ).json()
-                self._parse_gql_error(part_response)
-                time.sleep(0.2)
-                if not response_json:
-                    response_json = part_response
-                else:
-                    response_json = self._merge_response(response_json, part_response)
+            batched_ids: Union[List[List[str]], tqdm] = self._batch_ids(batch_size)
         else:
-            response_json = requests.post(
+            batched_ids = [self._input_ids]
+        response_json: Dict[str, Any] = {}
+
+        if progress_bar is True:
+            batched_ids = tqdm(batched_ids)
+
+        for id_batch in batched_ids:
+            query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
+            part_response = requests.post(
                 headers={"Content-Type": "application/graphql"},
-                data=self._query,
-                url=ApiSettings.API_ENDPOINT.value,
-                timeout=ApiSettings.TIMEOUT.value
+                data=query,
+                url=const.DATA_API_ENDPOINT,
+                timeout=config.API_TIMEOUT
             ).json()
-            self._parse_gql_error(response_json)
+            self._parse_gql_error(part_response)
+            time.sleep(0.2)
+            if not response_json:
+                response_json = part_response
+            else:
+                response_json = self._merge_response(response_json, part_response)
+
         if "data" in response_json.keys():
             query_response = response_json["data"][self._input_type]
             if query_response is None:
-                logging.warning("Input produced no results. Check that input ids are valid")
+                logger.warning("Input produced no results. Check that input ids are valid")
             if isinstance(query_response, list):
                 if len(query_response) == 0:
-                    logging.warning("Input produced no results. Check that input ids are valid")
+                    logger.warning("Input produced no results. Check that input ids are valid")
         self._response = response_json
         return response_json
 
@@ -234,3 +248,28 @@ class DataQuery:
         combined_response = merge_into_response
         combined_response["data"][self._input_type] += to_merge_response["data"][self._input_type]
         return combined_response
+
+
+class AllStructures:
+    def __init__(self):
+        self.ALL_STRUCTURES = self.reload()
+
+    def reload(self) -> dict[str, List[str]]:
+        ALL_STRUCTURES = {}
+        for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
+            all_ids: List[str] = []
+            for endpoint in endpoints:
+                response = requests.get(endpoint, timeout=60)
+                if response.status_code == 200:
+                    all_ids.extend(json.loads(response.text))
+                else:
+                    response.raise_for_status()
+                ALL_STRUCTURES[input_type] = all_ids
+
+        return ALL_STRUCTURES
+
+    def get_all_ids(self, input_type) -> List[str]:
+        if input_type in self.ALL_STRUCTURES:
+            return self.ALL_STRUCTURES[input_type]
+        else:
+            raise ValueError(f"ALL_STRUCTURES is not yet available for input_type {input_type}")

@@ -763,6 +763,174 @@
             "uniqueItems": true,
             "rcsb_nested_indexing": true
         },
+        "database_2": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "database_code": {
+                        "type": "string",
+                        "examples": [
+                            "1ABC",
+                            "ABCDEF"
+                        ],
+                        "description": "The code assigned by the database identified in\n _database_2.database_id.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "The code assigned by the database identified in\n _database_2.database_id.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Database Code",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "ID(s) and Keywords",
+                                "priority_order": 15
+                            }
+                        ]
+                    },
+                    "database_id": {
+                        "type": "string",
+                        "enum": [
+                            "AlphaFoldDB",
+                            "BMRB",
+                            "EBI",
+                            "EMDB",
+                            "MODBASE",
+                            "ModelArchive",
+                            "NDB",
+                            "PDB",
+                            "PDB-Dev",
+                            "PDBE",
+                            "PDB_ACC",
+                            "RCSB",
+                            "SWISS-MODEL_REPOSITORY",
+                            "WWPDB"
+                        ],
+                        "description": "An abbreviation that identifies the database.",
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "AlphaFoldDB",
+                                "detail": "                                 AlphaFoldDB"
+                            },
+                            {
+                                "value": "BMRB",
+                                "detail": "                                 Biological Magnetic Reference Data Bank"
+                            },
+                            {
+                                "value": "EBI",
+                                "detail": "                                 European Bioinformatics Institute"
+                            },
+                            {
+                                "value": "EMDB",
+                                "detail": "                                 Electron Microscopy Data Bank"
+                            },
+                            {
+                                "value": "MODBASE",
+                                "detail": "                                 Database of Comparative Protein Structure Models"
+                            },
+                            {
+                                "value": "ModelArchive",
+                                "detail": "                                 ModelArchive"
+                            },
+                            {
+                                "value": "NDB",
+                                "detail": "                                 Nucleic Acid Database"
+                            },
+                            {
+                                "value": "PDB",
+                                "detail": "                                 Protein Data Bank"
+                            },
+                            {
+                                "value": "PDB-Dev",
+                                "detail": "                                 PDB-Dev integrative/hybrid methods"
+                            },
+                            {
+                                "value": "PDBE",
+                                "detail": "                                 Protein Data Bank Europe"
+                            },
+                            {
+                                "value": "PDB_ACC",
+                                "detail": "                                 Protein Data Bank Versioned Accession"
+                            },
+                            {
+                                "value": "RCSB",
+                                "detail": "                                 Research Collaboratory for Structural Bioinformatics"
+                            },
+                            {
+                                "value": "SWISS-MODEL_REPOSITORY",
+                                "detail": "                                 Swiss-Model Repository"
+                            },
+                            {
+                                "value": "WWPDB",
+                                "detail": "                                 Worldwide Protein Data Bank"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "An abbreviation that identifies the database.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "pdbx_DOI": {
+                        "type": "string",
+                        "examples": [
+                            "10.2210/pdb6lu7/pdb"
+                        ],
+                        "description": "Document Object Identifier (DOI) for this entry registered\nwith http://crossref.org.",
+                        "rcsb_description": [
+                            {
+                                "text": "Document Object Identifier (DOI) for this entry registered\nwith http://crossref.org.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "pdbx_database_accession": {
+                        "type": "string",
+                        "examples": [
+                            "pdb_00006lu7"
+                        ],
+                        "description": "Extended accession code issued for for _database_2.database_code assigned by the database identified in\n _database_2.database_id.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "suggest"
+                        ],
+                        "rcsb_full_text_priority": 20,
+                        "rcsb_description": [
+                            {
+                                "text": "Extended accession code issued for for _database_2.database_code assigned by the database identified in\n _database_2.database_id.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Database Accession",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "ID(s) and Keywords",
+                                "priority_order": 10
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "database_code",
+                    "database_id"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
         "diffrn": {
             "type": "array",
             "items": {
@@ -880,19 +1048,43 @@
                     },
                     "pdbx_serial_crystal_experiment": {
                         "type": "string",
+                        "enum": [
+                            "N",
+                            "Y"
+                        ],
                         "examples": [
                             "Y",
                             "N"
                         ],
                         "description": "Y/N if using serial crystallography experiment in which multiple crystals contribute to each diffraction frame in the experiment.",
                         "rcsb_search_context": [
-                            "full-text"
+                            "exact-match"
                         ],
-                        "rcsb_full_text_priority": 1,
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "N",
+                                "detail": "No"
+                            },
+                            {
+                                "value": "Y",
+                                "detail": "Yes"
+                            }
+                        ],
                         "rcsb_description": [
                             {
                                 "text": "Y/N if using serial crystallography experiment in which multiple crystals contribute to each diffraction frame in the experiment.",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "Diffraction Serial Crystal Experiment",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "X-ray Data Collection Details",
+                                "priority_order": 55
                             }
                         ]
                     }
@@ -3532,6 +3724,7 @@
                             "TFS TALOS",
                             "TFS TALOS F200C",
                             "TFS TALOS L120C",
+                            "TFS TITAN THEMIS",
                             "TFS TUNDRA",
                             "ZEISS LEO912",
                             "ZEISS LIBRA120PLUS"
@@ -4035,7 +4228,7 @@
                                 "context": "dictionary"
                             },
                             {
-                                "text": "EM Reconstruction Software",
+                                "text": "EM Software",
                                 "context": "brief"
                             }
                         ],
@@ -4408,6 +4601,7 @@
                             "LEICA PLUNGER",
                             "REICHERT-JUNG PLUNGER",
                             "SPOTITON",
+                            "SPT LABTECH CHAMELEON",
                             "ZEISS PLUNGE FREEZER CRYOBOX"
                         ],
                         "description": "The type of instrument used in the vitrification process.",
@@ -5878,9 +6072,16 @@
                     "data_content_type": {
                         "type": "string",
                         "enum": [
+                            "Additional map",
                             "Chemical component",
+                            "EM metadata",
+                            "FSC",
+                            "Half map",
+                            "Image",
+                            "Mask",
                             "NMR restraints",
                             "NMR shifts",
+                            "Primary map",
                             "Structure factors",
                             "Structure model"
                         ],
@@ -5890,8 +6091,32 @@
                         "description": "The type of file that the pdbx_audit_revision_history record refers to.",
                         "rcsb_enum_annotated": [
                             {
+                                "value": "Additional map",
+                                "detail": "EM map"
+                            },
+                            {
                                 "value": "Chemical component",
                                 "detail": "Chemical component definition file"
+                            },
+                            {
+                                "value": "EM metadata",
+                                "detail": "Data describing EM experimental data"
+                            },
+                            {
+                                "value": "FSC",
+                                "detail": "EM Fourier Shell Correlation data"
+                            },
+                            {
+                                "value": "Half map",
+                                "detail": "EM half map"
+                            },
+                            {
+                                "value": "Image",
+                                "detail": "Image that represents primary map"
+                            },
+                            {
+                                "value": "Mask",
+                                "detail": "EM mask map"
                             },
                             {
                                 "value": "NMR restraints",
@@ -5900,6 +6125,10 @@
                             {
                                 "value": "NMR shifts",
                                 "detail": "NMR chemical shifts file"
+                            },
+                            {
+                                "value": "Primary map",
+                                "detail": "EM primary map"
                             },
                             {
                                 "value": "Structure factors",
@@ -5956,9 +6185,16 @@
                     "data_content_type": {
                         "type": "string",
                         "enum": [
+                            "Additional map",
                             "Chemical component",
+                            "EM metadata",
+                            "FSC",
+                            "Half map",
+                            "Image",
+                            "Mask",
                             "NMR restraints",
                             "NMR shifts",
+                            "Primary map",
                             "Structure factors",
                             "Structure model"
                         ],
@@ -5968,8 +6204,32 @@
                         "description": "The type of file that the pdbx_audit_revision_history record refers to.",
                         "rcsb_enum_annotated": [
                             {
+                                "value": "Additional map",
+                                "detail": "EM map"
+                            },
+                            {
                                 "value": "Chemical component",
                                 "detail": "Chemical component definition file"
+                            },
+                            {
+                                "value": "EM metadata",
+                                "detail": "Data describing EM experimental data"
+                            },
+                            {
+                                "value": "FSC",
+                                "detail": "EM Fourier Shell Correlation data"
+                            },
+                            {
+                                "value": "Half map",
+                                "detail": "EM half map"
+                            },
+                            {
+                                "value": "Image",
+                                "detail": "Image that represents primary map"
+                            },
+                            {
+                                "value": "Mask",
+                                "detail": "EM mask map"
                             },
                             {
                                 "value": "NMR restraints",
@@ -5978,6 +6238,10 @@
                             {
                                 "value": "NMR shifts",
                                 "detail": "NMR chemical shifts file"
+                            },
+                            {
+                                "value": "Primary map",
+                                "detail": "EM primary map"
                             },
                             {
                                 "value": "Structure factors",
@@ -6056,6 +6320,9 @@
                         "type": "string",
                         "enum": [
                             "Coordinate replacement",
+                            "Data added",
+                            "Data removed",
+                            "Data updated",
                             "Initial release",
                             "Obsolete",
                             "Remediation"
@@ -6090,9 +6357,16 @@
                     "data_content_type": {
                         "type": "string",
                         "enum": [
+                            "Additional map",
                             "Chemical component",
+                            "EM metadata",
+                            "FSC",
+                            "Half map",
+                            "Image",
+                            "Mask",
                             "NMR restraints",
                             "NMR shifts",
+                            "Primary map",
                             "Structure factors",
                             "Structure model"
                         ],
@@ -6102,8 +6376,32 @@
                         "description": "The type of file that the pdbx_audit_revision_history record refers to.",
                         "rcsb_enum_annotated": [
                             {
+                                "value": "Additional map",
+                                "detail": "EM map"
+                            },
+                            {
                                 "value": "Chemical component",
                                 "detail": "Chemical component definition file"
+                            },
+                            {
+                                "value": "EM metadata",
+                                "detail": "Data describing EM experimental data"
+                            },
+                            {
+                                "value": "FSC",
+                                "detail": "EM Fourier Shell Correlation data"
+                            },
+                            {
+                                "value": "Half map",
+                                "detail": "EM half map"
+                            },
+                            {
+                                "value": "Image",
+                                "detail": "Image that represents primary map"
+                            },
+                            {
+                                "value": "Mask",
+                                "detail": "EM mask map"
                             },
                             {
                                 "value": "NMR restraints",
@@ -6112,6 +6410,10 @@
                             {
                                 "value": "NMR shifts",
                                 "detail": "NMR chemical shifts file"
+                            },
+                            {
+                                "value": "Primary map",
+                                "detail": "EM primary map"
                             },
                             {
                                 "value": "Structure factors",
@@ -6141,7 +6443,7 @@
                             "Derived calculations",
                             "Experimental data",
                             "Experimental preparation",
-                            "Initial release",
+                            "Experimental summary",
                             "Non-polymer description",
                             "Other",
                             "Polymer sequence",
@@ -6192,8 +6494,8 @@
                                 "detail": "Categories describing the experimental sample preparation"
                             },
                             {
-                                "value": "Initial release",
-                                "detail": "Reports the initial release of the data contents"
+                                "value": "Experimental summary",
+                                "detail": "Categories that describe the title, authorship and molecular description"
                             },
                             {
                                 "value": "Non-polymer description",
@@ -6270,9 +6572,16 @@
                     "data_content_type": {
                         "type": "string",
                         "enum": [
+                            "Additional map",
                             "Chemical component",
+                            "EM metadata",
+                            "FSC",
+                            "Half map",
+                            "Image",
+                            "Mask",
                             "NMR restraints",
                             "NMR shifts",
+                            "Primary map",
                             "Structure factors",
                             "Structure model"
                         ],
@@ -6282,8 +6591,32 @@
                         "description": "The type of file that the pdbx_audit_revision_history record refers to.",
                         "rcsb_enum_annotated": [
                             {
+                                "value": "Additional map",
+                                "detail": "EM map"
+                            },
+                            {
                                 "value": "Chemical component",
                                 "detail": "Chemical component definition file"
+                            },
+                            {
+                                "value": "EM metadata",
+                                "detail": "Data describing EM experimental data"
+                            },
+                            {
+                                "value": "FSC",
+                                "detail": "EM Fourier Shell Correlation data"
+                            },
+                            {
+                                "value": "Half map",
+                                "detail": "EM half map"
+                            },
+                            {
+                                "value": "Image",
+                                "detail": "Image that represents primary map"
+                            },
+                            {
+                                "value": "Mask",
+                                "detail": "EM mask map"
                             },
                             {
                                 "value": "NMR restraints",
@@ -6292,6 +6625,10 @@
                             {
                                 "value": "NMR shifts",
                                 "detail": "NMR chemical shifts file"
+                            },
+                            {
+                                "value": "Primary map",
+                                "detail": "EM primary map"
                             },
                             {
                                 "value": "Structure factors",
@@ -6371,9 +6708,16 @@
                     "data_content_type": {
                         "type": "string",
                         "enum": [
+                            "Additional map",
                             "Chemical component",
+                            "EM metadata",
+                            "FSC",
+                            "Half map",
+                            "Image",
+                            "Mask",
                             "NMR restraints",
                             "NMR shifts",
+                            "Primary map",
                             "Structure factors",
                             "Structure model"
                         ],
@@ -6383,8 +6727,32 @@
                         "description": "The type of file that the pdbx_audit_revision_history record refers to.",
                         "rcsb_enum_annotated": [
                             {
+                                "value": "Additional map",
+                                "detail": "EM map"
+                            },
+                            {
                                 "value": "Chemical component",
                                 "detail": "Chemical component definition file"
+                            },
+                            {
+                                "value": "EM metadata",
+                                "detail": "Data describing EM experimental data"
+                            },
+                            {
+                                "value": "FSC",
+                                "detail": "EM Fourier Shell Correlation data"
+                            },
+                            {
+                                "value": "Half map",
+                                "detail": "EM half map"
+                            },
+                            {
+                                "value": "Image",
+                                "detail": "Image that represents primary map"
+                            },
+                            {
+                                "value": "Mask",
+                                "detail": "EM mask map"
                             },
                             {
                                 "value": "NMR restraints",
@@ -6393,6 +6761,10 @@
                             {
                                 "value": "NMR shifts",
                                 "detail": "NMR chemical shifts file"
+                            },
+                            {
+                                "value": "Primary map",
+                                "detail": "EM primary map"
                             },
                             {
                                 "value": "Structure factors",
@@ -7023,7 +7395,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -7094,7 +7466,7 @@
                         "WDRN"
                     ],
                     "examples": [
-                        "PROC  = Processing in progress\n     WAIT  = Awaiting author approval\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted and replaced by another entry\n     WDRN  = Entry has been withdrawn by depositor"
+                        "PROC  = Processing in progress\n     WAIT  = Awaiting author approval\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted\n     WDRN  = Entry has been withdrawn by depositor"
                     ],
                     "description": "Code for status of chemical shift data file.",
                     "rcsb_enum_annotated": [
@@ -7116,7 +7488,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -7171,7 +7543,7 @@
                         "WDRN"
                     ],
                     "examples": [
-                        "PROC  = To be processed\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted and replaced by another entry\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
+                        "PROC  = To be processed\n     REL   = Release\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
                     ],
                     "description": "Code for status of NMR constraints file.",
                     "rcsb_enum_annotated": [
@@ -7193,7 +7565,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -7247,7 +7619,7 @@
                         "WDRN"
                     ],
                     "examples": [
-                        "PROC  = To be processed\n     REL   = Released\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted and replaced by another entry\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
+                        "PROC  = To be processed\n     REL   = Released\n     HOLD  = On hold until yyyy-mm-dd\n     HPUB  = On hold until publication\n     OBS   = Entry has been obsoleted\n     WDRN  = Entry has been withdrawn by depositor\n     WAIT  = Awaiting author approval"
                     ],
                     "description": "Code for status of structure factor file.",
                     "rcsb_enum_annotated": [
@@ -7265,7 +7637,7 @@
                         },
                         {
                             "value": "OBS",
-                            "detail": "Entry has been obsoleted and replaced by another entry"
+                            "detail": "Entry has been obsoleted"
                         },
                         {
                             "value": "POLC",
@@ -7350,7 +7722,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "ID(s) and Keywords",
-                                "priority_order": 10
+                                "priority_order": 20
                             }
                         ]
                     },
@@ -8856,10 +9228,14 @@
                             "AVANCE III HD",
                             "WH",
                             "WM",
+                            "AC+",
+                            "Alpha",
                             "AM",
                             "AMX",
+                            "AMX II",
                             "DMX",
                             "DRX",
+                            "DSX",
                             "MSL",
                             "OMEGA",
                             "OMEGA PSG",
@@ -8871,10 +9247,15 @@
                             "EX",
                             "LA",
                             "ECP",
-                            "VXRS",
+                            "Infinityplus",
+                            "Mercury",
+                            "VNMRS",
+                            "VXR",
                             "UNITY",
+                            "UNITY INOVA",
                             "UNITYPLUS",
-                            "INOVA"
+                            "INOVA",
+                            "home-built"
                         ],
                         "description": "The model of the NMR spectrometer.",
                         "rcsb_search_context": [
@@ -10269,6 +10650,916 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "pdbx_vrpt_summary": {
+            "type": "object",
+            "properties": {
+                "RNA_suiteness": {
+                    "type": "number",
+                    "examples": [
+                        0.89
+                    ],
+                    "description": "The MolProbity conformer-match quality parameter for RNA structures.\nLow values are worse. Specific to structures that contain RNA polymers.",
+                    "rcsb_description": [
+                        {
+                            "text": "The MolProbity conformer-match quality parameter for RNA structures.\nLow values are worse. Specific to structures that contain RNA polymers.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "attempted_validation_steps": {
+                    "type": "string",
+                    "description": "The steps that were attempted by the validation pipeline software. \nA step typically involves running a 3rd party validation tool, for instance \"mogul\"\nEach step will be enumerated in _pdbx_vrpt_software category.",
+                    "rcsb_description": [
+                        {
+                            "text": "The steps that were attempted by the validation pipeline software. \nA step typically involves running a 3rd party validation tool, for instance \"mogul\"\nEach step will be enumerated in _pdbx_vrpt_software category.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "ligands_for_buster_report": {
+                    "type": "string",
+                    "enum": [
+                        "N",
+                        "Y"
+                    ],
+                    "description": "A flag indicating if there are ligands in the model used for detailed Buster analysis.",
+                    "rcsb_description": [
+                        {
+                            "text": "A flag indicating if there are ligands in the model used for detailed Buster analysis.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "report_creation_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date, time and time-zone that the validation report  was created. \nThe string will be formatted like yyyy-mm-dd:hh:mm in GMT time.",
+                    "rcsb_description": [
+                        {
+                            "text": "The date, time and time-zone that the validation report  was created. \nThe string will be formatted like yyyy-mm-dd:hh:mm in GMT time.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "restypes_notchecked_for_bond_angle_geometry": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "description": "This is a comma separated list of the residue types whose bond lengths and bond angles have \nnot been checked against \"standard geometry\" using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996)",
+                        "rcsb_description": [
+                            {
+                                "text": "This is a comma separated list of the residue types whose bond lengths and bond angles have \nnot been checked against \"standard geometry\" using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996)",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "uniqueItems": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "pdbx_vrpt_summary_diffraction": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "B_factor_type": {
+                        "type": "string",
+                        "enum": [
+                            "FULL",
+                            "PARTIAL"
+                        ],
+                        "description": "An indicator if isotropic B factors are partial or full values.",
+                        "rcsb_description": [
+                            {
+                                "text": "An indicator if isotropic B factors are partial or full values.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Babinet_b": {
+                        "type": "number",
+                        "description": "REFMAC scaling parameter as reported in log output line starting 'bulk solvent: scale'.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                        "rcsb_description": [
+                            {
+                                "text": "REFMAC scaling parameter as reported in log output line starting 'bulk solvent: scale'.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Babinet_k": {
+                        "type": "number",
+                        "description": "REFMAC scaling parameter as reported in log output line starting 'bulk solvent: scale'.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                        "rcsb_description": [
+                            {
+                                "text": "REFMAC scaling parameter as reported in log output line starting 'bulk solvent: scale'.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "CCP4_version": {
+                        "type": "string",
+                        "description": "The version of CCP4 suite used in the analysis.",
+                        "rcsb_description": [
+                            {
+                                "text": "The version of CCP4 suite used in the analysis.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "DCC_R": {
+                        "type": "number",
+                        "description": "The overall R-factor from a DCC recalculation of an electron density map.\nCurrently value is rounded to 2 decimal places.\nX-ray entry specific, obtained from the DCC program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall R-factor from a DCC recalculation of an electron density map.\nCurrently value is rounded to 2 decimal places.\nX-ray entry specific, obtained from the DCC program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "DCC_Rfree": {
+                        "type": "number",
+                        "description": "Rfree as calculated by DCC.",
+                        "rcsb_description": [
+                            {
+                                "text": "Rfree as calculated by DCC.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "EDS_R": {
+                        "type": "number",
+                        "description": "The overall R factor from the EDS REFMAC calculation (no free set is used in this).\nCurrently value is rounded to 2 decimal places.\nX-ray entry specific, obtained in the eds step from REFMAC calculation.",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall R factor from the EDS REFMAC calculation (no free set is used in this).\nCurrently value is rounded to 2 decimal places.\nX-ray entry specific, obtained in the eds step from REFMAC calculation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "EDS_R_warning": {
+                        "type": "string",
+                        "description": "Warning message when EDS calculated R vs reported R is higher than a threshold",
+                        "rcsb_description": [
+                            {
+                                "text": "Warning message when EDS calculated R vs reported R is higher than a threshold",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "EDS_res_high": {
+                        "type": "number",
+                        "description": "The data high resolution diffraction limit, in Angstroms, found in the input structure factor file.\nX-ray entry specific, obtained in the EDS step.",
+                        "rcsb_units": "angstroms",
+                        "rcsb_description": [
+                            {
+                                "text": "The data high resolution diffraction limit, in Angstroms, found in the input structure factor file.\nX-ray entry specific, obtained in the EDS step.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "EDS_res_low": {
+                        "type": "number",
+                        "description": "The data low resolution diffraction limit, in Angstroms, found in the input structure factor file.\nX-ray entry specific, obtained in the EDS step.",
+                        "rcsb_units": "angstroms",
+                        "rcsb_description": [
+                            {
+                                "text": "The data low resolution diffraction limit, in Angstroms, found in the input structure factor file.\nX-ray entry specific, obtained in the EDS step.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Fo_Fc_correlation": {
+                        "type": "number",
+                        "description": "Fo,Fc correlation: The difference between the observed structure factors (Fo) and the \ncalculated structure factors (Fc) measures the correlation between the model and the\nexperimental data. \nX-ray entry specific, obtained in the eds step from REFMAC calculation.",
+                        "rcsb_description": [
+                            {
+                                "text": "Fo,Fc correlation: The difference between the observed structure factors (Fo) and the \ncalculated structure factors (Fc) measures the correlation between the model and the\nexperimental data. \nX-ray entry specific, obtained in the eds step from REFMAC calculation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "I_over_sigma": {
+                        "type": "string",
+                        "description": "Each reflection has an intensity (I) and an uncertainty in measurement \n(sigma(I)), so I/sigma(I) is the signal-to-noise ratio. This\nratio decreases at higher resolution. <I/sigma(I)> is the mean of individual I/sigma(I)\nvalues. Value for outer resolution shell is given in parentheses. In case\nstructure factor amplitudes are deposited, Xtriage estimates the intensities\nfirst and then calculates this metric. When intensities are available in the\ndeposited file, these are converted to amplitudes and then back to intensity\nestimate before calculating the metric.  \nX-ray entry specific, calculated by Phenix Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "Each reflection has an intensity (I) and an uncertainty in measurement \n(sigma(I)), so I/sigma(I) is the signal-to-noise ratio. This\nratio decreases at higher resolution. <I/sigma(I)> is the mean of individual I/sigma(I)\nvalues. Value for outer resolution shell is given in parentheses. In case\nstructure factor amplitudes are deposited, Xtriage estimates the intensities\nfirst and then calculates this metric. When intensities are available in the\ndeposited file, these are converted to amplitudes and then back to intensity\nestimate before calculating the metric.  \nX-ray entry specific, calculated by Phenix Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Padilla_Yeates_L2_mean": {
+                        "type": "number",
+                        "description": "Padilla and Yeates twinning parameter <|L**2|>.\nTheoretical values is 0.333 in the untwinned case, and 0.2 in the perfectly twinned case.\nX-ray entry specific, obtained from the Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "Padilla and Yeates twinning parameter <|L**2|>.\nTheoretical values is 0.333 in the untwinned case, and 0.2 in the perfectly twinned case.\nX-ray entry specific, obtained from the Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Padilla_Yeates_L_mean": {
+                        "type": "number",
+                        "description": "Padilla and Yeates twinning parameter <|L|>.\nTheoretical values is 0.5 in the untwinned case, and 0.375 in the perfectly twinned case.\nX-ray entry specific, obtained from the Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "Padilla and Yeates twinning parameter <|L|>.\nTheoretical values is 0.5 in the untwinned case, and 0.375 in the perfectly twinned case.\nX-ray entry specific, obtained from the Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Q_score": {
+                        "type": "number",
+                        "description": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Wilson_B_aniso": {
+                        "type": "string",
+                        "description": "Result of absolute likelihood based Wilson scaling, \nThe anisotropic B value of the data is determined using a likelihood based approach. \nThe resulting B tensor is reported, the 3 diagonal values are given first, followed\nby the 3 off diagonal values.\nA large spread in (especially the diagonal) values indicates anisotropy. \nX-ray entry specific, calculated by Phenix Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "Result of absolute likelihood based Wilson scaling, \nThe anisotropic B value of the data is determined using a likelihood based approach. \nThe resulting B tensor is reported, the 3 diagonal values are given first, followed\nby the 3 off diagonal values.\nA large spread in (especially the diagonal) values indicates anisotropy. \nX-ray entry specific, calculated by Phenix Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Wilson_B_estimate": {
+                        "type": "number",
+                        "description": "An estimate of the overall B-value of the structure, calculated from the diffraction data. \nUnits Angstroms squared.\nIt serves as an indicator of the degree of order in the crystal and the value is usually \nnot hugely different from the average B-value calculated from the model.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                        "rcsb_units": "angstroms_squared",
+                        "rcsb_description": [
+                            {
+                                "text": "An estimate of the overall B-value of the structure, calculated from the diffraction data. \nUnits Angstroms squared.\nIt serves as an indicator of the degree of order in the crystal and the value is usually \nnot hugely different from the average B-value calculated from the model.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "acentric_outliers": {
+                        "type": "integer",
+                        "description": "The number of acentric reflections that Xtriage identifies as outliers on the basis \nof Wilson statistics. Note that if pseudo translational symmetry is present, \na large number of 'outliers' will be present.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of acentric reflections that Xtriage identifies as outliers on the basis \nof Wilson statistics. Note that if pseudo translational symmetry is present, \na large number of 'outliers' will be present.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "bulk_solvent_b": {
+                        "type": "number",
+                        "description": "REFMAC scaling parameter as reported in log output file.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                        "rcsb_description": [
+                            {
+                                "text": "REFMAC scaling parameter as reported in log output file.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "bulk_solvent_k": {
+                        "type": "number",
+                        "description": "REFMAC reported scaling parameter.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                        "rcsb_description": [
+                            {
+                                "text": "REFMAC reported scaling parameter.\nX-ray entry specific, obtained in the EDS step from REFMAC calculation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "centric_outliers": {
+                        "type": "integer",
+                        "description": "The number of centric reflections that Xtriage identifies as outliers.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of centric reflections that Xtriage identifies as outliers.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "data_anisotropy": {
+                        "type": "number",
+                        "description": "The ratio (Bmax - Bmin) / Bmean where Bmax, Bmin and Bmean are computed from the B-values \nassociated with the principal axes of the anisotropic thermal ellipsoid. \nThis ratio is usually less than 0.5; for only 1% of PDB entries it is more than 1.0 (Read et al., 2011).\nX-ray entry specific, obtained from the Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The ratio (Bmax - Bmin) / Bmean where Bmax, Bmin and Bmean are computed from the B-values \nassociated with the principal axes of the anisotropic thermal ellipsoid. \nThis ratio is usually less than 0.5; for only 1% of PDB entries it is more than 1.0 (Read et al., 2011).\nX-ray entry specific, obtained from the Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "data_completeness": {
+                        "type": "number",
+                        "description": "The percent completeness of diffraction data.",
+                        "rcsb_description": [
+                            {
+                                "text": "The percent completeness of diffraction data.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "density_fitness_version": {
+                        "type": "string",
+                        "description": "The version of density-fitness suite programs used in the analysis.",
+                        "rcsb_description": [
+                            {
+                                "text": "The version of density-fitness suite programs used in the analysis.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "exp_method": {
+                        "type": "string",
+                        "description": "Experimental method for statistics",
+                        "rcsb_description": [
+                            {
+                                "text": "Experimental method for statistics",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_miller_indices": {
+                        "type": "integer",
+                        "description": "The number of Miller Indices reported by the Xtriage program. This should be the same as the\nnumber of _refln in the input structure factor file.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of Miller Indices reported by the Xtriage program. This should be the same as the\nnumber of _refln in the input structure factor file.\nX-ray entry specific, calculated by Phenix Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "number_reflns_R_free": {
+                        "type": "integer",
+                        "description": "The number of reflections in the free set as defined in the input structure factor file supplied to the validation pipeline. \nX-ray entry specific, obtained from the DCC program.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of reflections in the free set as defined in the input structure factor file supplied to the validation pipeline. \nX-ray entry specific, obtained from the DCC program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "percent_RSRZ_outliers": {
+                        "type": "number",
+                        "description": "The percent of RSRZ outliers.",
+                        "rcsb_description": [
+                            {
+                                "text": "The percent of RSRZ outliers.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "percent_free_reflections": {
+                        "type": "number",
+                        "description": "A percentage, Normally percent proportion of the total number. Between 0% and 100%.",
+                        "rcsb_description": [
+                            {
+                                "text": "A percentage, Normally percent proportion of the total number. Between 0% and 100%.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "servalcat_version": {
+                        "type": "string",
+                        "description": "The version of Servalcat program used in the analysis.",
+                        "rcsb_description": [
+                            {
+                                "text": "The version of Servalcat program used in the analysis.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "trans_NCS_details": {
+                        "type": "string",
+                        "examples": [
+                            "The largest off-origin peak in the Patterson function is 8.82% of the height of the origin peak. No significant pseudotranslation is detected."
+                        ],
+                        "description": "A sentence giving the result of Xtriage's analysis on translational NCS.\nX-ray entry specific, obtained from the Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "A sentence giving the result of Xtriage's analysis on translational NCS.\nX-ray entry specific, obtained from the Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "twin_fraction": {
+                        "type": "string",
+                        "examples": [
+                            "h,h-k,h-l:0.477;-h,-h+k,-l:0.020;-h,-k,-h+l:0.017"
+                        ],
+                        "description": "Estimated twinning fraction for operators as identified by Xtriage. A semicolon separated\nlist of operators with fractions is givens \nX-ray entry specific, obtained from the Xtriage program.",
+                        "rcsb_description": [
+                            {
+                                "text": "Estimated twinning fraction for operators as identified by Xtriage. A semicolon separated\nlist of operators with fractions is givens \nX-ray entry specific, obtained from the Xtriage program.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "pdbx_vrpt_summary_em": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "Q_score": {
+                        "type": "number",
+                        "description": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "atom_inclusion_all_atoms": {
+                        "type": "number",
+                        "description": "The proportion of all non hydrogen atoms within density.",
+                        "rcsb_description": [
+                            {
+                                "text": "The proportion of all non hydrogen atoms within density.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "atom_inclusion_backbone": {
+                        "type": "number",
+                        "description": "The proportion of backbone atoms within density.",
+                        "rcsb_description": [
+                            {
+                                "text": "The proportion of backbone atoms within density.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "author_provided_fsc_resolution_by_cutoff_halfbit": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the author provided fsc and the indicator curve halfbit.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the author provided fsc and the indicator curve halfbit.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "author_provided_fsc_resolution_by_cutoff_onebit": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the author provided fsc and the indicator curve onebit.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the author provided fsc and the indicator curve onebit.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "author_provided_fsc_resolution_by_cutoff_pt_143": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the author provided fsc and the indicator curve 0.143.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the author provided fsc and the indicator curve 0.143.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "author_provided_fsc_resolution_by_cutoff_pt_333": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the author provided fsc and the indicator curve 0.333.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the author provided fsc and the indicator curve 0.333.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "author_provided_fsc_resolution_by_cutoff_pt_5": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the author provided fsc and the indicator curve 0.5.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the author provided fsc and the indicator curve 0.5.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "author_provided_fsc_resolution_by_cutoff_threesigma": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the author provided fsc and the indicator curve threesigma.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the author provided fsc and the indicator curve threesigma.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "calculated_fsc_resolution_by_cutoff_halfbit": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve halfbit.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve halfbit.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "calculated_fsc_resolution_by_cutoff_onebit": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve onebit.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve onebit.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "calculated_fsc_resolution_by_cutoff_pt_143": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve 0.143.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve 0.143.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "calculated_fsc_resolution_by_cutoff_pt_333": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve 0.333.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve 0.333.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "calculated_fsc_resolution_by_cutoff_pt_5": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve 0.5.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve 0.5.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "calculated_fsc_resolution_by_cutoff_threesigma": {
+                        "type": "number",
+                        "description": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve threesigma.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resolution from the intersection of the fsc curve generated by from the provided halfmaps and the indicator curve threesigma.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "contour_level_primary_map": {
+                        "type": "number",
+                        "description": "The recommended contour level for the primary map of this deposition.",
+                        "rcsb_description": [
+                            {
+                                "text": "The recommended contour level for the primary map of this deposition.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "exp_method": {
+                        "type": "string",
+                        "description": "Experimental method for statistics",
+                        "rcsb_description": [
+                            {
+                                "text": "Experimental method for statistics",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "pdbx_vrpt_summary_geometry": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "angles_RMSZ": {
+                        "type": "number",
+                        "description": "The overall root mean square of the Z-score for deviations of bond angles in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The overall root mean square of the Z-score for deviations of bond angles in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Molprobity Angles RMSZ",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Entry Features",
+                                "priority_order": 100
+                            }
+                        ]
+                    },
+                    "bonds_RMSZ": {
+                        "type": "number",
+                        "description": "The overall root mean square of the Z-score for deviations of bond lengths in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The overall root mean square of the Z-score for deviations of bond lengths in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Molprobity Bonds RMSZ",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Entry Features",
+                                "priority_order": 105
+                            }
+                        ]
+                    },
+                    "clashscore": {
+                        "type": "number",
+                        "description": "This score is derived from the number of pairs of atoms in the PDB_model_num that are unusually close to each other. \nIt is calculated by the MolProbity pdbx_vrpt_software and expressed as the number or such clashes per thousand atoms.\nFor structures determined by NMR the clashscore value here will only consider label_atom_id pairs in the \nwell-defined (core) residues from ensemble analysis.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "This score is derived from the number of pairs of atoms in the PDB_model_num that are unusually close to each other. \nIt is calculated by the MolProbity pdbx_vrpt_software and expressed as the number or such clashes per thousand atoms.\nFor structures determined by NMR the clashscore value here will only consider label_atom_id pairs in the \nwell-defined (core) residues from ensemble analysis.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Molprobity Clashscore",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Entry Features",
+                                "priority_order": 110
+                            }
+                        ]
+                    },
+                    "clashscore_full_length": {
+                        "type": "number",
+                        "description": "Only given for structures determined by NMR. The MolProbity pdbx_vrpt_instance_clashes score for all label_atom_id pairs.",
+                        "rcsb_description": [
+                            {
+                                "text": "Only given for structures determined by NMR. The MolProbity pdbx_vrpt_instance_clashes score for all label_atom_id pairs.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_H_reduce": {
+                        "type": "integer",
+                        "description": "This is the number of hydrogen atoms added and optimized by the MolProbity reduce pdbx_vrpt_software as part of the\nall-atom clashscore.",
+                        "rcsb_description": [
+                            {
+                                "text": "This is the number of hydrogen atoms added and optimized by the MolProbity reduce pdbx_vrpt_software as part of the\nall-atom clashscore.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_angles_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond angles compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond angles compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_bonds_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond lengths compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond lengths compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).\nThis value is for all chains in the structure.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "percent_ramachandran_outliers": {
+                        "type": "number",
+                        "description": "The percentage of residues with Ramachandran outliers.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The percentage of residues with Ramachandran outliers.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Molprobity Percentage Ramachandran Outliers",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Entry Features",
+                                "priority_order": 115
+                            }
+                        ]
+                    },
+                    "percent_ramachandran_outliers_full_length": {
+                        "type": "number",
+                        "description": "Only given for structures determined by NMR. The MolProbity Ramachandran outlier score\nfor all atoms in the structure rather than just the well-defined (core) residues.",
+                        "rcsb_description": [
+                            {
+                                "text": "Only given for structures determined by NMR. The MolProbity Ramachandran outlier score\nfor all atoms in the structure rather than just the well-defined (core) residues.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "percent_rotamer_outliers": {
+                        "type": "number",
+                        "description": "The MolProbity sidechain outlier score (a percentage).\nProtein sidechains mostly adopt certain (combinations of) preferred torsion angle values \n(called rotamers or rotameric conformers), much like their backbone torsion angles \n(as assessed in the Ramachandran analysis). MolProbity considers the sidechain conformation \nof a residue to be an outlier if its set of torsion angles is not similar to any preferred \ncombination. The sidechain outlier score is calculated as the percentage of residues \nwith an unusual sidechain conformation with respect to the total number of residues for \nwhich the assessment is available.\nExample: percent-rota-outliers=\"2.44\".\nSpecific to structure that contain protein chains and have sidechains modelled.\nFor NMR structures only the  well-defined (core) residues from ensemble analysis will be considered.\nThe percentage of residues with rotamer outliers.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The MolProbity sidechain outlier score (a percentage).\nProtein sidechains mostly adopt certain (combinations of) preferred torsion angle values \n(called rotamers or rotameric conformers), much like their backbone torsion angles \n(as assessed in the Ramachandran analysis). MolProbity considers the sidechain conformation \nof a residue to be an outlier if its set of torsion angles is not similar to any preferred \ncombination. The sidechain outlier score is calculated as the percentage of residues \nwith an unusual sidechain conformation with respect to the total number of residues for \nwhich the assessment is available.\nExample: percent-rota-outliers=\"2.44\".\nSpecific to structure that contain protein chains and have sidechains modelled.\nFor NMR structures only the  well-defined (core) residues from ensemble analysis will be considered.\nThe percentage of residues with rotamer outliers.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Molprobity Percentage Rotamer Outliers",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Entry Features",
+                                "priority_order": 120
+                            }
+                        ]
+                    },
+                    "percent_rotamer_outliers_full_length": {
+                        "type": "number",
+                        "description": "Only given for structures determined by NMR. The MolProbity sidechain outlier score\nfor all atoms in the structure rather than just the well-defined (core) residues.",
+                        "rcsb_description": [
+                            {
+                                "text": "Only given for structures determined by NMR. The MolProbity sidechain outlier score\nfor all atoms in the structure rather than just the well-defined (core) residues.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "pdbx_vrpt_summary_nmr": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "chemical_shift_completeness": {
+                        "type": "number",
+                        "description": "Overall completeness of the chemical shift assignments for the well-defined \nregions of the structure.",
+                        "rcsb_description": [
+                            {
+                                "text": "Overall completeness of the chemical shift assignments for the well-defined \nregions of the structure.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "chemical_shift_completeness_full_length": {
+                        "type": "number",
+                        "description": "Overall completeness of the chemical shift assignments for the full \nmacromolecule or complex as suggested by the molecular description of an entry\n(whether some portion of it is modelled or not).",
+                        "rcsb_description": [
+                            {
+                                "text": "Overall completeness of the chemical shift assignments for the full \nmacromolecule or complex as suggested by the molecular description of an entry\n(whether some portion of it is modelled or not).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "cyrange_error": {
+                        "type": "string",
+                        "description": "Diagnostic message from the wrapper of Cyrange software which identifies the \nwell-defined cores (domains) of NMR protein structures.",
+                        "rcsb_description": [
+                            {
+                                "text": "Diagnostic message from the wrapper of Cyrange software which identifies the \nwell-defined cores (domains) of NMR protein structures.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "cyrange_number_of_domains": {
+                        "type": "integer",
+                        "description": "Total number of well-defined cores (domains) identified by Cyrange",
+                        "rcsb_description": [
+                            {
+                                "text": "Total number of well-defined cores (domains) identified by Cyrange",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "exp_method": {
+                        "type": "string",
+                        "description": "Experimental method for statistics",
+                        "rcsb_description": [
+                            {
+                                "text": "Experimental method for statistics",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "medoid_model": {
+                        "type": "integer",
+                        "description": "For each Cyrange well-defined core (\"cyrange_domain\") the id of the PDB_model_num which is most \nsimilar to other models as measured by pairwise RMSDs over the domain. \nFor the whole entry (\"Entry\"), the medoid PDB_model_num of the largest core is taken as an overall\nrepresentative of the structure.",
+                        "rcsb_description": [
+                            {
+                                "text": "For each Cyrange well-defined core (\"cyrange_domain\") the id of the PDB_model_num which is most \nsimilar to other models as measured by pairwise RMSDs over the domain. \nFor the whole entry (\"Entry\"), the medoid PDB_model_num of the largest core is taken as an overall\nrepresentative of the structure.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "nmr_models_consistency_flag": {
+                        "type": "string",
+                        "description": "A flag indicating if all models in the NMR ensemble contain the exact \nsame atoms (\"True\") or if the models differ in this respect (\"False\").",
+                        "rcsb_description": [
+                            {
+                                "text": "A flag indicating if all models in the NMR ensemble contain the exact \nsame atoms (\"True\") or if the models differ in this respect (\"False\").",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "nmrclust_error": {
+                        "type": "string",
+                        "description": "Diagnostic message from the wrapper of NMRClust software which clusters NMR models.",
+                        "rcsb_description": [
+                            {
+                                "text": "Diagnostic message from the wrapper of NMRClust software which clusters NMR models.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "nmrclust_number_of_clusters": {
+                        "type": "integer",
+                        "description": "Total number of clusters in the NMR ensemble identified by NMRClust.",
+                        "rcsb_description": [
+                            {
+                                "text": "Total number of clusters in the NMR ensemble identified by NMRClust.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "nmrclust_number_of_models": {
+                        "type": "integer",
+                        "description": "Number of models analysed by NMRClust - should in almost all cases be the\nsame as the number of models in the NMR ensemble.",
+                        "rcsb_description": [
+                            {
+                                "text": "Number of models analysed by NMRClust - should in almost all cases be the\nsame as the number of models in the NMR ensemble.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "nmrclust_number_of_outliers": {
+                        "type": "integer",
+                        "description": "Number of models that do not belong to any cluster as deemed by NMRClust.",
+                        "rcsb_description": [
+                            {
+                                "text": "Number of models that do not belong to any cluster as deemed by NMRClust.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "nmrclust_representative_model": {
+                        "type": "integer",
+                        "description": "Overall representative PDB_model_num of the NMR ensemble as identified by NMRClust.",
+                        "rcsb_description": [
+                            {
+                                "text": "Overall representative PDB_model_num of the NMR ensemble as identified by NMRClust.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
         "rcsb_accession_info": {
             "type": "object",
             "properties": {
@@ -10600,7 +11891,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "ID(s) and Keywords",
-                                "priority_order": 20
+                                "priority_order": 30
                             }
                         ]
                     },
@@ -10735,7 +12026,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "ID(s) and Keywords",
-                                "priority_order": 25
+                                "priority_order": 35
                             }
                         ]
                     },
@@ -11077,7 +12368,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "X-ray Data Collection Details",
-                            "priority_order": 60
+                            "priority_order": 65
                         }
                     ]
                 },
@@ -11101,7 +12392,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "X-ray Data Collection Details",
-                            "priority_order": 55
+                            "priority_order": 60
                         }
                     ]
                 },
@@ -15468,7 +16759,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "ID(s) and Keywords",
-                            "priority_order": 35
+                            "priority_order": 45
                         }
                     ]
                 },
@@ -15503,7 +16794,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "ID(s) and Keywords",
-                            "priority_order": 40
+                            "priority_order": 50
                         }
                     ]
                 }
@@ -16151,5 +17442,5 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Core Entry",
     "description": "JSON schema for entry level core data. Combines Exchange DB schema: json-schema-min-pdbx_core_entry.json and RCSB Data Warehouse schema: json-schema-core_entry.json",
-    "$comment": "schema_version: 9.0.2"
+    "$comment": "schema_version: 9.0.4"
 }
