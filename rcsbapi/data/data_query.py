@@ -272,4 +272,4 @@ class AllStructures:
         if input_type in self.ALL_STRUCTURES:
             return self.ALL_STRUCTURES[input_type]
         else:
-            raise ValueError(f"ALL_STRUCTURES is not yet available for {input_type}")
+            raise ValueError(f"ALL_STRUCTURES is not yet available for input_type {input_type}")

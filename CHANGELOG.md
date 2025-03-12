@@ -1,5 +1,5 @@
 # Changelog
-## v1.1.0 (2025-03-03)
+## v1.1.0 (2025-03-12)
 
 - Add `ALL_STRUCTURES` object, allowing Data API queries for all PDB structures and chemical components
 - Add `progress_bar` and `batch_size` parameters to Data API package's `.exec`
