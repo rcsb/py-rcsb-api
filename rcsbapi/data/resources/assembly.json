@@ -582,7 +582,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "ID(s) and Keywords",
-                            "priority_order": 15
+                            "priority_order": 25
                         }
                     ]
                 },

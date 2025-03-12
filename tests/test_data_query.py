@@ -321,7 +321,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. Making Queries"):
             try:
@@ -428,6 +428,31 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
+    def testAllStructures(self):
+        from rcsbapi.data import ALL_STRUCTURES
+
+        with self.subTest("1. Test entries ALL_STRUCTURES"):
+            try:
+                data_query = DataQuery(
+                    input_type="entries",
+                    input_ids=ALL_STRUCTURES,
+                    return_data_list=["exptl.method"],
+                )
+                data_query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest("2. Test chem_comps ALL_STRUCTURES"):
+            try:
+                data_query = DataQuery(
+                    input_type="chem_comps",
+                    input_ids=ALL_STRUCTURES,
+                    return_data_list=["chem_comps.rcsb_id"],
+                )
+                data_query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
 
 def buildQuery():
     suiteSelect = unittest.TestSuite()
@@ -439,6 +464,7 @@ def buildQuery():
     suiteSelect.addTest(QueryTests("testAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
     suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
 
 

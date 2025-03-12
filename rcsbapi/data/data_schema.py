@@ -114,7 +114,7 @@ class DataSchema:
         GraphQL schema defining available fields, types, and how they are connected.
         """
         self.pdb_url: str = const.DATA_API_ENDPOINT
-        self.timeout: int = config.DATA_API_TIMEOUT
+        self.timeout: int = config.API_TIMEOUT
         self.schema: Dict = self._fetch_schema()
         """JSON resulting from full introspection of GraphQL query"""
 
