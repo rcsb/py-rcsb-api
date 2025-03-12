@@ -65,6 +65,118 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "pdbx_vrpt_summary_entity_fit_to_map": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "PDB_model_num": {
+                        "type": "integer",
+                        "description": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                        "rcsb_description": [
+                            {
+                                "text": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "Q_score": {
+                        "type": "number",
+                        "description": "The calculated average Q-score.",
+                        "rcsb_description": [
+                            {
+                                "text": "The calculated average Q-score.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "average_residue_inclusion": {
+                        "type": "number",
+                        "description": "The average of the residue inclusions for all residues in this instance",
+                        "rcsb_description": [
+                            {
+                                "text": "The average of the residue inclusions for all residues in this instance",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "pdbx_vrpt_summary_entity_geometry": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "PDB_model_num": {
+                        "type": "integer",
+                        "description": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                        "rcsb_description": [
+                            {
+                                "text": "The unique model number from _atom_site.pdbx_PDB_model_num.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "angles_RMSZ": {
+                        "type": "number",
+                        "description": "The overall root mean square of the Z-score for deviations of bond angles in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall root mean square of the Z-score for deviations of bond angles in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "average_residue_inclusion": {
+                        "type": "number",
+                        "description": "The average of the residue inclusions for all residues in this instance",
+                        "rcsb_description": [
+                            {
+                                "text": "The average of the residue inclusions for all residues in this instance",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "bonds_RMSZ": {
+                        "type": "number",
+                        "description": "The overall root mean square of the Z-score for deviations of bond lengths in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The overall root mean square of the Z-score for deviations of bond lengths in comparison to \n\"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_angles_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond angles compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond angles compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "num_bonds_RMSZ": {
+                        "type": "integer",
+                        "description": "The number of bond lengths compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                        "rcsb_description": [
+                            {
+                                "text": "The number of bond lengths compared to \"standard geometry\" made using the MolProbity dangle program.\nStandard geometry parameters are taken from Engh and Huber (2001) and Parkinson et al. (1996).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
         "rcsb_ligand_neighbors": {
             "type": "array",
             "items": {
@@ -851,12 +963,17 @@
                         "type": "string",
                         "enum": [
                             "ANGLE_OUTLIER",
+                            "ANGLE_OUTLIERS",
+                            "AVERAGE_OCCUPANCY",
                             "BEND",
                             "BINDING_SITE",
                             "BOND_OUTLIER",
+                            "BOND_OUTLIERS",
                             "C-MANNOSYLATION_SITE",
                             "CATH",
+                            "CHIRAL_OUTLIERS",
                             "CIS-PEPTIDE",
+                            "CLASHES",
                             "ECOD",
                             "HELIX_P",
                             "HELX_LH_PP_P",
@@ -881,12 +998,23 @@
                             "MA_QA_METRIC_LOCAL_TYPE_ZSCORE",
                             "MEMBRANE_SEGMENT",
                             "MOGUL_ANGLE_OUTLIER",
+                            "MOGUL_ANGLE_OUTLIERS",
                             "MOGUL_BOND_OUTLIER",
+                            "MOGUL_BOND_OUTLIERS",
+                            "MOGUL_RING_OUTLIERS",
+                            "MOGUL_TORSION_OUTLIERS",
                             "N-GLYCOSYLATION_SITE",
+                            "NATOMS_EDS",
                             "O-GLYCOSYLATION_SITE",
+                            "OWAB",
+                            "PLANE_OUTLIERS",
+                            "Q_SCORE",
                             "RAMACHANDRAN_OUTLIER",
                             "ROTAMER_OUTLIER",
+                            "RSCC",
                             "RSCC_OUTLIER",
+                            "RSR",
+                            "RSRZ",
                             "RSRZ_OUTLIER",
                             "S-GLYCOSYLATION_SITE",
                             "SABDAB_ANTIBODY_HEAVY_CHAIN_SUBCLASS",
@@ -899,6 +1027,7 @@
                             "SHEET",
                             "STEREO_OUTLIER",
                             "STRN",
+                            "SYMM_CLASHES",
                             "TURN_TY1_P",
                             "UNASSIGNED_SEC_STRUCT",
                             "UNOBSERVED_ATOM_XYZ",
@@ -919,6 +1048,16 @@
                                 "name": "Molprobity bond angle outlier"
                             },
                             {
+                                "value": "ANGLE_OUTLIERS",
+                                "detail": "Number of atoms with angle outliers",
+                                "name": "ANGLE_OUTLIERS"
+                            },
+                            {
+                                "value": "AVERAGE_OCCUPANCY",
+                                "detail": "The average heavy atom occupancy for coordinate records for the residue",
+                                "name": "AVERAGE_OCCUPANCY"
+                            },
+                            {
                                 "value": "BEND",
                                 "detail": "Bend - region with high backbone curvature without specific hydrogen bonding",
                                 "name": "Bend - region with high backbone curvature without specific hydrogen bonding"
@@ -934,6 +1073,11 @@
                                 "name": "Molprobity bond distance outlier"
                             },
                             {
+                                "value": "BOND_OUTLIERS",
+                                "detail": "Number of atoms with bond outliers",
+                                "name": "BOND_OUTLIERS"
+                            },
+                            {
                                 "value": "C-MANNOSYLATION_SITE",
                                 "detail": "Mannose glycan binding to the first tryptophan (W) residue in the sequence motif WXXW  (where X is any amino acid).",
                                 "name": "C-Mannosylation Site"
@@ -944,9 +1088,19 @@
                                 "name": "CATH"
                             },
                             {
+                                "value": "CHIRAL_OUTLIERS",
+                                "detail": "Number of chiral outliers",
+                                "name": "CHIRAL_OUTLIERS"
+                            },
+                            {
                                 "value": "CIS-PEPTIDE",
                                 "detail": "Peptide linkages with CIS configurations",
                                 "name": "CIS Peptide linkages"
+                            },
+                            {
+                                "value": "CLASHES",
+                                "detail": "Number of atoms a with clashes",
+                                "name": "CLASHES"
                             },
                             {
                                 "value": "ECOD",
@@ -1069,9 +1223,29 @@
                                 "name": "Mogul bond angle outlier"
                             },
                             {
+                                "value": "MOGUL_ANGLE_OUTLIERS",
+                                "detail": "Number of angle outliers as reported by MOGUL",
+                                "name": "MOGUL_ANGLE_OUTLIERS"
+                            },
+                            {
                                 "value": "MOGUL_BOND_OUTLIER",
                                 "detail": "Mogul bond distance outlier",
                                 "name": "Mogul bond distance outlier"
+                            },
+                            {
+                                "value": "MOGUL_BOND_OUTLIERS",
+                                "detail": "Number of bond outliers as reported by MOGUL",
+                                "name": "MOGUL_BOND_OUTLIERS"
+                            },
+                            {
+                                "value": "MOGUL_RING_OUTLIERS",
+                                "detail": "Number of atoms with ring outliers as reported by MOGUL",
+                                "name": "MOGUL_RING_OUTLIERS"
+                            },
+                            {
+                                "value": "MOGUL_TORSION_OUTLIERS",
+                                "detail": "Number of torsion angle outliers as reported by MOGUL",
+                                "name": "MOGUL_TORSION_OUTLIERS"
                             },
                             {
                                 "value": "N-GLYCOSYLATION_SITE",
@@ -1079,9 +1253,29 @@
                                 "name": "N-Glycosylation Site"
                             },
                             {
+                                "value": "NATOMS_EDS",
+                                "detail": "Number of atoms in the residue returned by the EDS software",
+                                "name": "NATOMS_EDS"
+                            },
+                            {
                                 "value": "O-GLYCOSYLATION_SITE",
                                 "detail": "Glycan binding to the oxygen atom of serine (Ser) or threonine (Thr) residues",
                                 "name": "O-Glycosylation Site"
+                            },
+                            {
+                                "value": "OWAB",
+                                "detail": "Occupancy-weighted Average B value",
+                                "name": "OWAB"
+                            },
+                            {
+                                "value": "PLANE_OUTLIERS",
+                                "detail": "Number of planar outliers",
+                                "name": "PLANE_OUTLIERS"
+                            },
+                            {
+                                "value": "Q_SCORE",
+                                "detail": "Q_score",
+                                "name": "Q_SCORE"
                             },
                             {
                                 "value": "RAMACHANDRAN_OUTLIER",
@@ -1094,9 +1288,24 @@
                                 "name": "Molprobity rotamer outlier"
                             },
                             {
+                                "value": "RSCC",
+                                "detail": "Real space correlation coefficient",
+                                "name": "RSCC"
+                            },
+                            {
                                 "value": "RSCC_OUTLIER",
                                 "detail": "Real space density correlation value < 0.65",
                                 "name": "Real space density correlation outlier"
+                            },
+                            {
+                                "value": "RSR",
+                                "detail": "Real Space R-value",
+                                "name": "RSR"
+                            },
+                            {
+                                "value": "RSRZ",
+                                "detail": "Real Space R-value z-score",
+                                "name": "RSRZ"
                             },
                             {
                                 "value": "RSRZ_OUTLIER",
@@ -1157,6 +1366,11 @@
                                 "value": "STRN",
                                 "detail": "Strand or beta-bridge (protein)",
                                 "name": "Strand or beta-bridge (protein)"
+                            },
+                            {
+                                "value": "SYMM_CLASHES",
+                                "detail": "Number of symmetry related clashes",
+                                "name": "SYMM_CLASHES"
                             },
                             {
                                 "value": "TURN_TY1_P",
@@ -1296,6 +1510,7 @@
                                         "PARTNER_ASYM_ID",
                                         "PARTNER_BOND_DISTANCE",
                                         "PARTNER_COMP_ID",
+                                        "PDB_MODEL_NUM",
                                         "SCOP2_DOMAIN_ID",
                                         "SCOP2_FAMILY_ID",
                                         "SCOP2_FAMILY_NAME",
@@ -1347,6 +1562,10 @@
                                         {
                                             "value": "PARTNER_COMP_ID",
                                             "detail": "Binding Partner Chemical Component Identifier"
+                                        },
+                                        {
+                                            "value": "PDB_MODEL_NUM",
+                                            "detail": "PDB Model Number"
                                         },
                                         {
                                             "value": "SCOP2_DOMAIN_ID",
@@ -1469,13 +1688,13 @@
                             0.5,
                             0.95
                         ],
-                        "description": "The fractional feature coverage relative to the full entity sequence.\n For instance, the fraction of features such as CATH or SCOP domains, secondary structure elements,\n unobserved residues, or geometrical outliers relative to the length of the entity sequence.",
+                        "description": "The fractional feature coverage relative to the full entity sequence.",
                         "rcsb_search_context": [
                             "default-match"
                         ],
                         "rcsb_description": [
                             {
-                                "text": "The fractional feature coverage relative to the full entity sequence.\n For instance, the fraction of features such as CATH or SCOP domains, secondary structure elements,\n unobserved residues, or geometrical outliers relative to the length of the entity sequence.",
+                                "text": "The fractional feature coverage relative to the full entity sequence.",
                                 "context": "dictionary"
                             },
                             {
@@ -1548,12 +1767,17 @@
                         "type": "string",
                         "enum": [
                             "ANGLE_OUTLIER",
+                            "ANGLE_OUTLIERS",
+                            "AVERAGE_OCCUPANCY",
                             "BEND",
                             "BINDING_SITE",
                             "BOND_OUTLIER",
+                            "BOND_OUTLIERS",
                             "C-MANNOSYLATION_SITE",
                             "CATH",
+                            "CHIRAL_OUTLIERS",
                             "CIS-PEPTIDE",
+                            "CLASHES",
                             "ECOD",
                             "HELIX_P",
                             "HELX_LH_PP_P",
@@ -1578,12 +1802,23 @@
                             "MA_QA_METRIC_LOCAL_TYPE_ZSCORE",
                             "MEMBRANE_SEGMENT",
                             "MOGUL_ANGLE_OUTLIER",
+                            "MOGUL_ANGLE_OUTLIERS",
                             "MOGUL_BOND_OUTLIER",
+                            "MOGUL_BOND_OUTLIERS",
+                            "MOGUL_RING_OUTLIERS",
+                            "MOGUL_TORSION_OUTLIERS",
                             "N-GLYCOSYLATION_SITE",
+                            "NATOMS_EDS",
                             "O-GLYCOSYLATION_SITE",
+                            "OWAB",
+                            "PLANE_OUTLIERS",
+                            "Q_SCORE",
                             "RAMACHANDRAN_OUTLIER",
                             "ROTAMER_OUTLIER",
+                            "RSCC",
                             "RSCC_OUTLIER",
+                            "RSR",
+                            "RSRZ",
                             "RSRZ_OUTLIER",
                             "S-GLYCOSYLATION_SITE",
                             "SABDAB_ANTIBODY_HEAVY_CHAIN_SUBCLASS",
@@ -1596,6 +1831,7 @@
                             "SHEET",
                             "STEREO_OUTLIER",
                             "STRN",
+                            "SYMM_CLASHES",
                             "TURN_TY1_P",
                             "UNASSIGNED_SEC_STRUCT",
                             "UNOBSERVED_ATOM_XYZ",
@@ -1619,6 +1855,16 @@
                                 "name": "Molprobity bond angle outlier"
                             },
                             {
+                                "value": "ANGLE_OUTLIERS",
+                                "detail": "Number of atoms with angle outliers",
+                                "name": "ANGLE_OUTLIERS"
+                            },
+                            {
+                                "value": "AVERAGE_OCCUPANCY",
+                                "detail": "The average heavy atom occupancy for coordinate records for the residue",
+                                "name": "AVERAGE_OCCUPANCY"
+                            },
+                            {
                                 "value": "BEND",
                                 "detail": "Bend - region with high backbone curvature without specific hydrogen bonding",
                                 "name": "Bend - region with high backbone curvature without specific hydrogen bonding"
@@ -1634,6 +1880,11 @@
                                 "name": "Molprobity bond distance outlier"
                             },
                             {
+                                "value": "BOND_OUTLIERS",
+                                "detail": "Number of atoms with bond outliers",
+                                "name": "BOND_OUTLIERS"
+                            },
+                            {
                                 "value": "C-MANNOSYLATION_SITE",
                                 "detail": "Mannose glycan binding to the first tryptophan (W) residue in the sequence motif WXXW  (where X is any amino acid).",
                                 "name": "C-Mannosylation Site"
@@ -1644,9 +1895,19 @@
                                 "name": "CATH"
                             },
                             {
+                                "value": "CHIRAL_OUTLIERS",
+                                "detail": "Number of chiral outliers",
+                                "name": "CHIRAL_OUTLIERS"
+                            },
+                            {
                                 "value": "CIS-PEPTIDE",
                                 "detail": "Peptide linkages with CIS configurations",
                                 "name": "CIS Peptide linkages"
+                            },
+                            {
+                                "value": "CLASHES",
+                                "detail": "Number of atoms a with clashes",
+                                "name": "CLASHES"
                             },
                             {
                                 "value": "ECOD",
@@ -1769,9 +2030,29 @@
                                 "name": "Mogul bond angle outlier"
                             },
                             {
+                                "value": "MOGUL_ANGLE_OUTLIERS",
+                                "detail": "Number of angle outliers as reported by MOGUL",
+                                "name": "MOGUL_ANGLE_OUTLIERS"
+                            },
+                            {
                                 "value": "MOGUL_BOND_OUTLIER",
                                 "detail": "Mogul bond distance outlier",
                                 "name": "Mogul bond distance outlier"
+                            },
+                            {
+                                "value": "MOGUL_BOND_OUTLIERS",
+                                "detail": "Number of bond outliers as reported by MOGUL",
+                                "name": "MOGUL_BOND_OUTLIERS"
+                            },
+                            {
+                                "value": "MOGUL_RING_OUTLIERS",
+                                "detail": "Number of atoms with ring outliers as reported by MOGUL",
+                                "name": "MOGUL_RING_OUTLIERS"
+                            },
+                            {
+                                "value": "MOGUL_TORSION_OUTLIERS",
+                                "detail": "Number of torsion angle outliers as reported by MOGUL",
+                                "name": "MOGUL_TORSION_OUTLIERS"
                             },
                             {
                                 "value": "N-GLYCOSYLATION_SITE",
@@ -1779,9 +2060,29 @@
                                 "name": "N-Glycosylation Site"
                             },
                             {
+                                "value": "NATOMS_EDS",
+                                "detail": "Number of atoms in the residue returned by the EDS software",
+                                "name": "NATOMS_EDS"
+                            },
+                            {
                                 "value": "O-GLYCOSYLATION_SITE",
                                 "detail": "Glycan binding to the oxygen atom of serine (Ser) or threonine (Thr) residues",
                                 "name": "O-Glycosylation Site"
+                            },
+                            {
+                                "value": "OWAB",
+                                "detail": "Occupancy-weighted Average B value",
+                                "name": "OWAB"
+                            },
+                            {
+                                "value": "PLANE_OUTLIERS",
+                                "detail": "Number of planar outliers",
+                                "name": "PLANE_OUTLIERS"
+                            },
+                            {
+                                "value": "Q_SCORE",
+                                "detail": "Q_score",
+                                "name": "Q_SCORE"
                             },
                             {
                                 "value": "RAMACHANDRAN_OUTLIER",
@@ -1794,9 +2095,24 @@
                                 "name": "Molprobity rotamer outlier"
                             },
                             {
+                                "value": "RSCC",
+                                "detail": "Real space correlation coefficient",
+                                "name": "RSCC"
+                            },
+                            {
                                 "value": "RSCC_OUTLIER",
                                 "detail": "Real space density correlation value < 0.65",
                                 "name": "Real space density correlation outlier"
+                            },
+                            {
+                                "value": "RSR",
+                                "detail": "Real Space R-value",
+                                "name": "RSR"
+                            },
+                            {
+                                "value": "RSRZ",
+                                "detail": "Real Space R-value z-score",
+                                "name": "RSRZ"
                             },
                             {
                                 "value": "RSRZ_OUTLIER",
@@ -1857,6 +2173,11 @@
                                 "value": "STRN",
                                 "detail": "Strand or beta-bridge (protein)",
                                 "name": "Strand or beta-bridge (protein)"
+                            },
+                            {
+                                "value": "SYMM_CLASHES",
+                                "detail": "Number of symmetry related clashes",
+                                "name": "SYMM_CLASHES"
                             },
                             {
                                 "value": "TURN_TY1_P",
@@ -2475,5 +2796,5 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Core Polymer Entity Instance",
     "description": "JSON schema for entity instance core data.",
-    "$comment": "schema_version: 10.0.2"
+    "$comment": "schema_version: 10.0.3"
 }

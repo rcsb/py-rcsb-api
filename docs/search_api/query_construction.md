@@ -150,6 +150,35 @@ query = q1 & q2
 list(query())
 ```
 
+Some sets of attributes can be separately grouped for a more specific search. For example, the attribute `rcsb_chem_comp_related.resource_name` could be set to "DrugBank" or another database and grouped with the attribute `rcsb_chem_comp_related.resource_accession_code`, which can be used to search for an accession code. When grouped, these attributes will be searched for together (i.e. the accession code must be associated with the specified database). To identify attributes that can be grouped, check the [schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema) for attributes with `rcsb_nested_indexing` set to `true`. To specify that two attributes should be searched together, use the `group` function.
+
+```python
+from rcsbapi.search import AttributeQuery
+from rcsbapi.search import group
+
+q1 = AttributeQuery(
+    attribute="rcsb_chem_comp_related.resource_name",
+    operator="exact_match",
+    value="DrugBank"
+)
+
+q2 = AttributeQuery(
+    attribute="rcsb_chem_comp_related.resource_accession_code",
+    operator="exact_match",
+    value="DB01050"
+)
+
+q3 = AttributeQuery(
+    attribute="rcsb_entity_source_organism.scientific_name",
+    operator="exact_match",
+    value="Homo sapiens"
+)
+
+# Using `group` ensures that `resource_name` and `accession_code` attributes are searched together
+query = group(q1 & q2) & q3
+list(query())
+```
+
 ### Sessions
 The result of executing a query (either by calling it as a function or using `exec()`) is a
 `Session` object. It implements `__iter__`, so it is usually treated as an
@@ -184,8 +213,7 @@ session.get_query_builder_link()
 
 #### Progress Bar
 The `iquery()` `Session` method provides a progress bar indicating the number of API
-requests being made. It requires the `tqdm` package be installed to track the
-progress of the query interactively.
+requests being made.
 ```python
 results = query().iquery()
 ```

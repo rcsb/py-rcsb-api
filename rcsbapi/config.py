@@ -18,9 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 class Config:
-    DATA_API_TIMEOUT: int = 60
+    API_TIMEOUT: int = 60
     SEARCH_API_REQUESTS_PER_SECOND: int = 10
     SUPPRESS_AUTOCOMPLETE_WARNING: bool = False
+    INPUT_ID_LIMIT: int = 5000
 
     def __setattr__(self, name, value):
         """Verify attribute exists when a user tries to set a configuration parameter, and ensure proper typing.

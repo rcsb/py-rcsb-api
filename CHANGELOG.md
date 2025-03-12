@@ -1,4 +1,16 @@
 # Changelog
+## v1.1.0 (2025-03-12)
+
+- Add `ALL_STRUCTURES` object, allowing Data API queries for all PDB structures and chemical components
+- Add `progress_bar` and `batch_size` parameters to Data API package's `.exec`
+- Add `group` function to Search API package to enforce nested grouping
+- Update README with new citation information
+- Update search schemas: 1.48.0 -> 1.49.0
+- Update data schemas: 
+  - entry schema 9.0.3 -> 9.0.4
+  - polymer_entity_instance schema 10.0.2 -> 10.0.3
+  - nonpolymer_entity_instance schema 10.0.0 -> 10.0.1
+
 ## v1.0.1 (2025-01-17)
 
 - Add import to `const.py` for compatibility with Python 3.8

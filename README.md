@@ -134,9 +134,14 @@ For example, one notebook using both Search and Data API packages for a COVID-19
 
 
 ## Citing
-Please cite the ``rcsb-api`` package by URL:
+Please cite the ``rcsb-api`` package with the following reference:
 
-> https://rcsbapi.readthedocs.io
+> Dennis W Piehl, Brinda Vallat, Ivana Truong, Habiba Morsy, Rusham Bhatt, 
+> Santiago Blaumann, Pratyoy Biswas, Yana Rose, Sebastian Bittrich, Jose M. Duarte,
+> Joan Segura, Chunxiao Bi, Douglas Myers-Turnbull, Brian P. Hudson, Christine Zardecki,
+> Stephen K. Burley, Rcsb-Api: Python Toolkit for Streamlining Access to RCSB Protein 
+> Data Bank APIs, Journal of Molecular Biology, 2025.
+> DOI: [10.1016/j.jmb.2025.168970](https://doi.org/10.1016/j.jmb.2025.168970)
 
 You should also cite the RCSB.org API services this package utilizes:
 

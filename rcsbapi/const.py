@@ -97,5 +97,10 @@ class Const:
         "uniprot": [r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"]
     })
 
+    INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT: MappingProxyType[str, List[str]] = MappingProxyType({
+        "entries": ["https://data.rcsb.org/rest/v1/holdings/current/entry_ids"],
+        "chem_comps": ["https://data.rcsb.org/rest/v1/holdings/current/ccd_ids", "https://data.rcsb.org/rest/v1/holdings/current/prd_ids"]
+    })
+
 
 const = Const()
