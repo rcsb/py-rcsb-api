@@ -5,7 +5,7 @@ DATA_SCHEMA = DataSchema()
 
 # This is needed because __getattr__ will be called twice on import,
 # so ALL_STRUCTURES should be cached to avoid initializing twice
-_import_cache: dict = {}
+# _import_cache: dict = {}
 
 
 # def __getattr__(name: str):
