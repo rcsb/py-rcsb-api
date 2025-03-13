@@ -4228,7 +4228,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1737244800000.0,
+                        "rcsb_current_maximum_value": 1740096000000.0,
                         "rcsb_current_minimum_value": -29926281600000.0
                     },
                     "pdbx_frequency": {
@@ -15344,7 +15344,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1740009600000.0,
+                    "rcsb_current_maximum_value": 1741132800000.0,
                     "rcsb_current_minimum_value": 82339200000.0
                 },
                 "has_released_experimental_data": {
@@ -15406,7 +15406,7 @@
                             "priority_order": 25
                         }
                     ],
-                    "rcsb_current_maximum_value": 1741132800000.0,
+                    "rcsb_current_maximum_value": 1741737600000.0,
                     "rcsb_current_minimum_value": 201312000000.0
                 },
                 "major_revision": {
@@ -15456,7 +15456,7 @@
                             "priority_order": 30
                         }
                     ],
-                    "rcsb_current_maximum_value": 1741132800000.0,
+                    "rcsb_current_maximum_value": 1741737600000.0,
                     "rcsb_current_minimum_value": 1310515200000.0
                 },
                 "status_code": {
@@ -16408,7 +16408,7 @@
                             "priority_order": 15
                         }
                     ],
-                    "rcsb_current_maximum_value": 63486.35,
+                    "rcsb_current_maximum_value": 63727.11,
                     "rcsb_current_minimum_value": 0.42
                 },
                 "na_polymer_entity_types": {
@@ -16819,7 +16819,7 @@
                             "priority_order": 35
                         }
                     ],
-                    "rcsb_current_maximum_value": 150.0,
+                    "rcsb_current_maximum_value": 154.0,
                     "rcsb_current_minimum_value": 0.0
                 },
                 "polymer_entity_taxonomy_count": {
@@ -24878,7 +24878,7 @@
                             "priority_order": 18
                         }
                     ],
-                    "rcsb_current_maximum_value": 40011745.0,
+                    "rcsb_current_maximum_value": 40042998.0,
                     "rcsb_current_minimum_value": 5.0
                 }
             },
@@ -25026,7 +25026,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1079456.0,
+                        "rcsb_current_maximum_value": 1079797.0,
                         "rcsb_current_minimum_value": 1.0
                     },
                     "identity": {
@@ -31495,7 +31495,7 @@
                             "context": "brief"
                         }
                     ],
-                    "rcsb_current_maximum_value": 150.0,
+                    "rcsb_current_maximum_value": 154.0,
                     "rcsb_current_minimum_value": 0.0
                 },
                 "polymer_entity_instance_count": {

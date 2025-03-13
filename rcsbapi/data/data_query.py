@@ -251,10 +251,19 @@ class DataQuery:
 
 
 class AllStructures:
+    """Class for representing all structures of different `input_types`
+    """
     def __init__(self):
+        """initialize AllStructures object
+        """
         self.ALL_STRUCTURES = self.reload()
 
     def reload(self) -> dict[str, List[str]]:
+        """Build dictionary of IDs based on endpoints defined in const
+
+        Returns:
+            dict[str, List[str]]: ALL_STRUCTURES object
+        """
         ALL_STRUCTURES = {}
         for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
             all_ids: List[str] = []
@@ -268,7 +277,18 @@ class AllStructures:
 
         return ALL_STRUCTURES
 
-    def get_all_ids(self, input_type) -> List[str]:
+    def get_all_ids(self, input_type: str) -> List[str]:
+        """Get all ids of a certain `input_type`
+
+        Args:
+            input_type (str): `input_type` string
+
+        Raises:
+            ValueError: raise an error if the `input_type` isn't in ALL_STRUCTURES
+
+        Returns:
+            List[str]: list of IDS of specified `input_type`
+        """
         if input_type in self.ALL_STRUCTURES:
             return self.ALL_STRUCTURES[input_type]
         else:
