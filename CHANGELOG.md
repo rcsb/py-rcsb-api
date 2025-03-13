@@ -1,4 +1,9 @@
 # Changelog
+## v1.1.1 (2025-03-13)
+
+- Add missing dependency for building documentation
+- Add docstrings
+
 ## v1.1.0 (2025-03-12)
 
 - Add `ALL_STRUCTURES` object, allowing Data API queries for all PDB structures and chemical components
