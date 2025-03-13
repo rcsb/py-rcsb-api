@@ -251,6 +251,8 @@ class DataQuery:
 
 
 class AllStructures:
+    """Class for representing all structures of different `input_types`
+    """
     def __init__(self):
         self.ALL_STRUCTURES = self.reload()
 
