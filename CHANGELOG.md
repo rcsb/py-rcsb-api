@@ -1,4 +1,9 @@
 # Changelog
+
+## v1.1.2 (2025-03-20)
+
+- Update how `dataclass` attributes are created in `const.py` 
+
 ## v1.1.1 (2025-03-13)
 
 - Add missing dependency for building documentation
