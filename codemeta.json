@@ -1,20 +1,44 @@
 {
     "@context": "https://w3id.org/codemeta/3.0",
     "type": "SoftwareSourceCode",
+    "applicationCategory": "Structural Biology, Bioinformatics",
     "codeRepository": "https://github.com/rcsb/py-rcsb-api",
     "dateCreated": "2024-04-15",
+    "dateModified": "2025-03-20",
     "datePublished": "2024-07-22",
     "description": "Python interface for RCSB PDB API services at RCSB.org.",
+    "downloadUrl": "https://github.com/rcsb/py-rcsb-api/archive/refs/heads/master.zip",
+    "funder": {
+        "type": "Organization",
+        "name": "US National Science Foundation (DBI-2321666), US Department of Energy (DE-SC0019749), National Cancer Institute, National Institute of Allergy and Infectious Diseases, and National Institute of General Medical Sciences of the National Institutes of Health (R01GM157729)"
+    },
+    "keywords": [
+        "structural biology",
+        "bioinformatics",
+        "protein structure",
+        "application programming interface",
+        "APIs"
+    ],
     "license": "https://spdx.org/licenses/MIT",
     "name": "rcsb-api",
     "operatingSystem": [
         "Linux",
         "Windows",
-        "macOS"
+        "MacOS"
     ],
     "programmingLanguage": "Python 3",
     "relatedLink": [
         "https://pypi.org/project/rcsb-api/",
         "https://rcsbapi.readthedocs.io/en/latest/index.html"
-    ]
+    ],
+    "softwareRequirements": "https://github.com/rcsb/py-rcsb-api/blob/master/requirements.txt",
+    "version": "1.1.2",
+    "codemeta:contIntegration": {
+        "id": "https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master"
+    },
+    "continuousIntegration": "https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master",
+    "developmentStatus": "active",
+    "funding": "DBI-2321666, DE-SC0019749, R01GM157729",
+    "issueTracker": "https://github.com/rcsb/py-rcsb-api/issues",
+    "referencePublication": "https://doi.org/10.1016/j.jmb.2025.168970"
 }
