@@ -1,5 +1,5 @@
 {
-    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "@context": "https://w3id.org/codemeta/3.0",
     "type": "SoftwareSourceCode",
     "applicationCategory": "Structural Biology, Bioinformatics",
     "codeRepository": "https://github.com/rcsb/py-rcsb-api",
@@ -33,10 +33,10 @@
     ],
     "softwareRequirements": "https://github.com/rcsb/py-rcsb-api/blob/master/requirements.txt",
     "version": "1.1.2",
-    "contIntegration": "https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master",
-    "codemeta:continuousIntegration": {
+    "codemeta:contIntegration": {
         "id": "https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master"
     },
+    "continuousIntegration": "https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master",
     "developmentStatus": "active",
     "funding": "DBI-2321666, DE-SC0019749, R01GM157729",
     "issueTracker": "https://github.com/rcsb/py-rcsb-api/issues",
