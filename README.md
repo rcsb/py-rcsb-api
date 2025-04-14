@@ -1,6 +1,7 @@
 [![PyPi Release](https://img.shields.io/pypi/v/rcsb-api.svg)](https://pypi.org/project/rcsb-api/)
 [![Build Status](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_apis/build/status/rcsb.py-rcsb-api?branchName=master)](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/rcsbapi/badge/?version=latest)](https://rcsbapi.readthedocs.io/en/latest/?badge=latest)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10424/badge)](https://www.bestpractices.dev/projects/10424)
 [![FAIR checklist badge](https://fairsoftwarechecklist.net/badge.svg)](https://fairsoftwarechecklist.net/v0.2?f=31&a=30112&i=32111&r=133)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8B-yellow)](https://fair-software.eu)
 
