@@ -36,7 +36,7 @@ logger.setLevel(logging.INFO)
 
 
 class QueryTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__startTime = time.time()
         logger.info("Starting %s at %s", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
 
@@ -44,14 +44,14 @@ class QueryTests(unittest.TestCase):
         endTime = time.time()
         logger.info("Completed %s at %s (%.4f seconds)", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
-    def testGetEditorLink(self):
+    def testGetEditorLink(self) -> None:
         # query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
         query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": ["4HHB", "1IYE"]}, return_data_list=["exptl"])
         url = query_obj.get_editor_link()
         response_json = requests.get(url, timeout=10)
         self.assertEqual(response_json.status_code, 200)
 
-    def testExec(self):
+    def testExec(self) -> None:
         with self.subTest("1. Batching into requests with fewer Ids"):
             input_ids = []
             for _ in range(165):
@@ -61,7 +61,7 @@ class QueryTests(unittest.TestCase):
             # assert that the batch and merge functions are called
             # assert len of results is same as num of input ids
 
-    def testLowercaseIds(self):
+    def testLowercaseIds(self) -> None:
         with self.subTest(msg="1. List of IDs"):
             try:
                 query_obj = DataQuery(input_type="entries", input_ids=["4hhb"], return_data_list=["exptl.method"])
@@ -93,10 +93,10 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testParseGQLError(self):
+    def testParseGQLError(self) -> None:
         pass
 
-    def testBatchIDs(self):
+    def testBatchIDs(self) -> None:
         input_ids = []
         for _ in range(165):
             input_ids.append("4HHB")
@@ -110,11 +110,11 @@ class QueryTests(unittest.TestCase):
             total_ids += len_id_batch
         self.assertEqual(len(query_obj.get_input_ids()), total_ids)
 
-    def testMergeResponse(self):
+    def testMergeResponse(self) -> None:
         # assert that the lengths are combined and all ids are present?
         pass
 
-    def testDocs(self):
+    def testDocs(self) -> None:
         with self.subTest(msg="1. Initialize Schema"):
             schema = DataSchema()
 
@@ -183,7 +183,7 @@ class QueryTests(unittest.TestCase):
                 except Exception as error:
                     self.fail(f"Failed unexpectedly: {error}")
 
-    def testAddExamples(self):
+    def testAddExamples(self) -> None:
         with self.subTest(msg="1. Entries"):
             try:
                 query = DataQuery(input_type="entries", input_ids=["1STP", "2JEF", "1CDG"], return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"])
@@ -308,11 +308,11 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testQuickstartNotebook(self):
+    def testQuickstartNotebook(self) -> None:
         with self.subTest(msg="1. Initialize Schema"):
             schema = DataSchema()
         with self.subTest(msg="2. GraphQL example query"):
-            query = """
+            ex_query = """
             {
             entry(entry_id: "4HHB") {
                 rcsb_entry_info {
@@ -321,7 +321,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.DATA_API_TIMEOUT).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=ex_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. Making Queries"):
             try:
@@ -387,7 +387,7 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testSearchDataNotebook(self):
+    def testSearchDataNotebook(self) -> None:
         with self.subTest(msg="1. Construct search API query and request"):
             # search API query and request
             try:
@@ -417,7 +417,7 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             try:
-                json = data_query.get_response()["data"]["entries"]
+                json = data_query.get_response()["data"]["entries"]  # type: ignore
                 json[0]["rcsb_id"]
                 json[0]["nonpolymer_entities"]
                 json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]
@@ -429,7 +429,7 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
 
 
-def buildQuery():
+def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(QueryTests("testGetEditorLink"))
     suiteSelect.addTest(QueryTests("testExec"))

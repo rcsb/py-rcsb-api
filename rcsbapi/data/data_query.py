@@ -196,7 +196,7 @@ class DataQuery:
         self._response = response_json
         return response_json
 
-    def _parse_gql_error(self, response_json: Dict[str, Any]):
+    def _parse_gql_error(self, response_json: Dict[str, Any]) -> None:
         if "errors" in response_json.keys():
             error_msg_list: list[str] = []
             for error_dict in response_json["errors"]:
@@ -228,7 +228,7 @@ class DataQuery:
                 batched_ids.append(batch_list)
         return batched_ids
 
-    def _merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]):
+    def _merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]) ->  Dict[str, Any]:
         """merge two JSON responses. Used after batching ids to merge responses from each batch.
 
         Args:

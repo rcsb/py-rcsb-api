@@ -118,7 +118,7 @@ class SeqSchema:
     def __init__(self) -> None:
         """GraphQL schema defining available fields, types, and how they are connected."""
         self.pdb_url: str = seq_const.API_ENDPOINT + "/graphql"
-        self.timeout: int = config.DATA_API_TIMEOUT  # TODO: change?
+        self.timeout: int = config.API_TIMEOUT  # TODO: change?
         self.schema: dict[str, Any] = self.fetch_schema()
         """JSON resulting from full introspection of the GraphQL schema"""
 
@@ -905,9 +905,9 @@ class SeqSchema:
             return_data_query_list.append(return_field_query_dict)
 
         # Merge all the queries in merge_query_list so there are no redundant paths
-        idx_query_body = self._merge_query_list(return_data_query_list)
-        name_query_body = self._idx_dict_to_name_dict(idx_query_body, query_args)
-        query = self._query_dict_to_graphql_string(first_line, name_query_body)
+        idx_query_body = self._merge_query_list(return_data_query_list)  # type: ignore
+        name_query_body = self._idx_dict_to_name_dict(idx_query_body, query_args)  # type: ignore
+        query = self._query_dict_to_graphql_string(first_line, name_query_body)  # type: ignore
         return {"query": query}
 
     def _merge_query_list(self, query_list: list[dict[int, Any] | list[int]]) -> list[dict[int, Any] | list[int]]:

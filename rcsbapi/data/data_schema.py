@@ -114,7 +114,7 @@ class DataSchema:
         GraphQL schema defining available fields, types, and how they are connected.
         """
         self.pdb_url: str = const.DATA_API_ENDPOINT
-        self.timeout: int = config.DATA_API_TIMEOUT
+        self.timeout: int = config.API_TIMEOUT
         self.schema: Dict = self._fetch_schema()
         """JSON resulting from full introspection of GraphQL query"""
 
@@ -447,12 +447,12 @@ class DataSchema:
         type_node.set_index(index)
         return type_node
 
-    def _find_kind(self, field_dict: Dict) -> str:
+    def _find_kind(self, field_dict: Dict[str, Any]) -> Any:
         if field_dict["name"] is not None:
             return field_dict["kind"]
         return self._find_kind(field_dict["ofType"])
 
-    def _find_type_name(self, field_dict: Dict) -> str:
+    def _find_type_name(self, field_dict: Dict[str, Any]) -> Any:
         if field_dict["name"] is not None:
             return field_dict["name"]
         return self._find_type_name(field_dict["ofType"])
@@ -462,6 +462,7 @@ class DataSchema:
             if type_dict["name"] == type_name:
                 for field in type_dict["fields"]:
                     if field["name"] == field_name:
+                        assert isinstance(field["description"], str)
                         return field["description"]
         return ""
 
@@ -518,7 +519,7 @@ class DataSchema:
             input_dict[name] = description
         return input_dict
 
-    def _recurse_fields(self, fields: Dict[Any, Any], field_map: Dict[Any, Any], indent=2) -> str:
+    def _recurse_fields(self, fields: Dict[Any, Any], field_map: Dict[Any, Any], indent: int=2) -> str:
         query_str = ""
         for target_idx, idx_path in fields.items():
             mapped_path = field_map.get(target_idx, [target_idx])
@@ -663,8 +664,8 @@ class DataSchema:
         input_type: str,
         input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]],
         return_data_list: List[str],
-        add_rcsb_id=True,
-        suppress_autocomplete_warning=False
+        add_rcsb_id: bool = True,
+        suppress_autocomplete_warning: bool = False
     ) -> str:
         suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
         if not (isinstance(input_ids, dict) or isinstance(input_ids, list)):
@@ -936,6 +937,7 @@ class DataSchema:
             if isinstance(input_dict[attr], list):
                 query += attr + ': ["' + '", "'.join(input_dict[attr]) + '"]'
             else:
+                # Special case for pubmed to not have quotes
                 if input_type == "pubmed":
                     query += attr + ": " + str(input_dict[attr])
                 else:

@@ -12,7 +12,6 @@ from rcsbapi.sequence import SEQ_SCHEMA
 
 
 # pylint: disable=useless-parent-delegation
-# This should be dynamically populated at some point.
 class EnumTypes(Enum):
     SequenceReference = SEQ_SCHEMA.read_enum("SequenceReference")
     FieldName = SEQ_SCHEMA.read_enum("FieldName")
@@ -27,7 +26,7 @@ class Query(ABC):
 
     @abstractmethod
     def to_dict(self) -> Dict[str, Any]:
-        """Get dictionary represented query and attributes, skips values of None"""
+        """Get dictionary representation of query and attributes, skips values of None"""
         request_dict: Dict[str, Any] = {}
         for field in fields(self):
             field_name = field.name
@@ -42,6 +41,10 @@ class Query(ABC):
                     field_value = [filter.to_string() for filter in field_value]
                 request_dict[field_name] = field_value
         return request_dict
+
+    def get_query(self) -> MappingProxyType[str, Any]:
+        assert hasattr(self, "_query")
+        return self._query  # type: ignore
 
     def construct_query(self, query_type: str) -> Dict[str, Any]:
         """type check based on the GraphQL schema, then construct the GraphQL query"""
@@ -79,7 +82,7 @@ class Query(ABC):
         response_json = requests.post(
             json=dict(self._query),
             url=seq_const.API_ENDPOINT + "/graphql",
-            timeout=config.DATA_API_TIMEOUT
+            timeout=config.API_TIMEOUT
         ).json()
         self._parse_gql_error(response_json)
         return dict(response_json)
