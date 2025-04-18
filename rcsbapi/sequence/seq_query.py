@@ -81,7 +81,7 @@ class Query(ABC):
             f"{self.__class__.__name__} must define '_query' attribute."
         response_json = requests.post(
             json=dict(self._query),
-            url=seq_const.API_ENDPOINT + "/graphql",
+            url=seq_const.GRAQPHQL_API_ENDPOINT,
             timeout=config.API_TIMEOUT
         ).json()
         self._parse_gql_error(response_json)
@@ -89,7 +89,7 @@ class Query(ABC):
 
     def get_editor_link(self) -> str:
         """Get link to GraphiQL editor with given query populated"""
-        editor_base_link = str(seq_const.API_ENDPOINT) + "/graphiql" + "/index.html?query="
+        editor_base_link = str(seq_const.BASE_API_ENDPOINT) + "/graphiql" + "/index.html?query="
         assert hasattr(self, "_query")  # for mypy
         return editor_base_link + urllib.parse.quote(str(self._query["query"]))
 

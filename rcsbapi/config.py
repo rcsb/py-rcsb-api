@@ -13,6 +13,7 @@ Example:
     config.SUPPRESS_AUTOCOMPLETE_WARNING = True
 """
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ class Config:
 
     SEARCH_API_REQUESTS_PER_SECOND: int = 10
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Verify attribute exists when a user tries to set a configuration parameter, and ensure proper typing.
         Raises an error if user accidentally tries to create a new, unused attribute (e.g., due to a typo or misspelling),
         or sets it to an unexpected type.

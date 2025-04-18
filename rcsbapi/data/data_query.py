@@ -170,7 +170,7 @@ class DataQuery:
                     headers={"Content-Type": "application/graphql"},
                     data=query,
                     url=const.DATA_API_ENDPOINT,
-                    timeout=config.DATA_API_TIMEOUT
+                    timeout=config.API_TIMEOUT
                 ).json()
                 self._parse_gql_error(part_response)
                 time.sleep(0.2)
@@ -183,7 +183,7 @@ class DataQuery:
                 headers={"Content-Type": "application/graphql"},
                 data=self._query,
                 url=const.DATA_API_ENDPOINT,
-                timeout=config.DATA_API_TIMEOUT
+                timeout=config.API_TIMEOUT
             ).json()
             self._parse_gql_error(response_json)
         if "data" in response_json.keys():

@@ -99,7 +99,8 @@ class Const:
 
 @dataclass(frozen=True)
 class SeqConst:
-    API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
+    BASE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
+    GRAQPHQL_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
 
 
 seq_const = SeqConst()

@@ -1,15 +1,14 @@
-"""Fetching and Parsing API's GraphQL schema."""
-
 from __future__ import annotations
+from abc import ABC, abstractmethod
+from typing import Dict, List, Any
 import logging
 import json
-from typing import Any
 from pathlib import Path
 import requests
 from graphql import build_client_schema
 import rustworkx as rx
 
-from rcsbapi.const import seq_const
+from rcsbapi.const import seq_const, const
 from rcsbapi.config import config
 
 use_networkx: bool = False
@@ -112,14 +111,13 @@ class TypeNode:
         self.field_list = field_list
 
 
-class SeqSchema:
+class Schema(ABC):
     """GraphQL schema defining available fields, types, and how they are connected."""
 
-    def __init__(self) -> None:
-        """GraphQL schema defining available fields, types, and how they are connected."""
-        self.pdb_url: str = seq_const.GRAQPHQL_API_ENDPOINT
-        self.timeout: int = config.API_TIMEOUT  # TODO: change?
-        self.schema: dict[str, Any] = self.fetch_schema()
+    def __init__(self, endpoint: str, timeout: int) -> None:
+        self.pdb_url: str = endpoint
+        self.timeout: int = timeout
+        self.schema: dict[str, Any] = self.fetch_schema("data_api_schema.json")
         """JSON resulting from full introspection of the GraphQL schema"""
 
         self._use_networkx: bool = use_networkx
@@ -200,7 +198,7 @@ class SeqSchema:
                 )
         return root_dict
 
-    def fetch_schema(self) -> dict[str, Any]:
+    def fetch_schema(self, fallback_file_name: str) -> dict[str, Any]:
         """
         Make an introspection query to get full Data API schema. Also found in resources folder as "seq_api_schema.json".
 
@@ -229,7 +227,7 @@ class SeqSchema:
             return dict(schema_response.json())
         logger.info("Loading data schema from file")
         current_dir = Path(Path(__file__).resolve()).parent
-        json_file_path = Path(current_dir) / "resources" / "seq_api_schema.json"
+        json_file_path = Path(current_dir) / "resources" / fallback_file_name
         with Path.open(json_file_path, encoding="utf-8") as schema_file:
             return dict(json.load(schema_file))
 
@@ -774,7 +772,7 @@ class SeqSchema:
         error_msg = "Not an ENUM value in GraphQL schema"
         raise ValueError(error_msg)
 
-    def check_typing(self, query_type: str, enum_types: "EnumTypes", args: dict[str, Any]) -> None:  # noqa: UP037, F821
+    def _check_typing(self, query_type: str, enum_types: "EnumTypes", args: dict[str, Any]) -> None:  # noqa: UP037, F821
         """Check that ENUM types are valid values and that if the schema type.
 
         Args:
@@ -817,26 +815,7 @@ class SeqSchema:
         if error_list:
             raise ValueError("\n" + "  " + "\n  ".join(error_list))
 
-    def construct_query(
-        self, query_type: str, query_args: dict[str, str] | dict[str, list[Any]], return_data_list: list[str], suppress_autocomplete_warning: bool = False
-    ) -> dict[str, Any]:
-        """
-        Construct a GraphQL query - currently only uses rustworkx.
-
-        Args:
-            query_type (str): root type ("alignments", "annotations")
-            query_args (dict[str, str] | dict[str, list]): dictionary where keys are argument names and
-                values are input values
-            return_data_list (list[str]): list of fields to request data for
-            suppress_autocomplete_warning (bool, optional): Whether to suppress warning for autocompletion of paths.
-                Defaults to False.
-
-        Raises:
-            ValueError: unknown field in the return_data_list
-
-        Returns:
-            dict: GraphQL query in JSON format
-        """
+    def _check_return_list(self, return_data_list: List[str]) -> None:
         unknown_return_list: list[str] = []
         for field in return_data_list:
             if "." in field:
@@ -849,32 +828,36 @@ class SeqSchema:
         if unknown_return_list:
             error_msg = f"Unknown item in return_data_list: {unknown_return_list}"
             raise ValueError(error_msg)
-        # if use_networkx:
-        #     query = self._construct_query_networkx(
-        #         input_type=input_type,
-        #         input_ids=input_ids,
-        #         return_data_list=return_data_list,
-        #         suppress_autocomplete_warning=suppress_autocomplete_warning
-        #     )
-        # else:
-        # query = self._construct_query_rustworkx(
-        #     input_type=input_type,
-        #     input_ids=input_ids,
-        #     return_data_list=return_data_list,
-        #     add_rcsb_id=add_rcsb_id,
-        #     suppress_autocomplete_warning=suppress_autocomplete_warning
-        # )
-        query = self._construct_query_rustworkx(
-            query_type=query_type, query_args=query_args, return_data_list=return_data_list, suppress_autocomplete_warning=suppress_autocomplete_warning
-        )
-        return query  # noqa: RET504
 
+    @abstractmethod
+    def construct_query(self) -> Dict[str, Any]:
+        """
+        Construct a GraphQL query - currently only uses rustworkx. Use kwargs to add API-specific arguments.
+
+        Args:
+            query_type (str): root type ("alignments", "annotations")
+            return_data_list (list[str]): list of fields to request data for
+            suppress_autocomplete_warning (bool, optional): Whether to suppress warning for autocompletion of paths.
+                Defaults to False.
+
+        Raises:
+            ValueError: unknown field in the return_data_list
+
+        Returns:
+            dict: GraphQL query
+        """
+        # In subclass implementations of this function,
+        # - validate return_data_list using `_check_return_list`
+        # - parse arguments into a format that can be passed into `_construct_query_rustworkx`
+        ...
+
+    @abstractmethod
     def _construct_query_rustworkx(
         self,
         query_type: str,
         query_args: dict[str, str] | dict[str, list[Any]],
         return_data_list: list[str],
-        suppress_autocomplete_warning: bool = False
+        suppress_autocomplete_warning: bool = False,
     ) -> dict[str, Any]:
         """Construct a GraphQL query as a dict, if using rustworkx.
 
@@ -905,9 +888,9 @@ class SeqSchema:
             return_data_query_list.append(return_field_query_dict)
 
         # Merge all the queries in merge_query_list so there are no redundant paths
-        idx_query_body = self._merge_query_list(return_data_query_list)  # type: ignore
-        name_query_body = self._idx_dict_to_name_dict(idx_query_body, query_args)  # type: ignore
-        query = self._query_dict_to_graphql_string(first_line, name_query_body)  # type: ignore
+        idx_query_body = self._merge_query_list(return_data_query_list)
+        name_query_body = self._idx_dict_to_name_dict(idx_query_body, query_args)
+        query = self._query_dict_to_graphql_string(first_line, name_query_body)
         return {"query": query}
 
     def _merge_query_list(self, query_list: list[dict[int, Any] | list[int]]) -> list[dict[int, Any] | list[int]]:

@@ -462,6 +462,8 @@ class DataSchema:
             if type_dict["name"] == type_name:
                 for field in type_dict["fields"]:
                     if field["name"] == field_name:
+                        if field["description"] is None:
+                            return ""
                         assert isinstance(field["description"], str)
                         return field["description"]
         return ""
