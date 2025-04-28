@@ -1,8 +1,7 @@
-from typing import List, Tuple, Literal, Optional, Any
+from typing import List, Tuple, Literal, Optional
 import typing
 import re
 import os
-import time
 import multiprocessing
 import gzip
 import urllib
@@ -10,17 +9,18 @@ import json
 import requests
 
 from rcsbapi.const import const, file_const
-# from rcsbapi.config import config  # TODO: eventually use config to set timeout?
+# from rcsbapi.config import config  # TODO: eventually use config to set timeout
 
+# Currently supported file types
 FileType = Literal["mmCIF", "bCIF", "PDB", "PDBML", "FASTA"]
 
 
-def build_url(pdb_id: str, file_type: str) -> str:
+def build_url(pdb_id: str, file_type: FileType) -> str:
     """build a full url based on a pdb_id and file_type
 
     Args:
         pdb_id (str): PDB identifier
-        file_type (str): Requested file_type
+        file_type (FileType): Requested file_type
 
     Returns:
         str: download url for file_type of pdb_id
@@ -37,17 +37,17 @@ def build_url(pdb_id: str, file_type: str) -> str:
     return file_const.FILE_DOWNLOAD_ENDPOINT + file_name + file_extension
 
 
-def make_full_type(pdb_id: str, file_type: str) -> str:
+def make_full_type(pdb_id: str, file_type: FileType) -> str:
     """Make a file type into the file type phrase listed within
     the Data API "repository_content_types"
         ex: "mmCIF" --> "entry mmCIF"
 
     NOTE: This is overly complicated for the current package, but
-    this is left in to allow for future development
+    this is left in to allow for adding support for more file types in the future
 
     Args:
         pdb_id (str): PDB ID to compare to regex
-        file_type (str): file_type requested to download
+        file_type (FileType): file_type requested to download
     Raises:
         ValueError: If the PDB ID doesn't match a regex string
 
@@ -65,7 +65,7 @@ def make_full_type(pdb_id: str, file_type: str) -> str:
         raise ValueError(f"{pdb_id} is not a valid entry or ligand PDB ID")
 
 
-def has_file_type(pdb_id: str, file_type: str):
+def has_file_type(pdb_id: str, file_type: FileType):
     """
     Check that the PDB ID has a given file type
 
@@ -217,7 +217,6 @@ def _download_file(
         str: If successful, returns empty string. If download fails, returns PDB id
     """
     url = build_url(pdb_id, file_type)
-    print(url)
     file_name = os.path.basename(url)
 
     # Special case for FASTA because url doesn't contain file extension
@@ -248,6 +247,7 @@ def _download_file(
             unzip_gz(path)  # TODO: Think about efficiency, I think it's slow rn
 
         # Not in use currently. For enforcing rate limit:
+        # Work in progress
         # with lock:  # ensure atomic increments
         #     request_counter.value += 1
         #     if request_counter.value % 2 == 0:
@@ -255,6 +255,7 @@ def _download_file(
 
         # For enforcing rate limit
         # download_time = time.time()
+        # check_rate_limit not implemented yet
         # check_rate_limit(download_time, prev_download_time)
 
         return ""
@@ -273,7 +274,7 @@ def download(
 
     Args:
         pdb_ids (List[str]): List of PDB identifiers
-        file_type (List[str], optional): List of file types to download. Defaults to ["mmCIF"]
+        file_type (List[str], optional): List of file types to download for each ID. Defaults to ["mmCIF"]
         dir (str, optional): Directory to download files into. Defaults to "."
         compressed (bool, optional): Whether to decompress downloaded files
             (which are downloaded compressed when possible). Defaults to True
@@ -284,6 +285,7 @@ def download(
     file_type_list = apply_capitalization(file_type_list)
 
     # Check that file_types are supported
+    # Throws errors if not supported
     check_file_types(file_type_list)
 
     # Before trying to download, check that PDB ids are in valid format
@@ -301,15 +303,6 @@ def download(
         cpu_count = os.cpu_count()
         assert isinstance(cpu_count, int)
         num_processors = min((len(pdb_ids) * len(file_type_list)), cpu_count - 1)
-
-    # Not in use currently. Shared counter for tracking number of requests.
-    # Context manager needs to contain rest of function?
-    # with multiprocessing.Manager() as manager:
-        # Used to ensure requests remain below rate limit
-        # request_counter = manager.Value("i", 0)
-        # lock = manager.Lock()  # for syncing counter across processes
-        # prev_download_time = manager.Value("time", time.time())
-        # time_lock = manager.Lock()
 
     # Make tuples of arguments to pass into _download_file(), required for multiprocessing
     id_file_arg_list: List[Tuple[str, FileType, str, bool]] = make_id_file_tuples(
