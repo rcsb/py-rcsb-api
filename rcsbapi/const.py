@@ -90,7 +90,7 @@ class Const:
     DATA_API_INPUT_TYPE_TO_REGEX: MappingProxyType[str, List[str]] = field(default_factory=lambda: MappingProxyType({
         "entry": [r"^(MA|AF|ma|af)_[A-Z0-9]*$", r"^[A-Za-z0-9]{4}$"],
         "entity": [r"^(MA|AF|ma|af)_[A-Z0-9]*_[0-9]+$", r"^[A-Z0-9]{4}_[0-9]+$"],
-        "instance": [r"^(MA|AF|ma|af)_[A-Z0-9]*\.[A-Za-z]$", r"^[A-Z0-9]{4}\.[A-Za-z]$"],
+        "instance": [r"^(MA|AF|ma|af)_[A-Z0-9]*\.[A-Za-z]+$", r"^[A-Z0-9]{4}\.[A-Za-z]+$"],
         "assembly": [r"^(MA|AF|ma|af)_[A-Z0-9]*-[0-9]+$", r"^[A-Z0-9]{4}-[0-9]+$"],
         "interface": [r"^(MA|AF|ma|af)_[A-Z0-9]*-[0-9]+\.[0-9]+$", r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$"],
         # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
