@@ -1,8 +1,12 @@
 # Changelog
 
+## v1.1.3 (2025-05-05)
+
+- Fix: Update regex pattern for instances in `const.py` to support suffixes longer than one character (e.g., "1S5L.AA")
+
 ## v1.1.2 (2025-03-20)
 
-- Update how `dataclass` attributes are created in `const.py` 
+- Update how `dataclass` attributes are created in `const.py`
 
 ## v1.1.1 (2025-03-13)
 
