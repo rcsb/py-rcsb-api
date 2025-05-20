@@ -10,7 +10,7 @@ Currently supports these file types:
 - FASTA
 
 But many more file types are available. Available types from files.wwpdb.org summarized here: [File Download Services page](https://www.rcsb.org/docs/programmatic-access/file-download-services#pdb-entry-files).
-More configured files are available through the [ModelServer API](https://models.rcsb.org/#/General/ligand-post).
+More configurable files are available through the [ModelServer API](https://models.rcsb.org/#/General/ligand-post).
 
 ## Quickstart
 To import this sub-package:
