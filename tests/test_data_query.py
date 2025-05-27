@@ -428,7 +428,7 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testAllStructures(self):
+    def testAllStructures(self) -> None:
         from rcsbapi.data import ALL_STRUCTURES
 
         with self.subTest("1. Test entries ALL_STRUCTURES"):

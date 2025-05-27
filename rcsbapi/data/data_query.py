@@ -180,10 +180,10 @@ class DataQuery:
             batched_ids = tqdm(batched_ids)
 
         for id_batch in batched_ids:
-            query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
+            query_body = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query["query"])
             part_response = requests.post(
-                headers={"Content-Type": "application/graphql"},
-                data=query,
+                headers={"Content-Type": "application/json"},
+                json={"query": query_body},
                 url=const.DATA_API_ENDPOINT,
                 timeout=config.API_TIMEOUT
             ).json()
