@@ -145,7 +145,8 @@ class DataQuery:
         Returns:
             str: query in GraphQL syntax
         """
-        return self._query
+        assert isinstance(self._query["query"], str)
+        return self._query["query"]
 
     def get_response(self) -> Union[None, Dict[str, Any]]:
         """get JSON response to executed query
@@ -162,7 +163,7 @@ class DataQuery:
             str: GraphiQL url
         """
         editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
-        return str(editor_base_link + urllib.parse.quote(str(self._query)))
+        return str(editor_base_link + urllib.parse.quote(str(self._query["query"])))
 
     def exec(self, batch_size: int = 5000, progress_bar: bool = False) -> Dict[str, Any]:
         """POST a GraphQL query and get response

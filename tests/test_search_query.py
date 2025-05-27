@@ -1819,7 +1819,7 @@ class SearchTests(unittest.TestCase):
             self.fail(f"Failed unexpectedly: {error}")
 
 
-def buildSearch() -> None:
+def buildSearch() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SearchTests("testConstruction"))
     suiteSelect.addTest(SearchTests("testLargePagination"))
