@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 import re
 import warnings
-from typing import List, Union
+from typing import List, Dict, Union
 import requests
 from ..const import const
 
@@ -289,7 +289,7 @@ class SearchSchema:
                 raise TypeError(f"Unrecognized node type {node['type']!r} of {fullname}")
         return group
 
-    def _set_leaves(self, d: dict) -> dict:
+    def _set_leaves(self, d: Dict) -> Dict:
         """Converts Attr objects to dictionary format."""
         for leaf in d:
             if isinstance(d[leaf], self.Attr):

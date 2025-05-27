@@ -1,5 +1,4 @@
 from typing import Dict, List, Any, Optional
-from enum import Enum
 from types import MappingProxyType
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
@@ -9,15 +8,17 @@ import requests
 from rcsbapi.const import seq_const
 from rcsbapi.config import config
 from rcsbapi.sequence import SEQ_SCHEMA
+from rcsbapi.graphql_schema import SchemaEnum
 
 
 # pylint: disable=useless-parent-delegation
-class EnumTypes(Enum):
-    SequenceReference = SEQ_SCHEMA.read_enum("SequenceReference")
-    FieldName = SEQ_SCHEMA.read_enum("FieldName")
-    OperationType = SEQ_SCHEMA.read_enum("OperationType")
-    AnnotationReference = SEQ_SCHEMA.read_enum("AnnotationReference")
-    GroupReference = SEQ_SCHEMA.read_enum("GroupReference")
+class SeqEnums(SchemaEnum):
+    # While it makes more sense to have this in seq_schema, it's here to avoid a circular import error
+    SequenceReference = SEQ_SCHEMA._read_enum("SequenceReference")
+    FieldName = SEQ_SCHEMA._read_enum("FieldName")
+    OperationType = SEQ_SCHEMA._read_enum("OperationType")
+    AnnotationReference = SEQ_SCHEMA._read_enum("AnnotationReference")
+    GroupReference = SEQ_SCHEMA._read_enum("GroupReference")
 
 
 @dataclass(frozen=True)
@@ -26,10 +27,12 @@ class Query(ABC):
 
     @abstractmethod
     def to_dict(self) -> Dict[str, Any]:
-        """Get dictionary representation of query and attributes, skips values of None"""
+        """Get dictionary representation of query and attributes, skips values of None. Skips return_data_list"""
         request_dict: Dict[str, Any] = {}
         for field in fields(self):
             field_name = field.name
+            if field_name == "return_data_list":
+                continue
             field_value = getattr(self, field_name)
             field_name = field_name.replace("_", "")
             if field_value:
@@ -59,9 +62,9 @@ class Query(ABC):
         assert hasattr(self, "suppress_autocomplete_warning"), \
             f"{self.__class__.__name__} must define 'suppress_autocomplete_warning' attribute."
 
-        SEQ_SCHEMA.check_typing(
+        SEQ_SCHEMA._check_typing(
             query_type=query_type,
-            enum_types=EnumTypes,
+            enum_types=SeqEnums,
             args=self.to_dict(),
         )
 
@@ -81,7 +84,7 @@ class Query(ABC):
             f"{self.__class__.__name__} must define '_query' attribute."
         response_json = requests.post(
             json=dict(self._query),
-            url=seq_const.GRAQPHQL_API_ENDPOINT,
+            url=seq_const.GRAPHQL_API_ENDPOINT,
             timeout=config.API_TIMEOUT
         ).json()
         self._parse_gql_error(response_json)
@@ -187,7 +190,7 @@ class GroupAlignments(Query):
     """
     group: str
     groupId: str
-    return_data_list: list[str]
+    return_data_list: List[str]
     filter: Optional[list[str]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
@@ -218,7 +221,7 @@ class GroupAnnotations(Query):
     group: str
     groupId: str
     sources: List[str]
-    return_data_list: list[str]
+    return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
@@ -247,7 +250,7 @@ class GroupAnnotationsSummary(Query):
     group: str
     groupId: str
     sources: List[str]
-    return_data_list: list[str]
+    return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
@@ -287,7 +290,7 @@ class AnnotationFilterInput:
     def to_string(self) -> str:
         """Generate string to insert in GraphQL query based on GraphQL schema"""
 
-        input_field_specs: list[Any] = []
+        input_field_specs: List[Any] = []
         for arg_dict in SEQ_SCHEMA._root_dict["annotations"]:
             if arg_dict["name"] == "filters":
                 input_field_specs = arg_dict["inputFields"]

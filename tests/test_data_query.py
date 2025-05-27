@@ -82,7 +82,7 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="3. Pubmed IDs"):
             try:
-                query_obj = DataQuery(input_type="pubmed", input_ids=["6726807"], return_data_list=["rcsb_pubmed_doi"])
+                query_obj = DataQuery(input_type="pubmed", input_ids=[6726807], return_data_list=["rcsb_pubmed_doi"])
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")

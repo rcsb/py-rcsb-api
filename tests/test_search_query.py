@@ -37,7 +37,7 @@ logger.setLevel(logging.INFO)
 
 
 class SearchTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__startTime = time.time()
         logger.info("Starting %s at %s", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
         HERE = os.path.abspath(os.path.dirname(__file__))
@@ -53,14 +53,14 @@ class SearchTests(unittest.TestCase):
         self.__4hhbpdb1Gz = os.path.join(self.__dirPath, "4hhb.pdb1.gz")
         self.__2mnr = os.path.join(self.__dirPath, "2mnr.cif")
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         unitS = "MB" if platform.system() == "Darwin" else "GB"
         rusageMax = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         logger.info("Maximum resident memory size %.4f %s", rusageMax / 10 ** 6, unitS)
         endTime = time.time()
         logger.info("Completed %s at %s (%.4f seconds)", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
-    def testConstruction(self):
+    def testConstruction(self) -> None:
         """Test the construction of queries, and check that the query is what
         you'd expect. """
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
@@ -86,7 +86,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Construction test results: ok : (%r)", ok)
 
-    def testSingleQuery(self):
+    def testSingleQuery(self) -> None:
         """Test firing off a single query, making sure the result is not None."""
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
         session = Session(Group("and", [q1]))
@@ -96,8 +96,9 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Single query test results: ok : (%r)", ok)
 
-    def testIquery(self):
-        """Tests the iquery function, which evaluates a query with a progress bar."""
+    def testIquery(self) -> None:
+        """Tests the iquery function, which evaluates a query with a progress bar.
+        The progress bar requires tqdm to run. """
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
         session = Session(q1)
         result = session.iquery()
@@ -105,7 +106,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Iquery test results: ok : (%r)", ok)
 
-    def testIterable(self):
+    def testIterable(self) -> None:
         """Take a query, make it iterable and then test that its attributes remain unchanged as a result. """
         ids = ["4HHB", "2GS2"]
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=ids)
@@ -116,7 +117,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok2)
         logger.info("Iterable test results: ok : (%r), ok2 = (%r)", ok, ok2)
 
-    def testInversion(self):
+    def testInversion(self) -> None:
         """Test the overloaded inversion operator in a query. """
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="exact_match", value="5T89")
         q3 = ~q1
@@ -138,7 +139,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Inversion failed on SeqSimilarityQuery: ok : (%r)", ok)
 
-    def testXor(self):
+    def testXor(self) -> None:
         """Test the overloaded XOR operator in a query. """
         ids1 = ["5T89", "2GS2"]
         ids2 = ["4HHB", "2GS2"]
@@ -162,7 +163,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("xor failed for seq queries: ok : (%r)", ok)
 
-    def testPagination(self):
+    def testPagination(self) -> None:
         """Test the pagination of the query. Note that this test differs from
         the large pagination tests below, which test avoiding a 429 error,
         while this exists to make sure the feature behaves as intended. """
@@ -193,7 +194,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Pagination test results: ok : (%r)", ok)
 
-    def testMalformedQuery(self):
+    def testMalformedQuery(self) -> None:
         """Attempt to make an invalid, malformed query. Upon finding an error,
         catch the error and pass, continuing tests. An exception is only thrown
         if the query somehow completes successfully. """
@@ -207,7 +208,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Malformed query test results: ok : (%r)", ok)
 
-    def exampleQuery1(self):
+    def exampleQuery1(self) -> None:
         """Make an example query, and make sure it performs correctly.
         This example is pulled directly from the 'Biological Assembly Search'
         example found at http://search.rcsb.org/#examples"""
@@ -241,7 +242,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Example1 Test Results: length: (%d) ok: (%r)", len(results), ok)
 
-    def exampleQuery2(self):
+    def exampleQuery2(self) -> None:
         """Make another example query, and make sure that it performs successfully. """
         q1 = (
             TextQuery("thymidine kinase")
@@ -269,7 +270,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Example2 Test Results: length: (%d) ok: (%r)", len(results), ok)
 
-    def testAttribute(self):
+    def testAttribute(self) -> None:
         """Test the attributes - make sure that they are assigned correctly, etc. """
         attr = Attr(attribute="attr", type="type")
 
@@ -292,7 +293,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Attribute tests results: ok: (%d)", ok)
 
-    def testFreeText(self):
+    def testFreeText(self) -> None:
         """Test the free text search function"""
         query = TextQuery("tubulin")  # make a TextQuery
         results = list(query())  # make it an iterable set
@@ -300,7 +301,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("FreeText test results: length (%d) ok (%r)", len(results), ok)
 
-    def testPartialQuery(self):
+    def testPartialQuery(self) -> None:
         """Test the ability to perform partial queries. """
         query = Attr(attribute="a", type="text").equals("aval").and_("b")
 
@@ -741,7 +742,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Structure type exact match: symmetry type: (%s), length: (%d), ok: (%r)", "symmetric", len(results), ok)
 
-    def testLargePagination(self):
+    def testLargePagination(self) -> None:
         """Test server throttling (avoidance of 429s) - using generic text query with many results to paginate over"""
         try:
             q1 = TextQuery("coli")
@@ -752,7 +753,7 @@ class SearchTests(unittest.TestCase):
             ok = False
         self.assertTrue(ok)
 
-    def testChemSearch(self):
+    def testChemSearch(self) -> None:
         """Test the chemical attribute search using both the operator and
         fluent syntaxes. """
         q1 = attrs.drugbank_info.brand_names.contains_phrase("Tylenol")  # 111 results 19/06/23
@@ -780,7 +781,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok2)
         logger.info("Chemical Search Fluent Syntax: result length: (%d), ok: (%r), ok2: (%r)", len(resultL), ok, ok2)
 
-    def testMismatch(self):
+    def testMismatch(self) -> None:
         """Negative test - test running a chemical attribute query but with structure attribute service type.
         Expected failure."""
         try:
@@ -794,7 +795,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Mismatch test: ok: (%r)", ok)
 
-    def testCSMquery(self):
+    def testCSMquery(self) -> None:
         """Test firing off a single query that includes Computed Structure Models. Making sure the result is not None"""
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["AF_AFO87296F1"])  # entry ID for specific computed structure model of hemoglobin
         session = Session(q1, return_content_type=["computational", "experimental"])
@@ -833,7 +834,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok2)
         logger.info("Query results with only computed models: ok : (%r) : ok2 : (%s)", ok, ok2)
 
-    def testSeqSimilarityQuery(self):
+    def testSeqSimilarityQuery(self) -> None:
         """Test firing off a Sequence query"""
         # Sequence query with hemoglobin protein sequence (id: 4HHB). Default parameters
         q1 = SeqSimilarityQuery("VLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR")
@@ -853,7 +854,7 @@ class SearchTests(unittest.TestCase):
         ok = result_len > 0  # this query displays 313 ids in pdb website search function
         logger.info("Sequence query results correctly displays ids with custom parameters: (%r)", ok)
 
-    def testSeqMotifQuery(self):
+    def testSeqMotifQuery(self) -> None:
         """Test firing off a SeqMotif query"""
         q1 = SeqMotifQuery("RK")  # basic test, make sure standard query is instantiated properly
         result = list(q1())
@@ -911,7 +912,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("SeqMotif Query with invalid parameters failed successfully: (%r)", ok)
 
-    def testFileUpload(self):
+    def testFileUpload(self) -> None:
         """Test uploading a file. Used for structure queries.
         As a unique URL is generated each time, the only common
         denominator is that the return URL contains the file
@@ -1009,7 +1010,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("invalid query failed successfully: (%r)", ok)
 
-    def testStructSimQuery(self):
+    def testStructSimQuery(self) -> None:
         """Test firing off a structure similarity query"""
         # Basic query - assembly ID
         q1 = StructSimilarityQuery(entry_id="4HHB")
@@ -1118,7 +1119,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("File url query with wrong file format failed successfully : (%r)", ok)
 
-    def testStructMotifQuery(self):
+    def testStructMotifQuery(self) -> None:
         # base example, entry ID, residues
         Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
         Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
@@ -1208,7 +1209,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Invalid structure_search_type caught correctly: (%r)", ok)
 
-    def testChemSimilarityQuery(self):
+    def testChemSimilarityQuery(self) -> None:
         """Test firing off chemical similarity queries"""
         # Basic query with default values: query type = formula and match subset = False
         q1 = ChemSimilarityQuery(value="C12 H17 N4 O S")
@@ -1291,7 +1292,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Descriptor query type with invalid parameters failed successfully : (%r)", ok)
 
-    def testReturnCounts(self):
+    def testReturnCounts(self) -> None:
         """Test firing off results count requests"""
         # Attribute query test
         q1 = AttributeQuery("exptl.method", "exact_match", "FLUORESCENCE TRANSFER")
@@ -1400,7 +1401,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Counting results of queries combined with &: (%d), ok : (%r)", result, ok)
 
-    def testResultsVerbosity(self):
+    def testResultsVerbosity(self) -> None:
         """Test firing off queries with result verbosity set"""
         q1 = AttributeQuery("rcsb_entry_info.polymer_entity_count_RNA", operator="equals", value=4)
         result = list(q1(results_verbosity="compact"))
@@ -1418,7 +1419,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Query with verbose results: (%d), ok : (%r)", len(result), ok)
 
-    def testFacetQuery(self):
+    def testFacetQuery(self) -> None:
         """Test firing off Facets queries and Filter Facet queries"""
 
         q1 = AttributeQuery(
@@ -1566,7 +1567,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Group Filter Facet query results: result length : (%d), ok : (%r)", len(result), ok)
 
-    def testGroupBy(self):
+    def testGroupBy(self) -> None:
         with self.subTest("1. Group by deposit ID + ranking_criteria_type"):
             # TerminalFilter
             try:
@@ -1705,7 +1706,7 @@ class SearchTests(unittest.TestCase):
             ))._make_params()
             self.assertEqual(query_dict["return_type"], "polymer_entity")
 
-    def testGroupByReturnType(self):
+    def testGroupByReturnType(self) -> None:
         query = AttributeQuery(
             attribute="rcsb_entity_source_organism.scientific_name",
             operator="exact_match",
@@ -1767,7 +1768,7 @@ class SearchTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 query(return_type="polymer_entity", group_by_return_type="groups")
 
-    def testSort(self):
+    def testSort(self) -> None:
         with self.subTest("1. Sorting without filter"):
             try:
                 query = AttributeQuery(
@@ -1806,11 +1807,11 @@ class SearchTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testReturnExplainMetadata(self):
+    def testReturnExplainMetadata(self) -> None:
         query = AttributeQuery("rcsb_entity_source_organism.ncbi_scientific_name", operator="exact_match", value="Homo sapiens")
         self.assertIsNotNone(query(return_explain_metadata=True).explain_metadata)
 
-    def testScoringStrategy(self):
+    def testScoringStrategy(self) -> None:
         try:
             query = AttributeQuery("rcsb_entity_source_organism.ncbi_scientific_name", operator="exact_match", value="Homo sapiens")
             query(scoring_strategy="text")
@@ -1818,7 +1819,7 @@ class SearchTests(unittest.TestCase):
             self.fail(f"Failed unexpectedly: {error}")
 
 
-def buildSearch():
+def buildSearch() -> None:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SearchTests("testConstruction"))
     suiteSelect.addTest(SearchTests("testLargePagination"))
