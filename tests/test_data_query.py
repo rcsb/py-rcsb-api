@@ -428,6 +428,31 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
+    def testAllStructures(self):
+        from rcsbapi.data import ALL_STRUCTURES
+
+        with self.subTest("1. Test entries ALL_STRUCTURES"):
+            try:
+                data_query = DataQuery(
+                    input_type="entries",
+                    input_ids=ALL_STRUCTURES,
+                    return_data_list=["exptl.method"],
+                )
+                data_query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        with self.subTest("2. Test chem_comps ALL_STRUCTURES"):
+            try:
+                data_query = DataQuery(
+                    input_type="chem_comps",
+                    input_ids=ALL_STRUCTURES,
+                    return_data_list=["chem_comps.rcsb_id"],
+                )
+                data_query.exec()
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
 
 def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
@@ -439,6 +464,7 @@ def buildQuery() -> unittest.TestSuite:
     suiteSelect.addTest(QueryTests("testAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
     suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
 
 

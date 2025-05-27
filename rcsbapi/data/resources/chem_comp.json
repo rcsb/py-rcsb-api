@@ -89,6 +89,7 @@
                     ],
                     "description": "The full name of the component.",
                     "rcsb_search_context": [
+                        "exact-match",
                         "full-text",
                         "suggest"
                     ],
@@ -504,6 +505,7 @@
                         "enum": [
                             "Create component",
                             "Initial release",
+                            "Modify PCM",
                             "Modify aromatic_flag",
                             "Modify atom id",
                             "Modify backbone",
@@ -4426,7 +4428,7 @@
         "rcsb_id"
     ],
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "schema: bird_chem_comp_core collection: bird_chem_comp_core version: 7.1.3",
-    "description": "RCSB Exchange Database JSON schema derived from the bird_chem_comp_core content type schema. This schema supports collection bird_chem_comp_core version 7.1.3. This schema is hosted in repository https://github.com/rcsb/py-rcsb.db/tree/master/rcsb.db/data/json-schema/json-schema-min-bird_chem_comp_core.json and follows JSON schema specification version 4",
-    "$comment": "schema_version: 7.1.3"
+    "title": "schema: bird_chem_comp_core collection: bird_chem_comp_core version: 7.1.4",
+    "description": "RCSB Exchange Database JSON schema derived from the bird_chem_comp_core content type schema. This schema supports collection bird_chem_comp_core version 7.1.4. This schema is hosted in repository https://github.com/rcsb/py-rcsb.db/tree/master/rcsb.db/data/json-schema/json-schema-min-bird_chem_comp_core.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 7.1.4"
 }

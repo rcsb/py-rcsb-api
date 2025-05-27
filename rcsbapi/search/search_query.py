@@ -38,9 +38,10 @@ if sys.version_info > (3, 8):
 else:
     from typing_extensions import Literal
 
+from tqdm import trange
+
 logger = logging.getLogger(__name__)
 
-# tqdm is optional
 # Allowed return types for searches. https://search.rcsb.org/#return-type
 ReturnType = Literal["entry", "assembly", "polymer_entity", "non_polymer_entity", "polymer_instance", "mol_definition"]
 ReturnContentType = Literal["experimental", "computational"]  # results_content_type parameter list values
@@ -130,7 +131,7 @@ def fileUpload(filepath: str, fmt: str = "cif") -> str:
     should then be passed through as part of the value parameter,
     along with the format of the file."""
     with open(filepath, mode="rb") as f:
-        res = requests.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=None)
+        res = requests.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=config.API_TIMEOUT)
         try:
             spec = res.json()["key"]
         except KeyError:
@@ -192,23 +193,23 @@ class SearchQuery(ABC):
     def __invert__(self) -> "SearchQuery":
         """Negation: `~a`"""
 
-    def __and__(self, other: "SearchQuery") -> "SearchQuery":
+    def __and__(self, other: "SearchQuery") -> "Group":
         """Intersection: `a & b`"""
         assert isinstance(other, SearchQuery)
         return Group("and", [self, other])
 
-    def __or__(self, other: "SearchQuery") -> "SearchQuery":
+    def __or__(self, other: "SearchQuery") -> "Group":
         """Union: `a | b`"""
         assert isinstance(other, SearchQuery)
         return Group("or", [self, other])
 
-    def __sub__(self, other: "SearchQuery") -> "SearchQuery":
+    def __sub__(self, other: "SearchQuery") -> "Group":
         """Difference: `a - b`"""
         return self & ~other
 
-    def __xor__(self, other: "SearchQuery") -> "SearchQuery":
+    def __xor__(self, other: "SearchQuery") -> "Group":
         """Symmetric difference: `a ^ b`"""
-        return (self & ~other) | (~self & other)
+        return (self & ~other) | (~self & other)  # type: ignore
 
     def exec(
         self,
@@ -421,8 +422,6 @@ class Attr:
     | range              | dict (keys below)*  |
     +--------------------+---------------------+
     | exists             |                     |
-    +--------------------+---------------------+
-    | in\\_              |                     |
     +--------------------+---------------------+
 
     Previously, __bool__ was overloaded to run the exists function, but __bool__ can't be overloaded to return non-boolean value.
@@ -647,23 +646,6 @@ class Attr:
         if isinstance(value, Value):
             value = value.value
         return self.greater_or_equal(value)
-
-    def __contains__(self, value: Union[str, List[str], "Value[str]", "Value[List[str]]"]) -> Terminal:
-        """Maps to contains_words or contains_phrase depending on the value passed.
-
-        * `"value" in attr` maps to `attr.contains_phrase("value")` for simple values.
-        * `["value"] in attr` maps to `attr.contains_words(["value"])` for lists and
-          tuples.
-        """
-        if isinstance(value, Value):
-            value = value.value
-        if isinstance(value, list):
-            if len(value) == 0 or isinstance(value[0], str):
-                return self.contains_words(value)
-            else:
-                return NotImplemented
-        else:
-            return self.contains_phrase(value)
 
 
 SEARCH_SCHEMA = SearchSchema(Attr)
@@ -1019,7 +1001,18 @@ class Group(SearchQuery):
     """AND and OR combinations of queries"""
 
     operator: TAndOr
-    nodes: Iterable[SearchQuery] = ()
+    nodes: Iterable[Union[Group, SearchQuery]] = ()
+    keep_nested: bool = False
+
+    @staticmethod
+    def group(query: Group):
+        """Add a flag to a Group object so that it will remain grouped when adding more nodes.
+        In __init__, this method is set to be globally accessible.
+
+        Args:
+            query (Group): Group object that will be marked to remain grouped
+        """
+        return Group(query.operator, query.nodes, keep_nested=True)
 
     def to_dict(self):
         group_dict = dict(
@@ -1032,27 +1025,45 @@ class Group(SearchQuery):
     def __invert__(self):
         if self.operator == "and":
             return Group("or", [~node for node in self.nodes])
+        if self.operator == "or":
+            return Group("and", [~node for node in self.nodes])
 
-    def __and__(self, other: SearchQuery) -> SearchQuery:
-        # Combine nodes if possible
+    def __and__(self, other: Union[SearchQuery, Group]) -> Group:
         if self.operator == "and":
             if isinstance(other, Group):
-                if other.operator == "and":
+                # If keep_nested set to True, don't combine groups
+                if (self.keep_nested) and (other.keep_nested):
+                    return Group("and", (self, other))
+                if other.keep_nested:
+                    return Group("and", (*self.nodes, other))
+                # Else, combine groups
+                elif other.operator == "and":
                     return Group("and", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
+                # If keep_nested set to True, don't combine groups
+                if self.keep_nested:
+                    return Group("and", (self, other))
                 return Group("and", (*self.nodes, other))
             else:
                 return NotImplemented
 
         return super().__and__(other)
 
-    def __or__(self, other: SearchQuery) -> SearchQuery:
-        # Combine nodes if possible
+    def __or__(self, other: SearchQuery) -> Group:
         if self.operator == "or":
             if isinstance(other, Group):
-                if other.operator == "or":
+                # If keep_nested set to True, don't combine groups
+                if (self.keep_nested) and (other.keep_nested):
+                    return Group("or", (self, other))
+                if other.keep_nested:
+                    return Group("or", (*self.nodes, other))
+                # Else, combine groups
+                elif other.operator == "or":
                     return Group("or", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
+                # If keep_nested set to True, don't combine groups
+                if self.keep_nested:
+                    return Group("or", (self, other))
                 return Group("or", (*self.nodes, other))
             else:
                 return NotImplemented
@@ -1286,10 +1297,6 @@ class PartialQuery:
 
     @_attr_delegate(Attr.__ge__)
     def __ge__(self, value: TNumberLike) -> SearchQuery:
-        ...
-
-    @_attr_delegate(Attr.__contains__)
-    def __contains__(self, value: Union[str, List[str], "Value[str]", "Value[List[str]]"]) -> SearchQuery:
         ...
 
 
@@ -1760,7 +1767,7 @@ class Session(Iterable[str]):
         "Fires a single query"
         params = self._make_params(start)
         logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=None)
+        response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=config.API_TIMEOUT)
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
             return response.json()
@@ -1821,11 +1828,7 @@ class Session(Iterable[str]):
 
     def iquery(self, limit: Optional[int] = None) -> List[str]:
         """Evaluate the query and display an interactive progress bar.
-
-        Requires tqdm.
         """
-        from tqdm import trange  # type: ignore
-
         response = self._single_query(start=0)
         if response is None:
             return []

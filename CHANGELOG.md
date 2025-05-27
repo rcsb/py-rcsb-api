@@ -1,5 +1,44 @@
 # Changelog
 
+## v1.1.3 (2025-05-05)
+
+- Fix: Update regex pattern for instances in `const.py` to support suffixes longer than one character (e.g., "1S5L.AA")
+
+## v1.1.2 (2025-03-20)
+
+- Update how `dataclass` attributes are created in `const.py`
+
+## v1.1.1 (2025-03-13)
+
+- Add missing dependency for building documentation
+- Add docstrings
+
+## v1.1.0 (2025-03-12)
+
+- Add `ALL_STRUCTURES` object, allowing Data API queries for all PDB structures and chemical components
+- Add `progress_bar` and `batch_size` parameters to Data API package's `.exec`
+- Add `group` function to Search API package to enforce nested grouping
+- Update README with new citation information
+- Update search schemas: 1.48.0 -> 1.49.0
+- Update data schemas: 
+  - entry schema 9.0.3 -> 9.0.4
+  - polymer_entity_instance schema 10.0.2 -> 10.0.3
+  - nonpolymer_entity_instance schema 10.0.0 -> 10.0.1
+
+## v1.0.1 (2025-01-17)
+
+- Add import to `const.py` for compatibility with Python 3.8
+- Update search schemas: 1.47.7 -> 1.48.0
+
+## v1.0.0 (2024-11-6)
+
+- Release version 1.0.0 of package
+- Update search schemas: 1.47.6 -> 1.47.7
+- Update data schemas: 
+  - entry schema 9.0.2 -> 9.0.3
+  - chem_comp schema 7.1.3 -> 7.1.4
+- Update documentation
+
 ## v0.5.0 (2024-10-28)
 
 - Separate out package-wide settings into immutable constants (`const.py`) and configurable parameters (`config.py`)

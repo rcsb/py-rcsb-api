@@ -20,7 +20,9 @@ logger = logging.getLogger(__name__)
 
 class Config:
     API_TIMEOUT: int = 60
+    SEARCH_API_REQUESTS_PER_SECOND: int = 10
     SUPPRESS_AUTOCOMPLETE_WARNING: bool = False
+    INPUT_ID_LIMIT: int = 5000
 
     SEARCH_API_REQUESTS_PER_SECOND: int = 10
 

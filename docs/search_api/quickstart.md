@@ -48,7 +48,7 @@ print(results)
 
 Refer to the [Search Attributes](https://search.rcsb.org/structure-search-attributes.html) and [Chemical Attributes](https://search.rcsb.org/chemical-search-attributes.html) documentation for a full list of attributes and applicable operators.
 
-Alternatively, you can also construct attribute queries with comparative operators using the `search_attributes` object (which also allows for names to be tab-completed):
+Alternatively, you can construct attribute queries with comparative operators using the `search_attributes` object (which also allows for names to be tab-completed):
 
 ```python
 from rcsbapi.search import search_attributes as attrs
@@ -84,7 +84,7 @@ results = list(query())
 print(results[:10])
 ```
 
-These examples are in `operator` syntax. You can also make queries in `fluent` syntax. Learn more about both syntaxes and implementation details in [Query Syntax and Execution](query_construction.md#query-syntax-and-execution).
+These examples are in "operator" syntax. You can also make queries in "fluent" syntax. Learn more about both syntaxes and implementation details in [Query Syntax and Execution](query_construction.md#query-syntax-and-execution).
 
 ### Supported Search Services
 The list of supported search service types are listed in the table below. For more details on their usage, see [Search Service Types](query_construction.md#search-service-types).

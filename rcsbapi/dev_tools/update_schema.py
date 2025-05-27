@@ -75,8 +75,8 @@ def make_changelog_msg(
             continue
 
         if not msg:
-            msg = f"Update {package} schemas: \n"
-        msg += f"  {f_name.replace('.json', '')} schema {current_ver_dict[f_name]} -> {new_ver_dict[f_name]}\n"
+            msg = f"- Update {package} schemas: \n"
+        msg += f"  - {f_name.replace('.json', '')} schema {current_ver_dict[f_name]} -> {new_ver_dict[f_name]}\n"
     return msg
 
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         and all(curr_ver == curr_ver_list[0] for curr_ver in curr_ver_list)
     ):
         if not all(curr_ver == version_list[0] for curr_ver in list(search_current_ver_dict.values())):
-            print(f"Update search schemas: {curr_ver_list[0]} -> {version_list[0]}")
+            print(f"- Update search schemas: {curr_ver_list[0]} -> {version_list[0]}")
         else:
             print("Search schemas are up-to-date")
     else:

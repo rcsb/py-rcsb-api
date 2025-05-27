@@ -2,8 +2,8 @@ rcsb-api - Query RCSB PDB data from Python
 ===============================================
 
 The ``rcsb-api`` package provides a Python interface to 
-`RCSB PDB API services <https://www.rcsb.org/docs/programmatic-access/web-services-overview>`_. 
-Use it to search and fetch macromolecular structure data from RCSB PDB (at RCSB.org).
+`RCSB PDB API services <https://www.rcsb.org/docs/programmatic-access/web-apis-overview>`_. 
+Use it to search and fetch macromolecular structure data from RCSB PDB `at RCSB.org <https://www.rcsb.org/>`_.
 
 Availability
 ------------
@@ -51,13 +51,13 @@ Code is licensed under the MIT license. See the
 Citing
 ------
 
-Please cite the ``rcsb-api`` package by URL:
+Please cite the ``rcsb-api`` package with the following reference:
 
-  https://rcsbapi.readthedocs.io
+  Dennis W. Piehl, Brinda Vallat, Ivana Truong, Habiba Morsy, Rusham Bhatt, Santiago Blaumann, Pratyoy Biswas, Yana Rose, Sebastian Bittrich, Jose M. Duarte, Joan Segura, Chunxiao Bi, Douglas Myers-Turnbull, Brian P. Hudson, Christine Zardecki, Stephen K. Burley. rcsb-api: Python Toolkit for Streamlining Access to RCSB Protein Data Bank APIs, Journal of Molecular Biology, 2025. DOI: https://doi.org/10.1016/j.jmb.2025.168970
 
 You should also cite the RCSB.org API services this package utilizes:
 
-  Yana Rose, Jose M. Duarte, Robert Lowe, Joan Segura, Chunxiao Bi, Charmi Bhikadiya, Li Chen, Alexander S. Rose, Sebastian Bittrich, Stephen K. Burley, John D. Westbrook. RCSB Protein Data Bank: Architectural Advances Towards Integrated Searching and Efficient Access to Macromolecular Structure Data from the PDB Archive, Journal of Molecular Biology, 2020. DOI: 10.1016/j.jmb.2020.11.003
+  Yana Rose, Jose M. Duarte, Robert Lowe, Joan Segura, Chunxiao Bi, Charmi Bhikadiya, Li Chen, Alexander S. Rose, Sebastian Bittrich, Stephen K. Burley, John D. Westbrook. RCSB Protein Data Bank: Architectural Advances Towards Integrated Searching and Efficient Access to Macromolecular Structure Data from the PDB Archive, Journal of Molecular Biology, 2020. DOI: https://doi.org/10.1016/j.jmb.2020.11.003
 
 
 Support

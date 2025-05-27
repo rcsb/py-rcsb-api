@@ -27,6 +27,7 @@ from itertools import islice
 import requests
 from rcsbapi.const import const
 from rcsbapi.search import search_attributes as attrs
+from rcsbapi.search import group
 from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group
@@ -96,8 +97,7 @@ class SearchTests(unittest.TestCase):
         logger.info("Single query test results: ok : (%r)", ok)
 
     def testIquery(self):
-        """Tests the iquery function, which evaluates a query with a progress bar.
-        The progress bar requires tqdm to run. """
+        """Tests the iquery function, which evaluates a query with a progress bar."""
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
         session = Session(q1)
         result = session.iquery()
@@ -363,6 +363,342 @@ class SearchTests(unittest.TestCase):
         ok = query.nodes[1].params.get("value") == "dval"
         self.assertTrue(ok)
         logger.info("Partial Query results: ok: (%r)", ok)
+
+    def testAttributeAndTextGroups(self):
+        with self.subTest("1. Grouping should not affect results (and)"):
+            q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Homo sapiens"
+            q2 = attrs.exptl.method == "X-RAY DIFFRACTION"
+            q3 = attrs.rcsb_entry_info.resolution_combined >= 1
+            q4 = attrs.rcsb_entry_info.resolution_combined <= 2
+
+            query = q1 & q2 & q3 & q4
+            len_query = len(list(query()))
+
+            # test different groupings
+            grouped_1 = group(q1 & q2) & q3 & q4
+            len_grouped_1 = len(list(grouped_1()))
+            self.assertEqual(len_query, len_grouped_1)
+
+            grouped_2 = q1 & group(q2 & q3) & q4
+            len_grouped_2 = len(list(grouped_2()))
+            self.assertEqual(len_query, len_grouped_2)
+
+            grouped_3 = q1 & q2 & group(q3 & q4)
+            len_grouped_3 = len(list(grouped_3()))
+            self.assertEqual(len_query, len_grouped_3)
+
+            grouped_4 = group(q1 & q2 & q3) & q4
+            len_grouped_4 = len(list(grouped_4()))
+            self.assertEqual(len_query, len_grouped_4)
+
+        with self.subTest("2. Grouping should not affect results (or)"):
+            q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Homo sapiens"
+            q2 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Gallus gallus"
+            q3 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Arabidopsis thaliana"
+            q4 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "Mus musculus"
+
+            query = q1 | q2 | q3 | q4
+            len_query = len(list(query()))
+
+            # test different groupings
+            grouped_1 = group(q1 | q2) | q3 | q4
+            len_grouped_1 = len(list(grouped_1()))
+            self.assertEqual(len_query, len_grouped_1)
+
+            grouped_2 = q1 | group(q2 | q3) | q4
+            len_grouped_2 = len(list(grouped_2()))
+            self.assertEqual(len_query, len_grouped_2)
+
+            grouped_3 = q1 | q2 | group(q3 | q4)
+            len_grouped_3 = len(list(grouped_3()))
+            self.assertEqual(len_query, len_grouped_3)
+
+            grouped_4 = group(q1 | q2 | q3) | q4
+            len_grouped_4 = len(list(grouped_4()))
+            self.assertEqual(len_query, len_grouped_4)
+
+        with self.subTest("3. Grouping should not affect results (mixed)"):
+            q1 = TextQuery("interleukin")
+            q2 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q3 = attrs.drugbank_info.drug_groups == "investigational"
+            q4 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query = q1 & q2 & (q3 | q4)
+            len_query = len(list(query()))
+
+            grouped_1 = q1 & q2 & group(q3 | q4)
+            len_grouped_1 = len(list(grouped_1()))
+            self.assertEqual(len_query, len_grouped_1)
+
+            grouped_2 = group(q1 & q2) & group(q3 | q4)
+            len_grouped_2 = len(list(grouped_2()))
+            self.assertEqual(len_query, len_grouped_2)
+
+        with self.subTest("4. Grouping should affect results"):
+            q1 = AttributeQuery("rcsb_binding_affinity.type", "exact_match", "EC50")
+            q2 = AttributeQuery("rcsb_binding_affinity.value", "equals", 2.0)
+            q3 = AttributeQuery("rcsb_entry_info.selected_polymer_entity_types", "exists")
+            q4 = AttributeQuery("rcsb_nonpolymer_entity_container_identifiers.nonpolymer_comp_id", "exists")
+
+            query = q1 & q2 & q3 & q4
+            grouped = group(q1 & q2) & q3 & q4
+
+            len_query = len(list(query()))
+            len_grouped = len(list(grouped()))
+
+            self.assertNotEqual(len_query, len_grouped)
+
+        with self.subTest("5. Check `and` groups are formed correctly"):
+            q1 = TextQuery("interleukin")
+            q2 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q3 = attrs.drugbank_info.drug_groups == "investigational"
+            q4 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query_1 = group(q1 & q2) & q3 & q4
+            len_group_1 = len(query_1.nodes[0].nodes)
+            self.assertEqual(len_group_1, 2)
+            self.assertEqual(len(query_1.nodes), 3)
+
+            query_2 = q1 & group(q2 & q3) & q4
+            len_group_2 = len(query_2.nodes[1].nodes)
+            self.assertEqual(len_group_2, 2)
+            self.assertEqual(len(query_2.nodes), 3)
+
+            query_3 = q1 & q2 & group(q3 & q4)
+            len_group_3 = len(query_3.nodes[2].nodes)
+            self.assertEqual(len_group_3, 2)
+            self.assertEqual(len(query_3.nodes), 3)
+
+            query_4 = group(q1 & q2) & group(q3 & q4)
+            len_group_4 = len(query_4.nodes[0].nodes)
+            self.assertEqual(len_group_4, 2)
+            len_group_4 = len(query_4.nodes[1].nodes)
+            self.assertEqual(len_group_4, 2)
+            self.assertEqual(len(query_4.nodes), 2)
+
+            query_5 = group(q1 & q2 & q3) & q4
+            len_group_5 = len(query_5.nodes[0].nodes)
+            self.assertEqual(len_group_5, 3)
+            self.assertEqual(len(query_5.nodes), 2)
+
+        with self.subTest("6. Check `or` groups are formed correctly"):
+            q1 = TextQuery("interleukin")
+            q2 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q3 = attrs.drugbank_info.drug_groups == "investigational"
+            q4 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query_1 = group(q1 | q2) | q3 | q4
+            len_group_1 = len(query_1.nodes[0].nodes)
+            self.assertEqual(len_group_1, 2)
+            self.assertEqual(len(query_1.nodes), 3)
+
+            query_2 = q1 | group(q2 | q3) | q4
+            len_group_2 = len(query_2.nodes[1].nodes)
+            self.assertEqual(len_group_2, 2)
+            self.assertEqual(len(query_2.nodes), 3)
+
+            query_3 = q1 | q2 | group(q3 | q4)
+            len_group_3 = len(query_3.nodes[2].nodes)
+            self.assertEqual(len_group_3, 2)
+            self.assertEqual(len(query_3.nodes), 3)
+
+            query_4 = group(q1 | q2) | group(q3 | q4)
+            len_group_4 = len(query_4.nodes[0].nodes)
+            self.assertEqual(len_group_4, 2)
+            len_group_4 = len(query_4.nodes[1].nodes)
+            self.assertEqual(len_group_4, 2)
+            self.assertEqual(len(query_4.nodes), 2)
+
+            query_5 = group(q1 | q2 | q3) | q4
+            len_group_5 = len(query_5.nodes[0].nodes)
+            self.assertEqual(len_group_5, 3)
+            self.assertEqual(len(query_5.nodes), 2)
+
+        with self.subTest("7. Check `not` groups are formed correctly"):
+            q1 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q2 = attrs.drugbank_info.drug_groups == "investigational"
+            q3 = attrs.drugbank_info.drug_groups == "experimental"
+
+            query_1 = ~group(q1 | q2)
+            self.assertEqual(query_1.operator, "and")
+
+            query_2 = ~group(q1 | group(q2 | q3))
+            self.assertEqual(query_2.operator, "and")
+            self.assertEqual(query_2.nodes[1].operator, "and")
+            self.assertEqual(len(query_2.nodes[1].nodes), 2)
+            self.assertEqual(len(query_2.nodes), 2)
+
+            query_3 = ~group(q1 & q2)
+            self.assertEqual(query_3.operator, "or")
+
+            query_4 = ~group(q1 & group(q2 & q3))
+            self.assertEqual(query_4.operator, "or")
+            self.assertEqual(query_4.nodes[1].operator, "or")
+            self.assertEqual(len(query_4.nodes[1].nodes), 2)
+            self.assertEqual(len(query_4.nodes), 2)
+
+        with self.subTest("8. Check mixed operator groups are formed correctly"):
+            q1 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
+            q2 = attrs.drugbank_info.drug_groups == "investigational"
+            q3 = attrs.drugbank_info.drug_groups == "experimental"
+            q3 = attrs.drugbank_info.drug_groups == "approved"
+
+            query_1 = q1 & group(q2 | q3)
+            self.assertEqual(query_1.operator, "and")
+            self.assertEqual(query_1.nodes[1].operator, "or")
+            self.assertEqual(len(query_1.nodes), 2)
+            self.assertEqual(len(query_1.nodes[1].nodes), 2)
+
+            query_2 = q1 | group(q2 & q3)
+            self.assertEqual(query_2.operator, "or")
+            self.assertEqual(query_2.nodes[1].operator, "and")
+            self.assertEqual(len(query_2.nodes), 2)
+            self.assertEqual(len(query_2.nodes[1].nodes), 2)
+
+            query_3 = group(q1 & q2) | group(q3 & q4)
+            self.assertEqual(query_3.operator, "or")
+            self.assertEqual(query_3.nodes[0].operator, "and")
+            self.assertEqual(query_3.nodes[1].operator, "and")
+            self.assertEqual(len(query_3.nodes), 2)
+            self.assertEqual(len(query_3.nodes[0].nodes), 2)
+            self.assertEqual(len(query_3.nodes[1].nodes), 2)
+
+            query_4 = group(q1 | q2) & group(q3 | q4)
+            self.assertEqual(query_4.operator, "and")
+            self.assertEqual(query_4.nodes[0].operator, "or")
+            self.assertEqual(query_4.nodes[1].operator, "or")
+            self.assertEqual(len(query_4.nodes), 2)
+            self.assertEqual(len(query_4.nodes[0].nodes), 2)
+            self.assertEqual(len(query_4.nodes[1].nodes), 2)
+
+    def testSeqSimilarityGroups(self):
+        q1 = TextQuery("heat-shock transcription factor")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Homo sapiens")
+        q3 = SeqSimilarityQuery(
+            "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET"
+            + "CLLDILDTAGQEEYSAMRDQYMRTGEGFLCVFAINNTKSFEDIHQYREQI"
+            + "KRVKDSDDVPMVLVGNKCDLPARTVETRQAQDLARSYGIPYIETSAKTRQ"
+            + "GVEDAFYTLVREIRQHKLRKLNPPDESGPGCMNCKCVIS"
+        )
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testSeqMotifGroups(self):
+        q1 = TextQuery("Phage dUTPases")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Dubowvirus dv80alpha")
+        q3 = SeqMotifQuery("MQTIF")
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testStructSimilarityGroups(self):
+        q1 = TextQuery("Phage dUTPases")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Dubowvirus dv80alpha")
+        q3 = StructSimilarityQuery(entry_id="3ZEZ")
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def testStructMotifGroups(self):
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
+        ResList = [Res1, Res2]
+
+        q1 = AttributeQuery("exptl.method", "exact_match", "X-RAY DIFFRACTION")
+        q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Pseudomonas putida")
+        q3 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
+
+    def ChemSimilarityGroups(self):
+        q1 = attrs.drugbank_info.drug_groups == "investigational"
+        q2 = attrs.drugbank_info.drug_groups == "experimental"
+        q3 = ChemSimilarityQuery(
+            value="CC(Cc1ccc(cc1)C(C(=O)O)C)C",
+            query_type="descriptor",
+            descriptor_type="SMILES",
+            match_type="graph-relaxed-stereo"
+        )
+
+        query_1 = group(q1 & q2) & q3
+        results = list(query_1())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_1.nodes[0].nodes), 2)
+        self.assertEqual(len(query_1.nodes), 2)
+
+        query_2 = q1 & group(q2 & q3)
+        results = list(query_2())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_2.nodes[1].nodes), 2)
+        self.assertEqual(len(query_2.nodes), 2)
+
+        query_3 = q3 & group(q1 & q2)
+        results = list(query_3())
+        self.assertGreater(len(results), 0)
+        self.assertEqual(len(query_3.nodes[1].nodes), 2)
+        self.assertEqual(len(query_3.nodes), 2)
 
     def testOperators(self):
         """Test operators such as contain and in. """
@@ -1488,6 +1824,12 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testLargePagination"))
     suiteSelect.addTest(SearchTests("testOperators"))
     suiteSelect.addTest(SearchTests("testPartialQuery"))
+    suiteSelect.addTest(SearchTests("testAttributeAndTextGroups"))
+    suiteSelect.addTest(SearchTests("testSeqSimilarityGroups"))
+    suiteSelect.addTest(SearchTests("testSeqMotifGroups"))
+    suiteSelect.addTest(SearchTests("testStructSimilarityGroups"))
+    suiteSelect.addTest(SearchTests("testStructMotifGroups"))
+    suiteSelect.addTest(SearchTests("ChemSimilarityGroups"))
     suiteSelect.addTest(SearchTests("testFreeText"))
     suiteSelect.addTest(SearchTests("testAttribute"))
     suiteSelect.addTest(SearchTests("exampleQuery1"))

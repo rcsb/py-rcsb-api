@@ -6,7 +6,8 @@ including API endpoints, search services, and schema URLs. The values are
 immutable and protected from modification during runtime.
 """
 
-from dataclasses import dataclass
+from __future__ import annotations
+from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import List
 
@@ -45,7 +46,7 @@ class Const:
     DATA_API_SCHEMA_DIR: str = "data/resources"
     DATA_API_SCHEMA_FILENAME: str = "data_api_schema.json"
     DATA_API_SCHEMA_BASE_URL: str = "https://data.rcsb.org/rest/v1/schema/"
-    DATA_API_SCHEMA_ENDPOINT_TO_FILE: MappingProxyType[str, str] = MappingProxyType({
+    DATA_API_SCHEMA_ENDPOINT_TO_FILE: MappingProxyType[str, str] = field(default_factory=lambda: MappingProxyType({
         "entry": "entry.json",
         "polymer_entity": "polymer_entity.json",
         "branched_entity": "branched_entity.json",
@@ -58,9 +59,9 @@ class Const:
         "pubmed": "pubmed.json",
         "uniprot": "uniprot.json",
         "drugbank": "drugbank.json",
-    })
+    }))
 
-    SINGULAR_TO_PLURAL: MappingProxyType[str, str] = MappingProxyType({
+    SINGULAR_TO_PLURAL: MappingProxyType[str, str] = field(default_factory=lambda: MappingProxyType({
         "entry": "entries",
         "polymer_entity": "polymer_entities",
         "branched_entity": "branched_entities",
@@ -76,25 +77,30 @@ class Const:
         "entry_group": "entry_groups",
         "polymer_entity_group": "polymer_entity_groups",
         "group_provenance": ""
-    })
+    }))
     #
-    ID_TO_SEPARATOR: MappingProxyType[str, str] = MappingProxyType({
+    ID_TO_SEPARATOR: MappingProxyType[str, str] = field(default_factory=lambda: MappingProxyType({
         "entity_id": "_",
         "asym_id": ".",
         "assembly_id": "-",
         "interface_id": "."
-    })
+    }))
 
     # Regex strings for IDs
-    DATA_API_INPUT_TYPE_TO_REGEX: MappingProxyType[str, List[str]] = MappingProxyType({
+    DATA_API_INPUT_TYPE_TO_REGEX: MappingProxyType[str, List[str]] = field(default_factory=lambda: MappingProxyType({
         "entry": [r"^(MA|AF|ma|af)_[A-Z0-9]*$", r"^[A-Za-z0-9]{4}$"],
         "entity": [r"^(MA|AF|ma|af)_[A-Z0-9]*_[0-9]+$", r"^[A-Z0-9]{4}_[0-9]+$"],
-        "instance": [r"^(MA|AF|ma|af)_[A-Z0-9]*\.[A-Za-z]$", r"^[A-Z0-9]{4}\.[A-Za-z]$"],
+        "instance": [r"^(MA|AF|ma|af)_[A-Z0-9]*\.[A-Za-z]+$", r"^[A-Z0-9]{4}\.[A-Za-z]+$"],
         "assembly": [r"^(MA|AF|ma|af)_[A-Z0-9]*-[0-9]+$", r"^[A-Z0-9]{4}-[0-9]+$"],
         "interface": [r"^(MA|AF|ma|af)_[A-Z0-9]*-[0-9]+\.[0-9]+$", r"^[A-Z0-9]{4}-[0-9]+\.[0-9]+$"],
         # Regex for uniprot: https://www.uniprot.org/help/accession_numbers
         "uniprot": [r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"]
-    })
+    }))
+
+    INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT: MappingProxyType[str, List[str]] = field(default_factory=lambda: MappingProxyType({
+        "entries": ["https://data.rcsb.org/rest/v1/holdings/current/entry_ids"],
+        "chem_comps": ["https://data.rcsb.org/rest/v1/holdings/current/ccd_ids", "https://data.rcsb.org/rest/v1/holdings/current/prd_ids"]
+    }))
 
 
 @dataclass(frozen=True)

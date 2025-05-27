@@ -5,6 +5,7 @@ Most examples come from [RCSB PDB Data API documentation](https://data.rcsb.org/
 Fetch information about structure title and experimental method for PDB entries:
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="entries",
     input_ids=["1STP", "2JEF", "1CDG"],
@@ -34,6 +35,7 @@ Fetch primary citation information (structure authors, PubMed ID, DOI) and relea
 
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="entries",
     input_ids=["1STP", "2JEF", "1CDG"],
@@ -72,6 +74,7 @@ Fetch taxonomy information and information about membership in the sequence clus
 
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="polymer_entities",
     input_ids=["2CPK_1", "3WHM_1", "2D5Z_1"],
@@ -108,6 +111,7 @@ Fetch information about the domain assignments for polymer entity instances:
 
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="polymer_entity_instances",
     input_ids=["4HHB.A", "12CA.A", "3PQR.A"],
@@ -140,10 +144,12 @@ Query branched entities (sugars or oligosaccharides) for commonly used linear de
 
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="branched_entities",
     input_ids=["5FMB_2", "6L63_3"],
     return_data_list=[
+        "rcsb_id",
         "pdbx_entity_branch.type",
         "pdbx_entity_branch_descriptor.type",
         "pdbx_entity_branch_descriptor.descriptor"
@@ -156,6 +162,7 @@ Performs the following GraphQL query:
 ```
 {
   branched_entities(entity_ids: ["5FMB_2", "6L63_3"]) {
+    rcsb_id
     pdbx_entity_branch {
       type
     }
@@ -171,10 +178,11 @@ Performs the following GraphQL query:
 
 Sequence positional features describe regions or sites of interest in the PDB sequences, such as binding sites, active sites, linear motifs, local secondary structure, structural and functional domains, etc. Positional annotations include depositor-provided information available in the PDB archive as well as annotations integrated from external resources (e.g. UniProtKB).
 
-This example queries 'polymer_entity_instances' positional features. The query returns features of different type: for example, CATH and SCOP classifications assignments integrated from UniProtKB data, or the secondary structure annotations from the PDB archive data calculated by the data-processing program called MAXIT (Macromolecular Exchange and Input Tool) that is based on an earlier ProMotif implementation.
+This example queries `polymer_entity_instances` positional features. The query returns features of different types: for example, CATH and SCOP classifications assignments integrated from UniProtKB data, or the secondary structure annotations from the PDB archive data calculated by the data-processing program called MAXIT (Macromolecular Exchange and Input Tool) that is based on an earlier ProMotif implementation.
 
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="polymer_entity_instances",
     input_ids=["1NDO.A"],
@@ -208,6 +216,7 @@ Performs the following GraphQL query:
 This example shows how to access identifiers related to entries (cross-references) and found in data collections other than PDB. Each cross-reference is described by the database name and the database accession. A single entry can have cross-references to several databases, e.g. UniProt and GenBank in 7NHM, or no cross-references, e.g. 5L2G:
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="entries",
     input_ids=["7NHM", "5L2G"],
@@ -242,6 +251,7 @@ Query for specific items in the chemical component dictionary based on a given l
 
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="chem_comps",
     input_ids=["NAG", "EBW"],
@@ -280,10 +290,11 @@ This example shows how to get a list of global Model Quality Assessment metrics 
 
 ```python
 from rcsbapi.data import DataQuery as Query
+
 query = Query(
     input_type="entries",
     input_ids=["AF_AFP68871F1"],
-    return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"]
+    return_data_list=["rcsb_id", "ma_qa_metric_global.type", "ma_qa_metric_global.value"]
 )
 result_dict = query.exec()
 print(result_dict)
@@ -292,6 +303,7 @@ Performs the following GraphQL query:
 ```
 {
   entries(entry_ids: ["AF_AFP68871F1"]) {
+    rcsb_id
     rcsb_ma_qa_metric_global {
       ma_qa_metric_global {
         type
@@ -306,6 +318,8 @@ Performs the following GraphQL query:
 This example gets the abstract text of the paper with the specified PubMed ID.
 
 ```python
+from rcsbapi.data import DataQuery as Query
+
 query = Query(
   input_type="pubmed",
   return_data_list=["rcsb_pubmed_abstract_text"],
@@ -329,6 +343,8 @@ Performs the following GraphQL query:
 This example gets a description of the function of a protein based on the UniProt ID.
 
 ```python
+from rcsbapi.data import DataQuery as Query
+
 query = Query(
   input_type="uniprot",
   return_data_list=["function.details"],

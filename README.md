@@ -1,6 +1,10 @@
 [![PyPi Release](https://img.shields.io/pypi/v/rcsb-api.svg)](https://pypi.org/project/rcsb-api/)
 [![Build Status](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_apis/build/status/rcsb.py-rcsb-api?branchName=master)](https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/rcsbapi/badge/?version=latest)](https://rcsbapi.readthedocs.io/en/latest/?badge=latest)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14052470.svg)](https://doi.org/10.5281/zenodo.14052470)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/10424/badge)](https://www.bestpractices.dev/projects/10424)
+[![FAIR checklist badge](https://fairsoftwarechecklist.net/badge.svg)](https://fairsoftwarechecklist.net/v0.2?f=31&a=30112&i=32111&r=133)
+[![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
 # rcsb-api
 Python interface for RCSB PDB API services at RCSB.org.
@@ -134,9 +138,14 @@ For example, one notebook using both Search and Data API packages for a COVID-19
 
 
 ## Citing
-Please cite the ``rcsb-api`` package by URL:
+Please cite the ``rcsb-api`` package with the following reference:
 
-> https://rcsbapi.readthedocs.io
+> Dennis W. Piehl, Brinda Vallat, Ivana Truong, Habiba Morsy, Rusham Bhatt, 
+> Santiago Blaumann, Pratyoy Biswas, Yana Rose, Sebastian Bittrich, Jose M. Duarte,
+> Joan Segura, Chunxiao Bi, Douglas Myers-Turnbull, Brian P. Hudson, Christine Zardecki,
+> Stephen K. Burley. rcsb-api: Python Toolkit for Streamlining Access to RCSB Protein 
+> Data Bank APIs, Journal of Molecular Biology, 2025.
+> DOI: [10.1016/j.jmb.2025.168970](https://doi.org/10.1016/j.jmb.2025.168970)
 
 You should also cite the RCSB.org API services this package utilizes:
 
