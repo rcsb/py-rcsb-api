@@ -57,9 +57,9 @@ class FieldNode:
         self.args: List[dict[str, str | None]] = args
         self.index: None | int = None
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         """FieldNode as a string."""
-        return f"Field Object name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
+        return f"FieldNode name: {self.name}, Kind: {self.kind}, Type: {self.type}, Index if set: {self.index}, Description: {self.description}"
 
     def set_index(self, index: int) -> None:
         """
@@ -93,6 +93,10 @@ class TypeNode:
         self.name = name
         self.index: None | int = None
         self.field_list: List[FieldNode] = []
+
+    def __repr__(self) -> str:
+        """TypeNode as a string."""
+        return f"TypeNode name: {self.name}, Index if set: {self.index}, Field list if set: {self.field_list}"
 
     def set_index(self, index: int) -> None:
         """
