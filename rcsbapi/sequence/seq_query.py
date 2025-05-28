@@ -102,7 +102,7 @@ class Query(ABC):
             error = response_json["errors"][0]
             raise requests.HTTPError(
                 f"\n{error["message"]}\n"
-                f"  Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query"
+                f"Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query"
             )
 
 
@@ -113,9 +113,9 @@ class Alignments(Query):
 
         from_ (str): From which query sequence database
         to (str): To which query sequence database
-        queryId (str): Database sequence identifier
-        return_data_list (List[str]): Requested data fields
-        range (Optional, List[]): Optional integer list to filter alignments to a particular region
+        queryId (str): Sequence identifier specified in `from_`
+        return_data_list (List[str]): Fields to request data for
+        range (Optional, List[]): Optional integer list to filter annotations that fall in a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         _query (MappingProxyType): Attribute for storing GraphQL query
     """
@@ -129,11 +129,15 @@ class Alignments(Query):
     """
     `offset` and `first` are field arguments (currently the only ones).
     Making them class attributes (below) would not work if there
-    were redundant field arg names. Other options:
+    were redundant field arg names for different fields.
+    (i.e. `first` an argument for `target_alignments` and a different field).
+    
+    Other options:
     1. Use a string in `return_data_list` and parse later
             return_data_list = ["target_alignments(first:0, offset:5)"]
     2. Create an attribute `field_args` and pass in args as a dict
             field_args = {"target_alignments": {first:0, offset:5}, ...}
+    Cons are that these put the burden of formatting/knowing the arg names on the user.
     """
     offset: Optional[int] = None
     first: Optional[int] = None
@@ -155,7 +159,7 @@ class Annotations(Query):
         sources (List[str]): List defining the annotation collections to be requested
         reference (SequenceReference): Query sequence database
         return_data_list (List[str]): Requested data fields
-        filters (list["AnnotationFilterInput"], optional): Optional annotation filter by type or target identifier
+        filters (list["AnnotationFilterInput"], optional): Select what annotations will be retrieved
         range: (List[int], optional): Optional integer list to filter annotations to a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         _query (MappingProxyType): Attribute for storing GraphQL query

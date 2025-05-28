@@ -5,7 +5,7 @@ from typing import List, Dict, Any
 
 from rcsbapi.const import seq_const
 from rcsbapi.config import config
-from rcsbapi.graphql_schema import Schema
+from rcsbapi.graphql_schema import GQLSchema
 
 use_networkx: bool = False
 # Below section and parts of code involving networkx are commented out
@@ -17,7 +17,7 @@ use_networkx: bool = False
 #     use_networkx = True
 
 
-class SeqSchema(Schema):
+class SeqSchema(GQLSchema):
     """GraphQL schema defining available fields, types, and how they are connected."""
 
     def __init__(self) -> None:
@@ -26,9 +26,6 @@ class SeqSchema(Schema):
             timeout=config.API_TIMEOUT,
             fallback_file="seq_api_schema.json",
         )
-
-    def fetch_schema(self) -> Dict[str, Any]:
-        return super()._abstract_fetch_schema("seq_api_schema.json")
 
     def construct_query(  # type: ignore[override]
         self,
@@ -116,3 +113,26 @@ class SeqSchema(Schema):
             return_data_list=return_data_list,
             suppress_autocomplete_warning=suppress_autocomplete_warning
         )
+
+    def find_field_names(self, search_string: str) -> list[str]:
+        """Find field names that fully or partially match the search string.
+
+        Args:
+            search_string (str): string to search field names for
+
+        Raises:
+            ValueError: thrown when a type other than string is passed in for search_string
+            ValueError: thrown when no fields match search_string
+
+        Returns:
+            list[str]: list of matching field names
+        """
+        return super().find_field_names(search_string)
+
+    def fetch_schema(self) -> Dict[str, Any]:
+        """Get the JSON schema defining the Sequence Coordinates API. Fallback to local file if necessary.
+
+        Returns:
+            Dict[str, Any]: JSON schema for Sequence Coordinates
+        """
+        return super()._abstract_fetch_schema("seq_api_schema.json")

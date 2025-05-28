@@ -6,7 +6,7 @@ import re
 
 from rcsbapi.const import const
 from rcsbapi.config import config
-from rcsbapi.graphql_schema import Schema, SchemaEnum
+from rcsbapi.graphql_schema import GQLSchema, SchemaEnum
 
 use_networkx: bool = False
 # Below section and parts of code involving networkx are commented out
@@ -23,7 +23,7 @@ class DataAPIEnums(SchemaEnum):
     pass
 
 
-class DataSchema(Schema):
+class DataSchema(GQLSchema):
     def __init__(self) -> None:
         super().__init__(
             endpoint=const.DATA_API_ENDPOINT,
@@ -32,9 +32,6 @@ class DataSchema(Schema):
             # remove paths containing "assemblies" if there are shorter or equal length paths available.
             weigh_nodes=["assemblies"]
         )
-
-    def fetch_schema(self) -> Dict[str, Any]:
-        return super()._abstract_fetch_schema("data_api_schema.json")
 
     # TODO: document this design decision where the signature of construct_query is variable
     def construct_query(  # type: ignore[override]
@@ -171,3 +168,26 @@ class DataSchema(Schema):
                 f"  schema = DataSchema()\n"
                 f'  schema.get_input_id_dict("{input_type}")'
             )
+
+    def find_field_names(self, search_string: str) -> list[str]:
+        """Find field names that fully or partially match the search string.
+
+        Args:
+            search_string (str): string to search field names for
+
+        Raises:
+            ValueError: thrown when a type other than string is passed in for search_string
+            ValueError: thrown when no fields match search_string
+
+        Returns:
+            list[str]: list of matching field names
+        """
+        return super().find_field_names(search_string)
+
+    def fetch_schema(self) -> Dict[str, Any]:
+        """Get the JSON schema defining the Data API. Fallback to local file if necessary.
+
+        Returns:
+            Dict[str, Any]: JSON schema for Data API
+        """
+        return super()._abstract_fetch_schema("data_api_schema.json")

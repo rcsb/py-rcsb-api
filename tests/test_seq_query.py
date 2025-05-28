@@ -94,7 +94,7 @@ class SeqTests(unittest.TestCase):
                     from_="NCBI_PROTEIN",
                     to="PDB_ENTITY",
                     queryId="XP_642496",
-                    range=[1, 10],
+                    range=[1, 100],
                     return_data_list=["target_alignments"],
                     first=1,
                     offset=10
@@ -109,7 +109,7 @@ class SeqTests(unittest.TestCase):
                 query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
-                    return_data_list=["target_id"],
+                    return_data_list=["target_alignments.aligned_regions", "target_id"],
                 )
                 query_obj.exec()
             except Exception as error:
@@ -119,7 +119,7 @@ class SeqTests(unittest.TestCase):
                 query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
-                    return_data_list=["target_id"],
+                    return_data_list=["target_alignments.aligned_regions", "target_id"],
                     filter=["8CNJ_1", "8FG4_1"]
                 )
                 query_obj.exec()
@@ -133,7 +133,7 @@ class SeqTests(unittest.TestCase):
                     group="MATCHING_UNIPROT_ACCESSION",
                     groupId="P01112",
                     sources=["PDB_ENTITY"],
-                    return_data_list=["target_id"]
+                    return_data_list=["features.name", "features.feature_positions", "target_id"],
                 )
                 query_obj.exec()
             except Exception as error:
@@ -152,7 +152,7 @@ class SeqTests(unittest.TestCase):
                             source="UNIPROT"
                         )
                     ],
-                    return_data_list=["target_id"]
+                    return_data_list=["features.name", "features.feature_positions", "target_id"],
                 )
                 query_obj.exec()
             except Exception as error:
@@ -200,8 +200,6 @@ class SeqTests(unittest.TestCase):
                     from_="UNIPROT",
                     to="PDB_ENTITY",
                     queryId="P01112",
-                    # TODO: This errors because "target_alignments" contains "aligned_regions" fields.
-                    # Can I fix it so that both set of fields remain in the query without repeat?
                     return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
                 )
                 query_obj.exec()

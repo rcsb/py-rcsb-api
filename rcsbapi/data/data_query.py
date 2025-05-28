@@ -213,7 +213,7 @@ class DataQuery:
                 combined_error_msg: str = ""
                 for i, error_msg in enumerate(error_msg_list):
                     combined_error_msg += f"{i+1}. {error_msg}\n"
-                raise ValueError(f"{combined_error_msg}. Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
+                raise ValueError(f"{combined_error_msg}.\n\nRun <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
     def _batch_ids(self, batch_size: int) -> List[List[str]]:  # assumes that plural types have only one arg, which is true right now
         """split queries with large numbers of input_ids into smaller batches
