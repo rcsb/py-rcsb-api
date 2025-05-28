@@ -468,7 +468,7 @@ class GQLSchema(ABC):
                 # Skips appending if no further subfields (ENUMS)
         return result
 
-    def return_fields_to_paths(
+    def _return_fields_to_paths(
         self,
         start_idx: int,
         query_type: str,
@@ -897,11 +897,11 @@ class GQLSchema(ABC):
         # Build first line of query where arguments are given
         arg_list = self._root_dict[query_type]
         arg_value_list = tuple(self._format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args)
-        first_line = f"{query_type}{str(arg_value_list).replace("'", '')}"
+        first_line = f"{query_type}({", ".join(arg_value_list)})"
 
         # Build query body
         start_idx = self._root_to_idx[query_type]
-        return_data_path_dict: Dict[int, list[int]] = self.return_fields_to_paths(start_idx, query_type, return_data_list)
+        return_data_path_dict: Dict[int, list[int]] = self._return_fields_to_paths(start_idx, query_type, return_data_list)
         # return_data_query_list is a list of queries, each one corresponding to one field in return_data_list
         return_data_query_list: List[dict[int, Any] | List[int] | List[dict[int, Any] | int]] = []
         for return_field_idx, path in return_data_path_dict.items():
