@@ -237,7 +237,7 @@ class DataQuery:
                 batched_ids.append(batch_list)
         return batched_ids
 
-    def _merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]) ->  Dict[str, Any]:
+    def _merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]) -> Dict[str, Any]:
         """merge two JSON responses. Used after batching ids to merge responses from each batch.
 
         Args:

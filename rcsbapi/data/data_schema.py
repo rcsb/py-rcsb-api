@@ -144,7 +144,7 @@ class DataSchema(GQLSchema):
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
         return input_dict
 
-    def _construct_query_rustworkx(
+    def _construct_query_rustworkx(  # pylint: useless-parent-delegation
         self,
         query_type: str,
         query_args: Dict[str, Any],
@@ -169,7 +169,7 @@ class DataSchema(GQLSchema):
                 f'  schema.get_input_id_dict("{input_type}")'
             )
 
-    def find_field_names(self, search_string: str) -> list[str]:
+    def find_field_names(self, search_string: str) -> list[str]:  # pylint: useless-parent-delegation
         """Find field names that fully or partially match the search string.
 
         Args:

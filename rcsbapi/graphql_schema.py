@@ -614,7 +614,7 @@ class GQLSchema(ABC):
         if arg_dict["kind"] == "LIST" or arg_dict["ofKind"] == "LIST":
             if arg_dict["ofType"] == "String":
                 # Add double quotes around each item
-                format_arg += f'{arg_dict["name"]}: {str(input_value).replace("'", '"')}'
+                format_arg += '{}: {}'.format(arg_dict["name"], str(input_value).replace("'", '"'))
             else:
                 # Remove single quotes if not string
                 format_arg += f'{arg_dict["name"]}: {str(input_value).replace("'", "")}'

@@ -101,7 +101,7 @@ class Query(ABC):
         if "errors" in response_json.keys():
             error = response_json["errors"][0]
             raise requests.HTTPError(
-                f"\n{error["message"]}\n"
+                f'\n{error["message"]}\n'
                 f"Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query"
             )
 
