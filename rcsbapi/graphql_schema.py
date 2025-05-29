@@ -22,6 +22,7 @@ use_networkx: bool = False
 class SchemaEnum(Enum):
     """Serves as an "abstract class" to represent GraphQL fields with enums.
     Currently used in Seq Coord API but not Data API (uses an empty Enum)"""
+
     pass
 
 
@@ -496,7 +497,7 @@ class GQLSchema(ABC):
                     break
                 # Else, check for matching path segments.
                 for i in range(len(possible_path_list)):
-                    if possible_path_list[i: i + len(path_list)] == path_list:
+                    if possible_path_list[i : i + len(path_list)] == path_list:
                         matching_paths.append(".".join(possible_path_list))
 
             idx_paths: List[list[int]] = []
@@ -588,11 +589,7 @@ class GQLSchema(ABC):
                             continue
                         name_compare_path = self._idx_path_to_name_path(compare_path)
                         # If there are shorter or equal length paths without "assemblies", filter out
-                        if (
-                            (len(compare_path) <= len(path))
-                            and ("assemblies" not in name_compare_path)
-                            and (compare_path[-1] == path[-1])
-                        ):
+                        if (len(compare_path) <= len(path)) and ("assemblies" not in name_compare_path) and (compare_path[-1] == path[-1]):
                             remove_paths.add(tuple(path))
 
         for remove_path in remove_paths:
@@ -614,10 +611,10 @@ class GQLSchema(ABC):
         if arg_dict["kind"] == "LIST" or arg_dict["ofKind"] == "LIST":
             if arg_dict["ofType"] == "String":
                 # Add double quotes around each item
-                format_arg += '{}: {}'.format(arg_dict["name"], str(input_value).replace("'", '"'))
+                format_arg += "{}: {}".format(arg_dict["name"], str(input_value).replace("'", '"'))
             else:
                 # Remove single quotes if not string
-                format_arg += '{}: {}'.format(arg_dict["name"], str(input_value).replace("'", ""))
+                format_arg += "{}: {}".format(arg_dict["name"], str(input_value).replace("'", ""))
         elif arg_dict["ofType"] == "String":
             # If arg type is string, add double quotes around value
             format_arg += '{}: "{}"'.format(arg_dict["name"], input_value)
@@ -974,7 +971,7 @@ class GQLSchema(ABC):
         #   Else: return both dicts in list
         if isinstance(dict_1, dict) and isinstance(dict_2, dict):
             for key in dict_1.keys():
-                if (key in dict_2):
+                if key in dict_2:
                     return [{key: self._merge_queries(dict_1[key], dict_2[key])}]
                 return [dict_1, dict_2]
 
@@ -998,10 +995,10 @@ class GQLSchema(ABC):
         raise ValueError("Invalid dictionary input")
 
     def _idxs_to_idx_dict(
-            self,
-            idx_list: List[int],
-            autopopulated_fields: List[int | dict[int, Any]],
-            partial_query: Dict[Any, Any] | None = None,
+        self,
+        idx_list: List[int],
+        autopopulated_fields: List[int | dict[int, Any]],
+        partial_query: Dict[Any, Any] | None = None,
     ) -> Dict[int, Any] | List[int] | List[dict[int, Any] | int]:
         """Construct a query with correct nesting of dicts/lists
 
@@ -1028,11 +1025,7 @@ class GQLSchema(ABC):
         else:
             return {idx_list[0]: self._idxs_to_idx_dict(idx_list[1:], autopopulated_fields=autopopulated_fields)}
 
-    def _idx_dict_to_name_dict(
-        self,
-        idx_fields: List[dict[int, Any] | int] | dict[int, Any] | int,
-        query_args: Dict[str, Any]
-    ) -> dict[str, Any] | list[str] | str:
+    def _idx_dict_to_name_dict(self, idx_fields: List[dict[int, Any] | int] | dict[int, Any] | int, query_args: Dict[str, Any]) -> dict[str, Any] | list[str] | str:
         """Convert dictionary of indices to dictionary of field names and add arguments if applicable."""
         query_dict = {}
         if isinstance(idx_fields, dict):
@@ -1060,7 +1053,7 @@ class GQLSchema(ABC):
         Returns:
             str: field name or field name with corresponding arguments
         """
-        # Check FieldNode argument names and see if user has passed in corresponding values 
+        # Check FieldNode argument names and see if user has passed in corresponding values
         formatted_args = []
         for arg in args:
             arg_name = arg["name"]
