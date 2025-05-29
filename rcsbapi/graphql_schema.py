@@ -620,10 +620,10 @@ class GQLSchema(ABC):
                 format_arg += '{}: {}'.format(arg_dict["name"], str(input_value).replace("'", ""))
         elif arg_dict["ofType"] == "String":
             # If arg type is string, add double quotes around value
-            format_arg += f'{arg_dict["name"]}: "{input_value}"'
+            format_arg += '{}: "{}"'.format(arg_dict["name"], input_value)
         else:
             assert isinstance(input_value, str) or isinstance(input_value, int)
-            format_arg += f"{arg_dict["name"]}: {input_value}"
+            format_arg += "{}: {}".format(arg_dict["name"], input_value)
         return format_arg
 
     def _find_idx_path(self, dot_path: List[str], idx_list: List[int], node_idx: int) -> List[int]:

@@ -314,13 +314,13 @@ class AnnotationFilterInput:
                     args.add("{}: {}".format(field_name, str(getattr(self, field_name)).replace("'", '"')))
                 else:
                     # If type isn't string, remove single quotes
-                    args.add(f"{field_name}: {str(getattr(self, field_name)).replace("'", "")}")
+                    args.add("{}: {}".format(field_name, str(getattr(self, field_name)).replace("'", "")))
             elif (
                 (input_field["type"]["kind"] == "ENUM")
                 or (input_field["type"]["ofType"]["kind"] == "ENUM")
             ):
                 # If type is ENUM, remove single quotes
-                args.add(f"{field_name}: {str(getattr(self, field_name)).replace("'", "")}")
+                args.add("{}: {}".format(field_name, str(getattr(self, field_name)).replace("'", "")))
             else:
                 raise NotImplementedError("Unsupported type in schema dictionary")
         str_filter = str(args).replace("'", "")
