@@ -1068,7 +1068,7 @@ class GQLSchema(ABC):
                 formatted_args.append(self._format_args(arg, query_args[arg_name]))
 
         if formatted_args:
-            return f"{field_name}{str(tuple(formatted_args)).replace("'", "")}"
+            return "{}{}".format(field_name, str(tuple(formatted_args)).replace("'", ""))
         else:
             return field_name
 
