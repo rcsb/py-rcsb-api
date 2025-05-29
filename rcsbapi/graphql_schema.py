@@ -707,7 +707,6 @@ class GQLSchema(ABC):
                     unique_paths_list = []
                 else:
                     for i, unique_path in enumerate(unique_paths_list):
-                        # TODO: did this work, is this the right spot to fix this
                         # Only include field indices
                         unique_path = [idx for idx in unique_path if isinstance(self._schema_graph[idx], FieldNode)]
                         unique_paths_list[i] = unique_path + path[1:]
@@ -897,7 +896,7 @@ class GQLSchema(ABC):
         # Build first line of query where arguments are given
         arg_list = self._root_dict[query_type]
         arg_value_list = tuple(self._format_args(arg_dict, query_args[arg_dict["name"]]) for arg_dict in arg_list if arg_dict["name"] in query_args)
-        first_line = f"{query_type}({", ".join(arg_value_list)})"
+        first_line = "{}({})".format(query_type, ", ".join(arg_value_list))
 
         # Build query body
         start_idx = self._root_to_idx[query_type]
@@ -933,8 +932,6 @@ class GQLSchema(ABC):
         for path in query_list[1:]:
             for i, result_path in enumerate(result):
                 merged_query = self._merge_queries(result_path, path)
-                # TODO: Rather than checking if merged query and having to use two separate functions.
-                #  Maybe check if length of merged_query is == len(result_path) + len(path) (with some additional logic obviously)
                 path_len = 1
                 if isinstance(path, list):
                     path_len = len(path)

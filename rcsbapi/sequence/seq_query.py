@@ -11,7 +11,6 @@ from rcsbapi.sequence import SEQ_SCHEMA
 from rcsbapi.graphql_schema import SchemaEnum
 
 
-# pylint: disable=useless-parent-delegation
 class SeqEnums(SchemaEnum):
     # While it makes more sense to have this in seq_schema, it's here to avoid a circular import error
     SequenceReference = SEQ_SCHEMA._read_enum("SequenceReference")
@@ -131,7 +130,7 @@ class Alignments(Query):
     Making them class attributes (below) would not work if there
     were redundant field arg names for different fields.
     (i.e. `first` an argument for `target_alignments` and a different field).
-    
+
     Other options:
     1. Use a string in `return_data_list` and parse later
             return_data_list = ["target_alignments(first:0, offset:5)"]

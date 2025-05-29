@@ -33,7 +33,6 @@ class DataSchema(GQLSchema):
             weigh_nodes=["assemblies"]
         )
 
-    # TODO: document this design decision where the signature of construct_query is variable
     def construct_query(  # type: ignore[override]
         self,
         input_type: str,
@@ -42,6 +41,18 @@ class DataSchema(GQLSchema):
         add_rcsb_id: bool = True,
         suppress_autocomplete_warning: bool = False
     ) -> Dict[str, Any]:
+        """Construct a GraphQL query in JSON format
+
+        Args:
+            input_ids (Union[List[str], Dict[str, str], Dict[str, List[str]]]): identifying information for the specific entry, chemical component, etc to query
+            input_type (str): specifies where you are starting your query. These are specific fields like "entry" or "polymer_entity_instance".
+            return_data_list (List[str]): requested data, can be field name(s) or dot-separated field names
+                ex: "cluster_id" or "exptl.method"
+            add_rcsb_id (bool): automatically request rcsb_id at the top of the query. Default is True.
+
+        Returns:
+            Dict[str, Any]: dictionary of format - {"query": <query in GraphQL syntax>}
+        """
         suppress_autocomplete_warning = config.SUPPRESS_AUTOCOMPLETE_WARNING if config.SUPPRESS_AUTOCOMPLETE_WARNING else suppress_autocomplete_warning
 
         # Do basic type-checking and validation of input_ids and input_type
@@ -144,7 +155,7 @@ class DataSchema(GQLSchema):
                 raise ValueError(f"Invalid ID format for {input_type}: {single_id}")
         return input_dict
 
-    def _construct_query_rustworkx(  # pylint: useless-parent-delegation
+    def _construct_query_rustworkx(
         self,
         query_type: str,
         query_args: Dict[str, Any],
@@ -169,7 +180,7 @@ class DataSchema(GQLSchema):
                 f'  schema.get_input_id_dict("{input_type}")'
             )
 
-    def find_field_names(self, search_string: str) -> list[str]:  # pylint: useless-parent-delegation
+    def find_field_names(self, search_string: str) -> list[str]:
         """Find field names that fully or partially match the search string.
 
         Args:
