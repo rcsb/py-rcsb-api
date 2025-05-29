@@ -311,7 +311,7 @@ class AnnotationFilterInput:
             ):
                 if input_field["type"]["ofType"]["ofType"]["ofType"]["name"] == "String":
                     # If type is string, add list with double quotes around each item
-                    args.add(f"{field_name}: {str(getattr(self, field_name)).replace("'", '"')}")
+                    args.add("{}: {}".format(field_name, str(getattr(self, field_name)).replace("'", '"')))
                 else:
                     # If type isn't string, remove single quotes
                     args.add(f"{field_name}: {str(getattr(self, field_name)).replace("'", "")}")
