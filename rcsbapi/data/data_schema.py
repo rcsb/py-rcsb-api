@@ -33,6 +33,7 @@ class DataSchema(GQLSchema):
             weigh_nodes=["assemblies"]
         )
 
+    # pylint: disable=arguments-differ
     def construct_query(  # type: ignore[override]
         self,
         input_type: str,

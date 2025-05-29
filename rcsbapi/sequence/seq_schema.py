@@ -25,8 +25,10 @@ class SeqSchema(GQLSchema):
             endpoint=seq_const.GRAPHQL_API_ENDPOINT,
             timeout=config.API_TIMEOUT,
             fallback_file="seq_api_schema.json",
+            weigh_nodes=[]
         )
 
+    # pylint: disable=arguments-differ
     def construct_query(  # type: ignore[override]
         self,
         query_type: str,

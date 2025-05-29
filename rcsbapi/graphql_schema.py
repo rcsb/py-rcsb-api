@@ -23,7 +23,7 @@ class SchemaEnum(Enum):
     """Serves as an "abstract class" to represent GraphQL fields with enums.
     Currently used in Seq Coord API but not Data API (uses an empty Enum)"""
 
-    pass
+    pass  # pylint: disable=unnecessary-pass
 
 
 class FieldNode:
@@ -120,7 +120,7 @@ class TypeNode:
 class GQLSchema(ABC):
     """GraphQL schema defining available fields, types, and how they are connected."""
 
-    def __init__(self, endpoint: str, timeout: int, fallback_file: str, weigh_nodes: List[str] = []) -> None:
+    def __init__(self, endpoint: str, timeout: int, fallback_file: str, weigh_nodes: List[str]) -> None:
         self.pdb_url: str = endpoint
         self.timeout: int = timeout
         self.schema: Dict[str, Any] = self.fetch_schema()
@@ -867,7 +867,6 @@ class GQLSchema(ABC):
         # 1. validate return_data_list using `_check_return_list`
         # 2. parse arguments into a format that can be passed into `_construct_query_rustworkx`
         # 3. call _construct_query_rustworkx
-        ...
 
     @abstractmethod
     def _construct_query_rustworkx(
@@ -1069,7 +1068,7 @@ class GQLSchema(ABC):
         """Turn query dictionary into a string in GraphQL syntax"""
         formatted_query_body = (
             # format the dict as a GraphQL query
-            # TODO: bit janky, change?
+            # Could change to be cleaner and more robust
             json.dumps(query_body, indent=2, separators=(" ", "~"))
             .replace('"', "")
             .replace("'", '"')
