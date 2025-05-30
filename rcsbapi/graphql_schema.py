@@ -496,13 +496,13 @@ class GQLSchema(ABC):
         query_type: str,
         return_data_list: List[str],
     ) -> dict[int, list[int]]:
-        return_data_paths: Dict[int, list[int]] = {}
-        complete_path: int = 0
         """Find matching index path for each return field. Raise error if not specific enough.
 
         Returns:
             dict[int, list[int]]: dictionary where the key is the index of the final field and the value is a list of indices representing the matching path
         """
+        return_data_paths: Dict[int, list[int]] = {}
+        complete_path: int = 0
 
         for field in return_data_list:
             # Generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
