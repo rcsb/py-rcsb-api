@@ -416,6 +416,14 @@ class GQLSchema(ABC):
         return ""
 
     def _make_args_dict(self, args: Dict[str, Any]) -> dict[str, str | None]:
+        """format field arguments
+
+        Args:
+            args (Dict[str, Any]): args listed in _type_fields_dict
+
+        Returns:
+            dict[str, str | None]: formatted args
+        """
         name = args["name"]
         ofType = args["type"]["ofType"]
         kind = args["type"]["kind"]
@@ -428,6 +436,7 @@ class GQLSchema(ABC):
         return {"name": name, "ofType": ofType, "kind": kind, "ofKind": ofKind}
 
     def _make_root_to_idx(self) -> dict[str, int]:
+        """Create dictionary where keys are root type names and values are indices"""
         root_to_idx: Dict[str, int] = {}
         # Assumes 0 is the index for root Query node.
         # Remains true as long as graph building starts from there
@@ -437,6 +446,18 @@ class GQLSchema(ABC):
         return root_to_idx
 
     def _get_descendant_fields(self, node_idx: int, visited: None | set[int] = None) -> list[int | dict[int, Any]]:
+        """Find all fields returning scalars under a node
+
+        Args:
+            node_idx (int): node index to search under
+            visited (None | set[int], optional): indices of visited nodes. Defaults to None.
+
+        Raises:
+            ValueError: A loop was created during recursion, meaning the field index was too general and would result in infinite recursion
+
+        Returns:
+            list[int | dict[int, Any]]: index paths that are nested
+        """
         if visited is None:
             visited = set()
 
@@ -477,6 +498,11 @@ class GQLSchema(ABC):
     ) -> dict[int, list[int]]:
         return_data_paths: Dict[int, list[int]] = {}
         complete_path: int = 0
+        """Find matching index path for each return field. Raise error if not specific enough.
+
+        Returns:
+            dict[int, list[int]]: dictionary where the key is the index of the final field and the value is a list of indices representing the matching path
+        """
 
         for field in return_data_list:
             # Generate list of all possible paths to the final requested field. Try to find matching sequence to user input.
