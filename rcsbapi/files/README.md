@@ -31,3 +31,7 @@ download(
     download_dir=".",
 )
 ```
+
+TODO
+- Rate limit isn't enforced in the code. During testing, it was below the rate limit, but number of requests per time period isn't tracked
+- Add warning that this shouldn't be used for downloading the whole archive
