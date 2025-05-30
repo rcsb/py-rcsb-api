@@ -96,7 +96,7 @@ if __name__ == "__main__":
         const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL: const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME,
         const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL: const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME,
     }
-    search_version_dict: dict[str, str] = {}
+    search_version_dict: Dict[str, str] = {}
     for url, file_name in search_url_to_file.items():
         search_version = update_schema(
             f_name=file_name,
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         search_version_dict[file_name] = search_version
 
     # Update Data API schemas
-    data_version_dict: dict[str, str] = {}
+    data_version_dict: Dict[str, str] = {}
     for endpoint, file_name in const.DATA_API_SCHEMA_ENDPOINT_TO_FILE.items():
         data_version = update_schema(
             f_name=file_name,

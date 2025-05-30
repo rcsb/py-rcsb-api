@@ -103,4 +103,11 @@ class Const:
     }))
 
 
+@dataclass(frozen=True)
+class SeqConst:
+    BASE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
+    GRAPHQL_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
+
+
+seq_const = SeqConst()
 const = Const()

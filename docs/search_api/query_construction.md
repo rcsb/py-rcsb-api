@@ -165,13 +165,13 @@ q1 = AttributeQuery(
 q2 = AttributeQuery(
     attribute="rcsb_chem_comp_related.resource_accession_code",
     operator="exact_match",
-    value="DB01050"
+    value="DB00114"
 )
 
 q3 = AttributeQuery(
     attribute="rcsb_entity_source_organism.scientific_name",
     operator="exact_match",
-    value="Homo sapiens"
+    value="Escherichia coli"
 )
 
 # Using `group` ensures that `resource_name` and `accession_code` attributes are searched together

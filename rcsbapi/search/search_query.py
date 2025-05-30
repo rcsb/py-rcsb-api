@@ -1444,7 +1444,7 @@ class Sort(RequestOption):
     direction: Optional[str] = None
     filter: Optional[Union[GroupFilter, TerminalFilter]] = None
 
-    def to_dict(self) -> Dict:  # pylint: disable=useless-parent-delegation
+    def to_dict(self) -> Dict:
         return super().to_dict()
 
 
@@ -1462,7 +1462,7 @@ class GroupBy(RequestOption):
     similarity_cutoff: Optional[int] = None
     ranking_criteria_type: Optional[RankingCriteriaType] = None
 
-    def to_dict(self,) -> Dict:  # pylint: disable=useless-parent-delegation
+    def to_dict(self,) -> Dict:
         return super().to_dict()
 
 

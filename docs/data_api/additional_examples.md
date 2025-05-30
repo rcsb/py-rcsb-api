@@ -323,7 +323,7 @@ from rcsbapi.data import DataQuery as Query
 query = Query(
   input_type="pubmed",
   return_data_list=["rcsb_pubmed_abstract_text"],
-  input_ids=["6726807"]
+  input_ids=[6726807]
 )
 
 result_dict = query.exec()

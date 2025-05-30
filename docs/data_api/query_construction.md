@@ -216,7 +216,7 @@ print(editor_link)
 ```
 
 ### find_paths()
-Given a redundant field, this method finds all paths from an `input_type` to nodes named as `return_data_name`. Method of the `DataSchema` class.
+Given a field name, this method finds all paths from an `input_type` to nodes named as `return_data_name`. Method of the `DataSchema` class.
 
 ```python
 from rcsbapi.data import DataSchema
