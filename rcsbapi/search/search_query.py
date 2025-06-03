@@ -31,7 +31,7 @@ from typing import (
 import requests
 from ..const import const
 from ..config import config
-from .search_schema import SearchSchema
+from .search_schema import SearchSchema, NestedAttributeSchema
 
 if sys.version_info > (3, 8):
     from typing import Literal
@@ -649,6 +649,13 @@ class Attr:
 
 
 SEARCH_SCHEMA = SearchSchema(Attr)
+print("SUCCESSFUL RUN OF SEARCH_SCHEMA")
+# logger.info("SUCCESSFUL RUN OF SEARCH_SCHEMA")
+
+NESTED_SCHEMA = NestedAttributeSchema(Attr)
+print("SUCCESSFUL RUN OF NESTED_SCHEMA")
+# logger.info("SUCCESSFUL RUN OF NESTED_SCHEMA")
+
 
 
 class AttributeQuery(Terminal):
