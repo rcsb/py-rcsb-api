@@ -31,7 +31,7 @@ from typing import (
 import requests
 from ..const import const
 from ..config import config
-from .search_schema import SearchSchema
+from .search_schema import SearchSchema, NestedAttributeSchema
 
 if sys.version_info > (3, 8):
     from typing import Literal
@@ -647,9 +647,8 @@ class Attr:
             value = value.value
         return self.greater_or_equal(value)
 
-
-SEARCH_SCHEMA = SearchSchema(Attr)
-
+SEARCH_SCHEMA = NestedAttributeSchema(Attr)
+print("SUCCESSFUL RUN OF SEARCH_SCHEMA")
 
 class AttributeQuery(Terminal):
     """Special case of a Terminal for Structure and Chemical Attribute Searches
@@ -702,7 +701,7 @@ class AttributeQuery(Terminal):
                 + f"{error_msg}"
             )
         assert isinstance(service, str)
-        super().__init__(params=paramsD, service=service)
+        super().__init__(params=paramsD, service=service)    
 
 
 class TextQuery(Terminal):
@@ -1093,6 +1092,73 @@ class Group(SearchQuery):
         else:
             raise ValueError("Illegal Operator")
 
+class NestedAttributeQuery(Group):
+    def __init__(self, q1: AttributeQuery, q2: AttributeQuery):
+        self.q1 = q1
+        self.q2 = q2
+        self.is_valid_nested = False
+        self.message = ""
+        self.tuple_key = None
+
+        """
+        EXAMPLE QUERY:
+        q1 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_name", operator="exact_match", value="DrugBank")
+        q2 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_accession_code", operator="exact_match", value="DB00114")
+        NestedAttributeQuery(q1,q2)
+        """
+        attribute1 = q1.params.get("attribute")
+        attribute2 = q2.params.get("attribute")
+
+        if (attribute1, attribute2) in SEARCH_SCHEMA.nested_indexed_attributes:
+            self.is_valid_nested = True
+            self.tuple_key = (attribute1, attribute2)
+            self.message = (f"These attributes: {attribute1}, {attribute2} are nested together.")
+        elif (attribute2, attribute1) in SEARCH_SCHEMA.nested_indexed_attributes:
+            self.is_valid_nested = True
+            self.tuple_key = (attribute2, attribute1)
+            self.message = (f"These attributes: {attribute1}, {attribute2} are nested together.")
+        else:
+            nested_attribute1 = False
+            nested_attribute2 = False
+            attribute1 = q1.params.get("attribute")
+            for tuple_key in SEARCH_SCHEMA.nested_indexed_attributes:
+                if attribute1 in tuple_key:
+                    nested_attribute1 = True
+                if attribute2 in tuple_key:
+                    nested_attribute2 = True
+            
+            if nested_attribute1 and not nested_attribute2:
+                self.message = (f"{attribute1} is a nested attribute, however {attribute2} is not")
+
+            elif nested_attribute2 and not nested_attribute1:
+                self.message = (f"{attribute2} is a nested attribute, however {attribute1} is not")
+            
+            else:
+                self.message = (f"{attribute2} and {attribute1} is not nested")
+            
+        if not self.is_valid_nested:
+            logging.warning(self.message)
+        
+        if self.is_valid_nested:
+            super().__init__("and", [q1, q2], keep_nested=True)
+
+class NestedAttributeQueryChecker(Group):
+    def __init__(self, q1: AttributeQuery):
+        self.q1 = q1 
+        self.is_valid_nested = False
+
+        attribute_name = self.q1.params.get("attribute")
+
+        for tuple_key in SEARCH_SCHEMA.nested_indexed_attributes:
+            if attribute_name in tuple_key:
+                self.is_valid_nested = True
+                # Once found in at least one nested context, we can stop searching.
+                break
+        
+        if self.is_valid_nested == False:
+            logging.warning("This is a nested attribute, please refer to the documentation: .")
+    
+    """FINISH WARNING"""
 
 # Type for functions returning Terminal
 FTerminal = TypeVar("FTerminal", bound=Callable[..., Terminal])
@@ -1852,6 +1918,10 @@ class Session(Iterable[str]):
         return f"https://search.rcsb.org/query-editor.html?json={urllib.parse.quote(data)}"
 
     def get_query_builder_link(self) -> str:
+        # --- Deprecation Warning ---
+        logging.warning("Deprecation Warning: Please use get_editor_link to access the Search API Query Editor")
+        # --- Deprecation Warning ---
+        
         """URL to view this query on the RCSB PDB website query builder"""
         params = self._make_params()
         params["request_options"]["paginate"]["rows"] = 25
