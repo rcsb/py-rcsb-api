@@ -1871,7 +1871,7 @@ class SearchTests(unittest.TestCase):
 
             with self.assertLogs(level='WARNING') as cm:
                 NestedAttributeQueryChecker(query).validate()
-            self.assertEqual(len(cm.output), 0, "No warnings should be logged for valid nested usage")
+            self.assertEqual(len(cm.output), 0)
 
         with self.subTest("2. Reusing nested attribute outside valid group should raise warning"):
             attribute1 = AttributeQuery(
@@ -1892,7 +1892,7 @@ class SearchTests(unittest.TestCase):
 
             with self.assertLogs(level='WARNING') as cm:
                 NestedAttributeQueryChecker(query).validate()
-            self.assertGreater(len(cm.output), 0, "A warning should be logged for invalid nested attribute reuse")
+            self.assertGreater(len(cm.output), 0)
 
 
 def buildSearch():
