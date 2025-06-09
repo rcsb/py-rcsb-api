@@ -28,9 +28,9 @@ import requests
 from rcsbapi.const import const
 from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import group
-from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery, NestedAttributeQuery
+from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
-from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group
+from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group, NestedAttributeQuery
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
