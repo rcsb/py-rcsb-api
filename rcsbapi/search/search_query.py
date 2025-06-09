@@ -226,6 +226,9 @@ class SearchQuery(ABC):
         scoring_strategy: Optional[ScoringStrategy] = None,
     ) -> Union["Session", int]:
         # pylint: disable=dangerous-default-value
+
+        NestedAttributeQueryChecker(self).validate() ##################################################################################################################################
+
         """Evaluate this query and return an iterator of all result IDs"""
         session = Session(
             query=self,
@@ -1157,6 +1160,73 @@ class NestedAttributeQuery(Group):
         
         if self.is_valid_nested:
             super().__init__("and", [q1, q2], keep_nested=True)
+
+class NestedAttributeQueryChecker:
+    """
+    Validates proper usage of nested attributes in a search query.
+
+    This class recursively traverses a `SearchQuery` object to ensure that any
+    nested attribute is used only within a valid context, such as a
+    `NestedAttributeQuery` or a `Group(..., keep_nested=True)`. If a nested
+    attribute is found outside such a context, a warning is logged.
+    """
+
+    def __init__(self, query: SearchQuery):
+        """
+        Initializes the checker with the root query to validate.
+
+        Args:
+            query (SearchQuery): The search query to validate.
+        """
+
+        self.query = query
+
+    def validate(self):
+        """
+        Validates the query by recursively checking for improper use of nested attributes.
+
+        Logs a warning for any nested attribute that is not inside a valid grouping context.
+        """
+
+        self._check(self.query, within_nested_block=False)
+
+    def _check(self, query: SearchQuery, within_nested_block: bool):
+        """
+        Recursively traverses the query tree and validates each node.
+
+        Args:
+            query (SearchQuery): The current query node being examined.
+            within_nested_block (bool): Indicates whether the current node is part of a valid nested context.
+        """
+
+        if isinstance(query, AttributeQuery):
+            self._validate_single_attribute_query(query, within_nested_block)
+        elif isinstance(query, NestedAttributeQuery):
+            for node in query.nodes:
+                self._check(node, within_nested_block=True)
+        elif isinstance(query, Group):
+            is_nested_group = query.keep_nested
+            for node in query.nodes:
+                self._check(node, within_nested_block=(within_nested_block or is_nested_group))
+        else:
+            pass  # ignore TextQuery, Terminal, etc.
+
+    def _validate_single_attribute_query(self, query: AttributeQuery, within_nested_block: bool):
+        """
+        Validates a single AttributeQuery node to ensure proper nested context.
+
+        Args:
+            query (AttributeQuery): The attribute-level query to validate.
+            within_nested_block (bool): True if the attribute is inside a valid nested group.
+        """
+
+        attribute = query.params.get("attribute")
+        is_nested = any(attribute in pair for pair in SEARCH_SCHEMA.nested_indexed_attributes)
+        if is_nested and not within_nested_block:
+            logging.warning(
+                "Attribute '%s' is a nested attribute and must be used only inside a NestedAttributeQuery.",
+                attribute
+            )
 
 # Type for functions returning Terminal
 FTerminal = TypeVar("FTerminal", bound=Callable[..., Terminal])
