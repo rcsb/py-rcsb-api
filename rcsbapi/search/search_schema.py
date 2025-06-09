@@ -197,7 +197,6 @@ class SearchSchema:
         self.search_attributes = self._make_schema_group()
 
     def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=True):
-        print("HI")
         sD = {}
         if refetch:
             sD = self._fetch_schema(schema_url)
@@ -288,6 +287,10 @@ class SearchSchema:
                     setattr(group, childname, childgroup)
             else:
                 raise TypeError(f"Unrecognized node type {node['type']!r} of {fullname}")
+        
+            # print("PRINTING GROUP: ", group)
+            # logger.info("PRINTING GROUP: %r", group)
+
         return group
 
     def _set_leaves(self, d: dict) -> dict:
@@ -300,6 +303,22 @@ class SearchSchema:
         return d
 
 class NestedAttributeSchema(SearchSchema):
+    """
+    Extension of `SearchSchema` that extracts and indexes nested attributes
+    which follow the `rcsb_nested_indexing_context` pattern.
+
+    This allows detection of queryable attribute pairs that rely on nested
+    indexing, such as attribute-path/category-path pairs for context-aware search.
+
+    Attributes:
+        nested_indexed_attributes (dict): Maps attribute/category path tuples to a placeholder value,
+        indicating presence of a valid nested context.
+
+    Example:
+        ('rcsb_uniprot_annotation.name', 'rcsb_uniprot_annotation.type') in SEARCH_SCHEMA.nested_indexed_attributes
+        True
+    """
+
     def __init__(
         self,
         attr_type,
@@ -325,16 +344,39 @@ class NestedAttributeSchema(SearchSchema):
         self.nested_indexed_attributes = self._extract_nested_indexing_contexts()
 
     def _extract_nested_indexing_contexts(self) -> dict:
-        """Search both structure and chemical schemas for nested indexing contexts."""
+        """
+        Traverse both structure and chemical schemas to identify nested indexing contexts.
+
+        Returns:
+            dict: Mapping of (attribute_path, category_path) tuples to a truthy placeholder.
+        """
         nested_attrs = {}
         nested_attrs.update(self._find_nested_indexing(self.struct_schema))
         nested_attrs.update(self._find_nested_indexing(self.chem_schema))
         return nested_attrs
 
     def _find_nested_indexing(self, root_node) -> dict:
-        """Iteratively find all valid rcsb_nested_indexing_context attributes with required structure."""
+        """
+        Recursively search the given schema JSON object for valid nested indexing contexts.
+
+        A valid context must contain:
+            - A `rcsb_nested_indexing_context` list
+            - Entries with `category_path`
+            - Nested `context_attributes`, each containing:
+                - `context_value`
+                - `attributes` list, with each attribute having a `path`
+
+        Args:
+            root_node (dict): Root node of the schema JSON.
+
+        Returns:
+            dict: Dictionary of valid (attribute_path, category_path) tuples as keys.
+        """
         found = {}
         queue = [(root_node, "")]  # Each item is (node_dict, path_str)
+        category_path = ""
+        _tupple_index = ("", "")
+
 
         while queue:
             current_node, current_path = queue.pop(0)
@@ -379,11 +421,11 @@ class NestedAttributeSchema(SearchSchema):
                                 new_path_reference = (path_reference or "").replace("properties.", "")
                                 new_category_path = (category_path or "").replace("properties.", "")
 
-                                tuppleIndex = (new_path_reference, new_category_path)
+                                _tupple_index = (new_path_reference, new_category_path)
 
-                            if tuppleIndex not in found:
-                                found[tuppleIndex] = {
-                                    "Value": True,
+                            if _tupple_index not in found:
+                                found[_tupple_index] = {
+                                    True,
                                 }
 
                         if not context_valid:
@@ -391,7 +433,6 @@ class NestedAttributeSchema(SearchSchema):
                     if not context_valid:
                         break
 
-            # Continue traversing through
             for key, value in current_node.items():
                 path = f"{current_path}.{key}" if current_path else key
                 if isinstance(value, dict):

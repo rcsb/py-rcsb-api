@@ -28,7 +28,7 @@ import requests
 from rcsbapi.const import const
 from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import group
-from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
+from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery, NestedAttributeQuery
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group
 
@@ -1817,6 +1817,35 @@ class SearchTests(unittest.TestCase):
         except Exception as error:
             self.fail(f"Failed unexpectedly: {error}")
 
+    def testNestedAttrs(self):
+        with self.subTest("1. Query using nested attributes and verify result exists"):
+            attribute1 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_name",
+                operator="exact_match",
+                value="DrugBank"
+            )
+            attribute2 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_accession_code",
+                operator="exact_match",
+                value="DB00114"
+            )
+            nested = NestedAttributeQuery(attribute1, attribute2)
+            self.assertTrue(nested)
+
+        with self.subTest("1. Query using nested attributes and verify result exists"):
+            attribute1 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_name.Krish_Parmar",
+                operator="exact_match",
+                value="DrugBank"
+            )
+            attribute2 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_accession_code",
+                operator="exact_match",
+                value="DB00114"
+            )
+            nested = NestedAttributeQuery(attribute1, attribute2)
+            self.assertFalse(nested)
+
 
 def buildSearch():
     suiteSelect = unittest.TestSuite()
@@ -1858,6 +1887,8 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testSort"))
     suiteSelect.addTest(SearchTests("testReturnExplainMetadata"))
     suiteSelect.addTest(SearchTests("testScoringStrategy"))
+    suiteSelect.addTest(SearchTests("testNestedAttrs"))
+
     return suiteSelect
 
 

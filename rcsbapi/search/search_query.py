@@ -703,7 +703,6 @@ class AttributeQuery(Terminal):
         assert isinstance(service, str)
         super().__init__(params=paramsD, service=service)    
 
-
 class TextQuery(Terminal):
     """Special case of a Terminal for free-text queries"""
 
@@ -1091,8 +1090,25 @@ class Group(SearchQuery):
             return f"({' | '.join((str(n) for n in self.nodes))})"
         else:
             raise ValueError("Illegal Operator")
-
+        
 class NestedAttributeQuery(Group):
+    """
+    Represents a search query restricted to a single nested attribute group.
+
+    Ensures that all attributes in the query fall within a valid nested indexing context, and provides
+    consistent behavior for nesting logic. It wraps `AttributeQuery` objects and restricts operations to those
+    allowed by the nested schema rules.
+
+    Args:
+        AttributeQuery (AttributeQuery): Two attribute-level queries that must all belong to the same nested context group.
+
+    Raises:
+        Warning: If queries do not all belong to a valid and consistent nested attribute group.
+
+    Returns:
+        NestedAttributeQuery: A valid instance of a nested group query suitable for use in the RCSB Search API.
+    """
+
     def __init__(self, q1: AttributeQuery, q2: AttributeQuery):
         self.q1 = q1
         self.q2 = q2
@@ -1141,24 +1157,6 @@ class NestedAttributeQuery(Group):
         
         if self.is_valid_nested:
             super().__init__("and", [q1, q2], keep_nested=True)
-
-class NestedAttributeQueryChecker(Group):
-    def __init__(self, q1: AttributeQuery):
-        self.q1 = q1 
-        self.is_valid_nested = False
-
-        attribute_name = self.q1.params.get("attribute")
-
-        for tuple_key in SEARCH_SCHEMA.nested_indexed_attributes:
-            if attribute_name in tuple_key:
-                self.is_valid_nested = True
-                # Once found in at least one nested context, we can stop searching.
-                break
-        
-        if self.is_valid_nested == False:
-            logging.warning("This is a nested attribute, please refer to the documentation: .")
-    
-    """FINISH WARNING"""
 
 # Type for functions returning Terminal
 FTerminal = TypeVar("FTerminal", bound=Callable[..., Terminal])
