@@ -31,7 +31,7 @@ from typing import (
 import requests
 from ..const import const
 from ..config import config
-from .search_schema import SearchSchema, NestedAttributeSchema
+from .search_schema import NestedAttributeSchema
 
 if sys.version_info > (3, 8):
     from typing import Literal
@@ -226,10 +226,10 @@ class SearchQuery(ABC):
         scoring_strategy: Optional[ScoringStrategy] = None,
     ) -> Union["Session", int]:
         # pylint: disable=dangerous-default-value
-
-        NestedAttributeQueryChecker(self).validate() ##################################################################################################################################
-
         """Evaluate this query and return an iterator of all result IDs"""
+
+        NestedAttributeQueryChecker(self).validate()
+
         session = Session(
             query=self,
             return_type=return_type,
@@ -650,8 +650,10 @@ class Attr:
             value = value.value
         return self.greater_or_equal(value)
 
+
 SEARCH_SCHEMA = NestedAttributeSchema(Attr)
 print("SUCCESSFUL RUN OF SEARCH_SCHEMA")
+
 
 class AttributeQuery(Terminal):
     """Special case of a Terminal for Structure and Chemical Attribute Searches
@@ -704,7 +706,8 @@ class AttributeQuery(Terminal):
                 + f"{error_msg}"
             )
         assert isinstance(service, str)
-        super().__init__(params=paramsD, service=service)    
+        super().__init__(params=paramsD, service=service)
+
 
 class TextQuery(Terminal):
     """Special case of a Terminal for free-text queries"""
@@ -1032,12 +1035,13 @@ class Group(SearchQuery):
     def __and__(self, other: Union[SearchQuery, Group]) -> Group:
         if self.operator == "and":
             if isinstance(other, Group):
-                # If keep_nested set to True, don't combine groups
+                # # If keep_nested set to True, don't combine groups
                 if (self.keep_nested) and (other.keep_nested):
                     return Group("and", (self, other))
                 if other.keep_nested:
                     return Group("and", (*self.nodes, other))
-                # Else, combine groups
+                if self.keep_nested:
+                    return Group("and", (self, *other.nodes))
                 elif other.operator == "and":
                     return Group("and", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
@@ -1093,7 +1097,8 @@ class Group(SearchQuery):
             return f"({' | '.join((str(n) for n in self.nodes))})"
         else:
             raise ValueError("Illegal Operator")
-        
+
+
 class NestedAttributeQuery(Group):
     """
     Represents a search query restricted to a single nested attribute group.
@@ -1145,21 +1150,22 @@ class NestedAttributeQuery(Group):
                     nested_attribute1 = True
                 if attribute2 in tuple_key:
                     nested_attribute2 = True
-            
+
             if nested_attribute1 and not nested_attribute2:
                 self.message = (f"{attribute1} is a nested attribute, however {attribute2} is not")
 
             elif nested_attribute2 and not nested_attribute1:
                 self.message = (f"{attribute2} is a nested attribute, however {attribute1} is not")
-            
+
             else:
                 self.message = (f"{attribute2} and {attribute1} is not nested")
-            
+
         if not self.is_valid_nested:
             logging.warning(self.message)
-        
+
         if self.is_valid_nested:
             super().__init__("and", [q1, q2], keep_nested=True)
+
 
 class NestedAttributeQueryChecker:
     """
@@ -1227,6 +1233,7 @@ class NestedAttributeQueryChecker:
                 "Attribute '%s' is a nested attribute and must be used only inside a NestedAttributeQuery.",
                 attribute
             )
+
 
 # Type for functions returning Terminal
 FTerminal = TypeVar("FTerminal", bound=Callable[..., Terminal])
@@ -1986,11 +1993,12 @@ class Session(Iterable[str]):
         return f"https://search.rcsb.org/query-editor.html?json={urllib.parse.quote(data)}"
 
     def get_query_builder_link(self) -> str:
-        # --- Deprecation Warning ---
-        logging.warning("Deprecation Warning: Please use get_editor_link to access the Search API Query Editor")
-        # --- Deprecation Warning ---
-        
         """URL to view this query on the RCSB PDB website query builder"""
+
+        # --- Deprecation Warning ---
+        logging.warning("Deprecation Warning: Please use .get_editor_link to access the Search API Query Editor")
+        # --- Deprecation Warning ---
+
         params = self._make_params()
         params["request_options"]["paginate"]["rows"] = 25
         if "results_verbosity" in params["request_options"]:

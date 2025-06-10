@@ -137,9 +137,6 @@ def buildSchema():
     suiteSelect.addTest(SchemaTests("testFetchSchema"))
     suiteSelect.addTest(SchemaTests("testRcsbAttrs"))
     suiteSelect.addTest(SchemaTests("testNestedAttrs"))
-
-    
-
     return suiteSelect
 
 

@@ -287,7 +287,7 @@ class SearchSchema:
                     setattr(group, childname, childgroup)
             else:
                 raise TypeError(f"Unrecognized node type {node['type']!r} of {fullname}")
-        
+
             # print("PRINTING GROUP: ", group)
             # logger.info("PRINTING GROUP: %r", group)
 
@@ -301,6 +301,7 @@ class SearchSchema:
             else:
                 d[leaf] = self._set_leaves(d[leaf])
         return d
+
 
 class NestedAttributeSchema(SearchSchema):
     """
@@ -331,14 +332,14 @@ class NestedAttributeSchema(SearchSchema):
         chem_attr_schema_file=os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME),
     ):
         super().__init__(
-        attr_type,
-        refetch=refetch,
-        use_fallback=use_fallback,
-        reload=reload,
-        struct_attr_schema_url=struct_attr_schema_url,
-        struct_attr_schema_file=struct_attr_schema_file,
-        chem_attr_schema_url=chem_attr_schema_url,
-        chem_attr_schema_file=chem_attr_schema_file,
+            attr_type,
+            refetch=refetch,
+            use_fallback=use_fallback,
+            reload=reload,
+            struct_attr_schema_url=struct_attr_schema_url,
+            struct_attr_schema_file=struct_attr_schema_file,
+            chem_attr_schema_url=chem_attr_schema_url,
+            chem_attr_schema_file=chem_attr_schema_file,
         )
         self.Attr = attr_type
         self.nested_indexed_attributes = self._extract_nested_indexing_contexts()
@@ -377,7 +378,6 @@ class NestedAttributeSchema(SearchSchema):
         category_path = ""
         _tupple_index = ("", "")
 
-
         while queue:
             current_node, current_path = queue.pop(0)
 
@@ -388,17 +388,17 @@ class NestedAttributeSchema(SearchSchema):
             context = current_node.get("rcsb_nested_indexing_context")
             if isinstance(context, list):
                 context_valid = True
-                for entry in context: #check for context, break if not
+                for entry in context:  # check for context, break if not
                     if not isinstance(entry, dict):
                         context_valid = False
                         break
                     if entry.get("category_path"):
                         category_path = entry.get("category_path")
                     context_attrs = entry.get("context_attributes")
-                    if not isinstance(context_attrs, list): # check for context_attributes, break if not
+                    if not isinstance(context_attrs, list):  # check for context_attributes, break if not
                         context_valid = False
                         break
-                    for attr in context_attrs: # check for attributes (which are within context_attributes), break if not
+                    for attr in context_attrs:  # check for attributes (which are within context_attributes), break if not
                         if not isinstance(attr, dict):
                             context_valid = False
                             break
@@ -408,7 +408,7 @@ class NestedAttributeSchema(SearchSchema):
                         if not isinstance(attr["attributes"], list):
                             context_valid = False
                             break
-                        for p in attr["attributes"]: # check for path(which is within attributes), break if not
+                        for p in attr["attributes"]:  # check for path(which is within attributes), break if not
                             if not isinstance(p, dict) or "path" not in p:
                                 context_valid = False
                                 break

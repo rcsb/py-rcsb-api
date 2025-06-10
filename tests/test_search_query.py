@@ -1849,8 +1849,8 @@ class SearchTests(unittest.TestCase):
     def TestNestedAttributes(self):
         with self.subTest("1. Valid nested usage should NOT raise a warning"):
             attribute1 = AttributeQuery(
-                attribute="rcsb_chem_comp_related.resource_name", 
-                operator="exact_match", 
+                attribute="rcsb_chem_comp_related.resource_name",
+                operator="exact_match",
                 value="DrugBank"
             )
             attribute2 = AttributeQuery(
