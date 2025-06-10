@@ -1937,8 +1937,6 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testScoringStrategy"))
     suiteSelect.addTest(SearchTests("testNestedAttrs"))
     suiteSelect.addTest(SearchTests("testNestedAttrsChecker"))
-
-
     return suiteSelect
 
 
