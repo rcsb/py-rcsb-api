@@ -119,15 +119,15 @@ class SchemaTests(unittest.TestCase):
 
     def testNestedAttrs(self):
         with self.subTest(msg="3. Check nested attribute indexing dictionary length"):
-            nested_dict = attrs.nested_indexed_attributes
+            nested_dict = SEARCH_SCHEMA.nested_attribute_schema
             self.assertGreaterEqual(len(nested_dict), 15)
 
         with self.subTest(msg="3. Check for a specific nested attribute"):
             expected_tuple = ('rcsb_uniprot_annotation.name', 'rcsb_uniprot_annotation.type')
-            self.assertIn(expected_tuple, attrs.nested_indexed_attributes)
+            self.assertIn(expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
 
             not_expected_tuple = ('rcsb_uniprot_annotation.name.asdlkfjaskdjfaskldjf', 'rcsb_uniprot_annotation.type')
-            self.assertNotIn(not_expected_tuple, attrs.nested_indexed_attributes)
+            self.assertNotIn(not_expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
 
 
 def buildSchema():

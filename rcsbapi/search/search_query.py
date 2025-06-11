@@ -1178,7 +1178,7 @@ class NestedAttributeQuery(Group):
                         f"Please wrap it correctly using NestedAttributeQuery(...)\n"
                         f"Valid attributes that can be used with '{attr}': {', '.join(sorted(nested_partners)) if nested_partners else 'None'}"
                     )
-            logging.warning(message)
+            logging.error(message)
 
         if self.is_valid_nested:
             super().__init__("and", [query1, query2], keep_nested=True)
