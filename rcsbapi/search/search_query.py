@@ -31,7 +31,7 @@ from typing import (
 import requests
 from ..const import const
 from ..config import config
-from .search_schema import NestedAttributeSchema
+from .search_schema import SearchSchema
 
 if sys.version_info > (3, 8):
     from typing import Literal
@@ -651,8 +651,7 @@ class Attr:
         return self.greater_or_equal(value)
 
 
-SEARCH_SCHEMA = NestedAttributeSchema(Attr)
-print("SUCCESSFUL RUN OF SEARCH_SCHEMA")
+SEARCH_SCHEMA = SearchSchema(Attr)
 
 
 class AttributeQuery(Terminal):
@@ -1117,35 +1116,36 @@ class NestedAttributeQuery(Group):
         NestedAttributeQuery: A valid instance of a nested group query suitable for use in the RCSB Search API.
     """
 
-    def __init__(self, q1: AttributeQuery, q2: AttributeQuery):
-        self.q1 = q1
-        self.q2 = q2
+    def __init__(self, query1: AttributeQuery, query2: AttributeQuery):
+        self.query1 = query1
+        self.query2 = query2
         self.is_valid_nested = False
         self.message = ""
         self.tuple_key = None
+        message = ""
 
         """
         EXAMPLE QUERY:
-        q1 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_name", operator="exact_match", value="DrugBank")
-        q2 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_accession_code", operator="exact_match", value="DB00114")
-        NestedAttributeQuery(q1,q2)
+        query1 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_name", operator="exact_match", value="DrugBank")
+        query2 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_accession_code", operator="exact_match", value="DB00114")
+        NestedAttributeQuery(query1,query2)
         """
-        attribute1 = q1.params.get("attribute")
-        attribute2 = q2.params.get("attribute")
+        attribute1 = query1.params.get("attribute")
+        attribute2 = query2.params.get("attribute")
 
-        if (attribute1, attribute2) in SEARCH_SCHEMA.nested_indexed_attributes:
+        if (attribute1, attribute2) in SEARCH_SCHEMA.nested_attribute_schema:
             self.is_valid_nested = True
             self.tuple_key = (attribute1, attribute2)
             self.message = (f"These attributes: {attribute1}, {attribute2} are nested together.")
-        elif (attribute2, attribute1) in SEARCH_SCHEMA.nested_indexed_attributes:
+        elif (attribute2, attribute1) in SEARCH_SCHEMA.nested_attribute_schema:
             self.is_valid_nested = True
             self.tuple_key = (attribute2, attribute1)
             self.message = (f"These attributes: {attribute1}, {attribute2} are nested together.")
         else:
             nested_attribute1 = False
             nested_attribute2 = False
-            attribute1 = q1.params.get("attribute")
-            for tuple_key in SEARCH_SCHEMA.nested_indexed_attributes:
+            attribute1 = query1.params.get("attribute")
+            for tuple_key in SEARCH_SCHEMA.nested_attribute_schema:
                 if attribute1 in tuple_key:
                     nested_attribute1 = True
                 if attribute2 in tuple_key:
@@ -1161,10 +1161,27 @@ class NestedAttributeQuery(Group):
                 self.message = (f"{attribute2} and {attribute1} is not nested")
 
         if not self.is_valid_nested:
-            logging.warning(self.message)
+            # Add partner suggestions for each nested attribute
+            for attr in [attribute1, attribute2]:
+                # Check if this attribute is nested
+                is_nested = any(attr in pair for pair in SEARCH_SCHEMA.nested_attribute_schema)
+                if is_nested:
+                    # Find its valid nested partners
+                    nested_partners = {
+                        other for pair in SEARCH_SCHEMA.nested_attribute_schema if attr in pair
+                        for other in pair if other != attr
+                    }
+                    # Determine the other attribute in the pair
+                    other_attr = attribute2 if attr == attribute1 else attribute1
+                    message += (
+                        f"\nAttribute '{attr}' is a nested attribute; however, attribute '{other_attr}' is not a valid partner.\n"
+                        f"Please wrap it correctly using NestedAttributeQuery(...)\n"
+                        f"Valid attributes that can be used with '{attr}': {', '.join(sorted(nested_partners)) if nested_partners else 'None'}"
+                    )
+            logging.warning(message)
 
         if self.is_valid_nested:
-            super().__init__("and", [q1, q2], keep_nested=True)
+            super().__init__("and", [query1, query2], keep_nested=True)
 
 
 class NestedAttributeQueryChecker:
@@ -1175,36 +1192,18 @@ class NestedAttributeQueryChecker:
     nested attribute is used only within a valid context, such as a
     `NestedAttributeQuery` or a `Group(..., keep_nested=True)`. If a nested
     attribute is found outside such a context, a warning is logged.
+
+    Args:
+            query (SearchQuery): The search query to validate
     """
 
     def __init__(self, query: SearchQuery):
-        """
-        Initializes the checker with the root query to validate.
-
-        Args:
-            query (SearchQuery): The search query to validate.
-        """
-
         self.query = query
 
     def validate(self):
-        """
-        Validates the query by recursively checking for improper use of nested attributes.
-
-        Logs a warning for any nested attribute that is not inside a valid grouping context.
-        """
-
         self._check(self.query, within_nested_block=False)
 
     def _check(self, query: SearchQuery, within_nested_block: bool):
-        """
-        Recursively traverses the query tree and validates each node.
-
-        Args:
-            query (SearchQuery): The current query node being examined.
-            within_nested_block (bool): Indicates whether the current node is part of a valid nested context.
-        """
-
         if isinstance(query, AttributeQuery):
             self._validate_single_attribute_query(query, within_nested_block)
         elif isinstance(query, NestedAttributeQuery):
@@ -1218,20 +1217,20 @@ class NestedAttributeQueryChecker:
             pass  # ignore TextQuery, Terminal, etc.
 
     def _validate_single_attribute_query(self, query: AttributeQuery, within_nested_block: bool):
-        """
-        Validates a single AttributeQuery node to ensure proper nested context.
-
-        Args:
-            query (AttributeQuery): The attribute-level query to validate.
-            within_nested_block (bool): True if the attribute is inside a valid nested group.
-        """
-
         attribute = query.params.get("attribute")
-        is_nested = any(attribute in pair for pair in SEARCH_SCHEMA.nested_indexed_attributes)
+        is_nested = any(attribute in pair for pair in SEARCH_SCHEMA.nested_attribute_schema)
         if is_nested and not within_nested_block:
+            nested_partners = {
+                other for pair in SEARCH_SCHEMA.nested_attribute_schema if attribute in pair
+                for other in pair if other != attribute
+            }
             logging.warning(
-                "Attribute '%s' is a nested attribute and must be used only inside a NestedAttributeQuery.",
-                attribute
+                "Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery.\n"
+                "Please wrap it using NestedAttributeQuery(...)\n"
+                "Other attributes commonly used with '%s': %s",
+                attribute,
+                attribute,
+                ', '.join(sorted(nested_partners)) if nested_partners else "None"
             )
 
 
@@ -1995,9 +1994,9 @@ class Session(Iterable[str]):
     def get_query_builder_link(self) -> str:
         """URL to view this query on the RCSB PDB website query builder"""
 
-        # --- Deprecation Warning ---
-        logging.warning("Deprecation Warning: Please use .get_editor_link to access the Search API Query Editor")
-        # --- Deprecation Warning ---
+        # --- Warning ---
+        logging.warning("Warning: For complex queries, Advanced Search links are incompatible and may not work. Please use .get_editor_link to access the Search API Query Editor")
+        # --- Warning ---
 
         params = self._make_params()
         params["request_options"]["paginate"]["rows"] = 25
