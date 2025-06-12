@@ -1872,7 +1872,8 @@ class SearchTests(unittest.TestCase):
             )
             nested = NestedAttributeQuery(attribute1, attribute2)
             query = nested & attribute3
-            self.assertGreater(list(query()), 90)
+            query_length = list(query())
+            self.assertGreater(len(query_length), 90)
 
     def TestNestedAttributes(self):
         with self.subTest("Valid nested usage should NOT raise a warning"):
