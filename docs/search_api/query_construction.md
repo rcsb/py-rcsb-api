@@ -179,6 +179,45 @@ query = group(q1 & q2) & q3
 list(query())
 ```
 
+Some attributes in the RCSB schema are part of a nested indexing context, meaning they must be queried together to ensure correct matching behavior. These include attributes like rcsb_binding_affinity.type and rcsb_binding_affinity.value, which are associated with the same underlying object (e.g., an EC50 measurement).
+
+To group such attributes correctly, use the NestedAttributeQuery class. This ensures the query is constructed in a way that complies with the schema's nested indexing rules.
+
+More information about which attribute pairs support nested indexing can be found by inspecting the schema or in the rcsb_nested_indexing_context fields of the attribute definitions.
+
+```python
+from rcsbapi.search import AttributeQuery, NestedAttributeQuery
+
+# Query for EC50-type binding affinity with a value of 2.0
+q1 = AttributeQuery(
+    attribute="rcsb_binding_affinity.type",
+    operator="exact_match",
+    value="EC50"
+)
+
+q2 = AttributeQuery(
+    attribute="rcsb_binding_affinity.value",
+    operator="equals",
+    value=2.0
+)
+
+# Other independent structural filters
+q3 = AttributeQuery(
+    attribute="rcsb_entry_info.selected_polymer_entity_types",
+    operator="exists"
+)
+
+# Group nested attributes using `NestedAttributeQuery`
+nested = NestedAttributeQuery(q1, q2)
+
+query = nested & q3
+
+list(query())
+```
+If you do not use NestedAttributeQuery, your query may be flattened, leading to incorrect behavior or ignored nested constraints.
+Additionally, a warning message will appear, informing you of improper nested attribute usage.
+
+
 ### Sessions
 The result of executing a query (either by calling it as a function or using `exec()`) is a
 `Session` object. It implements `__iter__`, so it is usually treated as an
