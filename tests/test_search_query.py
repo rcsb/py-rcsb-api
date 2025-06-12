@@ -1887,18 +1887,13 @@ class SearchTests(unittest.TestCase):
                 operator="exact_match",
                 value="DB00114"
             )
-            attribute3 = AttributeQuery(
-                attribute="rcsb_entity_source_organism.scientific_name",
-                operator="exact_match",
-                value="Escherichia coli"
-            )
 
             nested = NestedAttributeQuery(attribute1, attribute2)
             self.assertTrue(nested.is_valid_nested)
 
-            query = nested & attribute3
+            query = nested & attribute2
 
-            with self.assertNoLogs(level='WARNING'):
+            with self.assertLogs(level='WARNING'):
                 NestedAttributeQueryChecker(query).validate()
 
 
