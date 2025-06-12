@@ -179,11 +179,11 @@ query = group(q1 & q2) & q3
 list(query())
 ```
 
-Some attributes in the RCSB schema are part of a nested indexing context, meaning they must be queried together to ensure correct matching behavior. These include attributes like rcsb_binding_affinity.type and rcsb_binding_affinity.value, which are associated with the same underlying object (e.g., an EC50 measurement).
+Some attributes in the RCSB schema are part of a nested indexing context, meaning they must be queried together to ensure correct matching behavior. These include attributes like `rcsb_binding_affinity.type` and `rcsb_binding_affinity.value`, which are associated with the same underlying object (e.g., an EC50 measurement).
 
-To group such attributes correctly, use the NestedAttributeQuery class. This ensures the query is constructed in a way that complies with the schema's nested indexing rules.
+To group such attributes correctly, use the `NestedAttributeQuery` class. This ensures the query is constructed in a way that complies with the schema's nested indexing rules.
 
-More information about which attribute pairs support nested indexing can be found by inspecting the schema or in the rcsb_nested_indexing_context fields of the attribute definitions.
+More information about which attribute pairs support nested indexing can be found by inspecting the  [schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema) or in the `rcsb_nested_indexing_context` fields of the attribute definitions.
 
 ```python
 from rcsbapi.search import AttributeQuery, NestedAttributeQuery
@@ -214,7 +214,7 @@ query = nested & q3
 
 list(query())
 ```
-If you do not use NestedAttributeQuery, your query may be flattened, leading to incorrect behavior or ignored nested constraints.
+If you do not use `NestedAttributeQuery`, your query may be flattened, leading to incorrect behavior or ignored nested constraints.
 Additionally, a warning message will appear, informing you of improper nested attribute usage.
 
 

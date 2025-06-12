@@ -438,10 +438,10 @@ class Attr:
     available in the `schema <https://search.rcsb.org/rcsbsearch/v2/metadata/schema>`_.
 
     * The `range` dictionary requires the following keys:
-     * "from" -> int
-     * "to" -> int
-     * "include_lower" -> bool
-     * "include_upper" -> bool
+    * "from" -> int
+    * "to" -> int
+    * "include_lower" -> bool
+    * "include_upper" -> bool
     """
 
     attribute: str
@@ -1907,7 +1907,7 @@ class Session(Iterable[str]):
         "Fires a single query"
         params = self._make_params(start)
         logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.get(self.url, {"json": json.dumps(params, separators=(",", ":"))}, timeout=config.API_TIMEOUT)
+        response = requests.post(self.url, json=params, timeout=config.API_TIMEOUT)
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
             return response.json()

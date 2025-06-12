@@ -1817,7 +1817,7 @@ class SearchTests(unittest.TestCase):
         except Exception as error:
             self.fail(f"Failed unexpectedly: {error}")
 
-    def testNestedAttrs(self):
+    def testNestedAttributes(self):
         with self.subTest("1. Query using nested attributes and verify result exists"):
             attribute1 = AttributeQuery(
                 attribute="rcsb_chem_comp_related.resource_name",
@@ -1852,7 +1852,7 @@ class SearchTests(unittest.TestCase):
             nested = NestedAttributeQuery(attribute5, attribute6)
             query2 = nested & attribute7 & attribute8
 
-            self.assertNotEqual(list(query1()), list(query2()))
+            self.assertNotEqual(set(query1()), set(query2()))
 
         with self.subTest("4. Confirms query runs"):
             attribute1 = AttributeQuery(
@@ -1875,7 +1875,7 @@ class SearchTests(unittest.TestCase):
             query_length = list(query())
             self.assertGreater(len(query_length), 90)
 
-    def TestNestedAttributes(self):
+    def testNestedAttrsChecker(self):
         with self.subTest("Valid nested usage should NOT raise a warning"):
             attribute1 = AttributeQuery(
                 attribute="rcsb_chem_comp_related.resource_name",
@@ -1898,9 +1898,8 @@ class SearchTests(unittest.TestCase):
 
             query = nested & attribute3
 
-            with self.assertLogs(level='WARNING') as cm:
+            with self.assertNoLogs(level='WARNING'):
                 NestedAttributeQueryChecker(query).validate()
-            self.assertEqual(len(cm.output), 0, f"Unexpected warnings: {cm.output}")
 
 
 def buildSearch():
@@ -1943,7 +1942,7 @@ def buildSearch():
     suiteSelect.addTest(SearchTests("testSort"))
     suiteSelect.addTest(SearchTests("testReturnExplainMetadata"))
     suiteSelect.addTest(SearchTests("testScoringStrategy"))
-    suiteSelect.addTest(SearchTests("testNestedAttrs"))
+    suiteSelect.addTest(SearchTests("testNestedAttributes"))
     suiteSelect.addTest(SearchTests("testNestedAttrsChecker"))
     return suiteSelect
 
