@@ -1131,7 +1131,7 @@ class NestedAttributeQuery(Group):
         query2 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_accession_code", operator="exact_match", value="DB00114")
         nestedQuery = NestedAttributeQuery(query1, query2)
         """
-        
+
         attribute1 = query1.params.get("attribute")
         attribute2 = query2.params.get("attribute")
 
