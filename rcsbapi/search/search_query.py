@@ -1034,13 +1034,14 @@ class Group(SearchQuery):
     def __and__(self, other: Union[SearchQuery, Group]) -> Group:
         if self.operator == "and":
             if isinstance(other, Group):
-                # # If keep_nested set to True, don't combine groups
+                # If keep_nested set to True, don't combine groups
                 if (self.keep_nested) and (other.keep_nested):
                     return Group("and", (self, other))
                 if other.keep_nested:
                     return Group("and", (*self.nodes, other))
                 if self.keep_nested:
                     return Group("and", (self, *other.nodes))
+                # Else, combine groups
                 elif other.operator == "and":
                     return Group("and", (*self.nodes, *other.nodes))
             elif isinstance(other, SearchQuery):
@@ -1107,10 +1108,11 @@ class NestedAttributeQuery(Group):
     allowed by the nested schema rules.
 
     Args:
-        AttributeQuery (AttributeQuery): Two attribute-level queries that must all belong to the same nested context group.
+        query1 (AttributeQuery): First attribute query containing a nested attribute
+        query2 (AttributeQuery): Second attribute query containing the corresponding nested attribute that pairs with query1's attribute
 
     Raises:
-        Warning: If queries do not all belong to a valid and consistent nested attribute group.
+        Error: If queries do not all belong to a valid and consistent nested attribute group.
 
     Returns:
         NestedAttributeQuery: A valid instance of a nested group query suitable for use in the RCSB Search API.
@@ -1120,7 +1122,6 @@ class NestedAttributeQuery(Group):
         self.query1 = query1
         self.query2 = query2
         self.is_valid_nested = False
-        self.message = ""
         self.tuple_key = None
         message = ""
 
@@ -1128,37 +1129,18 @@ class NestedAttributeQuery(Group):
         EXAMPLE QUERY:
         query1 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_name", operator="exact_match", value="DrugBank")
         query2 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_accession_code", operator="exact_match", value="DB00114")
-        NestedAttributeQuery(query1,query2)
+        nestedQuery = NestedAttributeQuery(query1, query2)
         """
+        
         attribute1 = query1.params.get("attribute")
         attribute2 = query2.params.get("attribute")
 
         if (attribute1, attribute2) in SEARCH_SCHEMA.nested_attribute_schema:
             self.is_valid_nested = True
             self.tuple_key = (attribute1, attribute2)
-            self.message = (f"These attributes: {attribute1}, {attribute2} are nested together.")
         elif (attribute2, attribute1) in SEARCH_SCHEMA.nested_attribute_schema:
             self.is_valid_nested = True
             self.tuple_key = (attribute2, attribute1)
-            self.message = (f"These attributes: {attribute1}, {attribute2} are nested together.")
-        else:
-            nested_attribute1 = False
-            nested_attribute2 = False
-            attribute1 = query1.params.get("attribute")
-            for tuple_key in SEARCH_SCHEMA.nested_attribute_schema:
-                if attribute1 in tuple_key:
-                    nested_attribute1 = True
-                if attribute2 in tuple_key:
-                    nested_attribute2 = True
-
-            if nested_attribute1 and not nested_attribute2:
-                self.message = (f"{attribute1} is a nested attribute, however {attribute2} is not")
-
-            elif nested_attribute2 and not nested_attribute1:
-                self.message = (f"{attribute2} is a nested attribute, however {attribute1} is not")
-
-            else:
-                self.message = (f"{attribute2} and {attribute1} is not nested")
 
         if not self.is_valid_nested:
             # Add partner suggestions for each nested attribute
@@ -1995,7 +1977,8 @@ class Session(Iterable[str]):
         """URL to view this query on the RCSB PDB website query builder"""
 
         # --- Warning ---
-        logging.warning("Warning: For complex queries, Advanced Search links are incompatible and may not work. Please use .get_editor_link to access the Search API Query Editor")
+        logging.warning("Warning: For complex queries, the Advanced Search builder page may not be compatible and so links may not render correctly. "
+                        "Please use the `.get_editor_link()` method to access the Search API Query Editor instead.")
         # --- Warning ---
 
         params = self._make_params()

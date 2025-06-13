@@ -183,7 +183,7 @@ Some attributes in the RCSB schema are part of a nested indexing context, meanin
 
 To group such attributes correctly, use the `NestedAttributeQuery` class. This ensures the query is constructed in a way that complies with the schema's nested indexing rules.
 
-More information about which attribute pairs support nested indexing can be found by inspecting the  [schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema) or in the `rcsb_nested_indexing_context` fields of the attribute definitions.
+More information about which attribute pairs support nested indexing can be found by inspecting the  [schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema) and looking at `rcsb_nested_indexing_context` fields of the attribute definitions.
 
 ```python
 from rcsbapi.search import AttributeQuery, NestedAttributeQuery
@@ -208,9 +208,9 @@ q3 = AttributeQuery(
 )
 
 # Group nested attributes using `NestedAttributeQuery`
-nested = NestedAttributeQuery(q1, q2)
+nestedQuery = NestedAttributeQuery(q1, q2)
 
-query = nested & q3
+query = nestedQuery & q3
 
 list(query())
 ```

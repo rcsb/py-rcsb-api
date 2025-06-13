@@ -126,7 +126,7 @@ class SchemaTests(unittest.TestCase):
             expected_tuple = ('rcsb_uniprot_annotation.name', 'rcsb_uniprot_annotation.type')
             self.assertIn(expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
 
-            not_expected_tuple = ('rcsb_uniprot_annotation.name.asdlkfjaskdjfaskldjf', 'rcsb_uniprot_annotation.type')
+            not_expected_tuple = ('drugbank_info.drug_groups', 'rcsb_uniprot_annotation.type')
             self.assertNotIn(not_expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
 
 
