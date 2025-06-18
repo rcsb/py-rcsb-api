@@ -841,8 +841,19 @@ class GQLSchema(ABC):
             if arg_dict["ofKind"] == "SCALAR" and arg_type == "String" and not isinstance(args[arg_name], str):
                 error_list.append(f"{arg_name} must be a str not {type(args[arg_name])}")
 
-            if arg_dict["ofKind"] == "SCALAR" and arg_type == "Int" and not isinstance(args[arg_name], int):
-                error_list.append(f"{arg_name} must be a int not {type(args[arg_name])}")
+            # TODO: Remove auto-cast to int in future release to enforce stricter typing
+            if arg_dict["ofKind"] == "SCALAR" and arg_type == "Int":
+                if isinstance(args[arg_name], str):
+                    try:
+                        args[arg_name] = int(args[arg_name])
+                    except ValueError:
+                        error_list.append(f"{arg_name} was provided as a string but cannot be converted to int: {args[arg_name]}")
+                elif not isinstance(args[arg_name], int):
+                    error_list.append(f"{arg_name} must be an int, not {type(args[arg_name])}")
+
+            # Previous Code for reference
+            # if arg_dict["ofKind"] == "SCALAR" and arg_type == "Int" and not isinstance(args[arg_name], int):
+            # error_list.append(f"{arg_name} must be a int not {type(args[arg_name])}")
 
             # If list
             if arg_dict["ofKind"] == "LIST":
