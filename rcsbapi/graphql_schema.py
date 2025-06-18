@@ -121,9 +121,27 @@ class GQLSchema(ABC):
     """GraphQL schema defining available fields, types, and how they are connected."""
 
     def __init__(self, endpoint: str, timeout: int, fallback_file: str, weigh_nodes: List[str]) -> None:
+        self.introspection_query = {
+            "query": """query IntrospectionQuery { __schema
+            { queryType { name } types { kind name description fields(includeDeprecated: true)
+            { name description args { name description type { kind name ofType { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name } } } } } } } } defaultValue } type { kind name ofType { kind name ofType { kind name
+            ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } }
+            isDeprecated deprecationReason } inputFields { name description type { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name ofType { kind name } } } } } } } } defaultValue } interfaces { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name } } } } } } } } enumValues(includeDeprecated: true) { name description isDeprecated deprecationReason }
+            possibleTypes { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name ofType { kind name ofType { kind name } } } } } } } } } directives { name description locations args
+            { name description type { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } } defaultValue } } }}"""
+        }
         self.pdb_url: str = endpoint
         self.timeout: int = timeout
         self.schema: Dict[str, Any] = self.fetch_schema()
+
         """JSON resulting from full introspection of the GraphQL schema"""
 
         self._use_networkx: bool = use_networkx
@@ -236,24 +254,7 @@ class GQLSchema(ABC):
         Returns:
             Dict: JSON response of introspection request
         """
-        query = {
-            "query": """query IntrospectionQuery { __schema
-            { queryType { name } types { kind name description fields(includeDeprecated: true)
-            { name description args { name description type { kind name ofType { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name } } } } } } } } defaultValue } type { kind name ofType { kind name ofType { kind name
-            ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } }
-            isDeprecated deprecationReason } inputFields { name description type { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name ofType { kind name } } } } } } } } defaultValue } interfaces { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name } } } } } } } } enumValues(includeDeprecated: true) { name description isDeprecated deprecationReason }
-            possibleTypes { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name ofType { kind name ofType { kind name } } } } } } } } } directives { name description locations args
-            { name description type { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } } defaultValue } } }}"""
-        }
-        schema_response = requests.post(headers={"Content-Type": "application/json"}, json=query, url=self.pdb_url, timeout=self.timeout)
+        schema_response = requests.post(headers={"Content-Type": "application/json"}, json=self.introspection_query, url=self.pdb_url, timeout=self.timeout)
         if schema_response.status_code == 200:
             return dict(schema_response.json())
         # logger.info("Loading data schema from file")
@@ -523,7 +524,7 @@ class GQLSchema(ABC):
                     break
                 # Else, check for matching path segments.
                 for i in range(len(possible_path_list)):
-                    if possible_path_list[i : i + len(path_list)] == path_list:
+                    if possible_path_list[i: i + len(path_list)] == path_list:
                         matching_paths.append(".".join(possible_path_list))
 
             idx_paths: List[list[int]] = []

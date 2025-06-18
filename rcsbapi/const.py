@@ -61,6 +61,11 @@ class Const:
         "drugbank": "drugbank.json",
     }))
 
+    SEQUENCE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
+    SEQUENCE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
+    SEQUENCE_API_SCHEMA_DIR: str = "sequence/resources"
+    SEQUENCE_API_SCHEMA_FILENAME: str = "seq_api_schema.json"
+
     SINGULAR_TO_PLURAL: MappingProxyType[str, str] = field(default_factory=lambda: MappingProxyType({
         "entry": "entries",
         "polymer_entity": "polymer_entities",
