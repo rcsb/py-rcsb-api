@@ -1101,7 +1101,6 @@ class GQLSchema(ABC):
                 continue
 
             val = user_args[arg_name]
-            # Basic formatting without validation
             if isinstance(val, str):
                 formatted_args.append(f'{arg_name}: "{val}"')
             else:

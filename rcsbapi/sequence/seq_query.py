@@ -125,8 +125,6 @@ class Alignments(Query):
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
-    # TODO: Create an attribute `field_args` and pass in args as a dict
-    #         field_args = {"target_alignments": {first:0, offset:5}, ...}
     field_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
     offset: Optional[int] = None
     first: Optional[int] = None
