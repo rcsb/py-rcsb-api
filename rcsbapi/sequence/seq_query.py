@@ -1,4 +1,4 @@
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from types import MappingProxyType
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
@@ -125,19 +125,9 @@ class Alignments(Query):
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
-    """
-    `offset` and `first` are field arguments (currently the only ones).
-    Making them class attributes (below) would not work if there
-    were redundant field arg names for different fields.
-    (i.e. `first` an argument for `target_alignments` and a different field).
-
-    Other options:
-    1. Use a string in `return_data_list` and parse later
-            return_data_list = ["target_alignments(first:0, offset:5)"]
-    2. Create an attribute `field_args` and pass in args as a dict
-            field_args = {"target_alignments": {first:0, offset:5}, ...}
-    Cons are that these put the burden of formatting/knowing the arg names on the user.
-    """
+    # TODO: Create an attribute `field_args` and pass in args as a dict
+    #         field_args = {"target_alignments": {first:0, offset:5}, ...}
+    field_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
     offset: Optional[int] = None
     first: Optional[int] = None
 
@@ -197,6 +187,7 @@ class GroupAlignments(Query):
     filter: Optional[list[str]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
+    field_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
     offset: Optional[int] = None
     first: Optional[int] = None
 

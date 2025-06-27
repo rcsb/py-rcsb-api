@@ -96,8 +96,12 @@ class SeqTests(unittest.TestCase):
                     queryId="XP_642496",
                     range=[1, 100],
                     return_data_list=["target_alignments"],
-                    first=1,
-                    offset=10
+                    field_args={
+                        "target_alignments": {
+                            "first": 10,
+                            "offset": 5
+                        },
+                    }
                 )
                 query_obj.exec()
             except Exception as error:

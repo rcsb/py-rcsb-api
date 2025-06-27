@@ -113,7 +113,7 @@ class SeqSchema(GQLSchema):
             query_type=query_type,
             query_args=query_args,
             return_data_list=return_data_list,
-            suppress_autocomplete_warning=suppress_autocomplete_warning
+            suppress_autocomplete_warning=suppress_autocomplete_warning,
         )
 
     def find_field_names(self, search_string: str) -> list[str]:

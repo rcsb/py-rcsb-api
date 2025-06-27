@@ -1091,16 +1091,25 @@ class GQLSchema(ABC):
             str: field name or field name with corresponding arguments
         """
         # Check FieldNode argument names and see if user has passed in corresponding values
+        field_args_dict = query_args.get("fieldargs", {})
+        user_args = field_args_dict.get(field_name, {})
+
         formatted_args = []
-        for arg in args:
-            arg_name = arg["name"]
-            if arg_name in query_args:
-                formatted_args.append(self._format_args(arg, query_args[arg_name]))
+        for schema_arg in args:
+            arg_name = schema_arg["name"]
+            if arg_name not in user_args:
+                continue
+
+            val = user_args[arg_name]
+            # Basic formatting without validation
+            if isinstance(val, str):
+                formatted_args.append(f'{arg_name}: "{val}"')
+            else:
+                formatted_args.append(f"{arg_name}: {val}")
 
         if formatted_args:
-            return "{}{}".format(field_name, str(tuple(formatted_args)).replace("'", ""))
-        else:
-            return field_name
+            return f"{field_name}({', '.join(formatted_args)})"
+        return field_name
 
     def _query_dict_to_graphql_string(self, first_line: str, query_body: Dict[str, Any]) -> str:
         """Turn query dictionary into a string in GraphQL syntax"""
