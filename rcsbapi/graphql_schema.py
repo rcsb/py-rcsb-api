@@ -841,7 +841,6 @@ class GQLSchema(ABC):
             if arg_dict["ofKind"] == "SCALAR" and arg_type == "String" and not isinstance(args[arg_name], str):
                 error_list.append(f"{arg_name} must be a str not {type(args[arg_name])}")
 
-            # TODO: Remove auto-cast to int in future release to enforce stricter typing
             if arg_dict["ofKind"] == "SCALAR" and arg_type == "Int":
                 if isinstance(args[arg_name], str):
                     try:
@@ -1084,23 +1083,34 @@ class GQLSchema(ABC):
         """Add arguments to a field, returning the fieldname and args as a formatted string.
 
         Args:
-            args (list[dict[str, Any]]): args of a field, retrieved from the GraphQL schema/FieldNode object
-            query_args (dict[str, Any]): dictionary where keys are argument name and values are user input
+            field_name (str): name of the field
+            args (list[dict[str, Any]]): argument definitions from schema
+            query_args (dict[str, Any]): full dictionary of query arguments
 
         Returns:
-            str: field name or field name with corresponding arguments
+            str: field name, potentially with arguments applied (e.g., field(arg: val))
+
+        Raises:
+            ValueError: if an invalid field argument key is found
         """
-        # Check FieldNode argument names and see if user has passed in corresponding values
-        field_args_dict = query_args.get("fieldargs", {})
-        user_args = field_args_dict.get(field_name, {})
+        field_args_dict = query_args.get("datalistargs", {})
+
+        # Validate all user-provided field names
+        user_field_args = field_args_dict.get(field_name, {})
+
+        for user_key in field_args_dict.keys():
+            if user_key != field_name:
+                raise ValueError(
+                    f"Invalid field argument '{user_key}' in data_list_args. "
+                    f"Allowed fields for this query are: {list(self._field_names_list)}"
+                )
 
         formatted_args = []
-        for schema_arg in args:
-            arg_name = schema_arg["name"]
-            if arg_name not in user_args:
+        for arg in args:
+            arg_name = arg["name"]
+            if arg_name not in user_field_args:
                 continue
-
-            val = user_args[arg_name]
+            val = user_field_args[arg_name]
             if isinstance(val, str):
                 formatted_args.append(f'{arg_name}: "{val}"')
             else:

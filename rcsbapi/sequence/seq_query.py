@@ -125,9 +125,7 @@ class Alignments(Query):
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
-    field_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
-    offset: Optional[int] = None
-    first: Optional[int] = None
+    data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -185,9 +183,7 @@ class GroupAlignments(Query):
     filter: Optional[list[str]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
-    field_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
-    offset: Optional[int] = None
-    first: Optional[int] = None
+    data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
