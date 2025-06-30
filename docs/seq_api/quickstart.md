@@ -48,6 +48,29 @@ query.exec()
 |`return_data_list`|Fields to request data for|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
 
+### Pagination
+Some GraphQL fields support pagination using standard parameters: first and offset.
+These parameters are commonly used to limit or paginate results from a list-type field. For example:
+
+```python
+from rcsbapi.sequence.seq_query import Alignments
+
+query_obj = Alignments(
+    from_="NCBI_PROTEIN",
+    to="PDB_ENTITY",
+    queryId="XP_642496",
+    range=[1, 100],
+    return_data_list=["target_alignments"],
+    data_list_args={
+        "target_alignments": {
+            "first": 10,
+            "offset": 5
+        },
+    }
+)
+query_obj.exec()
+```
+
 ## Annotations
 `Annotations`
 
