@@ -44,8 +44,8 @@ Contents
    :caption: Sequence Coordinates API
    :maxdepth: 2
 
-   data_api/quickstart.md
-   data_api/additional_examples.md
+   seq_api/quickstart.md
+   seq_api/additional_examples.md
 
 License
 -------
