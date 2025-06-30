@@ -78,8 +78,8 @@ Valid Inputs for `reference`
 - `"PDB_ENTITY"`
 - `"PDB_INSTANCE"`
 
-# Additional Examples
+## Additional Examples
 For examples using other query types like `GroupAlignments`, `GroupAnnotations`, and `GroupAnnotationsSummary` or for examples using filters, check [Additional Examples](/docs/seq_api/additional_examples.md).
 
-# Jupyter Notebooks
+## Jupyter Notebooks
 <!-- TODO: add Jupyter notebooks here -->

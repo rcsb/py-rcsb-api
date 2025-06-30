@@ -1,6 +1,6 @@
 # Additional Examples
 
-# Annotations Query with Filter
+## Annotations Query with Filter
 Example comes from [RCSB PDB Sequence Coordinates API documentation](https://sequence-coordinates.rcsb.org/#examples)
 
 ```python
@@ -24,7 +24,7 @@ query = Annotations(
 query.exec()
 ```
 
-# Alignments with Range
+## Alignments with Range
 ```python
 from rcsbapi.sequence import Alignments
 
@@ -39,7 +39,7 @@ query = Alignments(
 query.exec()
 ```
 
-# GroupAlignments
+## GroupAlignments
 <!-- TODO: See if you can add more detail to description text -->
 Get alignments for structures in groups
 
@@ -55,7 +55,7 @@ query = GroupAlignments(
 query.exec()
 ```
 
-# GroupAlignments with Filter
+## GroupAlignments with Filter
 `filter` specify which IDs to return results for
 
 ```python
@@ -71,7 +71,7 @@ query = GroupAlignments(
 query.exec()
 ```
 
-# GroupAnnotations
+## GroupAnnotations
 <!-- TODO: See if you can add more detail to description text -->
 Get annotations for structures in groups
 
@@ -88,7 +88,7 @@ query = GroupAnnotations(
 query.exec()
 ```
 
-# GroupAnnotations with Filter
+## GroupAnnotations with Filter
 `filters` specify what annotations will be retrieved.
 
 ```python
@@ -112,7 +112,7 @@ query = GroupAnnotations(
 query.exec()
 ```
 
-# GroupAnnotationsSummary
+## GroupAnnotationsSummary
 <!-- TODO: This currently fails for reasons unrelated to python package, Joan is looking into it -->
 <!-- TODO: Add description -->
 
@@ -129,7 +129,7 @@ query = GroupAnnotationsSummary(
 query.exec()
 ```
 
-# GroupAnnotations with Filter
+## GroupAnnotations with Filter
 <!-- TODO: This currently fails for reasons unrelated to python package, Joan is looking into it -->
 `filters` specify what annotations will be retrieved.
 
