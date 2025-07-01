@@ -10,7 +10,7 @@ from rcsbapi.sequence import Annotations, AnnotationFilterInput
 query = Annotations(
     reference="NCBI_GENOME",
     sources=["PDB_INSTANCE"],
-    queryId="NC_000001",
+    query_id="NC_000001",
     filters=[
         AnnotationFilterInput(
             field="TYPE",
@@ -30,9 +30,9 @@ from rcsbapi.sequence import Alignments
 
 # Only return alignments data that fall in given range
 query = Alignments(
-    from_="NCBI_PROTEIN",
-    to="PDB_ENTITY",
-    queryId="XP_642496",
+    db_from="NCBI_PROTEIN",
+    db_to="PDB_ENTITY",
+    query_id="XP_642496",
     range=[1, 100],
     return_data_list=["target_alignments"]
 )
@@ -49,7 +49,7 @@ from rcsbapi.sequence import GroupAlignments
 # TODO: add description
 query = GroupAlignments(
     group="MATCHING_UNIPROT_ACCESSION",
-    groupId="P01112",
+    group_id="P01112",
     return_data_list=["target_alignments.aligned_regions", "target_id"],
 )
 query.exec()
@@ -64,7 +64,7 @@ from rcsbapi.sequence import GroupAlignments
 # TODO: add description
 query = GroupAlignments(
     group="MATCHING_UNIPROT_ACCESSION",
-    groupId="P01112",
+    group_id="P01112",
     return_data_list=["target_alignments.aligned_regions", "target_id"],
     filter=["8CNJ_1", "8FG4_1"]
 )
@@ -81,7 +81,7 @@ from rcsbapi.sequence import GroupAnnotations
 # TODO Add description
 query = GroupAnnotations(
     group="MATCHING_UNIPROT_ACCESSION",
-    groupId="P01112",
+    group_id="P01112",
     sources=["PDB_ENTITY"],
     return_data_list=["features.name","features.feature_positions", "target_id"]
 )
@@ -97,7 +97,7 @@ from rcsbapi.sequence import GroupAnnotations, AnnotationFilterInput
 # TODO: Add description
 query = GroupAnnotations(
     group="MATCHING_UNIPROT_ACCESSION",
-    groupId="P01112",
+    group_id="P01112",
     sources=["PDB_ENTITY"],
     filters=[
         AnnotationFilterInput(
@@ -122,7 +122,7 @@ from rcsbapi.sequence import GroupAnnotationsSummary
 # TODO: add description
 query = GroupAnnotationsSummary(
     group="MATCHING_UNIPROT_ACCESSION",
-    groupId="P01112",
+    group_id="P01112",
     sources=["PDB_INSTANCE"],
     return_data_list=["target_id", "features.type"]
 )
@@ -139,7 +139,7 @@ from rcsbapi.sequence import GroupAnnotationsSummary, AnnotationFilterInput
 # TODO: add description
 query = GroupAnnotationsSummary(
     group="MATCHING_UNIPROT_ACCESSION",
-    groupId="P01112",
+    group_id="P01112",
     sources=["PDB_INSTANCE"],
     filters=[
         AnnotationFilterInput(

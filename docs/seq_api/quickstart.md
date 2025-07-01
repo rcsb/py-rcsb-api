@@ -31,9 +31,9 @@ from rcsbapi.sequence import Alignments
 
 # Fetch alignments between a UniProt Accession and PDB Entities
 query = Alignments(
-    from_="UNIPROT",
-    to="PDB_ENTITY",
-    queryId="P01112",
+    db_from="UNIPROT",
+    db_to="PDB_ENTITY",
+    query_id="P01112",
     return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
 )
 query.exec()
@@ -41,9 +41,9 @@ query.exec()
 
 | Argument  | Description|
 | ----------|------------|
-|`from_`    |From which structure/sequence database|
-|`to`       |To which structure/sequence database|
-|`queryId`  |Sequence identifier for database specified in `from_`|
+|`db_from`  |From which structure/sequence database|
+|`db_to`    |To which structure/sequence database|
+|`query_id` |Sequence identifier for database specified in `from_`|
 |`range`    |Optional integer list (2-tuple) to filter annotations that fall in a particular region|
 |`return_data_list`|Fields to request data for|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
@@ -56,9 +56,9 @@ These parameters are commonly used to limit or paginate results from a list-type
 from rcsbapi.sequence.seq_query import Alignments
 
 query_obj = Alignments(
-    from_="NCBI_PROTEIN",
-    to="PDB_ENTITY",
-    queryId="XP_642496",
+    db_from="NCBI_PROTEIN",
+    db_to="PDB_ENTITY",
+    query_id="XP_642496",
     range=[1, 100],
     return_data_list=["target_alignments"],
     data_list_args={
@@ -81,7 +81,7 @@ from rcsbapi.sequence import Annotations
 query = Annotations(  # type: ignore
     reference="PDB_INSTANCE",
     sources=["UNIPROT"],
-    queryId="2UZI.C",
+    query_id="2UZI.C",
     return_data_list=["target_id", "features"]
 )
 query.exec()
@@ -91,7 +91,7 @@ query.exec()
 | ----------|------------|
 |`reference`|Structure/sequence database to request|
 |`sources`  |Enumerated list defining the annotation collections to be requested|
-|`queryId`  |Sequence identifier for database specified in `reference`|
+|`query_id` |Sequence identifier for database specified in `reference`|
 |`return_data_list`|Fields to request data for|
 |`filters`|Optional list of `AnnotationFilterInput` that can be used to select what annotations will be retrieved. See [Additional Examples](/docs/seq_api/additional_examples.md).|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|

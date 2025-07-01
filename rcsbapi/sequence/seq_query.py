@@ -46,7 +46,7 @@ class Query(ABC):
                     and all(isinstance(item, AnnotationFilterInput) for item in field_value)
                 ):
                     field_value = [filter.to_string() for filter in field_value]
-                
+
                 output_key = self.replacementDict.get(field_name, field_name)
                 request_dict[output_key] = field_value
 
