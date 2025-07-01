@@ -23,7 +23,7 @@ class SeqEnums(SchemaEnum):
 @dataclass(frozen=True)
 class Query(ABC):
     """Base class for all query types"""
-    replacementDict = {
+    argument_name_map = {
         "db_from": "from",
         "db_to": "to",
         "query_id": "queryId",
@@ -47,7 +47,7 @@ class Query(ABC):
                 ):
                     field_value = [filter.to_string() for filter in field_value]
 
-                output_key = self.replacementDict.get(field_name, field_name)
+                output_key = self.argument_name_map.get(field_name, field_name)
                 request_dict[output_key] = field_value
 
         return request_dict

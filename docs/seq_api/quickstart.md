@@ -43,10 +43,26 @@ query.exec()
 | ----------|------------|
 |`db_from`  |From which structure/sequence database|
 |`db_to`    |To which structure/sequence database|
-|`query_id` |Sequence identifier for database specified in `from_`|
+|`query_id` |Sequence identifier for database specified in `db_from`|
 |`range`    |Optional integer list (2-tuple) to filter annotations that fall in a particular region|
 |`return_data_list`|Fields to request data for|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
+
+### SequenceReference and Corresponding Database Identifiers
+
+The table below describes the type of database identifiers used for each `SequenceReference` value.
+
+| `SequenceReference` | Database Identifier Description              | Example                        |
+|---------------------|-----------------------------------------------|--------------------------------|
+| `NCBI_GENOME`       | NCBI RefSeq Chromosome Accession              | `NC_000001`                    |
+| `NCBI_PROTEIN`      | NCBI RefSeq Protein Accession                 | `NP_789765`                    |
+| `UNIPROT`           | UniProt Accession                             | `P01112`                       |
+| `PDB_ENTITY`        | RCSB PDB Entity Id / CSM Entity Id            | `2UZI_3` / `AF_AFP68871F1_1`   |
+| `PDB_INSTANCE`      | RCSB PDB Instance Id / CSM Instance Id        | `2UZI.C` / `AF_AFP68871F1.A`   |
+
+- `queryId` is a valid identifier in the sequence database defined by the `from` field.
+- `range` is an optional list of two integers (2-tuple) that can be used to filter the alignment to a particular region.
+
 
 ### Pagination
 Some GraphQL fields support pagination using standard parameters: first and offset.
