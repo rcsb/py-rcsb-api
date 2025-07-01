@@ -60,7 +60,7 @@ The table below describes the type of database identifiers used for each `Sequen
 | `PDB_ENTITY`        | RCSB PDB Entity Id / CSM Entity Id            | `2UZI_3` / `AF_AFP68871F1_1`   |
 | `PDB_INSTANCE`      | RCSB PDB Instance Id / CSM Instance Id        | `2UZI.C` / `AF_AFP68871F1.A`   |
 
-- `queryId` is a valid identifier in the sequence database defined by the `from` field.
+- `query_id` is a valid identifier in the sequence database defined by the `db_from` field.
 - `range` is an optional list of two integers (2-tuple) that can be used to filter the alignment to a particular region.
 
 
