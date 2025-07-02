@@ -1,5 +1,4 @@
 from typing import Dict, List
-from rich import print
 
 
 class ModelServerSchema:
