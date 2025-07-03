@@ -22,7 +22,7 @@ class SeqSchema(GQLSchema):
 
     def __init__(self) -> None:
         super().__init__(
-            endpoint=const.SEQUENCE_API_ENDPOINT_GRAPHQL,
+            endpoint=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
             timeout=config.API_TIMEOUT,
             fallback_file="seq_api_schema.json",
             weigh_nodes=[]

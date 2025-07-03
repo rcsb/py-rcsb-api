@@ -91,7 +91,7 @@ class Query(ABC):
             f"{self.__class__.__name__} must define '_query' attribute."
         response_json = requests.post(
             json=dict(self._query),
-            url=const.SEQUENCE_API_ENDPOINT_GRAPHQL,
+            url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
             timeout=config.API_TIMEOUT
         ).json()
         self._parse_gql_error(response_json)

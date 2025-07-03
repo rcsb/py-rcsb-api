@@ -124,7 +124,7 @@ if __name__ == "__main__":
         json.dump(schema_response.json(), f, indent=4)
 
     # Update full GraphQL Sequence API schema
-    schema_response = requests.post(headers={"Content-Type": "application/json"}, json=SEQ_SCHEMA.introspection_query, url=const.SEQUENCE_API_ENDPOINT_GRAPHQL,
+    schema_response = requests.post(headers={"Content-Type": "application/json"}, json=SEQ_SCHEMA.introspection_query, url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
                                     timeout=config.API_TIMEOUT)
     assert schema_response.status_code == 200
     data_schema_path = Path(__file__).parent.parent.joinpath(const.SEQUENCE_API_SCHEMA_DIR, const.SEQUENCE_API_SCHEMA_FILENAME)
