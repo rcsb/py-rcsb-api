@@ -62,7 +62,7 @@ class Const:
     }))
 
     SEQUENCE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
-    SEQUENCE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
+    SEQUENCE_API_ENDPOINT_GRAPHQL: str = "https://sequence-coordinates.rcsb.org/graphql"
     SEQUENCE_API_SCHEMA_DIR: str = "sequence/resources"
     SEQUENCE_API_SCHEMA_FILENAME: str = "seq_api_schema.json"
 
@@ -108,11 +108,4 @@ class Const:
     }))
 
 
-@dataclass(frozen=True)
-class SeqConst:
-    BASE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
-    GRAPHQL_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
-
-
-seq_const = SeqConst()
 const = Const()

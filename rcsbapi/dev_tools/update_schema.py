@@ -115,14 +115,17 @@ if __name__ == "__main__":
             package="data"
         )
         data_version_dict[file_name] = data_version
-
+    
+    # Update full GraphQL Data API schema
     schema_response = requests.post(headers={"Content-Type": "application/json"}, json=DATA_SCHEMA.introspection_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT)
     assert schema_response.status_code == 200
     data_schema_path = Path(__file__).parent.parent.joinpath(const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
     with open(data_schema_path, "wt", encoding="utf-8") as f:
         json.dump(schema_response.json(), f, indent=4)
 
-    schema_response = requests.post(headers={"Content-Type": "application/json"}, json=SEQ_SCHEMA.introspection_query, url=const.SEQUENCE_API_ENDPOINT, timeout=config.API_TIMEOUT)
+    # Update full GraphQL Sequence API schema
+    schema_response = requests.post(headers={"Content-Type": "application/json"}, json=SEQ_SCHEMA.introspection_query, url=const.SEQUENCE_API_ENDPOINT_GRAPHQL,
+                                    timeout=config.API_TIMEOUT)
     assert schema_response.status_code == 200
     data_schema_path = Path(__file__).parent.parent.joinpath(const.SEQUENCE_API_SCHEMA_DIR, const.SEQUENCE_API_SCHEMA_FILENAME)
     with open(data_schema_path, "wt", encoding="utf-8") as f:

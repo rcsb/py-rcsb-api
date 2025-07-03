@@ -3,7 +3,7 @@
 from __future__ import annotations
 from typing import List, Dict, Any
 
-from rcsbapi.const import seq_const
+from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.graphql_schema import GQLSchema
 
@@ -22,7 +22,7 @@ class SeqSchema(GQLSchema):
 
     def __init__(self) -> None:
         super().__init__(
-            endpoint=seq_const.GRAPHQL_API_ENDPOINT,
+            endpoint=const.SEQUENCE_API_ENDPOINT_GRAPHQL,
             timeout=config.API_TIMEOUT,
             fallback_file="seq_api_schema.json",
             weigh_nodes=[]

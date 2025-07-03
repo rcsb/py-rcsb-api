@@ -5,7 +5,7 @@ from dataclasses import dataclass, fields
 import urllib.parse
 import requests
 
-from rcsbapi.const import seq_const
+from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.sequence import SEQ_SCHEMA
 from rcsbapi.graphql_schema import SchemaEnum
@@ -91,7 +91,7 @@ class Query(ABC):
             f"{self.__class__.__name__} must define '_query' attribute."
         response_json = requests.post(
             json=dict(self._query),
-            url=seq_const.GRAPHQL_API_ENDPOINT,
+            url=const.SEQUENCE_API_ENDPOINT_GRAPHQL,
             timeout=config.API_TIMEOUT
         ).json()
         self._parse_gql_error(response_json)
@@ -99,7 +99,7 @@ class Query(ABC):
 
     def get_editor_link(self) -> str:
         """Get link to GraphiQL editor with given query populated"""
-        editor_base_link = str(seq_const.BASE_API_ENDPOINT) + "/graphiql" + "/index.html?query="
+        editor_base_link = str(const.SEQUENCE_API_ENDPOINT) + "/graphiql" + "/index.html?query="
         assert hasattr(self, "_query")  # for mypy
         return editor_base_link + urllib.parse.quote(str(self._query["query"]))
 
@@ -125,6 +125,8 @@ class Alignments(Query):
         range (Optional, List[]): Optional integer list to filter annotations that fall in a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         _query (MappingProxyType): Attribute for storing GraphQL query
+        data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
+            The key must match fields in `return_data_list`. Values currently include "offset" and "first"
     """
     db_from: str
     db_to: str
@@ -184,6 +186,8 @@ class GroupAlignments(Query):
         filter (list[str], optional): Optional string list of allowed identifiers for group members
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         _query (MappingProxyType): Attribute for storing GraphQL query
+        data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
+            The key must match fields in `return_data_list`. Values currently include "offset" and "first"
     """
     group: str
     group_id: str

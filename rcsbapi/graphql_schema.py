@@ -1084,8 +1084,8 @@ class GQLSchema(ABC):
 
         Args:
             field_name (str): name of the field
-            args (list[dict[str, Any]]): argument definitions from schema
-            query_args (dict[str, Any]): full dictionary of query arguments
+            args (list[dict[str, Any]]): args of a field, retrieved from the GraphQL schema/FieldNode object
+            query_args (dict[str, Any]): dictionary where keys are argument name and values are user input
 
         Returns:
             str: field name, potentially with arguments applied (e.g., field(arg: val))
@@ -1093,11 +1093,12 @@ class GQLSchema(ABC):
         Raises:
             ValueError: if an invalid field argument key is found
         """
-        field_args_dict = query_args.get("datalistargs", {})
+        field_args_dict = query_args.get("data_list_args", {})
 
         # Validate all user-provided field names
         user_field_args = field_args_dict.get(field_name, {})
 
+        # Validate that all provided field keys match the current field_name
         for user_key in field_args_dict.keys():
             if user_key != field_name:
                 raise ValueError(
@@ -1106,16 +1107,20 @@ class GQLSchema(ABC):
                 )
 
         formatted_args = []
+        # Build a list of properly formatted GraphQL arguments for the field
         for arg in args:
             arg_name = arg["name"]
             if arg_name not in user_field_args:
                 continue
             val = user_field_args[arg_name]
+
+            # Wrap strings in double quotes for GraphQL syntax
             if isinstance(val, str):
                 formatted_args.append(f'{arg_name}: "{val}"')
             else:
                 formatted_args.append(f"{arg_name}: {val}")
 
+        # If any arguments were applied, return the field with args; else, return the field name as-is
         if formatted_args:
             return f"{field_name}({', '.join(formatted_args)})"
         return field_name
