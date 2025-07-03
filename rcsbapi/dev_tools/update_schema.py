@@ -115,7 +115,7 @@ if __name__ == "__main__":
             package="data"
         )
         data_version_dict[file_name] = data_version
-    
+
     # Update full GraphQL Data API schema
     schema_response = requests.post(headers={"Content-Type": "application/json"}, json=DATA_SCHEMA.introspection_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT)
     assert schema_response.status_code == 200
