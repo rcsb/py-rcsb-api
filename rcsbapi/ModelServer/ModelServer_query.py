@@ -3,74 +3,23 @@ from typing import Optional, Dict, Any
 import requests
 
 
-@dataclass(frozen=True)
-class Query:
-    """Base class for RESTful ModelServer queries."""
-
+class BaseQuery:
     def to_dict(self) -> Dict[str, Any]:
         return {
             f.name: getattr(self, f.name)
             for f in fields(self)
-            if f.name != "id" and f.name != "query" and getattr(self, f.name) is not None
+            if f.name not in {"id", "query"} and getattr(self, f.name) is not None
         }
 
-    def build_url(self, base_url: str) -> str:
-        raise NotImplementedError
-
-    def exec(self, base_url: str) -> Any:
+    def exec(self, base_url: str = "https://models.rcsb.org") -> Any:
         url = self.build_url(base_url)
         response = requests.get(url, params=self.to_dict())
         response.raise_for_status()
         return response.content
-    
-    def get_editor_link(self) -> str:
-        # To be implemented
-    
-
-@dataclass(frozen=True)
-class Assembly(Query):
-    id: str
-    name: Optional[str] = "1"
-    model_nums: Optional[str] = None
-    encoding: Optional[str] = "cif"
-    copy_all_categories: Optional[bool] = False
-    data_source: Optional[str] = ""
-    transform: Optional[str] = None
-    download: Optional[bool] = False
-    filename: Optional[str] = ""
-
-    def build_url(self, base_url: str) -> str:
-        return f"{base_url}/v1/{self.id}/assembly"
 
 
 @dataclass(frozen=True)
-class Atoms(Query):
-    id: str
-    label_entity_id: Optional[str] = None
-    label_asym_id: Optional[str] = None
-    auth_asym_id: Optional[str] = None
-    label_comp_id: Optional[str] = None
-    auth_comp_id: Optional[str] = None
-    label_seq_id: Optional[int] = None
-    auth_seq_id: Optional[int] = None
-    pdbx_PDB_ins_code: Optional[str] = None
-    label_atom_id: Optional[str] = None
-    auth_atom_id: Optional[str] = None
-    type_symbol: Optional[str] = None
-    model_nums: Optional[str] = None
-    encoding: Optional[str] = "cif"
-    copy_all_categories: Optional[bool] = False
-    data_source: Optional[str] = ""
-    transform: Optional[str] = None
-    download: Optional[bool] = False
-    filename: Optional[str] = ""
-
-    def build_url(self, base_url: str) -> str:
-        return f"{base_url}/v1/{self.id}/atoms"
-
-
-@dataclass(frozen=True)
-class FullStructure(Query):
+class FullStructure(BaseQuery):
     id: str
     model_nums: Optional[str] = None
     encoding: Optional[str] = "cif"
@@ -85,7 +34,7 @@ class FullStructure(Query):
 
 
 @dataclass(frozen=True)
-class Ligand(Query):
+class Ligand(BaseQuery):
     id: str
     label_entity_id: Optional[str] = None
     label_asym_id: Optional[str] = None
@@ -111,7 +60,33 @@ class Ligand(Query):
 
 
 @dataclass(frozen=True)
-class ResidueInteraction(Query):
+class Atoms(BaseQuery):
+    id: str
+    label_entity_id: Optional[str] = None
+    label_asym_id: Optional[str] = None
+    auth_asym_id: Optional[str] = None
+    label_comp_id: Optional[str] = None
+    auth_comp_id: Optional[str] = None
+    label_seq_id: Optional[int] = None
+    auth_seq_id: Optional[int] = None
+    pdbx_PDB_ins_code: Optional[str] = None
+    label_atom_id: Optional[str] = None
+    auth_atom_id: Optional[str] = None
+    type_symbol: Optional[str] = None
+    model_nums: Optional[str] = None
+    encoding: Optional[str] = "cif"
+    copy_all_categories: Optional[bool] = False
+    data_source: Optional[str] = ""
+    transform: Optional[str] = None
+    download: Optional[bool] = False
+    filename: Optional[str] = ""
+
+    def build_url(self, base_url: str) -> str:
+        return f"{base_url}/v1/{self.id}/atoms"
+
+
+@dataclass(frozen=True)
+class ResidueInteraction(BaseQuery):
     id: str
     label_entity_id: Optional[str] = None
     label_asym_id: Optional[str] = None
@@ -153,7 +128,7 @@ class SurroundingLigands(ResidueInteraction):
 
 
 @dataclass(frozen=True)
-class SymmetryMates(Query):
+class SymmetryMates(BaseQuery):
     id: str
     radius: Optional[float] = 5.0
     model_nums: Optional[str] = None
@@ -168,12 +143,24 @@ class SymmetryMates(Query):
         return f"{base_url}/v1/{self.id}/symmetryMates"
 
 
-@dataclass(frozen=True)
-class QueryMany(Query):
-    query: str  # this will be a JSON string or already-encoded
+# @dataclass(frozen=True)
+# class QueryMany(BaseQuery):
+#     query: str
 
-    def to_dict(self) -> Dict[str, Any]:
-        return {"query": self.query}
+#     def to_dict(self) -> Dict[str, Any]:
+#         return {"query": self.query}
 
-    def build_url(self, base_url: str) -> str:
-        return f"{base_url}/v1/query-many"
+#     def build_url(self, base_url: str) -> str:
+#         return f"{base_url}/v1/query-many"
+
+
+# The container class
+class ModelServer:
+    FullStructure = FullStructure
+    Ligand = Ligand
+    Atoms = Atoms
+    ResidueInteraction = ResidueInteraction
+    ResidueSurroundings = ResidueSurroundings
+    SurroundingLigands = SurroundingLigands
+    SymmetryMates = SymmetryMates
+    # QueryMany = QueryMany
