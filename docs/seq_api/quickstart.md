@@ -43,9 +43,9 @@ print(result_dict)
 
 | Argument  | Description|
 | ----------|------------|
-|`db_from`  |From which structure/sequence database (see [`SequenceReference` table below](#SequenceReference-and-Corresponding-Database-Identifiers) for possible values)|
-|`db_to`    |To which structure/sequence database (see [`SequenceReference` table below](#SequenceReference-and-Corresponding-Database-Identifiers) for possible values)|
-|`query_id` |Sequence identifier for database specified in `db_from` (see [`SequenceReference` table below](#SequenceReference-and-Corresponding-Database-Identifiers) for examples)|
+|`db_from`  |From which structure/sequence database (see [`SequenceReference` table below](#sequencereference-and-corresponding-database-identifiers) for possible values)|
+|`db_to`    |To which structure/sequence database (see [`SequenceReference` table below](#sequencereference-and-corresponding-database-identifiers) for possible values)|
+|`query_id` |Sequence identifier for database specified in `db_from` (see [`SequenceReference` table below](#sequencereference-and-corresponding-database-identifiers) for examples)|
 |`range`    |Optional list of two integers that can be used to filter the alignment to a particular region (e.g., `[1, 100]`)|
 |`return_data_list`|Data to fetch (e.g., `["query_sequence", "target_alignments", "alignment_length"]`)|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
@@ -83,16 +83,16 @@ print(result_dict)
 
 | Argument  | Description|
 | ----------|------------|
-|`reference`|Structure/sequence database to request (see [`SequenceReference` table above](#SequenceReference-and-Corresponding-Database-Identifiers) for possible values)|
-|`query_id` |Sequence identifier for database specified in `reference` (see [`SequenceReference` table above](#SequenceReference-and-Corresponding-Database-Identifiers) for examples)|
+|`reference`|Structure/sequence database to request (see [`SequenceReference` table above](#sequencereference-and-corresponding-database-identifiers) for possible values)|
+|`query_id` |Sequence identifier for database specified in `reference` (see [`SequenceReference` table above](#sequencereference-and-corresponding-database-identifiers) for examples)|
 |`sources`  |Enumerated list defining the annotation collections to be requested (possible values: `"UNIPROT"`, `"PDB_ENTITY"`, `"PDB_INSTANCE"`, `"PDB_INTERFACE"`)|
 |`return_data_list`|Data to fetch (e.g., `["target_id", "features"]`)|
-|`filters`|Optional list of `AnnotationFilterInput` that can be used to select what annotations will be retrieved. See [Additional Examples](/docs/seq_api/additional_examples.md).|
+|`filters`|Optional list of `AnnotationFilterInput` that can be used to select what annotations will be retrieved. See [Additional Examples](additional_examples.md).|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
 
 
 ## Additional Usage and Examples
-For examples using other query types like `GroupAlignments`, `GroupAnnotations`, and `GroupAnnotationsSummary` or for examples using filters, check [Additional Examples](/docs/seq_api/additional_examples.md).
+For examples using other query types like `GroupAlignments`, `GroupAnnotations`, and `GroupAnnotationsSummary` or for examples using filters, check [Additional Examples](additional_examples.md).
 
 ## Jupyter Notebooks
 A runnable jupyter notebook is available in [notebooks/sequence_coord_quickstart.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/sequence_coord_quickstart.ipynb), or can be run online using Google Colab:
