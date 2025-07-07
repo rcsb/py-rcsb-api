@@ -1107,7 +1107,7 @@ class GQLSchema(ABC):
                 )
 
         # Build a list of properly formatted GraphQL arguments for the field
-        formatted_args = []  
+        formatted_args = []
         # This initializes an empty list.
         # It will store each formatted GraphQL argument (ex: "first: 10") as a string.
 
