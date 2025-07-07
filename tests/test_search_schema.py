@@ -1,8 +1,7 @@
 ##
-# File:    testschema.py
-# Author:  Spencer Bliven/Santiago Blaumann
+# File:    test_search_schema.py
+# Author:  Spencer Bliven/Santiago Blaumann/RCSB PDB contributors
 # Date:    6/7/23
-# Version: 1.0
 #
 # Update:
 #
@@ -11,11 +10,6 @@
 """
 Tests for all functions of the schema file.
 """
-
-__docformat__ = "google en"
-__author__ = "Santiago Blaumann"
-__email__ = "santiago.blaumann@rcsb.org"
-__license__ = "BSD 3-Clause"
 
 import logging
 import platform

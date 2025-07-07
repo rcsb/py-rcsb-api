@@ -1,26 +1,17 @@
 ##
 # File:    test_data_schema.py
-# Author:  Ivana Truong
+# Author:  Ivana Truong/RCSB PDB contributors
 # Date:
-# Version:
 #
 # Update:
 #
 #
 ##
 """
-Tests for all functions of the schema file. (Work in progress)
+Tests for all functions of the Data API schema file.
 """
 
-__docformat__ = "google en"
-__author__ = ""
-__email__ = ""
-__license__ = ""
-
 import logging
-
-# import platform
-# import resource
 import time
 import json
 import os

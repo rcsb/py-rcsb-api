@@ -59,7 +59,7 @@ class SeqQuery(ABC):
     def construct_query(self, query_type: str) -> Dict[str, Any]:
         """type check based on the GraphQL schema, then construct the GraphQL query"""
         # Assert attributes exists for mypy.
-        # Can't be defined in Query class because
+        # Can't be defined in SeqQuery class because
         # attributes without defaults must be defined before those with defaults.
         # Inherited attributes are placed before non-inherited attributes.
         # Possible workaround is making the attributes keyword-only, but I decided against it for now.

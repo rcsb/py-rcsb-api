@@ -1,26 +1,17 @@
 ##
-# File:    testschema.py
-# Author:  Ivana Truong
+# File:    test_seq_query.py
+# Author:  Ivana Truong/RCSB PDB contributors
 # Date:
-# Version:
 #
 # Update:
 #
 #
 ##
 """
-Tests for all functions of the schema file. (Work in progress)
+Tests for all functions of the sequence-coordinates API module.
 """
 
-__docformat__ = "google en"
-__author__ = ""
-__email__ = ""
-__license__ = ""
-
 import logging
-
-# import platform
-# import resource
 import time
 import unittest
 

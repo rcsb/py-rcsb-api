@@ -1,8 +1,7 @@
 ##
-# File:    testsearch.py
-# Author:  Santiago Blaumann
+# File:    test_search_query.py
+# Author:  Santiago Blaumann/RCSB PDB contributors
 # Date:    6/7/23
-# Version: 0.001
 #
 # Update:
 #
@@ -11,11 +10,6 @@
 """
 Tests for all functions of the search file.
 """
-
-__docformat__ = "google en"
-__author__ = "Santiago Blaumann"
-__email__ = "santiago.blaumann@rcsb.org"
-__license__ = "BSD 3-Clause"
 
 import logging
 import platform
