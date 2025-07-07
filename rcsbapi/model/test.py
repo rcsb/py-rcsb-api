@@ -19,6 +19,22 @@ class BaseQuery:
 
 
 @dataclass(frozen=True)
+class Assembly(BaseQuery):
+    id: str
+    name: Optional[str] = "1"
+    model_nums: Optional[str] = None
+    encoding: Optional[str] = "cif"
+    copy_all_categories: Optional[bool] = False
+    data_source: Optional[str] = ""
+    transform: Optional[str] = None
+    download: Optional[bool] = False
+    filename: Optional[str] = ""
+
+    def build_url(self, base_url: str) -> str:
+        return f"{base_url}/v1/{self.id}/assembly"
+
+
+@dataclass(frozen=True)
 class FullStructure(BaseQuery):
     id: str
     model_nums: Optional[str] = None
@@ -155,7 +171,8 @@ class SymmetryMates(BaseQuery):
 
 
 # The container class
-class ModelServer:
+class ModelQuery:
+    Assembly = Assembly
     FullStructure = FullStructure
     Ligand = Ligand
     Atoms = Atoms
