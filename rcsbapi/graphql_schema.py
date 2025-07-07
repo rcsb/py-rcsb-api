@@ -1106,12 +1106,18 @@ class GQLSchema(ABC):
                     f"Allowed fields for this query are: {list(self._field_names_list)}"
                 )
 
-        formatted_args = []
         # Build a list of properly formatted GraphQL arguments for the field
+        formatted_args = []  # Initialize an empty list to hold formatted GraphQL argument strings
+
+        # Loop through each argument defined for this field in the GraphQL schema
         for arg in args:
-            arg_name = arg["name"]
+            arg_name = arg["name"]  # Extract the name of the argument (right now: "first", "offset")
+
+            # Skip this argument if the user didn't provide a value for it
             if arg_name not in user_field_args:
                 continue
+
+            # Get the user-provided value for this argument
             val = user_field_args[arg_name]
 
             # Wrap strings in double quotes for GraphQL syntax
