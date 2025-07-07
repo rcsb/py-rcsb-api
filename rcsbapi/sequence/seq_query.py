@@ -21,7 +21,7 @@ class SeqEnums(SchemaEnum):
 
 
 @dataclass(frozen=True)
-class Query(ABC):
+class SeqQuery(ABC):
     """Base class for all query types"""
     argument_name_map = {
         "db_from": "from",
@@ -114,7 +114,7 @@ class Query(ABC):
 
 
 @dataclass(frozen=True)
-class Alignments(Query):
+class Alignments(SeqQuery):
     """
     Get sequence alignments
 
@@ -146,7 +146,7 @@ class Alignments(Query):
 
 
 @dataclass(frozen=True)
-class Annotations(Query):
+class Annotations(SeqQuery):
     """
     Get sequence annotations
 
@@ -177,7 +177,7 @@ class Annotations(Query):
 
 
 @dataclass(frozen=True)
-class GroupAlignments(Query):
+class GroupAlignments(SeqQuery):
     """
     Get alignments for structures in groups
 
@@ -206,7 +206,7 @@ class GroupAlignments(Query):
 
 
 @dataclass(frozen=True)
-class GroupAnnotations(Query):
+class GroupAnnotations(SeqQuery):
     """
     Get annotations for structures in groups
 
@@ -235,7 +235,7 @@ class GroupAnnotations(Query):
 
 
 @dataclass(frozen=True)
-class GroupAnnotationsSummary(Query):
+class GroupAnnotationsSummary(SeqQuery):
     """
     Get a positional summary of group annotations
 
