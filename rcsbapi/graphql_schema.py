@@ -8,16 +8,6 @@ import requests
 from graphql import build_client_schema
 import rustworkx as rx
 
-use_networkx: bool = False
-# Below section and parts of code involving networkx are commented out
-# May implement graph construction through networkx at a later point
-# try:
-#     import rustworkx as rx
-
-#     logging.info("Using  rustworkx")
-# except ImportError:
-#     use_networkx = True
-
 
 class SchemaEnum(Enum):
     """Serves as an "abstract class" to represent GraphQL fields with enums.
@@ -141,16 +131,7 @@ class GQLSchema(ABC):
         self.pdb_url: str = endpoint
         self.timeout: int = timeout
         self.schema: Dict[str, Any] = self.fetch_schema()
-
         """JSON resulting from full introspection of the GraphQL schema"""
-
-        self._use_networkx: bool = use_networkx
-        # if use_networkx:
-        #     self._schema_graph = nx.DiGraph()
-        #     """NetworkX graph representing the GraphQL schema"""
-        # else:
-        #     self._schema_graph = rx.PyDiGraph()
-        #     """rustworkx graph representing the GraphQL schema"""
 
         self._type_to_idx_dict: Dict[str, int] = {}
         self._field_to_idx_dict: Dict[str, list[int]] = {}
@@ -341,25 +322,15 @@ class GQLSchema(ABC):
             type_name = field_node.type
             if type_name in self._type_to_idx_dict:
                 type_index = self._type_to_idx_dict[type_name]
-                if use_networkx:
-                    schema_graph.add_edge(field_node.index, type_index, 1)
-                else:
-                    schema_graph.add_edge(field_node.index, type_index, 1)
+                schema_graph.add_edge(field_node.index, type_index, 1)
             else:
                 self._recurse_build_schema(schema_graph, type_name)
                 type_index = self._type_to_idx_dict[type_name]
-                # if self._use_networkx:
-                #     schema_graph.add_edge(field_node.index, type_index, 1)
-                if self._use_networkx is False:
-                    schema_graph.add_edge(field_node.index, type_index, 1)
+                schema_graph.add_edge(field_node.index, type_index, 1)
         return schema_graph
 
     def _make_type_node(self, type_name: str) -> TypeNode:
         type_node = TypeNode(type_name)
-        # if self._use_networkx:
-        #     index = len(self._schema_graph.nodes)
-        #     self._schema_graph.add_node(index, type_node=type_node)
-        # if self._use_networkx is False:
         index = self._schema_graph.add_node(type_node)
         self._type_to_idx_dict[type_name] = index
         type_node.set_index(index)
@@ -376,11 +347,6 @@ class GQLSchema(ABC):
             of_kind = self._find_kind(field_type_dict)
             field_node.set_of_kind(of_kind)
         parent_type_index = self._type_to_idx_dict[parent_type]
-        # if self._use_networkx:
-        #     index = len(self._schema_graph.nodes
-        #     self._schema_graph.add_node(index, field_node=field_node)
-        #     self._schema_graph.add_edge(parent_type_index, index, weight=1)
-        # if self._use_networkx is False:
         if field_node.kind == "SCALAR" or field_node.of_kind == "SCALAR":
             index = self._schema_graph.add_child(parent_type_index, field_node, 1)
         else:

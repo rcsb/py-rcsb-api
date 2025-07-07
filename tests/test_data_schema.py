@@ -26,8 +26,6 @@ import json
 import os
 import unittest
 import requests
-# import rustworkx as rx
-# import networkx as nx
 
 from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import config
@@ -139,23 +137,6 @@ class SchemaTests(unittest.TestCase):
             i += 1
         self.assertEqual(entry_dict_from_func, entry_dict)
         self.assertEqual(len(type_dict_list), len(DATA_SCHEMA._type_fields_dict.keys()))
-
-    # def testRecurseBuildSchema(self) -> None:  # doesn't work right now
-    #     original_networkx_flag = schema._use_networkx
-    #     schema._use_networkx = False
-    #     importlib.reload(schema)
-    #     DATA_SCHEMA = DataSchema(config.API_ENDPOINT)
-    #     DATA_SCHEMA.recurse_build_schema(DATA_SCHEMA._schema_graph, 'Query')
-    #     self.assertIsInstance(DATA_SCHEMA._schema_graph, rx.PyDiGraph)
-    #     schema._use_networkx = True
-    #     importlib.reload(schema)
-    #     DATA_SCHEMA = DataSchema(config.API_ENDPOINT)
-    #     DATA_SCHEMA.recurse_build_schema(DATA_SCHEMA._schema_graph, 'Query')
-    #     self.assertIsInstance(DATA_SCHEMA._schema_graph, nx.classes.digraph.DiGraph)
-    #     # reset to original
-    #     schema._use_networkx = original_networkx_flag
-    #     importlib.reload(schema)
-    #     DATA_SCHEMA = DataSchema(config.API_ENDPOINT)
 
     def testConstructQuery(self) -> None:
         with self.subTest(msg="1. return data not specific enough"):

@@ -7,15 +7,6 @@ from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.graphql_schema import GQLSchema
 
-use_networkx: bool = False
-# Below section and parts of code involving networkx are commented out
-# May implement graph construction through networkx at a later point
-# try:
-#     import rustworkx as rx
-#     logging.info("Using  rustworkx")
-# except ImportError:
-#     use_networkx = True
-
 
 class SeqSchema(GQLSchema):
     """GraphQL schema defining available fields, types, and how they are connected."""
@@ -66,21 +57,6 @@ class SeqSchema(GQLSchema):
         if unknown_return_list:
             error_msg = f"Unknown item in return_data_list: {unknown_return_list}"
             raise ValueError(error_msg)
-        # if use_networkx:
-        #     query = self._construct_query_networkx(
-        #         input_type=input_type,
-        #         input_ids=input_ids,
-        #         return_data_list=return_data_list,
-        #         suppress_autocomplete_warning=suppress_autocomplete_warning
-        #     )
-        # else:
-        # query = self._construct_query_rustworkx(
-        #     input_type=input_type,
-        #     input_ids=input_ids,
-        #     return_data_list=return_data_list,
-        #     add_rcsb_id=add_rcsb_id,
-        #     suppress_autocomplete_warning=suppress_autocomplete_warning
-        # )
         query = self._construct_query_rustworkx(
             query_type=query_type,
             query_args=query_args,

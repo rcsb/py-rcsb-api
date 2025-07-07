@@ -8,16 +8,6 @@ from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.graphql_schema import GQLSchema, SchemaEnum
 
-use_networkx: bool = False
-# Below section and parts of code involving networkx are commented out
-# May implement graph construction through networkx at a later point
-# try:
-#     import rustworkx as rx
-
-#     logging.info("Using  rustworkx")
-# except ImportError:
-#     use_networkx = True
-
 
 class DataAPIEnums(SchemaEnum):
     pass

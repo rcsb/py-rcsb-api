@@ -23,8 +23,6 @@ import logging
 # import resource
 import time
 import unittest
-# import rustworkx as rx
-# import networkx as nx
 
 from rcsbapi.sequence.seq_query import Alignments, GroupAlignments, Annotations, GroupAnnotations, GroupAnnotationsSummary, AnnotationFilterInput
 
