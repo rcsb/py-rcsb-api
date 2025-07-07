@@ -46,6 +46,7 @@ Contents
 
    seq_api/quickstart.md
    seq_api/additional_examples.md
+   seq_api/api.rst
 
 License
 -------

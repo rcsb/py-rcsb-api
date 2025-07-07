@@ -1,4 +1,5 @@
 # Quickstart
+This is a quickstart guide to interacting with the RCSB PDB [Sequence Coordinates API](https://sequence-coordinates.rcsb.org/#sequence-coordinates-api) using the *rcsb-api* Python package.
 
 ## Installation
 Get it from PyPI:
@@ -8,20 +9,20 @@ Get it from PyPI:
 Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
 
 ## Import
-To import this package, use:
+To import this module, use:
 ```python
 import rcsbapi.sequence
-# NOTE: in the below examples we'll import individual classes from the `sequence` module
-# Whether to import the whole module or individual classes is a matter of preference
 ```
+(***Note:*** in the examples below we'll import individual classes from the `sequence` module. Whether to import the whole module or individual classes is a matter of preference.)
 
 ## Getting Started
-<!-- TODO: can edit the below text -->
-The [RCSB PDB Sequence Coordinates API](https://sequence-coordinates.rcsb.org/#sequence-coordinates-api) allows querying for alignments between structural and sequence databases, integrating protein positional features from multiple resources. The API supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
+The [RCSB PDB Sequence Coordinates API](https://sequence-coordinates.rcsb.org/#sequence-coordinates-api) allows querying for alignments between structural and sequence databases as well as protein positional annotations/features integrated from multiple resources. Alignment data is available for NCBI [RefSeq](https://www.ncbi.nlm.nih.gov/refseq/) (including protein and genomic sequences), UniProt and PDB sequences. Protein positional features are integrated from [UniProt](https://www.uniprot.org/), [CATH](https://www.cathdb.info/), [SCOPe](https://scop.berkeley.edu/) and [RCSB PDB](https://www.rcsb.org/) and collected from the [RCSB PDB Data Warehouse](https://data.rcsb.org/#data-api).
 
-<!-- TODO: Add chart of enumerated query structure/sequence databases -->
+Alignments and positional features provided by this API include Experimental Structures from the [PDB](https://www.rcsb.org/) and [select Computed Structure Models (CSMs)](https://www.rcsb.org/docs/general-help/computed-structure-models-and-rcsborg#what-csms-are-available). Alignments and positional features for CSMs can be requested using the same parameters as Experimental Structures providing CSM Ids.
 
-There are two main types of queries: `Alignments` and `Annotations`
+The API supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package simplifies generating queries in GraphQL syntax. 
+
+There are two main types of queries: `Alignments` and `Annotations`.
 
 ## Alignments
 `Alignments` queries request data about alignments between an object in a supported database to all objects of another supported database.
@@ -34,19 +35,21 @@ query = Alignments(
     db_from="UNIPROT",
     db_to="PDB_ENTITY",
     query_id="P01112",
-    return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
+    return_data_list=["query_sequence", "target_alignments", "alignment_length"]
 )
-query.exec()
+result_dict = query.exec()
+print(result_dict)
 ```
 
 | Argument  | Description|
 | ----------|------------|
-|`db_from`  |From which structure/sequence database|
-|`db_to`    |To which structure/sequence database|
-|`query_id` |Sequence identifier for database specified in `db_from`|
-|`range`    |Optional integer list (2-tuple) to filter annotations that fall in a particular region|
-|`return_data_list`|Fields to request data for|
+|`db_from`  |From which structure/sequence database (see [`SequenceReference` table below](#SequenceReference-and-Corresponding-Database-Identifiers) for possible values)|
+|`db_to`    |To which structure/sequence database (see [`SequenceReference` table below](#SequenceReference-and-Corresponding-Database-Identifiers) for possible values)|
+|`query_id` |Sequence identifier for database specified in `db_from` (see [`SequenceReference` table below](#SequenceReference-and-Corresponding-Database-Identifiers) for examples)|
+|`range`    |Optional list of two integers that can be used to filter the alignment to a particular region (e.g., `[1, 100]`)|
+|`return_data_list`|Data to fetch (e.g., `["query_sequence", "target_alignments", "alignment_length"]`)|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
+
 
 ### SequenceReference and Corresponding Database Identifiers
 
@@ -60,35 +63,9 @@ The table below describes the type of database identifiers used for each `Sequen
 | `PDB_ENTITY`        | RCSB PDB Entity Id / CSM Entity Id            | `2UZI_3` / `AF_AFP68871F1_1`   |
 | `PDB_INSTANCE`      | RCSB PDB Instance Id / CSM Instance Id        | `2UZI.C` / `AF_AFP68871F1.A`   |
 
-- `query_id` is a valid identifier in the sequence database defined by the `db_from` field.
-- `range` is an optional list of two integers (2-tuple) that can be used to filter the alignment to a particular region.
-
-
-### Pagination
-Some GraphQL fields support pagination using standard parameters: first and offset.
-These parameters are commonly used to limit or paginate results from a list-type field. For example:
-
-```python
-from rcsbapi.sequence.seq_query import Alignments
-
-query_obj = Alignments(
-    db_from="NCBI_PROTEIN",
-    db_to="PDB_ENTITY",
-    query_id="XP_642496",
-    range=[1, 100],
-    return_data_list=["target_alignments"],
-    data_list_args={
-        "target_alignments": {
-            "first": 10,
-            "offset": 5
-        },
-    }
-)
-query_obj.exec()
-```
 
 ## Annotations
-`Annotations`
+`Annotations` queries request annotation data about a sequence (e.g., residue-level annotations/features). Protein positional features are integrated from [UniProt](https://www.uniprot.org/), [CATH](https://www.cathdb.info/), [SCOPe](https://scop.berkeley.edu/) and [RCSB PDB](https://www.rcsb.org/) and collected from the [RCSB PDB Data Warehouse](https://data.rcsb.org/#data-api). 
 
 ```python
 from rcsbapi.sequence import Annotations
@@ -96,29 +73,27 @@ from rcsbapi.sequence import Annotations
 # Fetch all positional features for a particular PDB Instance
 query = Annotations(  # type: ignore
     reference="PDB_INSTANCE",
-    sources=["UNIPROT"],
     query_id="2UZI.C",
+    sources=["UNIPROT"],
     return_data_list=["target_id", "features"]
 )
-query.exec()
+result_dict = query.exec()
+print(result_dict)
 ```
 
 | Argument  | Description|
 | ----------|------------|
-|`reference`|Structure/sequence database to request|
-|`sources`  |Enumerated list defining the annotation collections to be requested|
-|`query_id` |Sequence identifier for database specified in `reference`|
-|`return_data_list`|Fields to request data for|
+|`reference`|Structure/sequence database to request (see [`SequenceReference` table above](#SequenceReference-and-Corresponding-Database-Identifiers) for possible values)|
+|`query_id` |Sequence identifier for database specified in `reference` (see [`SequenceReference` table above](#SequenceReference-and-Corresponding-Database-Identifiers) for examples)|
+|`sources`  |Enumerated list defining the annotation collections to be requested (possible values: `"UNIPROT"`, `"PDB_ENTITY"`, `"PDB_INSTANCE"`, `"PDB_INTERFACE"`)|
+|`return_data_list`|Data to fetch (e.g., `["target_id", "features"]`)|
 |`filters`|Optional list of `AnnotationFilterInput` that can be used to select what annotations will be retrieved. See [Additional Examples](/docs/seq_api/additional_examples.md).|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
 
-Valid Inputs for `reference`
-- `"UNIPROT"`
-- `"PDB_ENTITY"`
-- `"PDB_INSTANCE"`
 
-## Additional Examples
+## Additional Usage and Examples
 For examples using other query types like `GroupAlignments`, `GroupAnnotations`, and `GroupAnnotationsSummary` or for examples using filters, check [Additional Examples](/docs/seq_api/additional_examples.md).
 
 ## Jupyter Notebooks
-<!-- TODO: add Jupyter notebooks here -->
+A runnable jupyter notebook is available in [notebooks/sequence_coord_quickstart.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/sequence_coord_quickstart.ipynb), or can be run online using Google Colab:
+<a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/sequence_coord_quickstart.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
