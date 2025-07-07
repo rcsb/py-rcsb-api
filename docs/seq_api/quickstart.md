@@ -31,9 +31,9 @@ from rcsbapi.sequence import Alignments
 
 # Fetch alignments between a UniProt Accession and PDB Entities
 query = Alignments(
-    from_="UNIPROT",
-    to="PDB_ENTITY",
-    queryId="P01112",
+    db_from="UNIPROT",
+    db_to="PDB_ENTITY",
+    query_id="P01112",
     return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
 )
 query.exec()
@@ -41,12 +41,51 @@ query.exec()
 
 | Argument  | Description|
 | ----------|------------|
-|`from_`    |From which structure/sequence database|
-|`to`       |To which structure/sequence database|
-|`queryId`  |Sequence identifier for database specified in `from_`|
+|`db_from`  |From which structure/sequence database|
+|`db_to`    |To which structure/sequence database|
+|`query_id` |Sequence identifier for database specified in `db_from`|
 |`range`    |Optional integer list (2-tuple) to filter annotations that fall in a particular region|
 |`return_data_list`|Fields to request data for|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
+
+### SequenceReference and Corresponding Database Identifiers
+
+The table below describes the type of database identifiers used for each `SequenceReference` value.
+
+| `SequenceReference` | Database Identifier Description              | Example                        |
+|---------------------|-----------------------------------------------|--------------------------------|
+| `NCBI_GENOME`       | NCBI RefSeq Chromosome Accession              | `NC_000001`                    |
+| `NCBI_PROTEIN`      | NCBI RefSeq Protein Accession                 | `NP_789765`                    |
+| `UNIPROT`           | UniProt Accession                             | `P01112`                       |
+| `PDB_ENTITY`        | RCSB PDB Entity Id / CSM Entity Id            | `2UZI_3` / `AF_AFP68871F1_1`   |
+| `PDB_INSTANCE`      | RCSB PDB Instance Id / CSM Instance Id        | `2UZI.C` / `AF_AFP68871F1.A`   |
+
+- `query_id` is a valid identifier in the sequence database defined by the `db_from` field.
+- `range` is an optional list of two integers (2-tuple) that can be used to filter the alignment to a particular region.
+
+
+### Pagination
+Some GraphQL fields support pagination using standard parameters: first and offset.
+These parameters are commonly used to limit or paginate results from a list-type field. For example:
+
+```python
+from rcsbapi.sequence.seq_query import Alignments
+
+query_obj = Alignments(
+    db_from="NCBI_PROTEIN",
+    db_to="PDB_ENTITY",
+    query_id="XP_642496",
+    range=[1, 100],
+    return_data_list=["target_alignments"],
+    data_list_args={
+        "target_alignments": {
+            "first": 10,
+            "offset": 5
+        },
+    }
+)
+query_obj.exec()
+```
 
 ## Annotations
 `Annotations`
@@ -58,7 +97,7 @@ from rcsbapi.sequence import Annotations
 query = Annotations(  # type: ignore
     reference="PDB_INSTANCE",
     sources=["UNIPROT"],
-    queryId="2UZI.C",
+    query_id="2UZI.C",
     return_data_list=["target_id", "features"]
 )
 query.exec()
@@ -68,7 +107,7 @@ query.exec()
 | ----------|------------|
 |`reference`|Structure/sequence database to request|
 |`sources`  |Enumerated list defining the annotation collections to be requested|
-|`queryId`  |Sequence identifier for database specified in `reference`|
+|`query_id` |Sequence identifier for database specified in `reference`|
 |`return_data_list`|Fields to request data for|
 |`filters`|Optional list of `AnnotationFilterInput` that can be used to select what annotations will be retrieved. See [Additional Examples](/docs/seq_api/additional_examples.md).|
 |`suppress_autocomplete_warning`|Suppress warning message about field path autocompletion. Defaults to False.|
@@ -78,8 +117,8 @@ Valid Inputs for `reference`
 - `"PDB_ENTITY"`
 - `"PDB_INSTANCE"`
 
-# Additional Examples
+## Additional Examples
 For examples using other query types like `GroupAlignments`, `GroupAnnotations`, and `GroupAnnotationsSummary` or for examples using filters, check [Additional Examples](/docs/seq_api/additional_examples.md).
 
-# Jupyter Notebooks
+## Jupyter Notebooks
 <!-- TODO: add Jupyter notebooks here -->

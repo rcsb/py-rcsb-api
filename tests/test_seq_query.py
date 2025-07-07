@@ -47,7 +47,7 @@ class SeqTests(unittest.TestCase):
                 query_obj = Annotations(
                     reference="NCBI_GENOME",
                     sources=["PDB_INSTANCE"],
-                    queryId="NC_000001",
+                    query_id="NC_000001",
                     filters=[
                         AnnotationFilterInput(
                             field="TYPE",
@@ -66,9 +66,9 @@ class SeqTests(unittest.TestCase):
         with self.subTest(msg="1. Alignments query without filter"):
             try:
                 query_obj = Alignments(
-                    from_="NCBI_PROTEIN",
-                    to="PDB_ENTITY",
-                    queryId="XP_642496",
+                    db_from="NCBI_PROTEIN",
+                    db_to="PDB_ENTITY",
+                    query_id="XP_642496",
                     return_data_list=["target_id"]
                 )
                 query_obj.exec()
@@ -78,9 +78,9 @@ class SeqTests(unittest.TestCase):
         with self.subTest(msg="2. Alignments query with range"):
             try:
                 query_obj = Alignments(
-                    from_="NCBI_PROTEIN",
-                    to="PDB_ENTITY",
-                    queryId="XP_642496",
+                    db_from="NCBI_PROTEIN",
+                    db_to="PDB_ENTITY",
+                    query_id="XP_642496",
                     range=[1, 10],
                     return_data_list=["target_id"]
                 )
@@ -91,13 +91,17 @@ class SeqTests(unittest.TestCase):
         with self.subTest(msg="3. Alignments query with target_alignments args"):
             try:
                 query_obj = Alignments(
-                    from_="NCBI_PROTEIN",
-                    to="PDB_ENTITY",
-                    queryId="XP_642496",
+                    db_from="NCBI_PROTEIN",
+                    db_to="PDB_ENTITY",
+                    query_id="XP_642496",
                     range=[1, 100],
                     return_data_list=["target_alignments"],
-                    first=1,
-                    offset=10
+                    data_list_args={
+                        "target_alignments": {
+                            "first": 10,
+                            "offset": 5
+                        },
+                    }
                 )
                 query_obj.exec()
             except Exception as error:
@@ -108,7 +112,7 @@ class SeqTests(unittest.TestCase):
             try:
                 query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
-                    groupId="P01112",
+                    group_id="P01112",
                     return_data_list=["target_alignments.aligned_regions", "target_id"],
                 )
                 query_obj.exec()
@@ -118,7 +122,7 @@ class SeqTests(unittest.TestCase):
             try:
                 query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
-                    groupId="P01112",
+                    group_id="P01112",
                     return_data_list=["target_alignments.aligned_regions", "target_id"],
                     filter=["8CNJ_1", "8FG4_1"]
                 )
@@ -131,7 +135,7 @@ class SeqTests(unittest.TestCase):
             try:
                 query_obj = GroupAnnotations(
                     group="MATCHING_UNIPROT_ACCESSION",
-                    groupId="P01112",
+                    group_id="P01112",
                     sources=["PDB_ENTITY"],
                     return_data_list=["features.name", "features.feature_positions", "target_id"],
                 )
@@ -142,7 +146,7 @@ class SeqTests(unittest.TestCase):
             try:
                 query_obj = GroupAnnotations(
                     group="MATCHING_UNIPROT_ACCESSION",
-                    groupId="P01112",
+                    group_id="P01112",
                     sources=["PDB_ENTITY"],
                     filters=[
                         AnnotationFilterInput(
@@ -163,7 +167,7 @@ class SeqTests(unittest.TestCase):
             try:
                 query_obj = GroupAnnotationsSummary(
                     group="MATCHING_UNIPROT_ACCESSION",
-                    groupId="P01112",
+                    group_id="P01112",
                     sources=["PDB_INSTANCE"],
                     return_data_list=["target_id", "features.type"]
                 )
@@ -174,7 +178,7 @@ class SeqTests(unittest.TestCase):
             try:
                 query_obj = GroupAnnotationsSummary(
                     group="MATCHING_UNIPROT_ACCESSION",
-                    groupId="P01112",
+                    group_id="P01112",
                     sources=["PDB_INSTANCE"],
                     filters=[
                         AnnotationFilterInput(
@@ -197,9 +201,9 @@ class SeqTests(unittest.TestCase):
         with self.subTest(msg="1. UniProt - PDB Entity alignment"):
             try:
                 query_obj = Alignments(
-                    from_="UNIPROT",
-                    to="PDB_ENTITY",
-                    queryId="P01112",
+                    db_from="UNIPROT",
+                    db_to="PDB_ENTITY",
+                    query_id="P01112",
                     return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
                 )
                 query_obj.exec()
@@ -209,9 +213,9 @@ class SeqTests(unittest.TestCase):
         with self.subTest(msg="2. Computed Structure Model - NCBI protein alignment"):
             try:
                 query_obj = Alignments(
-                    from_="PDB_ENTITY",
-                    to="NCBI_PROTEIN",
-                    queryId="AF_AFP68871F1_1",
+                    db_from="PDB_ENTITY",
+                    db_to="NCBI_PROTEIN",
+                    query_id="AF_AFP68871F1_1",
                     return_data_list=["query_sequence", "target_alignments", "aligned_regions"]
                 )
                 query_obj.exec()
@@ -223,7 +227,7 @@ class SeqTests(unittest.TestCase):
                 query_obj = Annotations(  # type: ignore
                     reference="PDB_INSTANCE",
                     sources=["UNIPROT"],
-                    queryId="2UZI.C",
+                    query_id="2UZI.C",
                     return_data_list=["target_id", "features"]
                 )
                 query_obj.exec()
@@ -233,9 +237,9 @@ class SeqTests(unittest.TestCase):
         with self.subTest(msg="4. Human Chromosome 1 - PDB Entity alignment"):
             try:
                 query_obj = Alignments(
-                    from_="NCBI_GENOME",
-                    to="PDB_ENTITY",
-                    queryId="NC_000001",
+                    db_from="NCBI_GENOME",
+                    db_to="PDB_ENTITY",
+                    query_id="NC_000001",
                     return_data_list=[
                         "target_alignments.target_id",
                         "target_alignments.orientation",
@@ -251,7 +255,7 @@ class SeqTests(unittest.TestCase):
                 query_obj = Annotations(  # type: ignore
                     reference="NCBI_GENOME",
                     sources=["PDB_INSTANCE"],
-                    queryId="NC_000001",
+                    query_id="NC_000001",
                     filters=[
                         AnnotationFilterInput(
                             field="TYPE",
@@ -268,9 +272,9 @@ class SeqTests(unittest.TestCase):
         with self.subTest(msg="6. Mapping a PDB Instance to NCBI RefSeq proteins"):
             try:
                 query_obj = Alignments(
-                    from_="PDB_INSTANCE",
-                    to="NCBI_PROTEIN",
-                    queryId="4Z36.A",
+                    db_from="PDB_INSTANCE",
+                    db_to="NCBI_PROTEIN",
+                    query_id="4Z36.A",
                     return_data_list=["query_sequence", "target_alignments"]
                 )
                 query_obj.exec()

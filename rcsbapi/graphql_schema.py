@@ -121,9 +121,27 @@ class GQLSchema(ABC):
     """GraphQL schema defining available fields, types, and how they are connected."""
 
     def __init__(self, endpoint: str, timeout: int, fallback_file: str, weigh_nodes: List[str]) -> None:
+        self.introspection_query = {
+            "query": """query IntrospectionQuery { __schema
+            { queryType { name } types { kind name description fields(includeDeprecated: true)
+            { name description args { name description type { kind name ofType { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name } } } } } } } } defaultValue } type { kind name ofType { kind name ofType { kind name
+            ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } }
+            isDeprecated deprecationReason } inputFields { name description type { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name ofType { kind name } } } } } } } } defaultValue } interfaces { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name } } } } } } } } enumValues(includeDeprecated: true) { name description isDeprecated deprecationReason }
+            possibleTypes { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name ofType { kind name ofType { kind name } } } } } } } } } directives { name description locations args
+            { name description type { kind name ofType { kind name ofType { kind name ofType { kind name ofType
+            { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } } defaultValue } } }}"""
+        }
         self.pdb_url: str = endpoint
         self.timeout: int = timeout
         self.schema: Dict[str, Any] = self.fetch_schema()
+
         """JSON resulting from full introspection of the GraphQL schema"""
 
         self._use_networkx: bool = use_networkx
@@ -236,24 +254,7 @@ class GQLSchema(ABC):
         Returns:
             Dict: JSON response of introspection request
         """
-        query = {
-            "query": """query IntrospectionQuery { __schema
-            { queryType { name } types { kind name description fields(includeDeprecated: true)
-            { name description args { name description type { kind name ofType { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name } } } } } } } } defaultValue } type { kind name ofType { kind name ofType { kind name
-            ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } }
-            isDeprecated deprecationReason } inputFields { name description type { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name ofType { kind name } } } } } } } } defaultValue } interfaces { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name } } } } } } } } enumValues(includeDeprecated: true) { name description isDeprecated deprecationReason }
-            possibleTypes { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name ofType { kind name ofType { kind name } } } } } } } } } directives { name description locations args
-            { name description type { kind name ofType { kind name ofType { kind name ofType { kind name ofType
-            { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } } defaultValue } } }}"""
-        }
-        schema_response = requests.post(headers={"Content-Type": "application/json"}, json=query, url=self.pdb_url, timeout=self.timeout)
+        schema_response = requests.post(headers={"Content-Type": "application/json"}, json=self.introspection_query, url=self.pdb_url, timeout=self.timeout)
         if schema_response.status_code == 200:
             return dict(schema_response.json())
         # logger.info("Loading data schema from file")
@@ -523,7 +524,7 @@ class GQLSchema(ABC):
                     break
                 # Else, check for matching path segments.
                 for i in range(len(possible_path_list)):
-                    if possible_path_list[i : i + len(path_list)] == path_list:
+                    if possible_path_list[i: i + len(path_list)] == path_list:
                         matching_paths.append(".".join(possible_path_list))
 
             idx_paths: List[list[int]] = []
@@ -840,8 +841,18 @@ class GQLSchema(ABC):
             if arg_dict["ofKind"] == "SCALAR" and arg_type == "String" and not isinstance(args[arg_name], str):
                 error_list.append(f"{arg_name} must be a str not {type(args[arg_name])}")
 
-            if arg_dict["ofKind"] == "SCALAR" and arg_type == "Int" and not isinstance(args[arg_name], int):
-                error_list.append(f"{arg_name} must be a int not {type(args[arg_name])}")
+            if arg_dict["ofKind"] == "SCALAR" and arg_type == "Int":
+                if isinstance(args[arg_name], str):
+                    try:
+                        args[arg_name] = int(args[arg_name])
+                    except ValueError:
+                        error_list.append(f"{arg_name} was provided as a string but cannot be converted to int: {args[arg_name]}")
+                elif not isinstance(args[arg_name], int):
+                    error_list.append(f"{arg_name} must be an int, not {type(args[arg_name])}")
+
+            # Previous Code for reference
+            # if arg_dict["ofKind"] == "SCALAR" and arg_type == "Int" and not isinstance(args[arg_name], int):
+            # error_list.append(f"{arg_name} must be a int not {type(args[arg_name])}")
 
             # If list
             if arg_dict["ofKind"] == "LIST":
@@ -1072,23 +1083,64 @@ class GQLSchema(ABC):
         """Add arguments to a field, returning the fieldname and args as a formatted string.
 
         Args:
+            field_name (str): name of the field
             args (list[dict[str, Any]]): args of a field, retrieved from the GraphQL schema/FieldNode object
             query_args (dict[str, Any]): dictionary where keys are argument name and values are user input
 
         Returns:
-            str: field name or field name with corresponding arguments
-        """
-        # Check FieldNode argument names and see if user has passed in corresponding values
-        formatted_args = []
-        for arg in args:
-            arg_name = arg["name"]
-            if arg_name in query_args:
-                formatted_args.append(self._format_args(arg, query_args[arg_name]))
+            str: field name, potentially with arguments applied (e.g., field(arg: val))
 
+        Raises:
+            ValueError: if an invalid field argument key is found
+        """
+        field_args_dict = query_args.get("data_list_args", {})
+
+        # Validate all user-provided field names
+        user_field_args = field_args_dict.get(field_name, {})
+
+        # Validate that all provided field keys match the current field_name
+        for user_key in field_args_dict.keys():
+            if user_key != field_name:
+                raise ValueError(
+                    f"Invalid field argument '{user_key}' in data_list_args. "
+                    f"Allowed fields for this query are: {list(self._field_names_list)}"
+                )
+
+        # Build a list of properly formatted GraphQL arguments for the field
+        formatted_args = []
+        # This initializes an empty list.
+        # It will store each formatted GraphQL argument (ex: "first: 10") as a string.
+
+        # Loop through each argument defined for this field in the GraphQL schema
+        for arg in args:
+            # Loops over each argument defined in the GraphQL schema for this particular field.
+            # Each arg is a dictionary with a "name" key and some other stuff (not relevant to us).
+            # Example: arg: {"name": "first", "type": "Int"}
+
+            arg_name = arg["name"]
+            # Extracts the name of the argument from the schema.
+            # This is the key that the user must provide a value for in query_args.
+            # Example: arg_name = "first"
+
+            if arg_name not in user_field_args:
+                continue
+                # This checks whether the user actually provided a value for this argument.
+                # If not, we skip it (continue) — no value, no need to include it in the formatted string.
+
+            val = user_field_args[arg_name]
+            # Gets the user-provided value corresponding to the argument name.
+            # This value (val) will be used to construct the final name.
+
+            # Wrap strings in double quotes for GraphQL syntax
+            if isinstance(val, str):
+                formatted_args.append(f'{arg_name}: "{val}"')
+            else:
+                formatted_args.append(f"{arg_name}: {val}")
+
+        # If any arguments were applied, return the field with args; else, return the field name as-is
         if formatted_args:
-            return "{}{}".format(field_name, str(tuple(formatted_args)).replace("'", ""))
-        else:
-            return field_name
+            return f"{field_name}({', '.join(formatted_args)})"
+        return field_name
 
     def _query_dict_to_graphql_string(self, first_line: str, query_body: Dict[str, Any]) -> str:
         """Turn query dictionary into a string in GraphQL syntax"""

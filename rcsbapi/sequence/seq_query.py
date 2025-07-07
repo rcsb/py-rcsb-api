@@ -1,11 +1,11 @@
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from types import MappingProxyType
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
 import urllib.parse
 import requests
 
-from rcsbapi.const import seq_const
+from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.sequence import SEQ_SCHEMA
 from rcsbapi.graphql_schema import SchemaEnum
@@ -23,6 +23,12 @@ class SeqEnums(SchemaEnum):
 @dataclass(frozen=True)
 class Query(ABC):
     """Base class for all query types"""
+    argument_name_map = {
+        "db_from": "from",
+        "db_to": "to",
+        "query_id": "queryId",
+        "group_id": "groupId"
+    }
 
     @abstractmethod
     def to_dict(self) -> Dict[str, Any]:
@@ -33,7 +39,6 @@ class Query(ABC):
             if field_name == "return_data_list":
                 continue
             field_value = getattr(self, field_name)
-            field_name = field_name.replace("_", "")
             if field_value:
                 # Create an exception for AnnotationFilterInput
                 if (
@@ -41,7 +46,10 @@ class Query(ABC):
                     and all(isinstance(item, AnnotationFilterInput) for item in field_value)
                 ):
                     field_value = [filter.to_string() for filter in field_value]
-                request_dict[field_name] = field_value
+
+                output_key = self.argument_name_map.get(field_name, field_name)
+                request_dict[output_key] = field_value
+
         return request_dict
 
     def get_query(self) -> MappingProxyType[str, Any]:
@@ -83,7 +91,7 @@ class Query(ABC):
             f"{self.__class__.__name__} must define '_query' attribute."
         response_json = requests.post(
             json=dict(self._query),
-            url=seq_const.GRAPHQL_API_ENDPOINT,
+            url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
             timeout=config.API_TIMEOUT
         ).json()
         self._parse_gql_error(response_json)
@@ -91,7 +99,7 @@ class Query(ABC):
 
     def get_editor_link(self) -> str:
         """Get link to GraphiQL editor with given query populated"""
-        editor_base_link = str(seq_const.BASE_API_ENDPOINT) + "/graphiql" + "/index.html?query="
+        editor_base_link = str(const.SEQUENCE_API_ENDPOINT) + "/graphiql" + "/index.html?query="
         assert hasattr(self, "_query")  # for mypy
         return editor_base_link + urllib.parse.quote(str(self._query["query"]))
 
@@ -110,36 +118,24 @@ class Alignments(Query):
     """
     Get sequence alignments
 
-        from_ (str): From which query sequence database
-        to (str): To which query sequence database
-        queryId (str): Sequence identifier specified in `from_`
+        db_from (str): From which query sequence database
+        db_to (str): To which query sequence database
+        query_id (str): Sequence identifier specified in `db_from`
         return_data_list (List[str]): Fields to request data for
         range (Optional, List[]): Optional integer list to filter annotations that fall in a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         _query (MappingProxyType): Attribute for storing GraphQL query
+        data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
+            The key must match fields in `return_data_list`. Values currently include "offset" and "first"
     """
-    from_: str
-    to: str
-    queryId: str
+    db_from: str
+    db_to: str
+    query_id: str
     return_data_list: List[str]
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
-    """
-    `offset` and `first` are field arguments (currently the only ones).
-    Making them class attributes (below) would not work if there
-    were redundant field arg names for different fields.
-    (i.e. `first` an argument for `target_alignments` and a different field).
-
-    Other options:
-    1. Use a string in `return_data_list` and parse later
-            return_data_list = ["target_alignments(first:0, offset:5)"]
-    2. Create an attribute `field_args` and pass in args as a dict
-            field_args = {"target_alignments": {first:0, offset:5}, ...}
-    Cons are that these put the burden of formatting/knowing the arg names on the user.
-    """
-    offset: Optional[int] = None
-    first: Optional[int] = None
+    data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -154,7 +150,7 @@ class Annotations(Query):
     """
     Get sequence annotations
 
-        queryId (str): Database sequence identifier
+        query_id (str): Database sequence identifier
         sources (List[str]): List defining the annotation collections to be requested
         reference (SequenceReference): Query sequence database
         return_data_list (List[str]): Requested data fields
@@ -163,7 +159,7 @@ class Annotations(Query):
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         _query (MappingProxyType): Attribute for storing GraphQL query
     """
-    queryId: str
+    query_id: str
     sources: List[str]
     reference: str
     return_data_list: List[str]
@@ -185,20 +181,21 @@ class GroupAlignments(Query):
     """
     Get alignments for structures in groups
 
-        queryId (str): Database sequence identifier for group
+        group_id (str): Database sequence identifier for group
         return_data_list (list[str]): Requested data fields
         filter (list[str], optional): Optional string list of allowed identifiers for group members
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         _query (MappingProxyType): Attribute for storing GraphQL query
+        data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
+            The key must match fields in `return_data_list`. Values currently include "offset" and "first"
     """
     group: str
-    groupId: str
+    group_id: str
     return_data_list: List[str]
     filter: Optional[list[str]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = MappingProxyType({})
-    offset: Optional[int] = None
-    first: Optional[int] = None
+    data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -214,7 +211,7 @@ class GroupAnnotations(Query):
     Get annotations for structures in groups
 
         group (GroupReference): Query sequence database
-        groupId (str): Database sequence identifier for group
+        group_id (str): Database sequence identifier for group
         sources (list[AnnotationReference]): List defining the annotation collections to be requested
         return_data_list (list[str]): Requested data fields
         filters (list[AnnotationFilterInput]): Optional annotation filter by type or target identifier
@@ -222,7 +219,7 @@ class GroupAnnotations(Query):
         _query (MappingProxyType): Attribute for storing GraphQL query
     """
     group: str
-    groupId: str
+    group_id: str
     sources: List[str]
     return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
@@ -243,7 +240,7 @@ class GroupAnnotationsSummary(Query):
     Get a positional summary of group annotations
 
         group (GroupReference): Query sequence database
-        groupId (str): Database sequence identifier for group
+        group_id (str): Database sequence identifier for group
         sources (list[AnnotationReference]): List defining the annotation collections to be requested
         return_data_list (list[str]): Request data fields
         filters (list[AnnotationFilterInput], optional): Optional annotation filter by type or target identifier
@@ -251,7 +248,7 @@ class GroupAnnotationsSummary(Query):
         _query (MappingProxyType): Attribute for storing GraphQL query
     """
     group: str
-    groupId: str
+    group_id: str
     sources: List[str]
     return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
