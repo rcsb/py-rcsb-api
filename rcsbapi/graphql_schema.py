@@ -1107,17 +1107,20 @@ class GQLSchema(ABC):
                 )
 
         # Build a list of properly formatted GraphQL arguments for the field
-        formatted_args = []  # Initialize an empty list to hold formatted GraphQL argument strings
+        formatted_args = []  # Initialize an empty list to hold formatted GraphQL argument strings (ex: "first: 10")
 
         # Loop through each argument defined for this field in the GraphQL schema
         for arg in args:
-            arg_name = arg["name"]  # Extract the name of the argument (right now: "first", "offset")
+            # Each arg is a dictionary with a "name" key and some other stuff (not relevant to us).
+            # Example: arg -> {"name": "first", "type": "Int"}
+
+            arg_name = arg["name"]  # Extract the name of the argument. Example: arg_name -> "first"
 
             # Skip this argument if the user didn't provide a value for it
             if arg_name not in user_field_args:
                 continue
 
-            # Get the user-provided value for this argument
+            # Get the user-provided value (int for now) for this argument
             val = user_field_args[arg_name]
 
             # Wrap strings in double quotes for GraphQL syntax
