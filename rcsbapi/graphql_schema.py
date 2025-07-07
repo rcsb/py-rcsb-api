@@ -1107,21 +1107,29 @@ class GQLSchema(ABC):
                 )
 
         # Build a list of properly formatted GraphQL arguments for the field
-        formatted_args = []  # Initialize an empty list to hold formatted GraphQL argument strings (ex: "first: 10")
+        formatted_args = []  
+        # This initializes an empty list.
+        # It will store each formatted GraphQL argument (ex: "first: 10") as a string.
 
         # Loop through each argument defined for this field in the GraphQL schema
         for arg in args:
+            # Loops over each argument defined in the GraphQL schema for this particular field.
             # Each arg is a dictionary with a "name" key and some other stuff (not relevant to us).
-            # Example: arg -> {"name": "first", "type": "Int"}
+            # Example: arg: {"name": "first", "type": "Int"}
 
-            arg_name = arg["name"]  # Extract the name of the argument. Example: arg_name -> "first"
+            arg_name = arg["name"]
+            # Extracts the name of the argument from the schema.
+            # This is the key that the user must provide a value for in query_args.
+            # Example: arg_name = "first"
 
-            # Skip this argument if the user didn't provide a value for it
             if arg_name not in user_field_args:
                 continue
+                # This checks whether the user actually provided a value for this argument.
+                # If not, we skip it (continue) — no value, no need to include it in the formatted string.
 
-            # Get the user-provided value (int for now) for this argument
             val = user_field_args[arg_name]
+            # Gets the user-provided value corresponding to the argument name.
+            # This value (val) will be used to construct the final name.
 
             # Wrap strings in double quotes for GraphQL syntax
             if isinstance(val, str):
