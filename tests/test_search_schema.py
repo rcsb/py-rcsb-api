@@ -111,6 +111,18 @@ class SchemaTests(unittest.TestCase):
             attr_details = attrs.get_attribute_details("foo")
             self.assertIsNone(attr_details)
 
+    def testNestedAttrs(self):
+        with self.subTest(msg="3. Check nested attribute indexing dictionary length"):
+            nested_dict = SEARCH_SCHEMA.nested_attribute_schema
+            self.assertGreaterEqual(len(nested_dict), 15)
+
+        with self.subTest(msg="3. Check for a specific nested attribute"):
+            expected_tuple = ('rcsb_uniprot_annotation.name', 'rcsb_uniprot_annotation.type')
+            self.assertIn(expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
+
+            not_expected_tuple = ('drugbank_info.drug_groups', 'rcsb_uniprot_annotation.type')
+            self.assertNotIn(not_expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
+
 
 def buildSchema() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
@@ -118,6 +130,7 @@ def buildSchema() -> unittest.TestSuite:
     suiteSelect.addTest(SchemaTests("testSchemaVersion"))
     suiteSelect.addTest(SchemaTests("testFetchSchema"))
     suiteSelect.addTest(SchemaTests("testRcsbAttrs"))
+    suiteSelect.addTest(SchemaTests("testNestedAttrs"))
     return suiteSelect
 
 

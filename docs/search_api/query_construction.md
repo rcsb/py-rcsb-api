@@ -150,7 +150,90 @@ query = q1 & q2
 list(query())
 ```
 
-Some sets of attributes can be separately grouped for a more specific search. For example, the attribute `rcsb_chem_comp_related.resource_name` could be set to "DrugBank" or another database and grouped with the attribute `rcsb_chem_comp_related.resource_accession_code`, which can be used to search for an accession code. When grouped, these attributes will be searched for together (i.e. the accession code must be associated with the specified database). To identify attributes that can be grouped, check the [schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema) for attributes with `rcsb_nested_indexing` set to `true`. To specify that two attributes should be searched together, use the `group` function.
+### Nested Attributes
+
+Some attributes in the RCSB schema are part of a nested indexing context, meaning they must be queried as a pair--i.e., a group node containing *only* those two attributes--to ensure correct matching behavior. These include attributes like `rcsb_binding_affinity.type` and `rcsb_binding_affinity.value`, which are associated with the same underlying object (e.g., an EC50 measurement). As another example, the attribute `rcsb_chem_comp_related.resource_name` could be set to "DrugBank" or another database and grouped with the attribute `rcsb_chem_comp_related.resource_accession_code`, which can be used to search for an accession code. When grouped as a pair, these attributes will be searched for together (i.e. the accession code must be associated with the specified database).
+
+To group such attributes correctly, use the `NestedAttributeQuery` class. This ensures the query is constructed in a way that complies with the schema's nested indexing rules and returns the correct set of results.
+
+More information about which attribute pairs support nested indexing can be found by inspecting the  [schema](http://search.rcsb.org/rcsbsearch/v2/metadata/schema) and looking at `rcsb_nested_indexing_context` fields of the attribute definitions.
+
+```python
+from rcsbapi.search import AttributeQuery, NestedAttributeQuery
+
+# Query for EC50-type binding affinity with a value of 2.0
+q1 = AttributeQuery(
+    attribute="rcsb_binding_affinity.type",
+    operator="exact_match",
+    value="EC50"
+)
+
+q2 = AttributeQuery(
+    attribute="rcsb_binding_affinity.value",
+    operator="equals",
+    value=2.0
+)
+
+# Other independent structural filters
+q3 = AttributeQuery(
+    attribute="rcsb_entry_info.selected_polymer_entity_types",
+    operator="exists"
+)
+
+# Group nested attributes using `NestedAttributeQuery`
+nestedQuery = NestedAttributeQuery(q1, q2)
+
+query = nestedQuery & q3
+
+list(query())
+```
+If you do not use `NestedAttributeQuery`, your query may be "flattened", leading to incorrect behavior or ignored nested constraints. Additionally, a warning message will appear, informing you of improper nested attribute usage.
+
+
+For example, the effect of using `NestedAttributeQuery` can be visualized as follows:
+```python
+# Without using `NestedAttributeQuery`
+query = (q1 & q2) & q3
+
+# Resulting JSON query submitted to search API:
+query = {
+    "operator": and,
+    "nodes": [
+        # Notice how all three nodes are in the same group/level
+        q1,
+        q2,
+        q3
+    ]
+}
+
+
+# WITH using `NestedAttributeQuery`
+query = NestedAttributeQuery(q1, q2) & q3
+
+# Resulting JSON query submitted to search API:
+query = {
+    "operator": and,
+    "nodes": [
+        # Now (q1 & q2) are paired together in their own dedicated group node
+        {
+            "operator": and,
+            "nodes": [
+                q1,
+                q2
+            ]
+        },
+        q3
+    ]
+}
+
+# Importantly, this subtle difference can have a *BIG* impact on the query results!
+
+```
+
+
+#### Custom/forced sub-grouping attributes
+The above `NestedAttributeQuery` class is intended for creating separated group nodes containing a single pair of nested attributes (and provides a validation of the attributes being paired to ensure that they are indeed nested attributes), to avoid flattening of otherwise equivalent `AND` and `OR` sub-queries (e.g., it prevents `(q1 & q2) & q3` from becoming `q1 & q2 & q3`, keeping `(q1 & q2)` as a separate group from `q3`). However, if you are interested in forcing the sub-grouping of any other subset of attributes, you can do so using the `group` function.
+
 
 ```python
 from rcsbapi.search import AttributeQuery
@@ -178,6 +261,7 @@ q3 = AttributeQuery(
 query = group(q1 & q2) & q3
 list(query())
 ```
+
 
 ### Sessions
 The result of executing a query (either by calling it as a function or using `exec()`) is a

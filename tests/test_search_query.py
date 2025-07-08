@@ -24,7 +24,7 @@ from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import group
 from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
-from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group
+from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group, NestedAttributeQuery, NestedAttributeQueryChecker
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -1812,6 +1812,85 @@ class SearchTests(unittest.TestCase):
         except Exception as error:
             self.fail(f"Failed unexpectedly: {error}")
 
+    def testNestedAttributes(self):
+        with self.subTest("1. Query using nested attributes and verify result exists"):
+            attribute1 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_name",
+                operator="exact_match",
+                value="DrugBank"
+            )
+            attribute2 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_accession_code",
+                operator="exact_match",
+                value="DB00114"
+            )
+            nested = NestedAttributeQuery(attribute1, attribute2)
+            self.assertTrue(nested)
+
+        with self.subTest("2. Query using not nested attributes and verify result does not exist"):
+            attribute1 = AttributeQuery("rcsb_nonpolymer_entity_container_identifiers.nonpolymer_comp_id", "exists")
+            attribute2 = AttributeQuery(attribute="rcsb_chem_comp_related.resource_accession_code", operator="exact_match", value="DB00114")
+            nested = NestedAttributeQuery(attribute1, attribute2)
+            self.assertRaises(TypeError)
+
+        with self.subTest("3. Confirms that the result counts between using NestedAttributeQuery and not using it differ"):
+            attribute1 = AttributeQuery("rcsb_binding_affinity.type", "exact_match", "EC50")
+            attribute2 = AttributeQuery("rcsb_binding_affinity.value", "equals", 2.0)
+            attribute3 = AttributeQuery("rcsb_entry_info.selected_polymer_entity_types", "exists")
+            attribute4 = AttributeQuery("rcsb_nonpolymer_entity_container_identifiers.nonpolymer_comp_id", "exists")
+            query1 = attribute1 & attribute2 & attribute3 & attribute4
+
+            attribute5 = AttributeQuery("rcsb_binding_affinity.type", "exact_match", "EC50")
+            attribute6 = AttributeQuery("rcsb_binding_affinity.value", "equals", 2.0)
+            attribute7 = AttributeQuery("rcsb_entry_info.selected_polymer_entity_types", "exists")
+            attribute8 = AttributeQuery("rcsb_nonpolymer_entity_container_identifiers.nonpolymer_comp_id", "exists")
+            nested = NestedAttributeQuery(attribute5, attribute6)
+            query2 = nested & attribute7 & attribute8
+
+            self.assertNotEqual(set(query1()), set(query2()))
+
+        with self.subTest("4. Confirms query runs"):
+            attribute1 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_name",
+                operator="exact_match",
+                value="DrugBank"
+            )
+            attribute2 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_accession_code",
+                operator="exact_match",
+                value="DB00114"
+            )
+            attribute3 = AttributeQuery(
+                attribute="rcsb_entity_source_organism.scientific_name",
+                operator="exact_match",
+                value="Escherichia coli"
+            )
+            nested = NestedAttributeQuery(attribute1, attribute2)
+            query = nested & attribute3
+            query_length = list(query())
+            self.assertGreater(len(query_length), 90)
+
+    def testNestedAttrsChecker(self):
+        with self.subTest("Valid nested usage should NOT raise a warning"):
+            attribute1 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_name",
+                operator="exact_match",
+                value="DrugBank"
+            )
+            attribute2 = AttributeQuery(
+                attribute="rcsb_chem_comp_related.resource_accession_code",
+                operator="exact_match",
+                value="DB00114"
+            )
+
+            nested = NestedAttributeQuery(attribute1, attribute2)
+            self.assertTrue(nested.is_valid_nested)
+
+            query = nested & attribute2
+
+            with self.assertLogs(level='WARNING'):
+                NestedAttributeQueryChecker(query).validate()
+
 
 def buildSearch() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
@@ -1853,6 +1932,8 @@ def buildSearch() -> unittest.TestSuite:
     suiteSelect.addTest(SearchTests("testSort"))
     suiteSelect.addTest(SearchTests("testReturnExplainMetadata"))
     suiteSelect.addTest(SearchTests("testScoringStrategy"))
+    suiteSelect.addTest(SearchTests("testNestedAttributes"))
+    suiteSelect.addTest(SearchTests("testNestedAttrsChecker"))
     return suiteSelect
 
 

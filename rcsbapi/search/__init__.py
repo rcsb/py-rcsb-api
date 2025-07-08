@@ -2,7 +2,7 @@
 
 from typing import List
 from rcsbapi.search.search_query import SEARCH_SCHEMA  # noqa: F401
-from rcsbapi.search.search_query import Attr, AttributeQuery, TextQuery
+from rcsbapi.search.search_query import Attr, AttributeQuery, TextQuery, NestedAttributeQuery
 from rcsbapi.search.search_query import SeqSimilarityQuery, SeqMotifQuery, ChemSimilarityQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from rcsbapi.search.search_query import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import Group
@@ -20,6 +20,7 @@ __all__ = [
     "Attr",
     "TextQuery",
     "AttributeQuery",
+    "NestedAttributeQuery",
     "SeqSimilarityQuery",
     "SeqMotifQuery",
     "ChemSimilarityQuery",
