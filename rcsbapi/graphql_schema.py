@@ -6,7 +6,7 @@ import json
 import logging
 from pathlib import Path
 import requests
-from graphql import build_client_schema
+from graphql import validate, parse, build_client_schema
 import rustworkx as rx
 from rcsbapi.const import const
 
@@ -42,6 +42,9 @@ class FieldNode:
             node_type (str): If applicable, the GraphQL type returned by the field
             name (str): Name of field
             description (str): Description of field
+            args (list): list of args for a field
+                (e.g., for "entry" -> [{'name': 'entry_id', 'ofType': {'kind': 'SCALAR', 'name': 'String', 'ofType': None}, 'kind': 'NON_NULL', 'ofKind': 'SCALAR'}])
+                Only available for top-level fields (e.g., "entries", "assemblies", ...)
         """
         self.name: str = name
         self.description: str = description
@@ -967,7 +970,12 @@ class GQLSchema(ABC):
         idx_query_body = self._merge_query_list(return_data_query_list)  # type: ignore[arg-type]
         name_query_body = self._idx_dict_to_name_dict(idx_query_body, query_args)  # type: ignore[arg-type]
         query = self._query_dict_to_graphql_string(first_line, name_query_body)  # type: ignore[arg-type]
-        return {"query": query}
+
+        # Validate query
+        validation_error_list = validate(self._client_schema, parse(query))
+        if not validation_error_list:
+            return {"query": query}
+        raise ValueError(validation_error_list)
 
     def _merge_query_list(self, query_list: List[dict[int, Any] | List[int]]) -> List[dict[int, Any] | List[int]]:
         """Merge a list of query dicts, returning a merged query with unique indices/index dictionaries.
