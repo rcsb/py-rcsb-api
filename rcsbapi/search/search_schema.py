@@ -194,6 +194,7 @@ class SearchSchema:
         if reload:
             self.struct_schema = self._reload_schema(struct_attr_schema_url, struct_attr_schema_file, refetch, use_fallback)
             self.chem_schema = self._reload_schema(chem_attr_schema_url, chem_attr_schema_file, refetch, use_fallback)
+            self.nested_attribute_schema = self._extract_nested_indexing_contexts()
         self.search_attributes = self._make_schema_group()
 
     def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=True):
@@ -297,3 +298,95 @@ class SearchSchema:
             else:
                 d[leaf] = self._set_leaves(d[leaf])
         return d
+
+    def _extract_nested_indexing_contexts(self) -> dict:
+        """
+        Traverse both structure and chemical schemas to identify nested indexing contexts.
+
+        Returns:
+            dict: Mapping of (attribute_path, category_path) tuples to a truthy placeholder.
+        """
+        nested_attrs = {}
+        nested_attrs.update(self._find_nested_indexing(self.struct_schema))
+        nested_attrs.update(self._find_nested_indexing(self.chem_schema))
+        return nested_attrs
+
+    def _find_nested_indexing(self, root_node) -> dict:
+        """
+        Recursively search the given schema JSON object for valid nested indexing contexts.
+
+        Args:
+            root_node (dict): Root node of the schema JSON.
+
+        Returns:
+            dict: Dictionary of valid (attribute_path, category_path) tuples as keys.
+        """
+
+        found = {}
+        queue = [(root_node, "")]  # Each item is (node_dict, path_str)
+        category_path = ""
+        _tupple_index = ("", "")
+
+        while queue:
+
+            current_node, current_path = queue.pop(0)
+
+            if not isinstance(current_node, dict):
+                continue
+
+            # Check for the full required structure
+            context = current_node.get("rcsb_nested_indexing_context")
+            if isinstance(context, list):
+                context_valid = True
+                for entry in context:  # check for context, break if not
+                    if not isinstance(entry, dict):
+                        context_valid = False
+                        break
+                    if entry.get("category_path"):
+                        category_path = entry.get("category_path")
+                    context_attrs = entry.get("context_attributes")
+                    if not isinstance(context_attrs, list):  # check for context_attributes, break if not
+                        context_valid = False
+                        break
+                    for attr in context_attrs:  # check for attributes (which are within context_attributes), break if not
+                        if not isinstance(attr, dict):
+                            context_valid = False
+                            break
+                        if "context_value" not in attr or "attributes" not in attr:
+                            context_valid = False
+                            break
+                        if not isinstance(attr["attributes"], list):
+                            context_valid = False
+                            break
+                        for p in attr["attributes"]:  # check for path(which is within attributes), break if not
+                            if not isinstance(p, dict) or "path" not in p:
+                                context_valid = False
+                                break
+                            if not context_valid:
+                                break
+                            path_reference = p.get("path")
+                            if context_valid:
+                                new_path_reference = (path_reference or "").replace("properties.", "")
+                                new_category_path = (category_path or "").replace("properties.", "")
+
+                                _tupple_index = (new_path_reference, new_category_path)
+
+                            if _tupple_index not in found:
+                                found[_tupple_index] = {
+                                    True,
+                                }
+                        if not context_valid:
+                            break
+                    if not context_valid:
+                        break
+
+            for key, value in current_node.items():
+                path = f"{current_path}.{key}" if current_path else key
+                if isinstance(value, dict):
+                    queue.append((value, path))
+                elif isinstance(value, list):
+                    for item in value:
+                        if isinstance(item, dict):
+                            queue.append((item, path))
+
+        return found
