@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.2.0 (2025-07-10)
+
+- Add support for [Sequence Coordinates API](https://sequence-coordinates.rcsb.org/) via new module `rcsbapi.sequence`. Use this to fetch alignments between sequences from different databases as well as sequence-level annotations integrated from external resources and RCSB PDB. (PRs [#46](https://github.com/rcsb/py-rcsb-api/pull/46), [#68](https://github.com/rcsb/py-rcsb-api/pull/68))
+  - [Documentation](https://rcsbapi.readthedocs.io/en/latest/seq_api/quickstart.html) and [Jupyter notebook](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/sequence_coord_quickstart.ipynb) provided
+  - Generalized pre-existing Data API module GraphQL schema and query generation code to be re-used by both `rcsbapi.data` and `rcsbapi.sequence` modules (no impact to user)
+- Add `NestedAttributeQuery` to Search API `rcsbapi.search` module to support restricted/pair-wise grouping of nested attributes and prevent them from being automatically flattened down to the same group level as adjacent terminal nodes. Warning messages have been added to notify users of the need to make use of this for any nested attributes being included in search queries. (PR [#66](https://github.com/rcsb/py-rcsb-api/pull/66); Issue [#49](https://github.com/rcsb/py-rcsb-api/issues/49))
+- Change `rcsbapi.search` Search API requests to use `POST` instead of `GET`, to handle very large query bodies that would otherwise generate massive URL lengths
+- Add custom User-Agent to API request headers (`"User-Agent": "py-rcsb-api/__version__ (+https://github.com/rcsb/py-rcsb-api)"`)
+- Add sequence-coordinates API schema (GraphQL; no version)
+- Update search schemas: 1.49.0 -> 1.50.1
+- Update data schemas: 
+  - entry schema 9.0.4 -> 9.0.4
+  - polymer_entity schema 10.0.5 -> 10.0.5
+
 ## v1.1.3 (2025-05-05)
 
 - Fix: Update regex pattern for instances in `const.py` to support suffixes longer than one character (e.g., "1S5L.AA")

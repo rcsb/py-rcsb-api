@@ -593,6 +593,12 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "PDB_MODEL_NUM",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "PREDICTED_IMPACT",
                             "description": null,
                             "isDeprecated": false,
@@ -823,6 +829,12 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "ANGLE_OUTLIERS",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "ARTIFACT",
                             "description": null,
                             "isDeprecated": false,
@@ -847,6 +859,12 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "AVERAGE_OCCUPANCY",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "BEND",
                             "description": null,
                             "isDeprecated": false,
@@ -860,6 +878,12 @@
                         },
                         {
                             "name": "BOND_OUTLIER",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "BOND_OUTLIERS",
                             "description": null,
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -889,7 +913,19 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "CHIRAL_OUTLIERS",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "CIS_PEPTIDE",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "CLASHES",
                             "description": null,
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -1231,7 +1267,31 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "MOGUL_ANGLE_OUTLIERS",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "MOGUL_BOND_OUTLIER",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "MOGUL_BOND_OUTLIERS",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "MOGUL_RING_OUTLIERS",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "MOGUL_TORSION_OUTLIERS",
                             "description": null,
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -1244,6 +1304,12 @@
                         },
                         {
                             "name": "MUTATION",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "NATOMS_EDS",
                             "description": null,
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -1279,6 +1345,12 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "OWAB",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "O_GLYCOSYLATION_SITE",
                             "description": null,
                             "isDeprecated": false,
@@ -1297,6 +1369,12 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "PLANE_OUTLIERS",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "PROPEPTIDE",
                             "description": null,
                             "isDeprecated": false,
@@ -1304,6 +1382,12 @@
                         },
                         {
                             "name": "PROTEIN_BINDING",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "Q_SCORE",
                             "description": null,
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -1333,7 +1417,25 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "RSCC",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "RSCC_OUTLIER",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "RSR",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "RSRZ",
                             "description": null,
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -1454,6 +1556,12 @@
                         },
                         {
                             "name": "STRN",
+                            "description": null,
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "SYMM_CLASHES",
                             "description": null,
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -3709,6 +3817,40 @@
                     ]
                 },
                 {
+                    "name": "defer",
+                    "description": "This directive allows results to be deferred during execution",
+                    "locations": [
+                        "FRAGMENT_SPREAD",
+                        "INLINE_FRAGMENT"
+                    ],
+                    "args": [
+                        {
+                            "name": "if",
+                            "description": "Deferred behaviour is controlled by this argument",
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Boolean",
+                                    "ofType": null
+                                }
+                            },
+                            "defaultValue": "true"
+                        },
+                        {
+                            "name": "label",
+                            "description": "A unique label that represents the fragment being deferred",
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "defaultValue": null
+                        }
+                    ]
+                },
+                {
                     "name": "deprecated",
                     "description": "Marks the field, argument, input field or enum value as deprecated",
                     "locations": [
@@ -3722,13 +3864,27 @@
                             "name": "reason",
                             "description": "The reason for the deprecation",
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "defaultValue": "\"No longer supported\""
                         }
                     ]
+                },
+                {
+                    "name": "experimental_disableErrorPropagation",
+                    "description": "This directive disables error propagation when a non nullable field returns null for the given operation.",
+                    "locations": [
+                        "QUERY",
+                        "MUTATION",
+                        "SUBSCRIPTION"
+                    ],
+                    "args": []
                 },
                 {
                     "name": "oneOf",

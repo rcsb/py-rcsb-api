@@ -2776,6 +2776,38 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "ihm_entry_collection_mapping",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "IhmEntryCollectionMapping",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ihm_external_reference_info",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "IhmExternalReferenceInfo",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "ma_data",
                             "description": null,
                             "args": [],
@@ -3517,6 +3549,38 @@
                                 "ofType": {
                                     "kind": "SCALAR",
                                     "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "rcsb_ihm_dataset_list",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "RcsbIhmDatasetList",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "rcsb_ihm_dataset_source_db_reference",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "RcsbIhmDatasetSourceDbReference",
                                     "ofType": null
                                 }
                             },
@@ -5423,7 +5487,7 @@
                     "fields": [
                         {
                             "name": "database_code",
-                            "description": "The code assigned by the database identified in\n _database_2.database_id.\n\nExamples:\n1ABC, ABCDEF\n",
+                            "description": "The code assigned by the database identified in\n _database_2.database_id.\n\nExamples:\n4HHB, 3LTQ\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -10498,6 +10562,105 @@
                 },
                 {
                     "kind": "OBJECT",
+                    "name": "GroupNonPolymerEntity",
+                    "description": "",
+                    "fields": [
+                        {
+                            "name": "rcsb_group_accession_info",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "RcsbGroupAccessionInfo",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "rcsb_group_container_identifiers",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "RcsbGroupContainerIdentifiers",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "rcsb_group_info",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "RcsbGroupInfo",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "rcsb_group_related",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "RcsbGroupRelated",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "rcsb_group_statistics",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "RcsbGroupStatistics",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "rcsb_id",
+                            "description": "A unique textual identifier for a group",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
                     "name": "GroupPolymerEntity",
                     "description": "",
                     "fields": [
@@ -10667,6 +10830,80 @@
                         {
                             "name": "rcsb_id",
                             "description": "A unique textual identifier for a group provenance",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "IhmEntryCollectionMapping",
+                    "description": "",
+                    "fields": [
+                        {
+                            "name": "collection_id",
+                            "description": "Identifier for the entry collection. \n This data item is a pointer to _ihm_entry_collection.id in the \n IHM_ENTRY_COLLECTION category.",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "IhmExternalReferenceInfo",
+                    "description": "",
+                    "fields": [
+                        {
+                            "name": "associated_url",
+                            "description": "The Uniform Resource Locator (URL) corresponding to the external reference (DOI). \n This URL should link to the corresponding downloadable file or archive and is provided \n to enable automated software to download the referenced file or archive.",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "reference",
+                            "description": "The external reference or the Digital Object Identifier (DOI).\n This field is not relevant for local files.\n\nExamples:\n10.5281/zenodo.46266\n",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "reference_provider",
+                            "description": "The name of the reference provider.\n\nExamples:\nZenodo, Figshare, Crossref\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -18056,6 +18293,41 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "nonpolymer_entity_groups",
+                            "description": "Given a list of group IDs get a list of group objects formed by aggregating non-polymer entities that share a degree of similarity",
+                            "args": [
+                                {
+                                    "name": "group_ids",
+                                    "description": "List of group IDs",
+                                    "type": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "LIST",
+                                            "name": null,
+                                            "ofType": {
+                                                "kind": "SCALAR",
+                                                "name": "String",
+                                                "ofType": null
+                                            }
+                                        }
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "LIST",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "GroupNonPolymerEntity",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "polymer_entity_groups",
                             "description": "Given a list of group IDs get a list of group objects formed by aggregating polymer entities that share a degree of similarity",
                             "args": [
@@ -18491,6 +18763,33 @@
                                     "name": "CoreInterface",
                                     "ofType": null
                                 }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "nonpolymer_entity_group",
+                            "description": "Given a group ID get a group object formed by aggregating non-polymer entities that share a degree of similarity",
+                            "args": [
+                                {
+                                    "name": "group_id",
+                                    "description": "Group ID",
+                                    "type": {
+                                        "kind": "NON_NULL",
+                                        "name": null,
+                                        "ofType": {
+                                            "kind": "SCALAR",
+                                            "name": "String",
+                                            "ofType": null
+                                        }
+                                    },
+                                    "defaultValue": null
+                                }
+                            ],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "GroupNonPolymerEntity",
+                                "ofType": null
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -24020,7 +24319,7 @@
                         },
                         {
                             "name": "experimental_method",
-                            "description": "The category of experimental method(s) used to determine the structure entry.\n\nAllowable values:\nEM, Multiple methods, NMR, Neutron, Other, X-ray\n",
+                            "description": "The category of experimental method(s) used to determine the structure entry.\n\nAllowable values:\nEM, Integrative, Multiple methods, NMR, Neutron, Other, X-ray\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -24037,6 +24336,54 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "Int",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ihm_multi_scale_flag",
+                            "description": "Multi-scale modeling flag for integrative structures.\n\nAllowable values:\nN, Y\n",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ihm_multi_state_flag",
+                            "description": "Multi-state modeling flag for integrative structures.\n\nAllowable values:\nN, Y\n",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ihm_ordered_state_flag",
+                            "description": "Ordered-state modeling flag for integrative structures.\n\nAllowable values:\nN, Y\n",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "ihm_structure_description",
+                            "description": "Description of the integrative structure.",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
                                 "ofType": null
                             },
                             "isDeprecated": false,
@@ -24303,6 +24650,18 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "representative_model",
+                            "description": "The chosen representative model.",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "Int",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "resolution_combined",
                             "description": "Combined estimates of experimental resolution contributing to the refined structural model.\n Resolution reported in \"refine.ls_d_res_high\" is used for X-RAY DIFFRACTION, FIBER DIFFRACTION, \n POWDER DIFFRACTION, ELECTRON CRYSTALLOGRAPHY, and NEUTRON DIFFRACTION as identified in\n \"refine.pdbx_refine_id\". \n Resolution reported in \"em_3d_reconstruction.resolution\" is used for ELECTRON MICROSCOPY. \n The best value corresponding to \"em_3d_reconstruction.resolution_method\" == \"FSC 0.143 CUT-OFF\" \n is used, if available. If not, the best \"em_3d_reconstruction.resolution\" value is used. \n For structures that are not obtained from diffraction-based methods, the resolution values in \n \"refine.ls_d_res_high\" are ignored.\n Multiple values are reported only if multiple methods are used in the structure determination.",
                             "args": [],
@@ -24360,7 +24719,7 @@
                         },
                         {
                             "name": "structure_determination_methodology",
-                            "description": "Indicates if the structure was determined using experimental or computational methods.\n\nAllowable values:\ncomputational, experimental\n",
+                            "description": "Indicates if the structure was determined using experimental or computational methods.\n\nAllowable values:\ncomputational, experimental, integrative\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -24595,7 +24954,7 @@
                         },
                         {
                             "name": "type",
-                            "description": "Specifies the type of similarity criteria used to aggregate members into higher levels in the hierarchy\n\nAllowable values:\nsequence_identity, matching_uniprot_accession, matching_deposit_group_id\n",
+                            "description": "Specifies the type of similarity criteria used to aggregate members into higher levels in the hierarchy\n\nAllowable values:\nsequence_identity, matching_uniprot_accession, matching_deposit_group_id, matching_chemical_component_id\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -24736,7 +25095,7 @@
                         },
                         {
                             "name": "group_provenance_id",
-                            "description": "A unique group provenance identifier\n\nAllowable values:\nprovenance_sequence_identity, provenance_matching_uniprot_accession, provenance_matching_deposit_group_id\n",
+                            "description": "A unique group provenance identifier\n\nAllowable values:\nprovenance_sequence_identity, provenance_matching_uniprot_accession, provenance_matching_deposit_group_id, provenance_matching_chemical_component_id\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -24807,7 +25166,7 @@
                         },
                         {
                             "name": "group_members_granularity",
-                            "description": "Granularity of group members identifiers\n\nAllowable values:\nassembly, entry, polymer_entity, polymer_entity_instance\n",
+                            "description": "Granularity of group members identifiers\n\nAllowable values:\nassembly, entry, polymer_entity, non_polymer_entity, polymer_entity_instance\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -24846,7 +25205,7 @@
                     "fields": [
                         {
                             "name": "group_provenance_id",
-                            "description": "A unique group provenance identifier\n\nAllowable values:\nprovenance_sequence_identity, provenance_matching_uniprot_accession, provenance_matching_deposit_group_id\n",
+                            "description": "A unique group provenance identifier\n\nAllowable values:\nprovenance_sequence_identity, provenance_matching_uniprot_accession, provenance_matching_deposit_group_id, provenance_matching_chemical_component_id\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -24938,6 +25297,100 @@
                                 "kind": "SCALAR",
                                 "name": "Float",
                                 "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "RcsbIhmDatasetList",
+                    "description": "",
+                    "fields": [
+                        {
+                            "name": "count",
+                            "description": "Number of input datasets used in integrative modeling.",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "Int",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "name",
+                            "description": "Name of input dataset used in integrative modeling.\n\nAllowable values:\n2DEM class average, 3DEM volume, CX-MS data, Comparative model, Crosslinking-MS data, DNA footprinting data, De Novo model, EM raw micrographs, EPR data, Ensemble FRET data, Experimental model, H/D exchange data, Hydroxyl radical footprinting data, Integrative model, Mass Spectrometry data, Mutagenesis data, NMR data, Other, Predicted contacts, Quantitative measurements of genetic interactions, SAS data, Single molecule FRET data, X-ray diffraction data, Yeast two-hybrid screening data\n",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "type",
+                            "description": "Type of input dataset used in integrative modeling.\n\nAllowable values:\nComputed restraints, Experimental data, Other, Starting model\n",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "RcsbIhmDatasetSourceDbReference",
+                    "description": "",
+                    "fields": [
+                        {
+                            "name": "accession_code",
+                            "description": "Accession code for the input dataset.\n\nExamples:\n5FM1, EMD-2799, SASDA82, PXD003381, MA-CO2KC\n",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
+                            "name": "db_name",
+                            "description": "Name of the source database for the input dataset.\n\nAllowable values:\nAlphaFoldDB, BMRB, BMRbig, BioGRID, EMDB, EMPIAR, MASSIVE, ModelArchive, Other, PDB, PDB-Dev, PRIDE, ProXL, ProteomeXchange, SASBDB, iProX, jPOSTrepo\n",
+                            "args": [],
+                            "type": {
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -28354,7 +28807,7 @@
                         },
                         {
                             "name": "uniprot_ids",
-                            "description": null,
+                            "description": "Uniprot accession codes assigned to polymeric entities.",
                             "args": [],
                             "type": {
                                 "kind": "LIST",
@@ -35998,6 +36451,18 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "isOneOf",
+                            "description": "This field is considered experimental because it has not yet been ratified in the graphql specification",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "Boolean",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "specifiedByURL",
                             "description": null,
                             "args": [],
@@ -36182,6 +36647,14 @@
                             "defaultValue": null
                         }
                     ]
+                },
+                {
+                    "name": "oneOf",
+                    "description": "Indicates an Input Object is a OneOf Input Object.",
+                    "locations": [
+                        "INPUT_OBJECT"
+                    ],
+                    "args": []
                 }
             ]
         }
