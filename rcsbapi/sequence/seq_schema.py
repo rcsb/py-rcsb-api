@@ -15,7 +15,7 @@ class SeqSchema(GQLSchema):
         super().__init__(
             endpoint=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
             timeout=config.API_TIMEOUT,
-            fallback_file="seq_api_schema.json",
+            fallback_file=const.SEQUENCE_API_SCHEMA_FILENAME,
             weigh_nodes=[]
         )
 
@@ -113,4 +113,4 @@ class SeqSchema(GQLSchema):
         Returns:
             Dict[str, Any]: JSON schema for Sequence Coordinates
         """
-        return super()._abstract_fetch_schema("seq_api_schema.json")
+        return super()._abstract_fetch_schema(const.SEQUENCE_API_SCHEMA_FILENAME)

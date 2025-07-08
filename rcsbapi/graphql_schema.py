@@ -931,10 +931,13 @@ class GQLSchema(ABC):
 
         # Build query body
         start_idx = self._root_to_idx[query_type]
+
+        # Add "rcsb_id" field to query
         added_rcsb_id: bool = False
         if (add_rcsb_id is True) and (f"{query_type}.rcsb_id" not in return_data_list) and ("rcsb_id" not in return_data_list):
             return_data_list.insert(0, f"{query_type}.rcsb_id")
             added_rcsb_id = True
+
         return_data_path_dict: Dict[int, list[int]] = self._return_fields_to_paths(
             start_idx=start_idx,
             query_type=query_type,

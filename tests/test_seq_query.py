@@ -42,7 +42,7 @@ class SeqTests(unittest.TestCase):
                             field="TYPE",
                             operation="EQUALS",
                             values=["BINDING_SITE"],
-                            source="UNIPROT"
+                            source="PDB_INSTANCE"
                         )
                     ],
                     return_data_list=["features.description"]
@@ -142,7 +142,7 @@ class SeqTests(unittest.TestCase):
                             field="TYPE",
                             operation="EQUALS",
                             values=["BINDING_SITE"],
-                            source="UNIPROT"
+                            source="PDB_INSTANCE"
                         )
                     ],
                     return_data_list=["features.name", "features.feature_positions", "target_id"],
@@ -174,7 +174,7 @@ class SeqTests(unittest.TestCase):
                             field="TYPE",
                             operation="EQUALS",
                             values=["BINDING_SITE"],
-                            source="UNIPROT"
+                            source="PDB_INSTANCE"
                         )
                     ],
                     return_data_list=["target_id", "features.type"]

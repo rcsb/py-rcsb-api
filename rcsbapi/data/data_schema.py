@@ -18,7 +18,7 @@ class DataSchema(GQLSchema):
         super().__init__(
             endpoint=const.DATA_API_ENDPOINT,
             timeout=config.API_TIMEOUT,
-            fallback_file="data_api_schema.json",
+            fallback_file=const.DATA_API_SCHEMA_FILENAME,
             # remove paths containing "assemblies" if there are shorter or equal length paths available.
             weigh_nodes=["assemblies"]
         )
@@ -201,4 +201,4 @@ class DataSchema(GQLSchema):
         Returns:
             Dict[str, Any]: JSON schema for Data API
         """
-        return super()._abstract_fetch_schema("data_api_schema.json")
+        return super()._abstract_fetch_schema(const.DATA_API_SCHEMA_FILENAME)
