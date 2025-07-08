@@ -1,8 +1,21 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
+import requests
+
+JSON_MODELSERVER_URL = "https://models.rcsb.org/openapi.json"
 
 
-class ModelServerSchema:
-    def __init__(self, attr_data: Dict):
+class ModelSchema:
+    def __init__(self, attr_data: Optional[Dict] = None, url: Optional[str] = None):
+        """
+        Initialize ModelSchema.
+        """
+        try:
+            response = requests.get(JSON_MODELSERVER_URL)
+            response.raise_for_status()
+            attr_data = response.json()
+        except requests.RequestException as e:
+            raise RuntimeError(f"Failed to fetch schema from {url}: {e}")
+
         self.Attr = attr_data
         self.paths = attr_data.get("paths", {})
         self.components = attr_data.get("components", {}).get("parameters", {})
@@ -21,10 +34,10 @@ class ModelServerSchema:
             param = self.resolve_parameter(param)
             result.append({
                 "name": param.get("name"),
-                "in": param.get("in"),
-                "required": param.get("required", False),
+                # "in": param.get("in"),
+                # "required": param.get("required", False),
                 "type": param.get("schema", {}).get("type"),
-                "enum": param.get("schema", {}).get("enum"),
+                # "enum": param.get("schema", {}).get("enum"),
                 "default": param.get("schema", {}).get("default"),
                 # "description": param.get("description", "")
             })
@@ -35,7 +48,7 @@ class ModelServerSchema:
 
         internal_schema = {}
         for path, methods in self.paths.items():
-            post_method = methods.get("post")
+            post_method = methods.get("get")
             entry = {
                 # "summary": post_method.get("summary", ""),
                 "operation_id": post_method.get("operationId"),
@@ -53,3 +66,34 @@ class ModelServerSchema:
             internal_schema[path] = entry
 
         return internal_schema
+
+    def get_param_dict(self) -> Dict[str, List[str]]:
+        """
+        Return a dictionary mapping query types to a list of attribute names used as parameters.
+        """
+        query_map = {}
+        for path, method_data in self.to_internal_schema().items():
+            op_id = method_data.get("operation_id", path)
+            param_names = [param["name"] for param in method_data["parameters"] if param.get("name")]
+            query_map[op_id] = param_names
+        return query_map
+
+
+# if __name__ == "__main__": 
+#     # Instantiate the ModelServerSchema class
+#     schema_data = {}
+#     try:
+#         schema = ModelSchema(schema_data)
+
+#         # Fetch the parameter dictionary which maps query types to their attributes
+#         param_dict = schema.get_param_dict()
+
+#         print(param_dict)
+
+#         # # Print out the query type and its corresponding attributes
+#         # for query_type, attributes in param_dict.items():
+#         #     print(f"\nQuery Type: {query_type}")
+#         #     for attr in attributes:
+#         #         print(f"  - {attr}")
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
