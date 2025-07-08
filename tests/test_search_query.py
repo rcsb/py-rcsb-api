@@ -437,11 +437,15 @@ class SearchTests(unittest.TestCase):
 
             query = q1 & q2 & q3 & q4
             grouped = group(q1 & q2) & q3 & q4
+            nested_grouped = NestedAttributeQuery(q1, q2) & q3 & q4
 
             len_query = len(list(query()))
             len_grouped = len(list(grouped()))
+            len_nested_grouped = len(list(nested_grouped()))
 
             self.assertNotEqual(len_query, len_grouped)
+            self.assertNotEqual(len_query, len_nested_grouped)
+            self.assertEqual(len_grouped, len_nested_grouped)
 
         with self.subTest("5. Check `and` groups are formed correctly"):
             q1 = TextQuery("interleukin")

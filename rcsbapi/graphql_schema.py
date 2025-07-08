@@ -8,6 +8,7 @@ from pathlib import Path
 import requests
 from graphql import build_client_schema
 import rustworkx as rx
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +188,12 @@ class GQLSchema(ABC):
         { name description type{ kind ofType{ name kind ofType{ inputFields {name type { kind ofType { name kind ofType { ofType { kind name ofType {kind name}} } } } }
         kind name ofType{name kind} } } } } } } } }"""
         }
-        response = requests.post(headers={"Content-Type": "application/json"}, json=root_query, url=self.pdb_url, timeout=self.timeout)
+        response = requests.post(
+            headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+            json=root_query,
+            url=self.pdb_url,
+            timeout=self.timeout
+        )
         return dict(response.json())
 
     def _construct_root_dict(self) -> dict[str, list[dict[str, Any]]]:
@@ -238,7 +244,12 @@ class GQLSchema(ABC):
         Returns:
             Dict: JSON response of introspection request
         """
-        schema_response = requests.post(headers={"Content-Type": "application/json"}, json=self.introspection_query, url=self.pdb_url, timeout=self.timeout)
+        schema_response = requests.post(
+            headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+            json=self.introspection_query,
+            url=self.pdb_url,
+            timeout=self.timeout
+        )
         if schema_response.status_code == 200:
             return dict(schema_response.json())
         # logger.info("Loading data schema from file")

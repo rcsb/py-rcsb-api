@@ -92,7 +92,8 @@ class SeqQuery(ABC):
         response_json = requests.post(
             json=dict(self._query),
             url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
-            timeout=config.API_TIMEOUT
+            timeout=config.API_TIMEOUT,
+            headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT}
         ).json()
         self._parse_gql_error(response_json)
         return dict(response_json)

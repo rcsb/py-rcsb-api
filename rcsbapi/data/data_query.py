@@ -183,7 +183,7 @@ class DataQuery:
         for id_batch in batched_ids:
             query_body = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query["query"])
             part_response = requests.post(
-                headers={"Content-Type": "application/json"},
+                headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
                 json={"query": query_body},
                 url=const.DATA_API_ENDPOINT,
                 timeout=config.API_TIMEOUT
@@ -270,7 +270,7 @@ class AllStructures:
         for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
             all_ids: List[str] = []
             for endpoint in endpoints:
-                response = requests.get(endpoint, timeout=60)
+                response = requests.get(endpoint, timeout=60, headers={"User-Agent": const.USER_AGENT})
                 if response.status_code == 200:
                     all_ids.extend(json.loads(response.text))
                 else:

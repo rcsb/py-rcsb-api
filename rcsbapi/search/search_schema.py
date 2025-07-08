@@ -214,7 +214,7 @@ class SearchSchema:
     def _fetch_schema(self, url: str):
         "Request the current schema from the web"
         logger.info("Requesting %s", url)
-        response = requests.get(url, timeout=None)
+        response = requests.get(url, timeout=None, headers={"User-Agent": const.USER_AGENT})
         if response.status_code == 200:
             return response.json()
         else:

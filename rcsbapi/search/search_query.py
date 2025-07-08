@@ -1889,7 +1889,7 @@ class Session(Iterable[str]):
         "Fires a single query"
         params = self._make_params(start)
         logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.post(self.url, json=params, timeout=config.API_TIMEOUT)
+        response = requests.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
             return response.json()

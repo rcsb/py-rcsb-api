@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import List
+from rcsbapi import __version__
 
 
 @dataclass(frozen=True)
@@ -106,6 +107,10 @@ class Const:
         "entries": ["https://data.rcsb.org/rest/v1/holdings/current/entry_ids"],
         "chem_comps": ["https://data.rcsb.org/rest/v1/holdings/current/ccd_ids", "https://data.rcsb.org/rest/v1/holdings/current/prd_ids"]
     }))
+
+    USER_AGENT: str = (
+        f"py-rcsb-api/{__version__} (+https://github.com/rcsb/py-rcsb-api)"
+    )
 
 
 const = Const()

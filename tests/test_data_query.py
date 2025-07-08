@@ -17,6 +17,7 @@ import unittest
 import requests
 
 from rcsbapi.search import search_attributes as attrs
+from rcsbapi.search import NestedAttributeQuery, AttributeQuery
 from rcsbapi.data import DataSchema, DataQuery
 from rcsbapi.config import config
 from rcsbapi.const import const
@@ -382,10 +383,16 @@ class QueryTests(unittest.TestCase):
             # search API query and request
             try:
                 q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "COVID-19 virus"
-                q2 = attrs.rcsb_nonpolymer_entity_annotation.type == "SUBJECT_OF_INVESTIGATION"
+                q2a = attrs.rcsb_nonpolymer_entity_annotation.type == "SUBJECT_OF_INVESTIGATION"
+                q2b = AttributeQuery(
+                    attribute="rcsb_nonpolymer_entity_annotation.comp_id",
+                    operator="exists",
+                )
                 q3 = attrs.rcsb_polymer_entity_feature_summary.type == "modified_monomer"
-                query = q1 & q2 & q3
-                result_list = query()
+                q4 = attrs.rcsb_polymer_entity_feature_summary.count > 1
+                query = q1 & NestedAttributeQuery(q2a, q2b) & NestedAttributeQuery(q3, q4)
+                result_list = list(query())
+                logger.info("Result list len (%r)", len(result_list))
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             self.assertGreaterEqual(len(list(result_list)), 10)
