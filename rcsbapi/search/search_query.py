@@ -29,9 +29,9 @@ from typing import (
 )
 
 import requests
-from ..const import const
-from ..config import config
-from .search_schema import SearchSchema
+from rcsbapi.const import const
+from rcsbapi.config import config
+from rcsbapi.search.search_schema import SearchSchema
 
 if sys.version_info > (3, 8):
     from typing import Literal

@@ -7,8 +7,8 @@ import json
 import requests
 from tqdm import tqdm
 from rcsbapi.data import DATA_SCHEMA
-from ..config import config
-from ..const import const
+from rcsbapi.config import config
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 

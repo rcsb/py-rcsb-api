@@ -7,7 +7,6 @@ __version__ = "1.1.3"
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)
 
 import logging
-from . import graphql_schema  # noqa F401
 
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 logger = logging.getLogger()

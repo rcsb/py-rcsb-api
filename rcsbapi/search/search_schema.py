@@ -10,7 +10,7 @@ import re
 import warnings
 from typing import List, Dict, Union
 import requests
-from ..const import const
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 
