@@ -116,17 +116,20 @@ class SeqQuery(ABC):
 @dataclass(frozen=True)
 class Alignments(SeqQuery):
     """
-    Get sequence alignments
+    Get sequence alignments.
 
+    Args:
         db_from (str): From which query sequence database
         db_to (str): To which query sequence database
         query_id (str): Sequence identifier specified in `db_from`
         return_data_list (List[str]): Fields to request data for
         range (Optional, List[]): Optional integer list to filter annotations that fall in a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
-        _query (MappingProxyType): Attribute for storing GraphQL query
         data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
             The key must match fields in `return_data_list`. Values currently include "offset" and "first"
+
+    Attrs:
+        _query (MappingProxyType): Attribute for storing GraphQL query
     """
     db_from: str
     db_to: str
@@ -148,8 +151,9 @@ class Alignments(SeqQuery):
 @dataclass(frozen=True)
 class Annotations(SeqQuery):
     """
-    Get sequence annotations
+    Get sequence annotations.
 
+    Args:
         query_id (str): Database sequence identifier
         sources (List[str]): List defining the annotation collections to be requested
         reference (SequenceReference): Query sequence database
@@ -157,6 +161,8 @@ class Annotations(SeqQuery):
         filters (list["AnnotationFilterInput"], optional): Select what annotations will be retrieved
         range: (List[int], optional): Optional integer list to filter annotations to a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
+
+    Attrs:
         _query (MappingProxyType): Attribute for storing GraphQL query
     """
     query_id: str
@@ -181,13 +187,16 @@ class GroupAlignments(SeqQuery):
     """
     Get alignments for structures in groups
 
+    Args:
         group_id (str): Database sequence identifier for group
         return_data_list (list[str]): Requested data fields
         filter (list[str], optional): Optional string list of allowed identifiers for group members
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
-        _query (MappingProxyType): Attribute for storing GraphQL query
         data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
             The key must match fields in `return_data_list`. Values currently include "offset" and "first"
+
+    Attrs:
+        _query (MappingProxyType): Attribute for storing GraphQL query
     """
     group: str
     group_id: str
@@ -208,14 +217,17 @@ class GroupAlignments(SeqQuery):
 @dataclass(frozen=True)
 class GroupAnnotations(SeqQuery):
     """
-    Get annotations for structures in groups
+    Get annotations for sequences in groups.
 
+    Args:
         group (GroupReference): Query sequence database
         group_id (str): Database sequence identifier for group
         sources (list[AnnotationReference]): List defining the annotation collections to be requested
         return_data_list (list[str]): Requested data fields
         filters (list[AnnotationFilterInput]): Optional annotation filter by type or target identifier
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
+
+    Attrs:
         _query (MappingProxyType): Attribute for storing GraphQL query
     """
     group: str
@@ -237,14 +249,17 @@ class GroupAnnotations(SeqQuery):
 @dataclass(frozen=True)
 class GroupAnnotationsSummary(SeqQuery):
     """
-    Get a positional summary of group annotations
+    Get a summary of positional annotations for a group of sequences.
 
+    Args:
         group (GroupReference): Query sequence database
         group_id (str): Database sequence identifier for group
         sources (list[AnnotationReference]): List defining the annotation collections to be requested
         return_data_list (list[str]): Request data fields
         filters (list[AnnotationFilterInput], optional): Optional annotation filter by type or target identifier
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
+
+    Attrs:
         _query (MappingProxyType): Attribute for storing GraphQL query
     """
     group: str
@@ -265,7 +280,7 @@ class GroupAnnotationsSummary(SeqQuery):
 
 class AnnotationFilterInput:
     """
-    filter used to select which annotations will be retrieved
+    Filter used to select which annotations will be retrieved.
     """
 
     def __init__(

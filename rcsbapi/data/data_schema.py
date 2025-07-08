@@ -40,6 +40,8 @@ class DataSchema(GQLSchema):
             return_data_list (List[str]): requested data, can be field name(s) or dot-separated field names
                 ex: "cluster_id" or "exptl.method"
             add_rcsb_id (bool): automatically request rcsb_id at the top of the query. Default is True.
+            suppress_autocomplete_warning (bool, optional): Whether to suppress warning when
+                autocompletion of paths is used. Defaults to False.
 
         Returns:
             Dict[str, Any]: dictionary of format - {"query": <query in GraphQL syntax>}
@@ -65,12 +67,12 @@ class DataSchema(GQLSchema):
         # Validate query_args, throw ValueError if there's a problem
         self._check_input_ids(query_args=query_args, input_type=input_type)
         self._check_typing(query_type=input_type, enum_types=DataAPIEnums, args=query_args)
-
         return self._construct_query_rustworkx(
             query_type=input_type,
             query_args=query_args,
             return_data_list=return_data_list,
-            suppress_autocomplete_warning=suppress_autocomplete_warning
+            add_rcsb_id=add_rcsb_id,
+            suppress_autocomplete_warning=suppress_autocomplete_warning,
         )
 
     def _construct_query_args(self, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]], input_type: str) -> Union[Dict[str, str], Dict[str, List[str]]]:
@@ -151,9 +153,16 @@ class DataSchema(GQLSchema):
         query_type: str,
         query_args: Dict[str, Any],
         return_data_list: List[str],
+        add_rcsb_id: bool = True,
         suppress_autocomplete_warning: bool = False
     ) -> Dict[str, Any]:
-        return super()._construct_query_rustworkx(query_type, query_args, return_data_list, suppress_autocomplete_warning)
+        return super()._construct_query_rustworkx(
+            query_type=query_type,
+            query_args=query_args,
+            return_data_list=return_data_list,
+            add_rcsb_id=add_rcsb_id,
+            suppress_autocomplete_warning=suppress_autocomplete_warning,
+        )
 
     def _check_input_ids(self, query_args: Dict[str, Any], input_type: str) -> None:
         arg_dict_list = self._root_dict[input_type]

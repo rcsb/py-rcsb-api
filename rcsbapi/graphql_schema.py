@@ -3,10 +3,13 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Dict, List, Tuple, Any
 import json
+import logging
 from pathlib import Path
 import requests
 from graphql import build_client_schema
 import rustworkx as rx
+
+logger = logging.getLogger(__name__)
 
 
 class SchemaEnum(Enum):
@@ -462,6 +465,8 @@ class GQLSchema(ABC):
         start_idx: int,
         query_type: str,
         return_data_list: List[str],
+        added_rcsb_id: bool,
+        suppress_autocomplete_warning: bool,
     ) -> dict[int, list[int]]:
         """Find matching index path for each return field. Raise error if not specific enough.
 
@@ -532,7 +537,7 @@ class GQLSchema(ABC):
                     raise ValueError(error_msg)
 
                 error_msg = (
-                    f'Given path  "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
+                    f'Given path "{field}" not specific enough. Use one or more of these paths in return_data_list argument:\n\n'
                     f"{len_path} of {len(matching_paths)} possible paths:\n"
                     f"{path_choice_msg}"
                 )
@@ -559,6 +564,31 @@ class GQLSchema(ABC):
             final_idx: int = idx_paths[0][-1]
             shortest_path: List[int] = idx_paths[0][1:]
             return_data_paths[final_idx] = shortest_path
+
+        if (complete_path != len(return_data_list)) and (suppress_autocomplete_warning is False):
+            info_list = []
+            for path in return_data_paths.values():
+                # PREVIOUSLY:
+                # assert len(path) == 1
+                # info_list.append(".".join(self._idx_path_to_name_path(path[0][1:])))
+                info_list.append(".".join(self._idx_path_to_name_path(path)))
+            if (added_rcsb_id is True) and ("rcsb_id" in info_list):
+                info_list.remove("rcsb_id")
+
+            path_msg = "".join(f'\n        "{item}",' for item in info_list)
+            logger.warning(
+                "\n"
+                "Some paths are being autocompleted based on the current API. If this code is meant for long-term use, use the set of fully qualified paths below:\n"
+                "    ["
+                "%s\n"
+                "    ]", path_msg
+            )
+
+        # NOTE: Keep? (Added back in from previous code before consolidating GraphQL methods)
+        for return_data in return_data_list:
+            if any(not value for value in return_data_paths.values()):
+                raise ValueError(f'You can\'t access "{return_data}" from input type {query_type}')
+
         return return_data_paths
 
     def _weigh_node(self, paths: List[List[int]], node_idxs: List[int]) -> List[List[int]]:
@@ -877,14 +907,16 @@ class GQLSchema(ABC):
         query_type: str,
         query_args: Dict[str, str] | dict[str, list[Any]],
         return_data_list: List[str],
+        add_rcsb_id: bool = False,
         suppress_autocomplete_warning: bool = False,
     ) -> dict[str, Any]:
         """Construct a GraphQL query as a dict. This function signature is enforced.
 
         Args:
-            query_type (str): type of query to make (ex: Alignments, Annotations, etc)
+            query_type (str): type of query to make (ex: "entries", "alignments", "annotations", etc.)
             query_args (dict[str, str] | dict[str, list[Any]]): dict of query_type-specific args
             return_data_list (list[str]): list of fields to request
+            add_rcsb_id (bool): automatically request rcsb_id at the top of the query (for Data API only). Default is False.
             suppress_autocomplete_warning (bool, optional): Whether to suppress warning when
                 autocompletion of paths is used. Defaults to False.
 
@@ -899,7 +931,17 @@ class GQLSchema(ABC):
 
         # Build query body
         start_idx = self._root_to_idx[query_type]
-        return_data_path_dict: Dict[int, list[int]] = self._return_fields_to_paths(start_idx, query_type, return_data_list)
+        added_rcsb_id: bool = False
+        if (add_rcsb_id is True) and (f"{query_type}.rcsb_id" not in return_data_list) and ("rcsb_id" not in return_data_list):
+            return_data_list.insert(0, f"{query_type}.rcsb_id")
+            added_rcsb_id = True
+        return_data_path_dict: Dict[int, list[int]] = self._return_fields_to_paths(
+            start_idx=start_idx,
+            query_type=query_type,
+            return_data_list=return_data_list,
+            added_rcsb_id=added_rcsb_id,
+            suppress_autocomplete_warning=suppress_autocomplete_warning,
+        )
         # return_data_query_list is a list of queries, each one corresponding to one field in return_data_list
         return_data_query_list: List[dict[int, Any] | List[int] | List[dict[int, Any] | int]] = []
         for return_field_idx, path in return_data_path_dict.items():
@@ -923,7 +965,6 @@ class GQLSchema(ABC):
         Returns:
             list[dict[int, Any] | int]: List of indices and index dicts representing the merged query
         """
-        # print(f"query_list: {query_list}")
         if isinstance(query_list[0], list):
             result: List[dict[int, Any] | List[int]] | List[int] = query_list[0]
         result = [query_list[0]]
@@ -941,13 +982,10 @@ class GQLSchema(ABC):
                 if len(merged_query) < (path_len + result_path_len):
                     result.pop(i)
                     result.extend(merged_query)
-                    # print(f"merging: {path} and {result_path}")
                     break
             if len(merged_query) == (path_len + result_path_len):
                 result.append(path)
-            # print(f"result: {result}")
 
-        # print(f"FINAL: {result}")
         return result
 
     def _merge_queries(
