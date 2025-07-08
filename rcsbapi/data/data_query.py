@@ -7,8 +7,8 @@ import json
 import requests
 from tqdm import tqdm
 from rcsbapi.data import DATA_SCHEMA
-from ..config import config
-from ..const import const
+from rcsbapi.config import config
+from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class DataQuery:
     def __init__(
         self,
         input_type: str,
-        input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]],
+        input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]], List[int]],
         return_data_list: List[str],
         add_rcsb_id: bool = True,
         suppress_autocomplete_warning: bool = False
@@ -50,7 +50,7 @@ class DataQuery:
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
-        self._query = DATA_SCHEMA.construct_query(
+        self._query: Dict[str, Any] = DATA_SCHEMA.construct_query(
             input_type=self._input_type,
             input_ids=self._input_ids,
             return_data_list=return_data_list,
@@ -81,7 +81,7 @@ class DataQuery:
 
         # Convert _input_type to plural if applicable
         converted = False
-        if DATA_SCHEMA._root_dict[input_type][0]["kind"] != "LIST":
+        if DATA_SCHEMA._root_dict[input_type][0]["ofKind"] != "LIST":
             plural_type = const.SINGULAR_TO_PLURAL[input_type]
             if plural_type:
                 input_type = plural_type
@@ -106,8 +106,9 @@ class DataQuery:
                 # If not converted, retrieve id list from dictionary
                 input_ids = list(input_ids[DATA_SCHEMA._root_dict[input_type][0]["name"]])
 
-        # Make all input_ids uppercase
-        input_ids = [id.upper() for id in input_ids]
+        # Make all input_ids uppercase if applicable
+        if isinstance(input_ids[0], str):
+            input_ids = [id.upper() for id in input_ids]
 
         assert isinstance(input_ids, list)
         return (input_type, input_ids)
@@ -144,7 +145,8 @@ class DataQuery:
         Returns:
             str: query in GraphQL syntax
         """
-        return self._query
+        assert isinstance(self._query["query"], str)
+        return self._query["query"]
 
     def get_response(self) -> Union[None, Dict[str, Any]]:
         """get JSON response to executed query
@@ -161,7 +163,7 @@ class DataQuery:
             str: GraphiQL url
         """
         editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
-        return editor_base_link + urllib.parse.quote(self._query)
+        return str(editor_base_link + urllib.parse.quote(str(self._query["query"])))
 
     def exec(self, batch_size: int = 5000, progress_bar: bool = False) -> Dict[str, Any]:
         """POST a GraphQL query and get response
@@ -179,10 +181,10 @@ class DataQuery:
             batched_ids = tqdm(batched_ids)
 
         for id_batch in batched_ids:
-            query = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query)
+            query_body = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query["query"])
             part_response = requests.post(
-                headers={"Content-Type": "application/graphql"},
-                data=query,
+                headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+                json={"query": query_body},
                 url=const.DATA_API_ENDPOINT,
                 timeout=config.API_TIMEOUT
             ).json()
@@ -203,15 +205,15 @@ class DataQuery:
         self._response = response_json
         return response_json
 
-    def _parse_gql_error(self, response_json: Dict[str, Any]):
+    def _parse_gql_error(self, response_json: Dict[str, Any]) -> None:
         if "errors" in response_json.keys():
-            error_msg_list: list[str] = []
+            error_msg_list: List[str] = []
             for error_dict in response_json["errors"]:
                 error_msg_list.append(error_dict["message"])
                 combined_error_msg: str = ""
                 for i, error_msg in enumerate(error_msg_list):
                     combined_error_msg += f"{i+1}. {error_msg}\n"
-                raise ValueError(f"{combined_error_msg}. Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
+                raise ValueError(f"{combined_error_msg}.\n\nRun <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
     def _batch_ids(self, batch_size: int) -> List[List[str]]:  # assumes that plural types have only one arg, which is true right now
         """split queries with large numbers of input_ids into smaller batches
@@ -235,7 +237,7 @@ class DataQuery:
                 batched_ids.append(batch_list)
         return batched_ids
 
-    def _merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]):
+    def _merge_response(self, merge_into_response: Dict[str, Any], to_merge_response: Dict[str, Any]) -> Dict[str, Any]:
         """merge two JSON responses. Used after batching ids to merge responses from each batch.
 
         Args:
@@ -268,7 +270,7 @@ class AllStructures:
         for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
             all_ids: List[str] = []
             for endpoint in endpoints:
-                response = requests.get(endpoint, timeout=60)
+                response = requests.get(endpoint, timeout=60, headers={"User-Agent": const.USER_AGENT})
                 if response.status_code == 200:
                     all_ids.extend(json.loads(response.text))
                 else:

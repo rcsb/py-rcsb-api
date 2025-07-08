@@ -181,9 +181,7 @@ q3 = AttributeQuery(
 )
 
 # Group nested attributes using `NestedAttributeQuery`
-nestedQuery = NestedAttributeQuery(q1, q2)
-
-query = nestedQuery & q3
+query = NestedAttributeQuery(q1, q2) & q3
 
 list(query())
 ```
@@ -240,26 +238,28 @@ from rcsbapi.search import AttributeQuery
 from rcsbapi.search import group
 
 q1 = AttributeQuery(
-    attribute="rcsb_chem_comp_related.resource_name",
+    attribute="exptl.method",
     operator="exact_match",
-    value="DrugBank"
+    value="electron microscopy"
 )
 
 q2 = AttributeQuery(
-    attribute="rcsb_chem_comp_related.resource_accession_code",
+    attribute="rcsb_id",
     operator="exact_match",
-    value="DB01050"
+    value="ATP",
+    service="text_chem"
 )
 
 q3 = AttributeQuery(
     attribute="rcsb_entity_source_organism.scientific_name",
     operator="exact_match",
-    value="Homo sapiens"
+    value="Escherichia coli"
 )
 
 # Using `group` ensures that `resource_name` and `accession_code` attributes are searched together
 query = group(q1 & q2) & q3
-list(query())
+print(list(query()))
+print(query().get_editor_link())
 ```
 
 

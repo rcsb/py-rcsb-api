@@ -29,9 +29,9 @@ from typing import (
 )
 
 import requests
-from ..const import const
-from ..config import config
-from .search_schema import SearchSchema
+from rcsbapi.const import const
+from rcsbapi.config import config
+from rcsbapi.search.search_schema import SearchSchema
 
 if sys.version_info > (3, 8):
     from typing import Literal
@@ -1566,7 +1566,7 @@ class Sort(RequestOption):
     direction: Optional[str] = None
     filter: Optional[Union[GroupFilter, TerminalFilter]] = None
 
-    def to_dict(self) -> Dict:  # pylint: disable=useless-parent-delegation
+    def to_dict(self) -> Dict:
         return super().to_dict()
 
 
@@ -1584,7 +1584,7 @@ class GroupBy(RequestOption):
     similarity_cutoff: Optional[int] = None
     ranking_criteria_type: Optional[RankingCriteriaType] = None
 
-    def to_dict(self,) -> Dict:  # pylint: disable=useless-parent-delegation
+    def to_dict(self,) -> Dict:
         return super().to_dict()
 
 
@@ -1889,7 +1889,7 @@ class Session(Iterable[str]):
         "Fires a single query"
         params = self._make_params(start)
         logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.post(self.url, json=params, timeout=config.API_TIMEOUT)
+        response = requests.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
         response.raise_for_status()
         if response.status_code == requests.codes.ok:
             return response.json()
