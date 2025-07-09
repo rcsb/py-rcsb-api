@@ -1,7 +1,8 @@
 from typing import Dict, List, Any, Optional, Union
 from types import MappingProxyType
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, fields, field
+from dataclasses import dataclass, fields
+from dataclasses import field as dcfield
 import urllib.parse
 import requests
 
@@ -138,8 +139,8 @@ class Alignments(SeqQuery):
     return_data_list: List[str]
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
     data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
+    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -173,7 +174,7 @@ class Annotations(SeqQuery):
     filters: Optional[list["AnnotationFilterInput"]] = None
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -204,8 +205,8 @@ class GroupAlignments(SeqQuery):
     return_data_list: List[str]
     filter: Optional[list[str]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
     data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
+    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -237,7 +238,7 @@ class GroupAnnotations(SeqQuery):
     return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -269,7 +270,7 @@ class GroupAnnotationsSummary(SeqQuery):
     return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = field(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
