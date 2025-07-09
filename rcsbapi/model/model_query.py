@@ -24,7 +24,7 @@ class ModelQuery:
         # This builds a map like {"full": ["encoding", ...], "ligand": [...], ...}
         self.full_param_map = self.schema.get_param_dict()
 
-    def _exec(self, type: str, entry_id: str, **params):
+    def _exec(self, type: str, entry_id: str, **kwargs):
         """
         Execute the API call based on the type and parameters.
         """
@@ -32,12 +32,24 @@ class ModelQuery:
         url = f"{self.base_url}/{entry_id}/{endpoint}"
 
         # Prepare the query parameters
-        query_params = {key: value for key, value in params.items() if value is not None}
+        query_params = {key: value for key, value in kwargs.items() if value is not None}
 
         try:
-            response = requests.post(url, json=query_params)  # POST request with JSON payload
+            response = requests.get(url, json=query_params)  # POST request with JSON payload
             response.raise_for_status()  # Raise an error for bad responses (4xx, 5xx)
-            return response.text
+
+            # if ('filename' and 'file_directory' in kwargs):
+            #     return
+
+            # elif ('download' and 'filename' in kwargs):
+            #     return
+
+            if 'download' in kwargs:
+                with open("response_content.txt", "w") as file:
+                    file.write(response.text)
+
+            else:
+                return response.text
 
         except requests.exceptions.RequestException as e:
             print(f"Request failed: {e}")
@@ -73,10 +85,8 @@ class ModelQuery:
             transform: Optional[str] = None,
             download: Optional[bool] = False,
             filename: Optional[str] = "",
+            file_directory: Optional[str] = None,
             ):
-        """
-        Get the full structure from the ModelServer.
-        """
         return self._exec(
             type="full",
             entry_id=entry_id,
@@ -86,7 +96,8 @@ class ModelQuery:
             data_source=data_source,
             transform=transform,
             download=download,
-            filename=filename
+            filename=filename,
+            file_directory=file_directory,
         )
 
     def get_ligand(
@@ -110,6 +121,7 @@ class ModelQuery:
             transform: Optional[str] = None,
             download: Optional[bool] = False,
             filename: Optional[str] = "",
+            file_directory: Optional[str] = None,
             ):
 
         return self._exec(
@@ -132,5 +144,253 @@ class ModelQuery:
             data_source=data_source,
             transform=transform,
             download=download,
-            filename=filename
+            filename=filename,
+            file_directory=file_directory,
         )
+
+    # def get_atoms(
+    #         self,
+    #         entry_id: str,
+    #         label_entity_id: Optional[str] = None,
+    #         label_asym_id: Optional[str] = None,
+    #         auth_asym_id: Optional[str] = None,
+    #         label_comp_id: Optional[str] = None,
+    #         auth_comp_id: Optional[str] = None,
+    #         label_seq_id: Optional[int] = None,
+    #         auth_seq_id: Optional[int] = None,
+    #         pdbx_PDB_ins_code: Optional[str] = None,
+    #         label_atom_id: Optional[str] = None,
+    #         auth_atom_id: Optional[str] = None,
+    #         type_symbol: Optional[str] = None,
+    #         model_nums: Optional[str] = None,
+    #         encoding: Optional[str] = "cif",
+    #         copy_all_categories: Optional[bool] = False,
+    #         data_source: Optional[str] = "",
+    #         transform: Optional[str] = None,
+    #         download: Optional[bool] = False,
+    #         filename: Optional[str] = "",
+    #         ):
+
+    #     return self._exec(
+    #         type="atoms",
+    #         entry_id=entry_id,
+    #         label_entity_id=label_entity_id,
+    #         label_asym_id=label_asym_id,
+    #         auth_asym_id=auth_asym_id,
+    #         label_comp_id=label_comp_id,
+    #         auth_comp_id=auth_comp_id,
+    #         label_seq_id=label_seq_id,
+    #         auth_seq_id=auth_seq_id,
+    #         pdbx_PDB_ins_code=pdbx_PDB_ins_code,
+    #         label_atom_id=label_atom_id,
+    #         auth_atom_id=auth_atom_id,
+    #         type_symbol=type_symbol,
+    #         model_nums=model_nums,
+    #         encoding=encoding,
+    #         copy_all_categories=copy_all_categories,
+    #         data_source=data_source,
+    #         transform=transform,
+    #         download=download,
+    #         filename=filename
+    #     )
+
+    # def get_residue_interaction(
+    #         self,
+    #         entry_id: str,
+    #         label_entity_id: Optional[str] = None,
+    #         label_asym_id: Optional[str] = None,
+    #         auth_asym_id: Optional[str] = None,
+    #         label_comp_id: Optional[str] = None,
+    #         auth_comp_id: Optional[str] = None,
+    #         label_seq_id: Optional[int] = None,
+    #         auth_seq_id: Optional[int] = None,
+    #         pdbx_PDB_ins_code: Optional[str] = None,
+    #         label_atom_id: Optional[str] = None,
+    #         auth_atom_id: Optional[str] = None,
+    #         type_symbol: Optional[str] = None,
+    #         radius: Optional[float] = 5.0,
+    #         assembly_name: Optional[str] = None,
+    #         model_nums: Optional[str] = None,
+    #         encoding: Optional[str] = "cif",
+    #         copy_all_categories: Optional[bool] = False,
+    #         data_source: Optional[str] = "",
+    #         transform: Optional[str] = None,
+    #         download: Optional[bool] = False,
+    #         filename: Optional[str] = "",
+    #         ):
+    #     return self._exec(
+    #         type="residue_interaction",
+    #         entry_id=entry_id,
+    #         label_entity_id=label_entity_id,
+    #         label_asym_id=label_asym_id,
+    #         auth_asym_id=auth_asym_id,
+    #         label_comp_id=label_comp_id,
+    #         auth_comp_id=auth_comp_id,
+    #         label_seq_id=label_seq_id,
+    #         auth_seq_id=auth_seq_id,
+    #         pdbx_PDB_ins_code=pdbx_PDB_ins_code,
+    #         label_atom_id=label_atom_id,
+    #         auth_atom_id=auth_atom_id,
+    #         type_symbol=type_symbol,
+    #         radius=radius,
+    #         assembly_name=assembly_name,
+    #         model_nums=model_nums,
+    #         encoding=encoding,
+    #         copy_all_categories=copy_all_categories,
+    #         data_source=data_source,
+    #         transform=transform,
+    #         download=download,
+    #         filename=filename
+    #     )
+
+    # def get_residue_surroundings(
+    #         self,
+    #         entry_id: str,
+    #         label_entity_id: Optional[str] = None,
+    #         label_asym_id: Optional[str] = None,
+    #         auth_asym_id: Optional[str] = None,
+    #         label_comp_id: Optional[str] = None,
+    #         auth_comp_id: Optional[str] = None,
+    #         label_seq_id: Optional[int] = None,
+    #         auth_seq_id: Optional[int] = None,
+    #         pdbx_PDB_ins_code: Optional[str] = None,
+    #         label_atom_id: Optional[str] = None,
+    #         auth_atom_id: Optional[str] = None,
+    #         type_symbol: Optional[str] = None,
+    #         radius: Optional[float] = 5.0,
+    #         assembly_name: Optional[str] = None,
+    #         model_nums: Optional[str] = None,
+    #         encoding: Optional[str] = "cif",
+    #         copy_all_categories: Optional[bool] = False,
+    #         data_source: Optional[str] = "",
+    #         transform: Optional[str] = None,
+    #         download: Optional[bool] = False,
+    #         filename: Optional[str] = "",
+    #         ):
+    #     return self._exec(
+    #         type="residue_surroundings",
+    #         entry_id=entry_id,
+    #         label_entity_id=label_entity_id,
+    #         label_asym_id=label_asym_id,
+    #         auth_asym_id=auth_asym_id,
+    #         label_comp_id=label_comp_id,
+    #         auth_comp_id=auth_comp_id,
+    #         label_seq_id=label_seq_id,
+    #         auth_seq_id=auth_seq_id,
+    #         pdbx_PDB_ins_code=pdbx_PDB_ins_code,
+    #         label_atom_id=label_atom_id,
+    #         auth_atom_id=auth_atom_id,
+    #         type_symbol=type_symbol,
+    #         radius=radius,
+    #         assembly_name=assembly_name,
+    #         model_nums=model_nums,
+    #         encoding=encoding,
+    #         copy_all_categories=copy_all_categories,
+    #         data_source=data_source,
+    #         transform=transform,
+    #         download=download,
+    #         filename=filename
+    #     )
+
+    # def get_surrounding_ligands(
+    #         self,
+    #         entry_id: str,
+    #         label_entity_id: Optional[str] = None,
+    #         label_asym_id: Optional[str] = None,
+    #         auth_asym_id: Optional[str] = None,
+    #         label_comp_id: Optional[str] = None,
+    #         auth_comp_id: Optional[str] = None,
+    #         label_seq_id: Optional[int] = None,
+    #         auth_seq_id: Optional[int] = None,
+    #         pdbx_PDB_ins_code: Optional[str] = None,
+    #         label_atom_id: Optional[str] = None,
+    #         auth_atom_id: Optional[str] = None,
+    #         type_symbol: Optional[str] = None,
+    #         omit_water: Optional[bool] = False,
+    #         radius: Optional[float] = 5.0,
+    #         assembly_name: Optional[str] = None,
+    #         model_nums: Optional[str] = None,
+    #         encoding: Optional[str] = "cif",
+    #         copy_all_categories: Optional[bool] = False,
+    #         data_source: Optional[str] = "",
+    #         transform: Optional[str] = None,
+    #         download: Optional[bool] = False,
+    #         filename: Optional[str] = "",
+    #         ):
+
+    #     return self._exec(
+    #         type="surrounding_ligands",
+    #         entry_id=entry_id,
+    #         label_entity_id=label_entity_id,
+    #         label_asym_id=label_asym_id,
+    #         auth_asym_id=auth_asym_id,
+    #         label_comp_id=label_comp_id,
+    #         auth_comp_id=auth_comp_id,
+    #         label_seq_id=label_seq_id,
+    #         auth_seq_id=auth_seq_id,
+    #         pdbx_PDB_ins_code=pdbx_PDB_ins_code,
+    #         label_atom_id=label_atom_id,
+    #         auth_atom_id=auth_atom_id,
+    #         type_symbol=type_symbol,
+    #         omit_water=omit_water,
+    #         assembly_name=assembly_name,
+    #         model_nums=model_nums,
+    #         encoding=encoding,
+    #         copy_all_categories=copy_all_categories,
+    #         data_source=data_source,
+    #         transform=transform,
+    #         download=download,
+    #         filename=filename
+    #     )
+
+    # def get_symmetry_mates(
+    #         self,
+    #         entry_id: str,
+    #         radius: Optional[float] = 5.0,
+    #         model_nums: Optional[str] = None,
+    #         encoding: Optional[str] = "cif",
+    #         copy_all_categories: Optional[bool] = False,
+    #         data_source: Optional[str] = "",
+    #         transform: Optional[str] = None,
+    #         download: Optional[bool] = False,
+    #         filename: Optional[str] = "",
+    #         ):
+
+    #     return self._exec(
+    #         type="symmetry_mates",
+    #         entry_id=entry_id,
+    #         radius=radius,
+    #         model_nums=model_nums,
+    #         encoding=encoding,
+    #         copy_all_categories=copy_all_categories,
+    #         data_source=data_source,
+    #         transform=transform,
+    #         download=download,
+    #         filename=filename
+    #     )
+
+    # def get_assembly(
+    #         self,
+    #         entry_id: str,
+    #         name: Optional[str] = "1",
+    #         model_nums: Optional[str] = None,
+    #         encoding: Optional[str] = "cif",
+    #         copy_all_categories: Optional[bool] = False,
+    #         data_source: Optional[str] = "",
+    #         transform: Optional[str] = None,
+    #         download: Optional[bool] = False,
+    #         filename: Optional[str] = "",
+    #         ):
+
+    #     return self._exec(
+    #         type="assembly",
+    #         entry_id=entry_id,
+    #         name=name,
+    #         model_nums=model_nums,
+    #         encoding=encoding,
+    #         copy_all_categories=copy_all_categories,
+    #         data_source=data_source,
+    #         transform=transform,
+    #         download=download,
+    #         filename=filename
+    #     )

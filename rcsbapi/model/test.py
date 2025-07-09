@@ -4,6 +4,7 @@ import requests
 
 
 class BaseQuery:
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             f.name: getattr(self, f.name)
