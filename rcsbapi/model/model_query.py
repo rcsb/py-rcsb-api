@@ -1,3 +1,4 @@
+import os
 import requests
 from typing import Optional
 from model_schema import ModelSchema
@@ -24,38 +25,65 @@ class ModelQuery:
         # This builds a map like {"full": ["encoding", ...], "ligand": [...], ...}
         self.full_param_map = self.schema.get_param_dict()
 
-    def _exec(self, type: str, entry_id: str, **kwargs):
+    def _exec(self, query_type: str, entry_id: str, **kwargs):
         """
-        Execute the API call based on the type and parameters.
+        Execute the API call based on the query_type and parameters, including handling different encoding types.
         """
-        endpoint = self._get_endpoint_for_type(type)
+        endpoint = self._get_endpoint_for_type(query_type)
         url = f"{self.base_url}/{entry_id}/{endpoint}"
 
         # Prepare the query parameters
         query_params = {key: value for key, value in kwargs.items() if value is not None}
 
         try:
-            response = requests.get(url, json=query_params)  # POST request with JSON payload
-            response.raise_for_status()  # Raise an error for bad responses (4xx, 5xx)
+            response = requests.get(url, json=query_params)  # POST request with JSON params
+            response.raise_for_status()  # Raise an error for bad responses
 
-            # if ('filename' and 'file_directory' in kwargs):
-            #     return
+            # Get encoding type (defaults to CIF if not provided)
+            encoding = kwargs.get('encoding', 'CIF').upper()
 
-            # elif ('download' and 'filename' in kwargs):
-            #     return
-
-            if 'download' in kwargs:
-                with open("response_content.txt", "w") as file:
-                    file.write(response.text)
-
+            # Handle response based on encoding type
+            if encoding == 'BCIF':
+                # Handle BCIF encoding
+                file_content = response.text
+                file_extension = 'bcif'
+            elif encoding == 'SDF':
+                # Handle SDF encoding
+                file_content = response.text
+                file_extension = 'sdf'
+            elif encoding == 'MOL':
+                # Handle MOL encoding
+                file_content = response.text
+                file_extension = 'mol'
+            elif encoding == 'MOL2':
+                # Handle MOL2 encoding
+                file_content = response.text
+                file_extension = 'mol2'
             else:
-                return response.text
+                # Default to CIF
+                file_content = response.text
+                file_extension = 'cif'
+
+            # Handle saving the file based on the encoding and pinput
+            if 'filename' in kwargs and 'file_directory' in kwargs:
+                file_path = os.path.join(kwargs['file_directory'], f"{entry_id}_{query_type}.{file_extension}")
+            elif 'download' in kwargs and 'filename' in kwargs:
+                file_path = os.path.join(os.getcwd(), kwargs['filename'])
+            elif 'download' in kwargs:
+                file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.{file_extension}")
+            else:
+                return file_content
+
+            # Write the content to the appropriate file
+            with open(file_path, 'w' if encoding == 'BCIF' else 'w') as file:  # TODO: CHANGE 'w' TO APPROPRIATE 
+                file.write(file_content)
+                print(f"Downloaded to {file_path}")
 
         except requests.exceptions.RequestException as e:
-            print(f"Request failed: {e}")
+            print(f"An error occurred: {e}")
             return None
 
-    def _get_endpoint_for_type(self, type: str) -> str:
+    def _get_endpoint_for_type(self, query_type: str) -> str:
         """
         Get the correct endpoint based on the query type.
         """
@@ -70,10 +98,10 @@ class ModelQuery:
             "assembly": "assembly"
         }
 
-        if type not in modelserver_endpoint_map:
-            raise ValueError(f"Unknown query type: {type}")
+        if query_type not in modelserver_endpoint_map:
+            raise ValueError(f"Unknown query type: {query_type}")
 
-        return modelserver_endpoint_map[type]
+        return modelserver_endpoint_map[query_type]
 
     def get_full_structure(
             self,
@@ -88,7 +116,7 @@ class ModelQuery:
             file_directory: Optional[str] = None,
             ):
         return self._exec(
-            type="full",
+            query_type="full",
             entry_id=entry_id,
             model_nums=model_nums,
             encoding=encoding,
@@ -125,7 +153,7 @@ class ModelQuery:
             ):
 
         return self._exec(
-            type="ligand",
+            query_type="ligand",
             entry_id=entry_id,
             label_entity_id=label_entity_id,
             label_asym_id=label_asym_id,
@@ -219,7 +247,7 @@ class ModelQuery:
     #         filename: Optional[str] = "",
     #         ):
     #     return self._exec(
-    #         type="residue_interaction",
+    #         query_type="residue_interaction",
     #         entry_id=entry_id,
     #         label_entity_id=label_entity_id,
     #         label_asym_id=label_asym_id,
@@ -268,7 +296,7 @@ class ModelQuery:
     #         filename: Optional[str] = "",
     #         ):
     #     return self._exec(
-    #         type="residue_surroundings",
+    #         query_type="residue_surroundings",
     #         entry_id=entry_id,
     #         label_entity_id=label_entity_id,
     #         label_asym_id=label_asym_id,
@@ -319,7 +347,7 @@ class ModelQuery:
     #         ):
 
     #     return self._exec(
-    #         type="surrounding_ligands",
+    #         query_type="surrounding_ligands",
     #         entry_id=entry_id,
     #         label_entity_id=label_entity_id,
     #         label_asym_id=label_asym_id,
@@ -357,7 +385,7 @@ class ModelQuery:
     #         ):
 
     #     return self._exec(
-    #         type="symmetry_mates",
+    #         query_type="symmetry_mates",
     #         entry_id=entry_id,
     #         radius=radius,
     #         model_nums=model_nums,
@@ -383,7 +411,7 @@ class ModelQuery:
     #         ):
 
     #     return self._exec(
-    #         type="assembly",
+    #         query_type="assembly",
     #         entry_id=entry_id,
     #         name=name,
     #         model_nums=model_nums,

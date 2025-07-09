@@ -11,7 +11,6 @@ response = model_query_instance.get_full_structure(
     # copy_all_categories=False,  # Whether to copy all categories (optional)
     # transform=None,             # Transformation to apply (optional)
     download=True,              # Whether to download the structure (optional)
-    filename="1tqn_structure.cif"  # Output filename for download (optional)
 )
 
 print(response)
