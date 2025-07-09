@@ -14,6 +14,10 @@
   - entry schema 9.0.4 -> 9.0.4
   - polymer_entity schema 10.0.5 -> 10.0.5
 
+## v1.1.4 (2025-07-09)
+
+- Fix: Patch schema parsing for search attributes to delete duplicate chemical attributes from structure attribute schema (following update to RCSB.org schemas in July 2025, in which chemical attributes are now merged into structure attribute schema)
+
 ## v1.1.3 (2025-05-05)
 
 - Fix: Update regex pattern for instances in `const.py` to support suffixes longer than one character (e.g., "1S5L.AA")

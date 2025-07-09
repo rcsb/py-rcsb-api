@@ -194,6 +194,12 @@ class SearchSchema:
         if reload:
             self.struct_schema = self._reload_schema(struct_attr_schema_url, struct_attr_schema_file, refetch, use_fallback)
             self.chem_schema = self._reload_schema(chem_attr_schema_url, chem_attr_schema_file, refetch, use_fallback)
+            # Patch: delete duplicate chemical attributes from structure schema (after chemical attrs were merged in July 2025)
+            chem_keys = self.chem_schema["properties"].keys()
+            for k in chem_keys:
+                if k != "rcsb_id" and k in self.struct_schema["properties"]:  # delete duplicate keys EXCEPT "rcsb_id"
+                    _ = self.struct_schema["properties"].pop(k)
+            # Assemble list of nested attributes (uses above structure and chemical attribute schemas)
             self.nested_attribute_schema = self._extract_nested_indexing_contexts()
         self.search_attributes = self._make_schema_group()
 
