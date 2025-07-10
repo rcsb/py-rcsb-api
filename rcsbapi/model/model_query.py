@@ -64,18 +64,24 @@ class ModelQuery:
                 file_content = response.text
                 file_extension = 'cif'
 
-            # Handle saving the file based on the encoding and pinput
-            if 'filename' in kwargs and 'file_directory' in kwargs:
-                file_path = os.path.join(kwargs['file_directory'], f"{entry_id}_{query_type}.{file_extension}")
-            elif 'download' in kwargs and 'filename' in kwargs:
-                file_path = os.path.join(os.getcwd(), kwargs['filename'])
-            elif 'download' in kwargs:
+            filename = query_params.get('filename')
+            file_directory = query_params.get('file_directory')
+
+            if filename and file_directory:
+                file_path = os.path.join(file_directory, filename)
+            elif query_params.get('download') and filename:
+                file_path = os.path.join(os.getcwd(), filename)
+            elif query_params.get('download'):
                 file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.{file_extension}")
             else:
                 return file_content
 
+            print("file_directory:", query_params.get('file_directory'))
+            print("filename:", query_params.get('filename'))
+            print("file_path:", file_path)
+
             # Write the content to the appropriate file
-            with open(file_path, 'w' if encoding == 'BCIF' else 'w') as file:  # TODO: CHANGE 'w' TO APPROPRIATE 
+            with open(file_path, 'w' if encoding == 'BCIF' else 'w') as file:  # TODO: CHANGE 'w' TO APPROPRIATE
                 file.write(file_content)
                 print(f"Downloaded to {file_path}")
 
