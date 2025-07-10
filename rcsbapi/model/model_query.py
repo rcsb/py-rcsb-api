@@ -40,12 +40,12 @@ class ModelQuery:
             response.raise_for_status()  # Raise an error for bad responses
 
             # Get encoding type (defaults to CIF if not provided)
-            encoding = kwargs.get('encoding', 'CIF').upper()
+            encoding = query_params.get('encoding', 'CIF').upper()
 
             # Handle response based on encoding type
             if encoding == 'BCIF':
                 # Handle BCIF encoding
-                file_content = response.text
+                file_content = response.content
                 file_extension = 'bcif'
             elif encoding == 'SDF':
                 # Handle SDF encoding
@@ -76,14 +76,13 @@ class ModelQuery:
             else:
                 return file_content
 
-            print("file_directory:", query_params.get('file_directory'))
-            print("filename:", query_params.get('filename'))
-            print("file_path:", file_path)
-
             # Write the content to the appropriate file
-            with open(file_path, 'w' if encoding == 'BCIF' else 'w') as file:  # TODO: CHANGE 'w' TO APPROPRIATE
-                file.write(file_content)
-                print(f"Downloaded to {file_path}")
+            if encoding == 'BCIF':
+                with open(file_path, 'wb') as file:
+                    file.write(file_content)
+            else:
+                with open(file_path, 'w') as file:
+                    file.write(file_content)
 
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
