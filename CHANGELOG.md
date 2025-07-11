@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.0 (2025-07-10)
+## v1.2.0 (2025-07-11)
 
 - Add support for [Sequence Coordinates API](https://sequence-coordinates.rcsb.org/) via new module `rcsbapi.sequence`. Use this to fetch alignments between sequences from different databases as well as sequence-level annotations integrated from external resources and RCSB PDB. (PRs [#46](https://github.com/rcsb/py-rcsb-api/pull/46), [#68](https://github.com/rcsb/py-rcsb-api/pull/68))
   - [Documentation](https://rcsbapi.readthedocs.io/en/latest/seq_api/quickstart.html) and [Jupyter notebook](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/sequence_coord_quickstart.ipynb) provided
