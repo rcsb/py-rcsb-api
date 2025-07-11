@@ -1,32 +1,23 @@
 ##
-# File:    testquery.py
-# Author:
+# File:    test_data_query.py
+# Author:  Ivana Truong/RCSB PDB contributors
 # Date:
-# Version:
 #
 # Update:
 #
 #
 ##
 """
-Tests for all functions of the schema file. (Work in progress)
+Tests for all functions of the Data API module.
 """
 
-__docformat__ = "google en"
-__author__ = ""
-__email__ = ""
-__license__ = ""
-
 import logging
-
-# import importlib
-# import platform
-# import resource
 import time
 import unittest
 import requests
 
 from rcsbapi.search import search_attributes as attrs
+from rcsbapi.search import NestedAttributeQuery, AttributeQuery
 from rcsbapi.data import DataSchema, DataQuery
 from rcsbapi.config import config
 from rcsbapi.const import const
@@ -36,7 +27,7 @@ logger.setLevel(logging.INFO)
 
 
 class QueryTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__startTime = time.time()
         logger.info("Starting %s at %s", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
 
@@ -44,14 +35,14 @@ class QueryTests(unittest.TestCase):
         endTime = time.time()
         logger.info("Completed %s at %s (%.4f seconds)", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
-    def testGetEditorLink(self):
+    def testGetEditorLink(self) -> None:
         # query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
         query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": ["4HHB", "1IYE"]}, return_data_list=["exptl"])
         url = query_obj.get_editor_link()
         response_json = requests.get(url, timeout=10)
         self.assertEqual(response_json.status_code, 200)
 
-    def testExec(self):
+    def testExec(self) -> None:
         with self.subTest("1. Batching into requests with fewer Ids"):
             input_ids = []
             for _ in range(165):
@@ -61,7 +52,7 @@ class QueryTests(unittest.TestCase):
             # assert that the batch and merge functions are called
             # assert len of results is same as num of input ids
 
-    def testLowercaseIds(self):
+    def testLowercaseIds(self) -> None:
         with self.subTest(msg="1. List of IDs"):
             try:
                 query_obj = DataQuery(input_type="entries", input_ids=["4hhb"], return_data_list=["exptl.method"])
@@ -82,7 +73,7 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="3. Pubmed IDs"):
             try:
-                query_obj = DataQuery(input_type="pubmed", input_ids=["6726807"], return_data_list=["rcsb_pubmed_doi"])
+                query_obj = DataQuery(input_type="pubmed", input_ids=[6726807], return_data_list=["rcsb_pubmed_doi"])
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
@@ -93,10 +84,10 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testParseGQLError(self):
+    def testParseGQLError(self) -> None:
         pass
 
-    def testBatchIDs(self):
+    def testBatchIDs(self) -> None:
         input_ids = []
         for _ in range(165):
             input_ids.append("4HHB")
@@ -110,11 +101,11 @@ class QueryTests(unittest.TestCase):
             total_ids += len_id_batch
         self.assertEqual(len(query_obj.get_input_ids()), total_ids)
 
-    def testMergeResponse(self):
+    def testMergeResponse(self) -> None:
         # assert that the lengths are combined and all ids are present?
         pass
 
-    def testDocs(self):
+    def testDocs(self) -> None:
         with self.subTest(msg="1. Initialize Schema"):
             schema = DataSchema()
 
@@ -183,7 +174,7 @@ class QueryTests(unittest.TestCase):
                 except Exception as error:
                     self.fail(f"Failed unexpectedly: {error}")
 
-    def testAddExamples(self):
+    def testAddExamples(self) -> None:
         with self.subTest(msg="1. Entries"):
             try:
                 query = DataQuery(input_type="entries", input_ids=["1STP", "2JEF", "1CDG"], return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"])
@@ -308,11 +299,11 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testQuickstartNotebook(self):
+    def testQuickstartNotebook(self) -> None:
         with self.subTest(msg="1. Initialize Schema"):
             schema = DataSchema()
         with self.subTest(msg="2. GraphQL example query"):
-            query = """
+            ex_query = """
             {
             entry(entry_id: "4HHB") {
                 rcsb_entry_info {
@@ -321,7 +312,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=ex_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
         with self.subTest(msg="4. Making Queries"):
             try:
@@ -375,7 +366,8 @@ class QueryTests(unittest.TestCase):
         with self.subTest(msg="12. More complex queries, multiple ids"):
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB", "12CA", "3PQR"], return_data_list=["nonpolymer_bound_components"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="13. More complex queries, multiple return data"):
@@ -383,19 +375,26 @@ class QueryTests(unittest.TestCase):
                 query = DataQuery(
                     input_type="entries", input_ids=["4HHB"], return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"]
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testSearchDataNotebook(self):
+    def testSearchDataNotebook(self) -> None:
         with self.subTest(msg="1. Construct search API query and request"):
             # search API query and request
             try:
                 q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "COVID-19 virus"
-                q2 = attrs.rcsb_nonpolymer_entity_annotation.type == "SUBJECT_OF_INVESTIGATION"
+                q2a = attrs.rcsb_nonpolymer_entity_annotation.type == "SUBJECT_OF_INVESTIGATION"
+                q2b = AttributeQuery(
+                    attribute="rcsb_nonpolymer_entity_annotation.comp_id",
+                    operator="exists",
+                )
                 q3 = attrs.rcsb_polymer_entity_feature_summary.type == "modified_monomer"
-                query = q1 & q2 & q3
-                result_list = query()
+                q4 = attrs.rcsb_polymer_entity_feature_summary.count > 1
+                query = q1 & NestedAttributeQuery(q2a, q2b) & NestedAttributeQuery(q3, q4)
+                result_list = list(query())
+                logger.info("Result list len (%r)", len(result_list))
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             self.assertGreaterEqual(len(list(result_list)), 10)
@@ -417,7 +416,7 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             try:
-                json = data_query.get_response()["data"]["entries"]
+                json = data_query.get_response()["data"]["entries"]  # type: ignore
                 json[0]["rcsb_id"]
                 json[0]["nonpolymer_entities"]
                 json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]
@@ -428,7 +427,7 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-    def testAllStructures(self):
+    def testAllStructures(self) -> None:
         from rcsbapi.data import ALL_STRUCTURES
 
         with self.subTest("1. Test entries ALL_STRUCTURES"):
@@ -454,7 +453,7 @@ class QueryTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
 
 
-def buildQuery():
+def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(QueryTests("testGetEditorLink"))
     suiteSelect.addTest(QueryTests("testExec"))

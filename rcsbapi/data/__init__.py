@@ -1,5 +1,5 @@
 """RCSB PDB Data API"""
-from .data_schema import DataSchema
+from rcsbapi.data.data_schema import DataSchema
 
 DATA_SCHEMA = DataSchema()
 
@@ -17,7 +17,7 @@ def __getattr__(name: str):
     """
     if name == "ALL_STRUCTURES":
         if name not in _import_cache:
-            from .data_query import AllStructures
+            from rcsbapi.data.data_query import AllStructures
             ALL_STRUCTURES = AllStructures()
             _import_cache[name] = ALL_STRUCTURES
 
@@ -27,6 +27,6 @@ def __getattr__(name: str):
     raise AttributeError(f"Module {repr(__name__)} has no attribute {repr(name)}")
 
 
-from .data_query import DataQuery  # noqa:E402
+from rcsbapi.data.data_query import DataQuery  # noqa:E402
 
 __all__ = ["DataQuery", "DataSchema"]

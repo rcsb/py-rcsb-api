@@ -3350,6 +3350,25 @@
                         }
                     ]
                 },
+                "uniprot_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "P01116",
+                            "P69905"
+                        ],
+                        "description": "Uniprot accession codes assigned to polymeric entities.",
+                        "rcsb_description": [
+                            {
+                                "text": "Uniprot accession codes assigned to polymeric entities.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
                 "reference_sequence_identifiers": {
                     "type": "array",
                     "items": {
@@ -3380,7 +3399,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "ID(s) and Keywords",
-                                        "priority_order": 40
+                                        "priority_order": 45
                                     }
                                 ]
                             },
@@ -3609,14 +3628,6 @@
                             ]
                         }
                     ]
-                },
-                "uniprot_ids": {
-                    "type": "array",
-                    "minItems": 1,
-                    "uniqueItems": true,
-                    "items": {
-                        "type": "string"
-                    }
                 }
             },
             "additionalProperties": false,

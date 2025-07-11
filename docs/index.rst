@@ -40,6 +40,13 @@ Contents
    data_api/additional_examples.md
    data_api/api.rst
 
+.. toctree::
+   :caption: Sequence Coordinates API
+   :maxdepth: 2
+
+   seq_api/quickstart.md
+   seq_api/additional_examples.md
+   seq_api/api.rst
 
 License
 -------
