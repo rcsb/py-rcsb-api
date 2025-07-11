@@ -366,7 +366,8 @@ class QueryTests(unittest.TestCase):
         with self.subTest(msg="12. More complex queries, multiple ids"):
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB", "12CA", "3PQR"], return_data_list=["nonpolymer_bound_components"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="13. More complex queries, multiple return data"):
@@ -374,7 +375,8 @@ class QueryTests(unittest.TestCase):
                 query = DataQuery(
                     input_type="entries", input_ids=["4HHB"], return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"]
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
