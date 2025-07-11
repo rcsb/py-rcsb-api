@@ -2,6 +2,8 @@ import os
 import requests
 from typing import Optional
 from model_schema import ModelSchema
+import urllib.parse
+import gzip
 
 
 BASE_MODELSERVER_URL = "https://models.rcsb.org/v1"
@@ -21,6 +23,7 @@ class ModelQuery:
             "symmetry_mates": "symmetryMates",
             "assembly": "assembly"
         }
+        self.fun_list = ['compress_gzip', 'file_directory']  # TODO: Change Name
 
         # This builds a map like {"full": ["encoding", ...], "ligand": [...], ...}
         self.full_param_map = self.schema.get_param_dict()
@@ -33,60 +36,93 @@ class ModelQuery:
         url = f"{self.base_url}/{entry_id}/{endpoint}"
 
         # Prepare the query parameters
-        query_params = {key: value for key, value in kwargs.items() if value is not None}
+        query_params = {key: value for key, value in kwargs.items() if key not in self.fun_list}
+
+        encoded_params = urllib.parse.urlencode(query_params, quote_via=urllib.parse.quote_plus)
+        full_url = f"{url}?{encoded_params}"
 
         try:
-            response = requests.get(url, json=query_params)  # POST request with JSON params
-            response.raise_for_status()  # Raise an error for bad responses
+            compress_gzip = kwargs.get('compress_gzip', False)
 
-            # Get encoding type (defaults to CIF if not provided)
-            encoding = query_params.get('encoding', 'CIF').upper()
+            # If compress_gzip is True, skip downloading the file and only download if compress_gzip is False
+            if not compress_gzip:
+                response = requests.get(full_url, timeout=30)  # Use the constructed URL
+                response.raise_for_status()  # Raise an error for bad responses
 
-            # Handle response based on encoding type
-            if encoding == 'BCIF':
-                # Handle BCIF encoding
-                file_content = response.content
-                file_extension = 'bcif'
-            elif encoding == 'SDF':
-                # Handle SDF encoding
-                file_content = response.text
-                file_extension = 'sdf'
-            elif encoding == 'MOL':
-                # Handle MOL encoding
-                file_content = response.text
-                file_extension = 'mol'
-            elif encoding == 'MOL2':
-                # Handle MOL2 encoding
-                file_content = response.text
-                file_extension = 'mol2'
+                # Get encoding type (defaults to CIF if not provided)
+                encoding = query_params.get('encoding', 'CIF').upper()
+
+                # Handle response based on encoding type
+                if encoding == 'BCIF':
+                    file_content = response.content
+                    file_extension = 'bcif'
+                elif encoding == 'SDF':
+                    file_content = response.text
+                    file_extension = 'sdf'
+                elif encoding == 'MOL':
+                    file_content = response.text
+                    file_extension = 'mol'
+                elif encoding == 'MOL2':
+                    file_content = response.text
+                    file_extension = 'mol2'
+                else:
+                    file_content = response.text
+                    file_extension = 'cif'
+
+                filename = query_params.get('filename')
+                file_directory = query_params.get('file_directory')
+
+                if filename and file_directory:
+                    file_path = os.path.join(file_directory, filename)
+                elif query_params.get('download') and filename:
+                    file_path = os.path.join(os.getcwd(), filename)
+                elif query_params.get('download'):
+                    file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.{file_extension}")
+                else:
+                    return file_content
+
+                # Write the content to the appropriate file
+                if encoding == 'BCIF':
+                    with open(file_path, 'wb') as file:
+                        file.write(file_content)
+                else:
+                    with open(file_path, 'w') as file:
+                        file.write(file_content)
+
             else:
-                # Default to CIF
-                file_content = response.text
-                file_extension = 'cif'
+                # If compress_gzip is True, download the file and compress it
+                file_content = self._download_and_compress_file(full_url)
 
-            filename = query_params.get('filename')
-            file_directory = query_params.get('file_directory')
+                filename = query_params.get('filename')
+                file_directory = query_params.get('file_directory')
 
-            if filename and file_directory:
-                file_path = os.path.join(file_directory, filename)
-            elif query_params.get('download') and filename:
-                file_path = os.path.join(os.getcwd(), filename)
-            elif query_params.get('download'):
-                file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.{file_extension}")
-            else:
-                return file_content
+                if filename and file_directory:
+                    file_path = os.path.join(file_directory, filename)
+                elif query_params.get('download') and filename:
+                    file_path = os.path.join(os.getcwd(), filename)
+                elif query_params.get('download'):
+                    file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.gz")
 
-            # Write the content to the appropriate file
-            if encoding == 'BCIF':
-                with open(file_path, 'wb') as file:
-                    file.write(file_content)
-            else:
-                with open(file_path, 'w') as file:
-                    file.write(file_content)
+                with gzip.open(file_path, 'wb') as f_out:
+                    f_out.write(file_content)
+
+            return file_path  # Return the path of the saved file or None if an error occurs
 
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
             return None
+
+    def _download_and_compress_file(self, url: str) -> bytes:
+        """
+        Downloads the content from the URL and compresses it using gzip.
+        Returns the compressed content as bytes.
+        """
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()  # Ensure we got a valid response
+
+        # Gzip compress the file content
+        compressed_content = gzip.compress(response.content)
+        return compressed_content
 
     def _get_endpoint_for_type(self, query_type: str) -> str:
         """
@@ -119,6 +155,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = "",
             file_directory: Optional[str] = None,
+            compress_gzip: Optional[bool] = False,
             ):
         return self._exec(
             query_type="full",
@@ -131,6 +168,7 @@ class ModelQuery:
             download=download,
             filename=filename,
             file_directory=file_directory,
+            compress_gzip=compress_gzip,
         )
 
     def get_ligand(
@@ -155,6 +193,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = "",
             file_directory: Optional[str] = None,
+            compress_gzip: Optional[bool] = False,
             ):
 
         return self._exec(
@@ -179,6 +218,7 @@ class ModelQuery:
             download=download,
             filename=filename,
             file_directory=file_directory,
+            compress_gzip=compress_gzip,
         )
 
     # def get_atoms(

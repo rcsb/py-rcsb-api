@@ -5,10 +5,12 @@ model_query_instance = model_query.ModelQuery()
 
 # Now call the method on the instance
 response = model_query_instance.get_full_structure(
-    entry_id="1tqn",            # PDB entry ID
-    model_nums="1,2",             # Model number to query (optional)
-    encoding="bcif",             # File format (can be "pdb" or "cif")
-    copy_all_categories=False,  # Whether to copy all categories (optional)
-    transform=None,             # Transformation to apply (optional)
-    download=True,              # Whether to download the structure (optional)
+    entry_id="1tqn",
+    model_nums="1,2",
+    encoding="bcif",
+    copy_all_categories=False,
+    transform=None,
+    download=True,
+    compress_gzip=True,
 )
+# print(response)
