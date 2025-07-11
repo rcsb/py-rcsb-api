@@ -16,7 +16,7 @@
 
 ## v1.1.4 (2025-07-09)
 
-- Fix: Patch schema parsing for search attributes to delete duplicate chemical attributes from structure attribute schema (following update to RCSB.org schemas in July 2025, in which chemical attributes are now merged into structure attribute schema)
+- Fix: Patch schema parsing for search attributes - delete duplicate chemical attributes from structure attribute schema (following update to RCSB.org schemas in July 2025, in which chemical attributes are now merged into structure attribute schema). (Issue [#70](https://github.com/rcsb/py-rcsb-api/issues/70))
 
 ## v1.1.3 (2025-05-05)
 
