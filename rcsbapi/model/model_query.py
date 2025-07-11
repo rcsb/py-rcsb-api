@@ -22,7 +22,7 @@ class ModelQuery:
             "symmetry_mates": "symmetryMates",
             "assembly": "assembly"
         }
-        self.fun_list = ['compress_gzip', 'file_directory']  # TODO: Change Name
+        self._params_to_exclude_from_url = ['compress_gzip', 'file_directory']
 
     def _exec(self, query_type: str, entry_id: str, **kwargs):
         """
@@ -32,52 +32,57 @@ class ModelQuery:
         url = f"{self.base_url}/{entry_id}/{endpoint}"
 
         # Prepare the query parameters
-        query_params = {key: value for key, value in kwargs.items() if key not in self.fun_list and value is not None}
+        query_params = {key: value for key, value in kwargs.items() if key not in self._params_to_exclude_from_url and value is not None}
 
         encoded_params = urllib.parse.urlencode(query_params, quote_via=urllib.parse.quote_plus)
         full_url = f"{url}?{encoded_params}"
 
         try:
-            compress_gzip = kwargs.get('compress_gzip', False)
+            response = requests.get(full_url, timeout=30)  # Use the constructed URL
+            response.raise_for_status()  # Raise an error for bad responses
 
-            # If compress_gzip is True, skip downloading the file and only download if compress_gzip is False
-            if not compress_gzip:
-                response = requests.get(full_url, timeout=30)  # Use the constructed URL
-                response.raise_for_status()  # Raise an error for bad responses
+            # Get encoding type (defaults to CIF if not provided)
+            encoding = query_params.get('encoding', 'CIF').upper()
 
-                # Get encoding type (defaults to CIF if not provided)
-                encoding = query_params.get('encoding', 'CIF').upper()
+            # Handle response based on encoding type
+            if encoding == 'BCIF':
+                file_content = response.content
+                file_extension = 'bcif'
+            elif encoding == 'SDF':
+                file_content = response.text
+                file_extension = 'sdf'
+            elif encoding == 'MOL':
+                file_content = response.text
+                file_extension = 'mol'
+            elif encoding == 'MOL2':
+                file_content = response.text
+                file_extension = 'mol2'
+            else:
+                file_content = response.text
+                file_extension = 'cif'
 
-                # Handle response based on encoding type
+            filename = query_params.get('filename')
+            file_directory = query_params.get('file_directory')
+
+            if filename and file_directory:
+                file_path = os.path.join(file_directory, filename)
+            elif query_params.get('download') and filename:
+                file_path = os.path.join(os.getcwd(), filename)
+            elif query_params.get('download'):
+                file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.{file_extension}")
+            else:
+                return file_content
+
+            if kwargs.get('compress_gzip', False):
+                # Compress the content before saving
                 if encoding == 'BCIF':
-                    file_content = response.content
-                    file_extension = 'bcif'
-                elif encoding == 'SDF':
-                    file_content = response.text
-                    file_extension = 'sdf'
-                elif encoding == 'MOL':
-                    file_content = response.text
-                    file_extension = 'mol'
-                elif encoding == 'MOL2':
-                    file_content = response.text
-                    file_extension = 'mol2'
+                    with gzip.open(file_path + '.gz', 'wb') as file:
+                        file.write(file_content)
                 else:
-                    file_content = response.text
-                    file_extension = 'cif'
-
-                filename = query_params.get('filename')
-                file_directory = query_params.get('file_directory')
-
-                if filename and file_directory:
-                    file_path = os.path.join(file_directory, filename)
-                elif query_params.get('download') and filename:
-                    file_path = os.path.join(os.getcwd(), filename)
-                elif query_params.get('download'):
-                    file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.{file_extension}")
-                else:
-                    return file_content
-
-                # Write the content to the appropriate file
+                    with gzip.open(file_path + '.gz', 'w') as file:
+                        file.write(file_content)
+            else:
+                # Write without compression
                 if encoding == 'BCIF':
                     with open(file_path, 'wb') as file:
                         file.write(file_content)
@@ -85,40 +90,9 @@ class ModelQuery:
                     with open(file_path, 'w') as file:
                         file.write(file_content)
 
-            else:
-                # If compress_gzip is True, download the file and compress it
-                file_content = self._download_and_compress_file(full_url)
-
-                filename = query_params.get('filename')
-                file_directory = query_params.get('file_directory')
-
-                if filename and file_directory:
-                    file_path = os.path.join(file_directory, filename)
-                elif query_params.get('download') and filename:
-                    file_path = os.path.join(os.getcwd(), filename)
-                elif query_params.get('download'):
-                    file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.gz")
-
-                with gzip.open(file_path, 'wb') as f_out:
-                    f_out.write(file_content)
-
-            return file_path  # Return the path of the saved file or None if an error occurs
-
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
             return None
-
-    def _download_and_compress_file(self, url: str) -> bytes:
-        """
-        Downloads the content from the URL and compresses it using gzip.
-        Returns the compressed content as bytes.
-        """
-        response = requests.get(url, timeout=30)
-        response.raise_for_status()  # Ensure we got a valid response
-
-        # Gzip compress the file content
-        compressed_content = gzip.compress(response.content)
-        return compressed_content
 
     def _get_endpoint_for_type(self, query_type: str) -> str:
         """
