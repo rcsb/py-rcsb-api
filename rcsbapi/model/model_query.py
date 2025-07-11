@@ -1,9 +1,9 @@
 import os
-import requests
 from typing import Optional
-from model_schema import ModelSchema
 import urllib.parse
 import gzip
+import requests
+# from model_schema import ModelSchema
 
 
 BASE_MODELSERVER_URL = "https://models.rcsb.org/v1"
@@ -12,7 +12,6 @@ BASE_MODELSERVER_URL = "https://models.rcsb.org/v1"
 class ModelQuery:
     def __init__(self):
         self.base_url = BASE_MODELSERVER_URL
-        self.schema = ModelSchema()
         self.modelserver_endpoint_map = {
             "full": "full",
             "ligand": "ligand",
@@ -24,9 +23,6 @@ class ModelQuery:
             "assembly": "assembly"
         }
         self.fun_list = ['compress_gzip', 'file_directory']  # TODO: Change Name
-
-        # This builds a map like {"full": ["encoding", ...], "ligand": [...], ...}
-        self.full_param_map = self.schema.get_param_dict()
 
     def _exec(self, query_type: str, entry_id: str, **kwargs):
         """

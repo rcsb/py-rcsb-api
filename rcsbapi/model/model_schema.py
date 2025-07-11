@@ -79,7 +79,7 @@ class ModelSchema:
         return query_map
 
 
-# if __name__ == "__main__": 
+# if __name__ == "__main__":
 #     # Instantiate the ModelServerSchema class
 #     schema_data = {}
 #     try:
