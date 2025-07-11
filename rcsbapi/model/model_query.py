@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Literal
 import urllib.parse
 import gzip
 import requests
@@ -118,7 +118,7 @@ class ModelQuery:
             self,
             entry_id: str,
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -156,7 +156,7 @@ class ModelQuery:
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'sdf', 'mol', 'mol2', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -206,7 +206,7 @@ class ModelQuery:
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -257,7 +257,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -310,7 +310,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -364,7 +364,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -406,7 +406,7 @@ class ModelQuery:
             entry_id: str,
             radius: Optional[float] = 5.0,
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -436,7 +436,7 @@ class ModelQuery:
             entry_id: str,
             name: Optional[str] = "1",
             model_nums: Optional[str] = None,
-            encoding: Optional[str] = "cif",
+            encoding: Optional[Literal['cif', 'bcif']] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
