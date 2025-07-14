@@ -1,7 +1,8 @@
 from rcsbapi.model import model_query
+import os
 
 # Create an instance of ModelQuery
-# model_query_instance = model_query.ModelQuery()
+model_query_instance = model_query.ModelQuery()
 
 # Now call the method on the instance
 # response = model_query_instance.get_full_structure(
@@ -11,15 +12,27 @@ from rcsbapi.model import model_query
 #     copy_all_categories=False,
 #     transform=None,
 #     download=True,
-#     compress_gzip=True,
+#     file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-out"
 # )
 # print(response)
 
-# Create an instance of the ModelQuery class
-model_query_instance = model_query.ModelQuery()
+file_directory = os.path.abspath("./test-out")
+print(file_directory)
+file_path = model_query_instance.get_full_structure(
+    entry_id="1tqn", encoding="cif", download=True, filename="1tqn_full_structure.cif", file_directory=file_directory
+)
 
-# List of structure IDs to query
-entry_ids = ["1tqn", "1tqn", "1tqn"]
+# self.assertIsNotNone(file_path, f"Expected a {file_path}, but got None.")
+# print(os.path.exists(file_path), f"File was not downloaded successfully: {file_path}")
 
-# Fetch multiple structures (e.g., "full" type) and save the result
-results = model_query_instance.get_multiple_structures(entry_ids, query_type="full", encoding="cif", download=True)
+
+# # Create an instance of the ModelQuery class
+# model_query_instance = model_query.ModelQuery()
+
+# # List of structure IDs to query
+# entry_ids = ["1cbs", "1tqn"]
+
+# # Fetch multiple structures (e.g., "full" type) and save the result
+# results = model_query_instance.get_multiple_structures(entry_ids, query_type="full", encoding="cif", download=True)
+
+# print(results)

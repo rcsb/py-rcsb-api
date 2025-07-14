@@ -61,11 +61,17 @@ class ModelQuery:
                 file_content = response.text
                 file_extension = 'cif'
 
-            filename = query_params.get('filename')
-            file_directory = query_params.get('file_directory')
+            filename = kwargs.get('filename')
+            file_directory = kwargs.get('file_directory')
 
             if filename and file_directory:
                 file_path = os.path.join(file_directory, filename)
+                # Ensure the directory exists
+                os.makedirs(file_directory, exist_ok=True)
+            elif query_params.get('download') and file_directory:
+                file_path = os.path.join(file_directory, f"{entry_id}_{query_type}.{file_extension}")
+                # Ensure the directory exists
+                os.makedirs(file_directory, exist_ok=True)
             elif query_params.get('download') and filename:
                 file_path = os.path.join(os.getcwd(), filename)
             elif query_params.get('download'):
@@ -89,6 +95,9 @@ class ModelQuery:
                 else:
                     with open(file_path, 'w') as file:
                         file.write(file_content)
+
+            # Return the file path of the downloaded file
+            return file_path
 
         except requests.exceptions.RequestException as e:
             print(f"An error occurred: {e}")
@@ -117,7 +126,7 @@ class ModelQuery:
     def get_multiple_structures(
         self,
         entry_ids: list[str],
-        query_type: str,
+        query_type: Literal['full', "ligand", "atoms", "residueInteraction", "residueSurroundings", "surroundingLigands", "symmetryMates", "assembly"],
         **kwargs
     ):
         """
