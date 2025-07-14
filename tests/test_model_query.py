@@ -8,7 +8,6 @@ class ModelQueryTests(unittest.TestCase):
         self.model_query = model_query.ModelQuery()
         self.test_directory = "./tests/test-out"
         self.entry_id = "1tqn"
-        self.invalid_entry_id = "invalid_id"
         self.entry_ids = ["1tqn", "4HHB", "1STP"]
 
     def test_get_full_structure(self) -> None:
@@ -16,6 +15,15 @@ class ModelQueryTests(unittest.TestCase):
             try:
                 result = self.model_query.get_full_structure(
                     entry_id=self.entry_id, encoding="cif", model_nums="1", transform="rotate", copy_all_categories=True
+                )
+                self.assertIsNotNone(result)
+            except Exception as e:
+                self.fail(f"Failed: {e}")
+
+        with self.subTest(msg="2. Full structure query with additional parameters"):
+            try:
+                result = self.model_query.get_full_structure(
+                    entry_id=self.entry_id, encoding="cif", model_nums="2", copy_all_categories=False
                 )
                 self.assertIsNotNone(result)
             except Exception as e:
@@ -31,11 +39,29 @@ class ModelQueryTests(unittest.TestCase):
             except Exception as e:
                 self.fail(f"Failed: {e}")
 
+        with self.subTest(msg="2. Ligand query with additional parameters"):
+            try:
+                result = self.model_query.get_ligand(
+                    entry_id=self.entry_id, label_entity_id="B", encoding="mol", auth_comp_id="A00"
+                )
+                self.assertIsNotNone(result)
+            except Exception as e:
+                self.fail(f"Failed: {e}")
+
     def test_get_atoms(self) -> None:
         with self.subTest(msg="1. Atoms query with additional parameters"):
             try:
                 result = self.model_query.get_atoms(
                     entry_id=self.entry_id, label_entity_id="A", encoding="cif", label_atom_id="CA", model_nums="1"
+                )
+                self.assertIsNotNone(result)
+            except Exception as e:
+                self.fail(f"Failed: {e}")
+
+        with self.subTest(msg="2. Atoms query with additional parameters"):
+            try:
+                result = self.model_query.get_atoms(
+                    entry_id=self.entry_id, label_entity_id="B", encoding="cif", label_atom_id="CA",
                 )
                 self.assertIsNotNone(result)
             except Exception as e:
@@ -51,11 +77,29 @@ class ModelQueryTests(unittest.TestCase):
             except Exception as e:
                 self.fail(f"Failed: {e}")
 
+        with self.subTest(msg="2. Residue interaction query with expanded parameters"):
+            try:
+                result = self.model_query.get_residue_interaction(
+                    entry_id=self.entry_id, radius=5.0, encoding="bcif", assembly_name="2"
+                )
+                self.assertIsNotNone(result)
+            except Exception as e:
+                self.fail(f"Failed: {e}")
+
     def test_get_residue_surroundings(self) -> None:
         with self.subTest(msg="1. Residue surroundings query with expanded parameters"):
             try:
                 result = self.model_query.get_residue_surroundings(
                     entry_id=self.entry_id, radius=10.0, encoding="cif", label_entity_id="A", auth_comp_id="A00"
+                )
+                self.assertIsNotNone(result)
+            except Exception as e:
+                self.fail(f"Failed: {e}")
+
+        with self.subTest(msg="2. Residue surroundings query with expanded parameters"):
+            try:
+                result = self.model_query.get_residue_surroundings(
+                    entry_id=self.entry_id, radius=5.0, encoding="cif", label_entity_id="B"
                 )
                 self.assertIsNotNone(result)
             except Exception as e:
@@ -109,8 +153,8 @@ class ModelQueryTests(unittest.TestCase):
                 result = self.model_query.get_multiple_structures(
                     entry_ids=self.entry_ids, query_type="full", encoding="cif", model_nums="1", transform="rotate"
                 )
-                for value in result:
-                    self.assertIsNone(result[value])
+                for a, value in result.items():
+                    self.assertIsNone(value, f"Expected None for entry {a}")
             except Exception as e:
                 self.fail(f"Failed: {e}")
 
@@ -126,15 +170,15 @@ class ModelQueryTests(unittest.TestCase):
 
 def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
-    # suiteSelect.addTest(ModelQueryTests("test_get_full_structure"))
-    # suiteSelect.addTest(ModelQueryTests("test_get_ligand"))
-    # suiteSelect.addTest(ModelQueryTests("test_get_atoms"))
-    # suiteSelect.addTest(ModelQueryTests("test_get_residue_interaction"))
-    # suiteSelect.addTest(ModelQueryTests("test_get_residue_surroundings"))
-    # suiteSelect.addTest(ModelQueryTests("test_get_surrounding_ligands"))
-    # suiteSelect.addTest(ModelQueryTests("test_get_symmetry_mates"))
-    # suiteSelect.addTest(ModelQueryTests("test_get_assembly"))
-    # suiteSelect.addTest(ModelQueryTests("test_download_file"))
+    suiteSelect.addTest(ModelQueryTests("test_get_full_structure"))
+    suiteSelect.addTest(ModelQueryTests("test_get_ligand"))
+    suiteSelect.addTest(ModelQueryTests("test_get_atoms"))
+    suiteSelect.addTest(ModelQueryTests("test_get_residue_interaction"))
+    suiteSelect.addTest(ModelQueryTests("test_get_residue_surroundings"))
+    suiteSelect.addTest(ModelQueryTests("test_get_surrounding_ligands"))
+    suiteSelect.addTest(ModelQueryTests("test_get_symmetry_mates"))
+    suiteSelect.addTest(ModelQueryTests("test_get_assembly"))
+    suiteSelect.addTest(ModelQueryTests("test_download_file"))
     suiteSelect.addTest(ModelQueryTests("test_get_multiple_structures"))
     return suiteSelect
 
