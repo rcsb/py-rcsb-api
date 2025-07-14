@@ -114,6 +114,32 @@ class ModelQuery:
 
         return modelserver_endpoint_map[query_type]
 
+    def get_multiple_structures(
+        self,
+        entry_ids: list[str],
+        query_type: str,
+        **kwargs
+    ):
+        """
+        Fetch multiple structures at once based on a list of entry_ids.
+
+        Args:
+            entry_ids (list[str]): List of structure IDs to query.
+            query_type (str): The type of query to execute (e.g., 'full', 'ligand', etc.).
+            **kwargs: Additional query parameters to pass to the API.
+
+        Returns:
+            dict: A dictionary with entry IDs as keys and the corresponding responses as values.
+        """
+        results = {}
+        for entry_id in entry_ids:
+            try:
+                result = self._exec(query_type, entry_id, **kwargs)
+                results[entry_id] = result
+            except Exception as e:
+                results[entry_id] = f"Error occurred: {str(e)}"
+        return results
+
     def get_full_structure(
             self,
             entry_id: str,
