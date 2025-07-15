@@ -1,8 +1,7 @@
 ##
-# File:    testschema.py
-# Author:  Spencer Bliven/Santiago Blaumann
+# File:    test_search_schema.py
+# Author:  Spencer Bliven/Santiago Blaumann/RCSB PDB contributors
 # Date:    6/7/23
-# Version: 1.0
 #
 # Update:
 #
@@ -11,11 +10,6 @@
 """
 Tests for all functions of the schema file.
 """
-
-__docformat__ = "google en"
-__author__ = "Santiago Blaumann"
-__email__ = "santiago.blaumann@rcsb.org"
-__license__ = "BSD 3-Clause"
 
 import logging
 import platform
@@ -33,25 +27,25 @@ logger.setLevel(logging.INFO)
 
 
 class SchemaTests(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.__startTime = time.time()
         logger.info("Starting %s at %s", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         unitS = "MB" if platform.system() == "Darwin" else "GB"
         rusageMax = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         logger.info("Maximum resident memory size %.4f %s", rusageMax / 10 ** 6, unitS)
         endTime = time.time()
         logger.info("Completed %s at %s (%.4f seconds)", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
-    def testSchema(self):
+    def testSchema(self) -> None:
         ok = attrs.rcsb_id.attribute == "rcsb_id"
         self.assertTrue(ok)
         ok2 = attrs.rcsb_struct_symmetry.symbol.attribute == "rcsb_struct_symmetry.symbol"
         self.assertTrue(ok2)
         logger.info("Schema test results: ok : (%r), ok2: (%r)", ok, ok2)
 
-    def testSchemaVersion(self):
+    def testSchemaVersion(self) -> None:
         # Check structure attribute schema version
         webSchema = SEARCH_SCHEMA._fetch_schema(const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL)
         localSchema = SEARCH_SCHEMA._load_json_schema(os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME))
@@ -81,7 +75,7 @@ class SchemaTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Chemical schema tests results: local version (%r) and web version (%s)", localVer, webVer)
 
-    def testFetchSchema(self):
+    def testFetchSchema(self) -> None:
         # check fetching of structure attribute schema
         fetchSchema = SEARCH_SCHEMA._fetch_schema(const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL)
         ok = fetchSchema is not None
@@ -97,7 +91,7 @@ class SchemaTests(unittest.TestCase):
         logger.info("ok is %r", ok)
         self.assertTrue(ok)
 
-    def testRcsbAttrs(self):
+    def testRcsbAttrs(self) -> None:
         with self.subTest(msg="1. Check type and descriptions exist for attributes"):
             for attr in attrs:
                 attr_dict = vars(attr)
@@ -117,14 +111,26 @@ class SchemaTests(unittest.TestCase):
             attr_details = attrs.get_attribute_details("foo")
             self.assertIsNone(attr_details)
 
+    def testNestedAttrs(self):
+        with self.subTest(msg="3. Check nested attribute indexing dictionary length"):
+            nested_dict = SEARCH_SCHEMA.nested_attribute_schema
+            self.assertGreaterEqual(len(nested_dict), 15)
 
-def buildSchema():
+        with self.subTest(msg="3. Check for a specific nested attribute"):
+            expected_tuple = ('rcsb_uniprot_annotation.name', 'rcsb_uniprot_annotation.type')
+            self.assertIn(expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
+
+            not_expected_tuple = ('drugbank_info.drug_groups', 'rcsb_uniprot_annotation.type')
+            self.assertNotIn(not_expected_tuple, SEARCH_SCHEMA.nested_attribute_schema)
+
+
+def buildSchema() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
     suiteSelect.addTest(SchemaTests("testSchema"))
     suiteSelect.addTest(SchemaTests("testSchemaVersion"))
     suiteSelect.addTest(SchemaTests("testFetchSchema"))
     suiteSelect.addTest(SchemaTests("testRcsbAttrs"))
-
+    suiteSelect.addTest(SchemaTests("testNestedAttrs"))
     return suiteSelect
 
 

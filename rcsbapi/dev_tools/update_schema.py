@@ -22,6 +22,7 @@ except Exception:
     pass
 
 from rcsbapi.data import DATA_SCHEMA
+from rcsbapi.sequence import SEQ_SCHEMA
 from rcsbapi.const import const
 from rcsbapi.config import config
 
@@ -96,7 +97,7 @@ if __name__ == "__main__":
         const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL: const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME,
         const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL: const.SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME,
     }
-    search_version_dict: dict[str, str] = {}
+    search_version_dict: Dict[str, str] = {}
     for url, file_name in search_url_to_file.items():
         search_version = update_schema(
             f_name=file_name,
@@ -106,7 +107,7 @@ if __name__ == "__main__":
         search_version_dict[file_name] = search_version
 
     # Update Data API schemas
-    data_version_dict: dict[str, str] = {}
+    data_version_dict: Dict[str, str] = {}
     for endpoint, file_name in const.DATA_API_SCHEMA_ENDPOINT_TO_FILE.items():
         data_version = update_schema(
             f_name=file_name,
@@ -116,10 +117,26 @@ if __name__ == "__main__":
         data_version_dict[file_name] = data_version
 
     # Update full GraphQL Data API schema
-    query = DATA_SCHEMA._get_introspection_query()
-    schema_response = requests.post(headers={"Content-Type": "application/graphql"}, data=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT)
+    schema_response = requests.post(
+        headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+        json=DATA_SCHEMA.introspection_query,
+        url=const.DATA_API_ENDPOINT,
+        timeout=config.API_TIMEOUT
+    )
     assert schema_response.status_code == 200
     data_schema_path = Path(__file__).parent.parent.joinpath(const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
+    with open(data_schema_path, "wt", encoding="utf-8") as f:
+        json.dump(schema_response.json(), f, indent=4)
+
+    # Update full GraphQL Sequence API schema
+    schema_response = requests.post(
+        headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+        json=SEQ_SCHEMA.introspection_query,
+        url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
+        timeout=config.API_TIMEOUT
+    )
+    assert schema_response.status_code == 200
+    data_schema_path = Path(__file__).parent.parent.joinpath(const.SEQUENCE_API_SCHEMA_DIR, const.SEQUENCE_API_SCHEMA_FILENAME)
     with open(data_schema_path, "wt", encoding="utf-8") as f:
         json.dump(schema_response.json(), f, indent=4)
 
