@@ -3,15 +3,14 @@ from typing import Optional, Literal
 import urllib.parse
 import gzip
 import requests
+from rcsbapi.const import const
+from rcsbapi.config import config
 # from model_schema import ModelSchema
-
-
-BASE_MODELSERVER_URL = "https://models.rcsb.org/v1"
 
 
 class ModelQuery:
     def __init__(self):
-        self.base_url = BASE_MODELSERVER_URL
+        self.base_url = const.BASE_MODELSERVER_URL
         self.modelserver_endpoint_map = {
             "full": "full",
             "ligand": "ligand",
@@ -38,7 +37,7 @@ class ModelQuery:
         full_url = f"{url}?{encoded_params}"
 
         try:
-            response = requests.get(full_url, timeout=30)  # Use the constructed URL
+            response = requests.get(full_url, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})  # Use the constructed URL
             response.raise_for_status()  # Raise an error for bad responses
 
             # Get encoding type (defaults to CIF if not provided)

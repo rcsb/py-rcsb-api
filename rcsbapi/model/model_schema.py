@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional
 import requests
-
-JSON_MODELSERVER_URL = "https://models.rcsb.org/openapi.json"
+from rcsbapi.const import const
+from rcsbapi.config import config
 
 
 class ModelSchema:
@@ -10,7 +10,7 @@ class ModelSchema:
         Initialize ModelSchema.
         """
         try:
-            response = requests.get(JSON_MODELSERVER_URL)
+            response = requests.get(const.JSON_MODELSERVER_URL, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
             response.raise_for_status()
             attr_data = response.json()
         except requests.RequestException as e:
