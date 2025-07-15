@@ -1,26 +1,27 @@
 from rcsbapi.model import model_query
-import os
 
 # Create an instance of ModelQuery
 model_query_instance = model_query.ModelQuery()
 
 # Now call the method on the instance
-# response = model_query_instance.get_full_structure(
-#     entry_id="1tqn",
-#     model_nums="1,2",
-#     encoding="bcif",
-#     copy_all_categories=False,
-#     transform=None,
-#     download=True,
-#     file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-out"
-# )
-# print(response)
-
-file_directory = os.path.abspath("./test-out")
-print(file_directory)
-file_path = model_query_instance.get_full_structure(
-    entry_id="1tqn", encoding="cif", download=True, filename="1tqn_full_structure.cif", file_directory=file_directory
+response = model_query_instance.get_full_structure(
+    entry_id="1tqn",
+    model_nums="1,2",
+    encoding="bcif",
+    copy_all_categories=False,
+    transform=None,
+    download=True,
+    file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-output",
+    filename="1tqn_full_structure.cif",
+    compress_gzip=True,
 )
+print(response)
+
+# file_directory = os.path.abspath("./test-out")
+# print(file_directory)
+# file_path = model_query_instance.get_full_structure(
+#     entry_id="1tqn", encoding="cif", download=True, filename="1tqn_full_structure.cif", file_directory=file_directory
+# )
 
 # self.assertIsNotNone(file_path, f"Expected a {file_path}, but got None.")
 # print(os.path.exists(file_path), f"File was not downloaded successfully: {file_path}")
