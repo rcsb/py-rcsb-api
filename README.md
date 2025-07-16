@@ -6,19 +6,22 @@
 [![FAIR checklist badge](https://fairsoftwarechecklist.net/badge.svg)](https://fairsoftwarechecklist.net/v0.2?f=31&a=30112&i=32111&r=133)
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
-# rcsb-api
-Python interface for RCSB PDB API services at RCSB.org.
 
-This package requires Python 3.8 or later.
-
+# <img src="https://github.com/user-attachments/assets/248d3e32-7644-46b2-bf18-b5248c9e6305" height="160"/> &nbsp;&nbsp; *rcsb-api*: Python Toolkit for Accessing RCSB.org APIs
+Python interface for RCSB Protein Data Bank API services at [RCSB.org](https://www.rcsb.org/).
 
 ## Installation
+This package requires Python 3.8 or later.
+
 Get it from PyPI:
 
     pip install rcsb-api
 
-Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api/)
+Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api/) and install locally:
 
+    git clone https://github.com/rcsb/py-rcsb-api.git
+    cd py-rcsb-api
+    pip install .
 
 ## Getting Started
 Full documentation available at [readthedocs](https://rcsbapi.readthedocs.io/en/latest/).
