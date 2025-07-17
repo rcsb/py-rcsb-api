@@ -159,8 +159,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="full",
             entry_id=entry_id,
@@ -197,8 +196,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="ligand",
             entry_id=entry_id,
@@ -246,8 +244,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="atoms",
             entry_id=entry_id,
@@ -297,8 +294,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="residue_interaction",
             entry_id=entry_id,
@@ -350,8 +346,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="residue_surroundings",
             entry_id=entry_id,
@@ -404,12 +399,11 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
-
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="surrounding_ligands",
             entry_id=entry_id,
+            radius=radius,
             label_entity_id=label_entity_id,
             label_asym_id=label_asym_id,
             auth_asym_id=auth_asym_id,
@@ -446,8 +440,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="symmetry_mates",
             entry_id=entry_id,
@@ -475,8 +468,7 @@ class ModelQuery:
             download: Optional[bool] = False,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,
-            ):
+            compress_gzip: Optional[bool] = False,):
         return self._exec(
             query_type="assembly",
             entry_id=entry_id,
