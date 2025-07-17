@@ -53,9 +53,7 @@ Contents
    :maxdepth: 2
 
    model_api/quickstart.md
-   model_api/additional_examples.md
    model_api/api.rst
-
 
 License
 -------

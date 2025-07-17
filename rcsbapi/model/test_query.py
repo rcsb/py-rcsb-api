@@ -7,12 +7,12 @@ model_query_instance = model_query.ModelQuery()
 response = model_query_instance.get_full_structure(
     entry_id="1tqn",
     model_nums="1,2",
-    encoding="bcif",
+    encoding="cif",
     copy_all_categories=False,
     transform=None,
-    download=True,
-    file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-output",
-    filename="1tqn_full_structure.cif",
+    download=False,
+    # file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-output",
+    # filename="1tqn_full_structure.cif",
     compress_gzip=True,
 )
 print(response)
