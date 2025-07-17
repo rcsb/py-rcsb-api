@@ -17,12 +17,12 @@
 # )
 # print(response)
 
-from rcsbapi.model import ModelQuery
+# from rcsbapi.model import ModelQuery
 
-# Fetch ligand data for the entry "2HHB"
-query = ModelQuery()
-ligand_result = query.get_ligand(entry_id="2HHB", label_comp_id="HEM")
-print(ligand_result)
+# # Fetch ligand data for the entry "2HHB"
+# query = ModelQuery()
+# ligand_result = query.get_ligand(entry_id="2HHB", label_comp_id="HEM")
+# print(ligand_result)
 
 
 # file_directory = os.path.abspath("./test-out")

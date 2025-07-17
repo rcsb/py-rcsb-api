@@ -153,7 +153,7 @@ class ModelQueryTests(unittest.TestCase):
             try:
                 result = self.model_query.get_multiple_structures(
                     entry_ids=self.entry_ids, query_type="full", encoding="cif", model_nums="1", transform="rotate"
-                )                
+                )
                 # Check if the length of entry_ids and the result are the same
                 if len(self.entry_ids) != len(result):
                     logging.warning("Length mismatch: entry_ids length is %d, result length is %d", len(self.entry_ids), len(result))
