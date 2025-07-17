@@ -51,7 +51,7 @@ You can use this API to automate data retrieval and integrate it into your bioin
 `Full Structure` queries fetch complete structural data for a given entry.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
 # Fetch the full structure for the entry "2HHB"
 query = ModelQuery()
@@ -78,7 +78,7 @@ print(result)
 `Ligand` queries fetch ligand-related data for a given structure.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
 # Fetch ligand data for the entry "2HHB"
 query = ModelQuery()
@@ -157,7 +157,7 @@ Here is the **ReadTheDocs**-formatted section for the **Residue Interaction** qu
 `Residue Interaction` queries fetch data on interactions between residues in a structure.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
 # Fetch residue interaction data for the entry "2HHB"
 query = ModelQuery()
@@ -191,12 +191,13 @@ print(residue_interaction_result)
 | `file_directory`      | Directory to save the file                                    |
 | `compress_gzip`       | Whether to compress the file (default: False)                 |
 
+
 ## Residue Surroundings
 
 `Residue Surroundings` queries fetch data on residues surrounding a specific residue in a structure.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
 # Fetch residue surrounding data for the entry "2HHB"
 query = ModelQuery()
@@ -236,7 +237,7 @@ print(residue_surroundings_result)
 `Surrounding Ligands` queries fetch data on ligands that are within a certain proximity of a residue in a structure.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
 # Fetch surrounding ligands data for the entry "2HHB"
 query = ModelQuery()
@@ -277,7 +278,7 @@ print(surrounding_ligands_result)
 `Symmetry Mates` queries fetch data on symmetry-related structures within a specified radius.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
 # Fetch symmetry mates data for the entry "2HHB"
 query = ModelQuery()
@@ -305,7 +306,7 @@ print(symmetry_mates_result)
 `Assembly` queries fetch data on the structure's assembly, useful for obtaining the full model or chain assembly.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
 # Fetch assembly data for the entry "2HHB"
 query = ModelQuery()

@@ -1,21 +1,29 @@
-from rcsbapi.model import model_query
+# from rcsbapi.model import model_query
 
-# Create an instance of ModelQuery
-model_query_instance = model_query.ModelQuery()
+# # Create an instance of ModelQuery
+# model_query_instance = model_query.ModelQuery()
 
-# Now call the method on the instance
-response = model_query_instance.get_full_structure(
-    entry_id="1tqn",
-    model_nums="1,2",
-    encoding="cif",
-    copy_all_categories=False,
-    transform=None,
-    download=False,
-    # file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-output",
-    # filename="1tqn_full_structure.cif",
-    compress_gzip=True,
-)
-print(response)
+# # Now call the method on the instance
+# response = model_query_instance.get_full_structure(
+#     entry_id="1tqn",
+#     model_nums="1,2",
+#     encoding="cif",
+#     copy_all_categories=False,
+#     transform=None,
+#     download=False,
+#     # file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-output",
+#     # filename="1tqn_full_structure.cif",
+#     compress_gzip=True,
+# )
+# print(response)
+
+from rcsbapi.model import ModelQuery
+
+# Fetch ligand data for the entry "2HHB"
+query = ModelQuery()
+ligand_result = query.get_ligand(entry_id="2HHB", label_comp_id="HEM")
+print(ligand_result)
+
 
 # file_directory = os.path.abspath("./test-out")
 # print(file_directory)
