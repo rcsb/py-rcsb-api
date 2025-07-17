@@ -9,6 +9,14 @@ from rcsbapi.config import config
 
 
 class ModelQuery:
+    """
+    Class for querying model data from the RCSB ModelServer.
+
+    Supports various query types such as full structure retrieval, ligand queries,
+    atom-level queries, and contextual residue or ligand information. Handles output
+    formats, optional file saving, and gzip compression.
+    """
+
     def __init__(self):
         self.base_url = const.BASE_MODELSERVER_URL
         self.modelserver_endpoint_map = {
@@ -25,7 +33,16 @@ class ModelQuery:
 
     def _exec(self, query_type: str, entry_id: str, **kwargs):
         """
-        Execute the API call based on the query_type and parameters, including handling different encoding types.
+        Execute the API request based on the query type and provided parameters.
+
+        Args:
+            query_type (str): The type of model query to perform.
+            entry_id (str): The entry ID to query.
+            **kwargs: Optional query parameters.
+
+        Returns:
+            Union[str, bytes, None]: File content if not downloaded, file path if downloaded,
+            or None if an error occurred.
         """
         endpoint = self._get_endpoint_for_type(query_type)
         url = f"{self.base_url}/{entry_id}/{endpoint}"
@@ -104,7 +121,16 @@ class ModelQuery:
 
     def _get_endpoint_for_type(self, query_type: str) -> str:
         """
-        Get the correct endpoint based on the query type.
+        Get the API endpoint string for a given query type.
+
+        Args:
+            query_type (str): Query type to map.
+
+        Returns:
+            str: Corresponding endpoint string.
+
+        Raises:
+            ValueError: If query type is invalid.
         """
         modelserver_endpoint_map = {
             "full": "full",
@@ -125,7 +151,7 @@ class ModelQuery:
     def get_multiple_structures(
         self,
         entry_ids: list[str],
-        query_type: Literal['full', "ligand", "atoms", "residueInteraction", "residueSurroundings", "surroundingLigands", "symmetryMates", "assembly"],
+        query_type: Literal["full", "ligand", "atoms", "residueInteraction", "residueSurroundings", "surroundingLigands", "symmetryMates", "assembly"],
         **kwargs
     ):
         """
@@ -152,7 +178,7 @@ class ModelQuery:
             self,
             entry_id: str,
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -189,7 +215,7 @@ class ModelQuery:
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'sdf', 'mol', 'mol2', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "sdf", "mol", "mol2", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -237,7 +263,7 @@ class ModelQuery:
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -287,7 +313,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -339,7 +365,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -392,7 +418,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -433,7 +459,7 @@ class ModelQuery:
             entry_id: str,
             radius: Optional[float] = 5.0,
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -461,7 +487,7 @@ class ModelQuery:
             entry_id: str,
             name: Optional[str] = "1",
             model_nums: Optional[str] = None,
-            encoding: Optional[Literal['cif', 'bcif']] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
