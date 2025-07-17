@@ -92,7 +92,7 @@ class ModelQuery:
                     with open(file_path, 'wb') as file:
                         file.write(file_content)
                 else:
-                    with open(file_path, 'w') as file:
+                    with open(file_path, 'w', encoding='utf-8') as file:  # Check to see if right encoding
                         file.write(file_content)
 
             # Return the file path of the downloaded file
