@@ -199,7 +199,6 @@ class ModelQuery:
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = False,
             ):
-
         return self._exec(
             query_type="ligand",
             entry_id=entry_id,
@@ -449,7 +448,6 @@ class ModelQuery:
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = False,
             ):
-
         return self._exec(
             query_type="symmetry_mates",
             entry_id=entry_id,
@@ -479,7 +477,6 @@ class ModelQuery:
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = False,
             ):
-
         return self._exec(
             query_type="assembly",
             entry_id=entry_id,
