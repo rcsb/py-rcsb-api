@@ -11,16 +11,7 @@ import warnings
 from typing import List, Dict, Union
 import requests
 from rcsbapi.const import const
-# from rich import print as rprint
-# from copy import deepcopy  # IS THIS NECESSARY, TO AVOID MODIFYING THE GROUP IN PLACE?? MIGHT BE GOOD TO USE THIS JUST IN CASE
-# from rcsbapi.search.search_schema import SearchSchemaGroup, Attr
-
-
-# ALSO TODO: Exclude any search attributes that don't have any search context (since they aren't searchable anyway)
-#            But in doing so, be aware that partial/parent paths will not have "rcsb_search_context" available
-#            (e.g., "chem_comp." doesn't, but many of its children do)
-
-# POSSIBLE TODO: Switch from this complicated grouping strategy below to use RUST...?
+from rich import print as rprint
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +110,8 @@ class SearchSchemaGroup:
         """
         split_attr = attribute.split(".")
         ptr = self  # dictionary of attributes
+        print("PTR", ptr)
+        print("attribute", attribute)
         for level in split_attr:
             if level not in ptr:
                 warnings.warn(f"Attribute path segment '{level}' (for input '{attribute}') not found in schema.", UserWarning)
@@ -204,11 +197,43 @@ class SearchSchema:
         if reload:
             self.struct_schema = self._reload_schema(struct_attr_schema_url, struct_attr_schema_file, refetch, use_fallback)
             self.chem_schema = self._reload_schema(chem_attr_schema_url, chem_attr_schema_file, refetch, use_fallback)
+            # Patch: delete duplicate chemical attributes from structure schema (after chemical attrs were merged in July 2025)
+            chem_keys = [i for i in self.chem_schema["properties"].keys()]
+            struc_keys = [i for i in self.struct_schema["properties"].keys()]
+            print(self.struct_schema["properties"]["drugbank_container_identifiers"]["properties"]["drugbank_id"]["description"])
+            self.struct_schema["properties"]["drugbank_container_identifiers"]["properties"]["drugbank_id"]["description"] = "The STRUCTURE attr DrugBank accession code"
+            print(self.struct_schema["properties"]["drugbank_container_identifiers"]["properties"]["drugbank_id"]["description"])
+            # exit()
+            # print(f"chem_keys: {chem_keys}")
+            # print(f"struc_keys: {struc_keys}")
+            # for k in chem_keys:
+            #     # if k in self.struct_schema["properties"] and k not in ["rcsb_id", "drugbank_container_identifiers"]:  # delete duplicate keys EXCEPT "rcsb_id"
+            #     if k in self.struct_schema["properties"] and k not in ["drugbank_container_identifiers"]:  # delete duplicate keys EXCEPT "rcsb_id"
+            #         _ = self.struct_schema["properties"].pop(k)
+            #         struc_keys.remove(k)
+            for k in chem_keys:
+                if k not in ["drugbank_container_identifiers"]:
+                # if k not in [ "rcsb_id", "drugbank_container_identifiers"]:
+                # if k not in ["rcsb_id"]:
+                    # print(k)
+                    _ = self.chem_schema["properties"].pop(k)
+            for k in struc_keys:
+                # if k != "rcsb_id" and k not in ["rcsb_assembly_info"]:
+                # if k not in ["rcsb_id"]:
+                # if k not in ["rcsb_id", "em_embedding", "drugbank_container_identifiers"]:
+                # if k not in ["em_embedding", "drugbank_container_identifiers"]:
+                if k not in ["drugbank_container_identifiers"]:
+                # if k not in ["rcsb_chem_comp_info"]:
+                # if k not in ["em_embedding"]:
+                # if k not in ["rcsb_branched_instance_feature"]:
+                # if k not in ["em_embedding", "rcsb_id"]:
+                    _ = self.struct_schema["properties"].pop(k)
+            print(f"chem_keys: {self.chem_schema["properties"].keys()}")
+            print(f"struc_keys: {self.struct_schema["properties"].keys()}")
             # Assemble list of nested attributes (uses above structure and chemical attribute schemas)
             self.nested_attribute_schema = self._extract_nested_indexing_contexts()
         self.search_attributes = self._make_schema_group()
-        # print(f"\n\nFINAL:\n{self.search_attributes}")
-        # rprint(f"\n\nFINAL:\n{self.search_attributes}")
+        print(f"\n\nFINAL:\n{self.search_attributes}")
 
     def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=True):
         sD = {}
@@ -251,63 +276,173 @@ class SearchSchema:
         An Attr (Leaf nodes) or SearchSchemaGroup (object nodes)
         """
         group = SearchSchemaGroup(self.Attr)
+        print(f"\nRESTARTING _make_group - fullname {fullname}")
+        # print("SELF: ", self.Attr.description)
+        # print("GROUP: ", group.Attr, group._members)
         for node, attrtype, desc in nodeL:
+            if "type" in node:
+                print(attrtype, node["type"], node.keys(), desc)
+            rprint(node)
+            # print(node["type"])
+            # print(attrtype, desc)
             if "anyOf" in node:
+                print("\nHERE IN anyOf\n")
                 children = {self._make_group(fullname, [(n, attrtype, n.get("description", node.get("description", desc)))]) for n in node["anyOf"]}
                 # Currently only deal with anyOf in leaf nodes
                 assert len(children) == 1, f"type of {fullname} couldn't be determined"
                 return next(iter(children))
             if "oneOf" in node:
+                print("\nHERE IN oneOf\n")
                 children = {self._make_group(fullname, [(n, attrtype, n.get("description", desc))]) for n in node["oneOf"]}
                 # Currently only deal with oneOf in leaf nodes
                 assert len(children) == 1, f"type of {fullname} couldn't be determined"
                 return next(iter(children))
             if "allOf" in node:
+                print("\nHERE IN allOf\n")
                 children = {self._make_group(fullname, [(n, attrtype, n.get("description", desc))]) for n in node["allOf"]}
                 # Currently only deal with allOf in leaf nodes
                 assert len(children) == 1, f"type of {fullname} couldn't be determined"
                 return next(iter(children))
             if node["type"] in ("string", "number", "integer", "date"):
+                rprint(f"NODE {node}")
+                rprint(f"GROUPa {group}")
                 # For nodes that occur in both schemas, list of both descriptions will be passed in through desc arg
+                # currentattr = getattr(group[childname], "type")
+                # attrlist = [currentattr, attrtype]
+
+                # currentdescript = getattr(group[childname], "description")
+                # descriptlist = [currentdescript, childnode.get("description", desc)]
+                # print(f"\n\n type(self.Attr) - {type(self.Attr)}")
+                # print(f"\n\n help(self.Attr) - {help(self.Attr)}")
+                attrtype_opposite_map = {"text": "text_chem", "text_chem": "text"}
+                desc_assign = None
+                attrtype_assign = None
+                print(f"FULL_NAME_IN_HERE", fullname)
+                print(f"GROUP_HERE", group)
+                print(f"CHECKING DESC", desc)
+                print(f"CHECKING attrtype", attrtype)
                 if isinstance(desc, list):
-                    return self.Attr(fullname, attrtype, desc)
+                    print("\nHERE IN TREATMENT 1\n")
+                    print("desc1: ", desc)
+                    if len(desc) == 1:
+                        desc_assign = desc + [node.get("description", desc[0])]
+                        attrtype_assign = attrtype + [attrtype_opposite_map[attrtype[0]]]
+                    # return self.Attr(fullname, attrtype, desc)
+                    else:
+                        desc_assign = desc
+                        attrtype_assign = attrtype
+                else:
+                    print("\nHERE IN TREATMENT 2\n")
+                    desc_assign = node.get("description", desc)
+                    attrtype_assign = attrtype
                 # For non-redundant nodes
-                return self.Attr(fullname, attrtype, node.get("description", desc))
+                print(f"\n NEW ATTR attrtype_assign, desc_assign: {attrtype_assign, desc_assign}")
+                print(f" NEW ATTR create: {self.Attr(fullname, attrtype_assign, desc_assign)}")
+                atout = self.Attr(fullname, attrtype_assign, desc_assign)
+                print("\n ATTR OUT", atout, type(atout), dir(atout))
+                return self.Attr(fullname, attrtype_assign, desc_assign)
             elif node["type"] == "array":
                 # skip to items
+                print("\nHERE IN array\n")
                 return self._make_group(fullname, [(node["items"], attrtype, node.get("description", desc))])
             elif node["type"] == "object":
+                print("\nHERE IN object\n")
+                # rprint("CURRENT self", dir(self), "\n")
                 for childname, childnode in node["properties"].items():
-                    # print("childname, childnode", childname, childnode)
                     fullchildname = f"{fullname}.{childname}" if fullname else childname
+                    print(f"\nHERE IN object - fullchildname {fullchildname} childnode {childnode}\n")
+                    # rprint("CURRENT GROUP", group, "\n")
                     # setattr(group, childname, childgroup)
+                    # childgroup = None
+                    # rprint("CURRENT GROUP", group, "\n")
                     if childname in group:
+                    # if childname in group and childnode.get("type") != "object":
+                        # ONLY NORMAL OCCURRENCE (in prod schema):
+                        # Childname in GROUP, rcsb_id <class 'rcsbapi.search.search_query.Attr'>
+                        print("Childname in GROUP,", childname, type(group[childname]))
+                        rprint("GROUP", group)
+                        print("GROUP[childname]", group[childname])
+                        # # ONLY NORMAL OCCURRENCE (in prod schema):
+                        # # Childname in GROUP, rcsb_id <class 'rcsbapi.search.search_query.Attr'>
+                        # print("Childname in GROUP 2,", childname, type(group[childname]))
+                        # rprint("GROUP", group)
+                        # print("GROUP[childname]", group[childname])
+                        # print("dir(GROUP[childname])", dir(group[childname]))
+                        # print("GROUP[childname].get_attribute_type", group[childname].get_attribute_type)
+                        # if isinstance(group[childname], SearchSchemaGroup):
+                        #     childgroup = self._make_group(fullchildname, [(childnode, attrtype, descriptlist)])
+                        #     continue
+
+                        rprint("CURRENT GROUP", group, "\n")
+                        # print("IS INSTANCE OF DICT", isinstance(group[childname], dict))
                         assert not isinstance(group[childname], dict)  # redundant name must not have nested attributes
-                        if childnode.get("type") not in ["object", "array"]:
+                        if childnode.get("type") == "object":
+                            print("CURRENT group 1 [childname]:", group[childname], type(group[childname]), dir(group[childname]))
+                            print("GROUP METHODS: ", dir(group))
+                            # print(group.get_attribute_type(fullchildname))
+                            # print("CURRENT group[childname]:", group[childname].Attr, type(group[childname].Attr), dir(group[childname].Attr))
+                            # print(getattr(group[childname], "type"))
+                            attrlist = [attrtype]
+                            descriptlist = [childnode.get("description", desc)]
+                            print("FULLCHILDNAME 1: ", fullchildname)
+                            print("\n OUT1 attrlist, descriptlist - ", attrlist, descriptlist)
+                            # childgroup = self._make_group(fullchildname, [(childnode, attrtype, childnode.get("description", desc))])
+                        else:
+                            print("CURRENT group 2 [childname]:", group[childname], type(group[childname]), dir(group[childname]))
                             # Create attrtype and description lists with existing and current value.
                             # List type triggers error if user doesn't specify service for redundant attribute.
                             currentattr = getattr(group[childname], "type")
                             attrlist = [currentattr, attrtype]
 
                             currentdescript = getattr(group[childname], "description")
+                            # getattr(group["drugbank_container_identifiers"]["drugbank_id"], "description")  ## THIS WORKS for type SchemaGroup
                             descriptlist = [currentdescript, childnode.get("description", desc)]
-                            childgroup = self._make_group(fullchildname, [(childnode, attrlist, descriptlist)])
-                        else:
-                            newchildgroup = self._make_group(fullchildname, [(childnode, attrtype, childnode.get("description", desc))])
-                            childgroup = self._merge_schema_groups(group[childname], newchildgroup)
+                            # print("KJDFLKJSDLKFJSDLKFJSLKJKLF")
+                            print("\n OUT2 attrlist, descriptlist - ", attrlist, descriptlist)
+
+                            print("FULLCHILDNAME 2: ", fullchildname)
+
+                        childgroup = self._make_group(fullchildname, [(childnode, attrlist, descriptlist)])
                     else:
-                        childgroup = self._make_group(fullchildname, [(childnode, attrtype, childnode.get("description", desc))])
+                        print("FULLCHILDNAME 3: ", fullchildname)
+                        # print("\n\n SPECIAL HERE \n\n")
+                        if isinstance(attrtype, list):
+                            if fullname:
+                                # currentattr = getattr(group[childname], "type")
+                                print("temporary fullchildname", fullchildname)
+                                currentattr = group.get_attribute_type(fullchildname)
+                                print("temporary out", currentattr)
+                                attrlist = [currentattr, attrtype]
+
+                                currentdescript = getattr(group[childname], "description")
+                                descriptlist = [currentdescript, childnode.get("description", desc)]
+
+                            # if len(desc) == 1:
+                            print(f"process DESC", desc, childnode.get("description"))
+                            print(f"process ATTRTYPE", attrtype)
+                            childgroup = self._make_group(fullchildname, [(childnode, attrtype, [childnode.get("description", desc[0])])])
+                            # els:
+                                # childgroup = self._make_group(fullchildname, [(childnode, attrtype, [childnode.get("description", desc)])])
+                        else:
+                            childgroup = self._make_group(fullchildname, [(childnode, attrtype, childnode.get("description", desc))])
                     # adding to SearchSchemaGroup as a dict allows for determining search service by attribute name with O(1) lookup
+                    # if childgroup:
+                    # if childname in group:
+                    #     print(f"\n childname {childname} in group {group}")
+                    #     if childnode.get("type") == "object":
+                    #         print(f"\n childnode is type OBJECT")
+                    #     else:
+                    #         print(f"\n childnode is NOT type OBJECT")
+
+                    #     pass
+                    # else:
                     group[childname] = childgroup
 
                     # adding to SearchSchemaGroup as an attribute allows for tab-completion for search_attributes/attrs
-                    #
-                    # NOTE: THIS IS BROKEN NOW THOUGH, e.g., 'attrs.chem_comp.formula' is no longer available (or 'attrs.rcsb_chem_comp_container_identifiers.comp_id')
-                    # I suspect it is related to how the 'merge' method doesn't call 'group[childname] = childgroup' and the below 'setattr(group, childname, childgroup)'
-                    # lines at each iteration.
                     setattr(group, childname, childgroup)
             else:
                 raise TypeError(f"Unrecognized node type {node['type']!r} of {fullname}")
+            # rprint("CURRENT GROUP", group, "\n")
         return group
 
     def _set_leaves(self, d: Dict) -> Dict:
@@ -410,26 +545,3 @@ class SearchSchema:
                             queue.append((item, path))
 
         return found
-
-    def _merge_schema_groups(self, group_a: SearchSchemaGroup, group_b: SearchSchemaGroup) -> SearchSchemaGroup:
-        merged = SearchSchemaGroup(self.Attr)
-        keys = set(group_a.keys()).intersection(group_b.keys())   # Only merge keys that exist in both
-
-        for k in keys:
-            attr_a = group_a[k]
-            attr_b = group_b[k]
-            if isinstance(attr_a, SearchSchemaGroup):
-                subattr_merged = self._merge_schema_groups(attr_a, attr_b)
-                merged[k] = subattr_merged
-            else:
-                # Merge type and description
-                type_list = [attr_a.type, attr_b.type]
-                description_list = [attr_a.description, attr_b.description]
-
-                merged[k] = self.Attr(
-                    attribute=attr_a.attribute,  # assuming attribute is same in both
-                    type=type_list,
-                    description=description_list
-                )
-
-        return merged
