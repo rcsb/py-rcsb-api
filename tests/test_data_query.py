@@ -455,14 +455,14 @@ class QueryTests(unittest.TestCase):
 
 def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
-    # suiteSelect.addTest(QueryTests("testGetEditorLink"))
-    # suiteSelect.addTest(QueryTests("testExec"))
-    # suiteSelect.addTest(QueryTests("testLowercaseIds"))
-    # suiteSelect.addTest(QueryTests("testBatchIDs"))
-    # suiteSelect.addTest(QueryTests("testDocs"))
-    # suiteSelect.addTest(QueryTests("testAddExamples"))
-    # suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
-    # suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    suiteSelect.addTest(QueryTests("testGetEditorLink"))
+    suiteSelect.addTest(QueryTests("testExec"))
+    suiteSelect.addTest(QueryTests("testLowercaseIds"))
+    suiteSelect.addTest(QueryTests("testBatchIDs"))
+    suiteSelect.addTest(QueryTests("testDocs"))
+    suiteSelect.addTest(QueryTests("testAddExamples"))
+    suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
+    suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
     suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
 
