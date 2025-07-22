@@ -34,7 +34,7 @@ The Model Server API supports multiple query types, including:
 - `atoms`: Fetches atom-level details.
 - `residue_interaction`: Retrieves data on interactions between residues.
 - `residue_surroundings`: Provides information about residues surrounding a given structure.
-- `surrounding_ligands`: Provides information about residues surrounding a given structure.
+- `surrounding_ligands`: Provides information about ligands surrounding a given structure.
 - `symmetry_mates`: Retrieves symmetry-related data.
 - `assembly`: Fetches information about molecular assemblies.
 

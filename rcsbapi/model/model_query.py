@@ -207,6 +207,21 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Retrieve the full atomic model of a specified entry from the ModelServer.
+
+        Parameters:
+            entry_id (str): The PDB ID of the structure to retrieve.
+            model_nums (Optional[List[int]]): List of model numbers to include (if multiple models exist).
+            encoding (Optional[Literal["cif", "bcif"]]): Format of the returned file (default is "cif").
+            copy_all_categories (Optional[bool]): If True, copies all data categories; otherwise, uses minimal.
+            data_source (Optional[str]): Optional data source name.
+            transform (Optional[str]): Transformation matrix to apply to coordinates.
+            download (Optional[bool]): If True, downloads and saves the file to disk.
+            filename (Optional[str]): Custom filename to use if downloading.
+            file_directory (Optional[str]): Directory where file will be saved.
+            compress_gzip (Optional[bool]): If True, compress the output file using GZIP.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download else self.download
@@ -248,10 +263,13 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Retrieves ligand-related information, including components and interactions.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="ligand",
             entry_id=entry_id,
@@ -300,10 +318,13 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Fetches atom-level details.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="atoms",
             entry_id=entry_id,
@@ -354,10 +375,13 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Retrieves data on interactions between residues.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="residue_interaction",
             entry_id=entry_id,
@@ -410,10 +434,13 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Provides information about residues surrounding a given structure.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="residue_surroundings",
             entry_id=entry_id,
@@ -467,10 +494,13 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Provides information about ligands surrounding a given structure.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="surrounding_ligands",
             entry_id=entry_id,
@@ -512,10 +542,13 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Retrieves symmetry-related data.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="symmetry_mates",
             entry_id=entry_id,
@@ -544,10 +577,13 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = None,):
+        """
+        Fetches information about molecular assemblies.
+        """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="assembly",
             entry_id=entry_id,
