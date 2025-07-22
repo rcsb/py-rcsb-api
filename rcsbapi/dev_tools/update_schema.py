@@ -140,6 +140,19 @@ if __name__ == "__main__":
     with open(data_schema_path, "wt", encoding="utf-8") as f:
         json.dump(schema_response.json(), f, indent=4)
 
+    # Update ModelServer OpenAPI schema
+    model_schema_url = const.MODELSERVER_API_SCHEMA_URL
+    model_schema_path = Path(__file__).parent.parent.joinpath(const.MODELSERVER_API_SCHEMA_FILEPATH)
+
+    model_schema_response = requests.get(
+        model_schema_url,
+        headers={"User-Agent": const.USER_AGENT},
+        timeout=config.API_TIMEOUT
+    )
+    assert model_schema_response.status_code == 200
+    with open(model_schema_path, "wt", encoding="utf-8") as f:
+        json.dump(model_schema_response.json(), f, indent=4)
+
     # Check if search schema version numbers are the same as each other
     version_list = list(search_version_dict.values())
     curr_ver_list = list(search_current_ver_dict.values())
