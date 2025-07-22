@@ -16,6 +16,8 @@ jobs:
       vmImage: 'macOS-15'
     ${{ if eq(parameters.os, 'linux') }}:
       vmImage: 'ubuntu-latest'
+    ${{ if eq(parameters.os, 'windows') }}:
+      vmImage: 'windows-latest'
 
   variables:
     - group: py-shared-variables
@@ -46,6 +48,10 @@ jobs:
         displayName: 'Installing OS dependencies'
       - script: apt-cache policy | grep http | awk '{print $2 $3}' | sort -u
         displayName: 'Checking for repos'
+    #
+    - ${{ if startsWith(parameters.os, 'windows') }}:
+      - script: python -c "import platform; print('Running on', platform.system())"
+        displayName: "Confirm Windows OS"
     #
     - script: "python -c \"import sys; print(sys.version); print(sys.executable)\""
       displayName: show python information
