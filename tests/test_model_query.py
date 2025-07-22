@@ -39,7 +39,7 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("2. Starting Full structure query with illegal parameters")
             try:
                 result = self.model_query.get_full_structure(
-                    entry_id="krish", encoding="cif", model_nums="2", copy_all_categories=False
+                    entry_id="krish", encoding="cif", model_nums=[2], copy_all_categories=False
                 )
                 logger.info("Query result: %s", self.log_first_10_lines(result))
                 self.assertIn("error", str(result).lower(), "Expected 'error' in result output")
@@ -137,7 +137,7 @@ class ModelQueryTests(unittest.TestCase):
             try:
                 file_path = self.model_query.get_full_structure(
                     entry_id=self.entry_id, encoding="cif", download=True, filename="1tqn_full_structure.cif",
-                    file_directory=self.test_output_directory, model_nums="1"
+                    file_directory=self.test_output_directory, model_nums=[1]
                 )
                 logger.info("File downloaded successfully, file path: %s", file_path)
                 self.assertIn("1tqn_full_structure.cif", file_path, "Downloaded file path doesn't match expected file name.")
@@ -151,7 +151,7 @@ class ModelQueryTests(unittest.TestCase):
             try:
                 file_path = self.model_query.get_full_structure(
                     entry_id=self.entry_id, encoding="cif", download=True, filename="1tqn_full_structure.cif",
-                    file_directory=self.test_output_directory, model_nums="1", compress_gzip=True,
+                    file_directory=self.test_output_directory, model_nums=[1], compress_gzip=True,
                 )
                 logger.info("File downloaded successfully, file path: %s", file_path)
                 self.assertIn("1tqn_full_structure.cif.gz", file_path, "Downloaded file path doesn't match expected file name.")
@@ -164,7 +164,7 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Get multiple structures query with expanded parameters")
             try:
                 result = self.model_query.get_multiple_structures(
-                    entry_ids=self.entry_ids, query_type="full", encoding="cif", model_nums="1", transform="rotate"
+                    entry_ids=self.entry_ids, query_type="full", encoding="cif", model_nums=[1], transform="rotate"
                 )
                 # Check if the length of entry_ids and the result are the same
                 if len(self.entry_ids) != len(result):
