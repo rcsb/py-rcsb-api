@@ -590,9 +590,6 @@ class GQLSchema(ABC):
             info_list = []
             for path_group in return_data_paths.values():
                 for path in path_group:
-                    # PREVIOUSLY:
-                    # assert len(path) == 1
-                    # info_list.append(".".join(self._idx_path_to_name_path(path[0][1:])))
                     info_list.append(".".join(self._idx_path_to_name_path(path)))
             if (added_rcsb_id is True) and ("rcsb_id" in info_list):
                 info_list.remove("rcsb_id")
@@ -969,8 +966,8 @@ class GQLSchema(ABC):
         )
         # return_data_query_list is a list of queries, each one corresponding to one field in return_data_list
         return_data_query_list: List[dict[int, Any] | List[int] | List[dict[int, Any] | int]] = []
-        for return_field_idx, paths in return_data_path_dict.items():
-            for path in paths:
+        for return_field_idx, path_group in return_data_path_dict.items():
+            for path in path_group:
                 # Format the paths with the correct nesting of fields. Still using indices at this point
                 return_field_query_dict = self._idxs_to_idx_dict(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
                 return_data_query_list.append(return_field_query_dict)
