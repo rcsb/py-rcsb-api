@@ -483,6 +483,7 @@ class QueryTests(unittest.TestCase):
                 logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
+
         with self.subTest(msg="14. More complex queries, multiple return data with same endpoint"):
             try:
                 query = DataQuery(
