@@ -47,19 +47,38 @@
 # print(results)
 
 
+# from rcsbapi.model import ModelQuery
+# model_query = ModelQuery(
+#     encoding="cif",
+#     file_directory="model-output",
+#     download=True
+# )
+
+# output_path = model_query.get_full_structure(
+#     entry_id="1tqn",
+#     filename="1tqn_structure.cif",
+#     # encoding="cif",  <-- above default will be used, unless this is commented back in
+#     # download=True,  <-- above default will be used, unless this is commented back in
+#     # file_directory="model-output"  <-- above default will be used, unless this is commented back in
+# )
+
+# print(output_path)
+
 from rcsbapi.model import ModelQuery
-model_query = ModelQuery(
+query = ModelQuery()
+
+result = query.get_full_structure(
+    entry_id="2HHB",
     encoding="cif",
-    file_directory="model-output",
-    download=True
+    download=True,
+    file_directory="model-output"
 )
+print(result)  # <-- prints relative path
 
-output_path = model_query.get_full_structure(
-    entry_id="1tqn",
-    filename="1tqn_structure.cif",
-    # encoding="cif",  <-- above default will be used, unless this is commented back in
-    # download=True,  <-- above default will be used, unless this is commented back in
-    # file_directory="model-output"  <-- above default will be used, unless this is commented back in
+
+result = query.get_full_structure(
+    entry_id="2HHB",
+    encoding="cif",
+    download=True,
 )
-
-print(output_path)
+print(result)  # <-- prints absolute path
