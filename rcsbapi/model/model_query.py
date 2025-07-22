@@ -270,7 +270,7 @@ class ModelQuery:
             compress_gzip: Optional[bool] = None,):
         """
         Retrieves ligand-related information, including components and interactions.
-  
+
         Parameters:
             entry_id (str): The PDB ID of the structure.
             label_entity_id (str, optional): Entity identifier using label nomenclature.
