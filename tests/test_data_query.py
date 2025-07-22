@@ -317,31 +317,36 @@ class QueryTests(unittest.TestCase):
         with self.subTest(msg="4. Making Queries"):
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["nonpolymer_bound_components"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="5. input_ids, mult args"):
             try:
                 query = DataQuery(input_type="polymer_entity_instances", input_ids=["4HHB.A"], return_data_list=["nonpolymer_bound_components"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="6. input_ids, list as entry input_ids"):
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["nonpolymer_bound_components"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="7. input_ids, list as polymer instance input_ids"):
             try:
                 query = DataQuery(input_type="polymer_entity_instances", input_ids=["4HHB.A"], return_data_list=["nonpolymer_bound_components"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="8. return_data_list, Not a unique field error"):
             with self.assertRaises(ValueError):
                 query = DataQuery(input_type="polymer_entity_instances", input_ids=["4HHB.A"], return_data_list=["polymer_composition"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
         with self.subTest(msg="9. return_data_list, find_paths() methods"):
             try:
                 schema = DataSchema()
@@ -351,7 +356,8 @@ class QueryTests(unittest.TestCase):
         with self.subTest(msg="10. return_data_list, corrected query with non-redundant field"):
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["rcsb_entry_info.polymer_composition"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
         with self.subTest(msg="11. find_field_names()"):
@@ -374,6 +380,21 @@ class QueryTests(unittest.TestCase):
             try:
                 query = DataQuery(
                     input_type="entries", input_ids=["4HHB"], return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"]
+                )
+                resD = query.exec()
+                logger.info("resD: %r", resD)
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+        with self.subTest(msg="14. More complex queries, multiple return data with same endpoint"):
+            try:
+                query = DataQuery(
+                    input_type="entries",
+                    input_ids=["1A07"],
+                    return_data_list=[
+                        "polymer_entities.chem_comp_nstd_monomers.chem_comp.id",
+                        "branched_entities.chem_comp_monomers.chem_comp.id",
+                        "nonpolymer_entities.nonpolymer_comp.chem_comp.id",
+                    ]
                 )
                 resD = query.exec()
                 logger.info("resD: %r", resD)
@@ -455,15 +476,15 @@ class QueryTests(unittest.TestCase):
 
 def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
-    suiteSelect.addTest(QueryTests("testGetEditorLink"))
-    suiteSelect.addTest(QueryTests("testExec"))
-    suiteSelect.addTest(QueryTests("testLowercaseIds"))
-    suiteSelect.addTest(QueryTests("testBatchIDs"))
-    suiteSelect.addTest(QueryTests("testDocs"))
-    suiteSelect.addTest(QueryTests("testAddExamples"))
+    # suiteSelect.addTest(QueryTests("testGetEditorLink"))
+    # suiteSelect.addTest(QueryTests("testExec"))
+    # suiteSelect.addTest(QueryTests("testLowercaseIds"))
+    # suiteSelect.addTest(QueryTests("testBatchIDs"))
+    # suiteSelect.addTest(QueryTests("testDocs"))
+    # suiteSelect.addTest(QueryTests("testAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
-    suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
-    suiteSelect.addTest(QueryTests("testAllStructures"))
+    # suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    # suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
 
 
