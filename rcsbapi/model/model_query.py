@@ -229,8 +229,8 @@ class ModelQuery:
         """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        download = download if download else self.download
-        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
+        download = download if download is not None else self.download
+        compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
         return self._exec(
             query_type="full",
             entry_id=entry_id,
