@@ -24,11 +24,11 @@ logger.setLevel(logging.INFO)
 class SeqTests(unittest.TestCase):
     def setUp(self) -> None:
         self.__startTime = time.time()
-        logger.info("Starting %s at %s", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
+        logger.info("Starting %s at %s", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
 
     def tearDown(self) -> None:
         endTime = time.time()
-        logger.info("Completed %s at %s (%.4f seconds)", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
+        logger.info("Completed %s at %s (%.4f seconds)", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
     def testAnnotations(self) -> None:
         with self.subTest(msg="1. Annotations query with filter"):
