@@ -294,7 +294,7 @@ class ModelQuery:
             file_directory (str, optional): Directory path to save the output file.
             compress_gzip (bool, optional): If True, compress the file using gzip.
         """
-        encoding = encoding if encoding else self.encoding
+        encoding = encoding if encoding is not None else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download is not None else self.download
         compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
@@ -338,7 +338,7 @@ class ModelQuery:
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -349,7 +349,7 @@ class ModelQuery:
         """
         Fetches atom-level details.
         """
-        encoding = encoding if encoding else self.encoding
+        encoding = encoding if encoding is not None else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download is not None else self.download
         compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
@@ -395,7 +395,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -406,7 +406,7 @@ class ModelQuery:
         """
         Retrieves data on interactions between residues.
         """
-        encoding = encoding if encoding else self.encoding
+        encoding = encoding if encoding is not None else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download is not None else self.download
         compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
@@ -454,7 +454,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -465,7 +465,7 @@ class ModelQuery:
         """
         Provides information about residues surrounding a given structure.
         """
-        encoding = encoding if encoding else self.encoding
+        encoding = encoding if encoding is not None else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download is not None else self.download
         compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
@@ -514,7 +514,7 @@ class ModelQuery:
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -525,7 +525,7 @@ class ModelQuery:
         """
         Provides information about ligands surrounding a given structure.
         """
-        encoding = encoding if encoding else self.encoding
+        encoding = encoding if encoding is not None else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download is not None else self.download
         compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
@@ -562,7 +562,7 @@ class ModelQuery:
             entry_id: str,
             radius: Optional[float] = 5.0,
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -573,7 +573,7 @@ class ModelQuery:
         """
         Retrieves symmetry-related data.
         """
-        encoding = encoding if encoding else self.encoding
+        encoding = encoding if encoding is not None else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download is not None else self.download
         compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
@@ -597,7 +597,7 @@ class ModelQuery:
             entry_id: str,
             name: Optional[str] = "1",
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -608,7 +608,7 @@ class ModelQuery:
         """
         Fetches information about molecular assemblies.
         """
-        encoding = encoding if encoding else self.encoding
+        encoding = encoding if encoding is not None else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
         download = download if download is not None else self.download
         compress_gzip = compress_gzip if compress_gzip is not None else self.compress_gzip
