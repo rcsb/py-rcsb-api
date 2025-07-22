@@ -15,7 +15,7 @@ import rcsbapi.model
 ```
 
 ## Getting Started
-The RCSB [ModelServer API](https://models.rcsb.org/) provides access to molecular structure data and related information. The Model Server API allows you to query for various structural data types, such as full structure, ligands, atoms, residue interactions, and more.
+The RCSB [ModelServer API](https://models.rcsb.org/) provides access to molecular structure data (e.g., atomic coordinates) and related information. The Model Server API allows you to query for various structural data types, such as full structure, ligands, atoms, residue interactions, and more.
 
 Key Features
 - Full Structure Data: Access complete structural information about biomolecules in different formats (e.g., CIF, BCIF).
@@ -23,19 +23,20 @@ Key Features
 - Atoms and Residue Data: Query for atom-level or residue-level data, including surrounding residues, interactions, and symmetries.
 - Symmetry Mates and Assemblies: Obtain symmetry mates or assembly data, important for understanding molecular structures in different environments.
 
-The API supports queries for Experimental Structures but not Computed Structure Models (CSMs).
+The API supports queries for Experimental Structures. (Support for Computed Structure Models (CSMs) is not yet available.)
 
 ### Query Types
 
 The Model Server API supports multiple query types, including:
 
-- full: Fetches the full structure for a given entry.
-- ligand: Retrieves ligand-related information, including components and interactions.
-- atoms: Fetches atom-level details.
-- residue_interaction: Retrieves data on interactions between residues.
-- residue_surroundings: Provides information about residues surrounding a given structure.
-- symmetry_mates: Retrieves symmetry-related data.
-- assembly: Fetches information about molecular assemblies.
+- `full`: Fetches the full structure for a given entry.
+- `ligand`: Retrieves ligand-related information, including components and interactions.
+- `atoms`: Fetches atom-level details.
+- `residue_interaction`: Retrieves data on interactions between residues.
+- `residue_surroundings`: Provides information about residues surrounding a given structure.
+- `surrounding_ligands`: Provides information about residues surrounding a given structure.
+- `symmetry_mates`: Retrieves symmetry-related data.
+- `assembly`: Fetches information about molecular assemblies.
 
 This package provides an interface to the Model Server API, making it easy to send requests and retrieve data in various formats.
 
@@ -48,22 +49,31 @@ You can use this API to automate data retrieval and integrate it into your bioin
 
 ## Full Structure
 
-`Full Structure` queries fetch complete structural data for a given entry.
+Use the `.get_full_structure()` method to fetch complete structural data for a given entry.
 
 ```python
 from rcsbapi.model import ModelQuery
 
-# Fetch the full structure for the entry "2HHB"
+# Fetch the full structure for the entry "2HHB" and store content in `result` variable
 query = ModelQuery()
 result = query.get_full_structure(entry_id="2HHB")
+print(result[:500])
+
+# Or, download the structure:
+result = query.get_full_structure(
+    entry_id="2HHB",
+    encoding="cif",
+    download=True,
+    file_directory="model-output"
+)
 print(result)
 ```
 
 | Argument              | Description                                                |
 | --------------------- | ---------------------------------------------------------- |
 | `entry_id`            | The ID of the structure (e.g., "2HHB")                     |
-| `model_nums`          | The model numbers to fetch (optional)                      |
-| `encoding`            | The encoding format for the response (`cif`, `bcif`) |
+| `model_nums`          | The model numbers to fetch (optional). If set, only include atoms with the corresponding `_atom_site.pdbx_PDB_model_num` field.                    |
+| `encoding`            | The encoding format for the response (`cif` (default), `bcif`) |
 | `copy_all_categories` | Whether to copy all categories (default: False)            |
 | `data_source`         | The data source for the structure                          |
 | `transform`           | Apply any transformations (optional)                       |
@@ -75,15 +85,17 @@ print(result)
 
 ## Ligand Data
 
-`Ligand` queries fetch ligand-related data for a given structure.
+Use the `.get_ligand()` method to fetch ligand-related data (metadata and coordinates) within a given structure.
+
+Note that by default this returns only the first instance of the specified ligand (e.g., if there are 10 `HEM` ligands in the structure, only the first one is returned). If you want a specific instance of the ligand, you can specify `label_asym_id` and/or `label_entity_id`. If you want *all* occurrences of a specific ligand, you should use the `.get_atoms()` [method below](#atoms-data).
 
 ```python
 from rcsbapi.model import ModelQuery
 
-# Fetch ligand data for the entry "2HHB"
+# Fetch the first occurrence of the `HEM` ligand for entry "4HHB"
 query = ModelQuery()
-ligand_result = query.get_ligand(entry_id="2HHB", label_comp_id="HEM")
-print(ligand_result)
+result = query.get_ligand(entry_id="4HHB", label_comp_id="HEM", download=True, filename="4HHB_HEM_ligand.cif", file_directory="model-output")
+print(result)
 ```
 
 | Argument              | Description                                                                |
@@ -112,15 +124,15 @@ print(ligand_result)
 
 ## Atoms Data
 
-`Atoms` queries fetch atom-level data from a given structure.
+Use the `.get_atoms()` method to fetch atom-level data (coordinates and metadata) from a given structure. This can be used to fetch all `atom_site` data for a particular component using `label_comp_id` (e.g., all `HEM` ligands, all water molecules `HOH`, or all `CYS` residues), a given entity, a specific residue in the sequence, and/or a combination of these criteria.
 
 ```python
-from rcsbapi.model_query import ModelQuery
+from rcsbapi.model import ModelQuery
 
-# Fetch atoms data for the entry "2HHB"
+# Fetch the metadata and `atom_site` coordinates of ALL occurrence of `HEM` in entry "4HHB"
 query = ModelQuery()
-atoms_result = query.get_atoms(entry_id="2HHB")
-print(atoms_result)
+result = query.get_atoms(entry_id="4HHB", label_comp_id="HEM", download=True, filename="4HHB_HEM_atoms.cif", file_directory="model-output")
+print(result)
 ```
 
 | Argument              | Description                                          |
@@ -148,21 +160,30 @@ print(atoms_result)
 | `compress_gzip`       | Whether to compress the file (default: False)        |
 
 
-Here is the **ReadTheDocs**-formatted section for the **Residue Interaction** query using the updated parameters:
-
----
-
 ## Residue Interaction
 
-`Residue Interaction` queries fetch data on interactions between residues in a structure.
+Use the `.get_residue_interaction()` method to fetch data (metadata and coordinates) on the surrounding residues of a given ligand or residue. If you only provide the `label_comp_id`, the server will return the interaction data for *all* occurrences of the component. This method takes crystal symmetry into account (returned data includes `_molstar_atom_site_operator_mapping`).
 
 ```python
 from rcsbapi.model import ModelQuery
 
-# Fetch residue interaction data for the entry "2HHB"
+# Fetch surrounding residues for ALL `HEM` ligands in entry "4HHB"
 query = ModelQuery()
-residue_interaction_result = query.get_residue_interaction(entry_id="2HHB")
-print(residue_interaction_result)
+result = query.get_residue_interaction(entry_id="4HHB", label_comp_id="HEM", radius=5.0, download=True, file_directory="model-output")
+print(result)
+
+# Fetch surrounding residues for `HEM` chain `E` in entry "4HHB"
+query = ModelQuery()
+result = query.get_residue_interaction(
+    entry_id="4HHB",
+    label_comp_id="HEM",
+    label_asym_id="E",
+    radius=5.0,
+    download=True,
+    filename="4HHB_HEM_E_residue_interaction.cif",
+    file_directory="model-output"
+)
+print(result)
 ```
 
 | Argument              | Description                                                   |
@@ -194,15 +215,23 @@ print(residue_interaction_result)
 
 ## Residue Surroundings
 
-`Residue Surroundings` queries fetch data on residues surrounding a specific residue in a structure.
+Use the `.get_residue_surroundings()` method to fetch data (metadata and coordinates) on the surrounding residues of a given ligand or residue. If you only provide the `label_comp_id`, the server will return the interaction data for *all* occurrences of the component. Similar to [Residue Interaction](#residue-interaction), but doesn't take crystal symmetry into account (returned data does *not* include `_molstar_atom_site_operator_mapping`).
 
 ```python
 from rcsbapi.model import ModelQuery
 
-# Fetch residue surrounding data for the entry "2HHB"
+# Fetch surrounding residues for `HEM` chain `E` in entry "4HHB"
 query = ModelQuery()
-residue_surroundings_result = query.get_residue_surroundings(entry_id="2HHB", radius=6.0)
-print(residue_surroundings_result)
+result = query.get_residue_surroundings(
+    entry_id="4HHB",
+    label_comp_id="HEM",
+    label_asym_id="E",
+    radius=5.0,
+    download=True,
+    filename="4HHB_HEM_E_residue_surroundings.cif",
+    file_directory="model-output"
+)
+print(result)
 ```
 
 | Argument              | Description                                                    |
@@ -234,15 +263,22 @@ print(residue_surroundings_result)
 
 ## Surrounding Ligands
 
-`Surrounding Ligands` queries fetch data on ligands that are within a certain proximity of a residue in a structure.
+Use the `.get_surrounding_ligands()` method to fetch data on ligands that are within a certain proximity of a residue in a structure. This method takes crystal symmetry into account (returned data includes `_molstar_atom_site_operator_mapping`).
 
 ```python
 from rcsbapi.model import ModelQuery
 
-# Fetch surrounding ligands data for the entry "2HHB"
+# Fetch surrounding ligands for `ALA 284` in entry "1TQN"
 query = ModelQuery()
-surrounding_ligands_result = query.get_surrounding_ligands(entry_id="2HHB", radius=5.0, omit_water=True)
-print(surrounding_ligands_result)
+result = query.get_surrounding_ligands(
+    entry_id="1TQN",
+    label_comp_id="ALA",
+    label_seq_id=284,
+    radius=5.0,
+    download=True,
+    file_directory="model-output"
+)
+print(result)
 ```
 
 | Argument              | Description                                                                      |
@@ -259,7 +295,7 @@ print(surrounding_ligands_result)
 | `label_atom_id`       | The label for the ligand atom                                                    |
 | `auth_atom_id`        | The author atom ID for the ligand                                                |
 | `type_symbol`         | The chemical type symbol for the ligand                                          |
-| `omit_water`          | Whether to exclude water molecules from the surrounding ligands (default: False) |
+| `omit_water`          | Whether to exclude water molecules from the surrounding ligands (default: False). (*Note: this does not appear to be functional on the ModelServer API yet*) |
 | `radius`              | The interaction radius for surrounding ligands (default: 5.0)                    |
 | `assembly_name`       | The assembly name (optional)                                                     |
 | `model_nums`          | The model numbers to fetch (optional)                                            |
@@ -275,15 +311,15 @@ print(surrounding_ligands_result)
 
 ## Symmetry Mates
 
-`Symmetry Mates` queries fetch data on symmetry-related structures within a specified radius.
+Use the `.get_symmetry_mates()` method to compute crystal symmetry mates within a specified radius.
 
 ```python
 from rcsbapi.model import ModelQuery
 
-# Fetch symmetry mates data for the entry "2HHB"
+# Generate the symmetry mates (unit cell replications) for the entry "1TQN"
 query = ModelQuery()
-symmetry_mates_result = query.get_symmetry_mates(entry_id="2HHB", radius=5.0)
-print(symmetry_mates_result)
+result = query.get_symmetry_mates(entry_id="1TQN", download=True, file_directory="model-output")
+print(result)
 ```
 
 | Argument              | Description                                              |
@@ -301,23 +337,23 @@ print(symmetry_mates_result)
 | `compress_gzip`       | Whether to compress the file (default: False)            |
 
 
-## Assembly
+## Assembly Data
 
-`Assembly` queries fetch data on the structure's assembly, useful for obtaining the full model or chain assembly.
+Use the `.get_assembly()` method to extract a structural assembly (select group of instances or "chains") from an entry.
 
 ```python
 from rcsbapi.model import ModelQuery
 
-# Fetch assembly data for the entry "2HHB"
+# Fetch assembly "3" for the entry "13PK"
 query = ModelQuery()
-assembly_result = query.get_assembly(entry_id="2HHB", name="1")
-print(assembly_result)
+result = query.get_assembly(entry_id="13PK", name="3", download=True, file_directory="model-output")
+print(result)
 ```
 
 | Argument              | Description                                          |
 | --------------------- | ---------------------------------------------------- |
 | `entry_id`            | The ID of the structure (e.g., "2HHB")               |
-| `name`                | The assembly name (default: "1")                     |
+| `name`                | The assembly id (default: "1")                       |
 | `model_nums`          | The model numbers to fetch (optional)                |
 | `encoding`            | The encoding format for the response (`cif`, `bcif`) |
 | `copy_all_categories` | Whether to copy all categories (default: False)      |
@@ -327,3 +363,39 @@ print(assembly_result)
 | `filename`            | The name of the file to save                         |
 | `file_directory`      | Directory to save the file                           |
 | `compress_gzip`       | Whether to compress the file (default: False)        |
+
+
+## Working with Multiple Structures
+
+Let's say you want to download or fetch data for several structures at once. You can do so by providing a list to the `.get_multiple_structures()` method:
+
+```python
+
+# List of structure IDs to query
+entry_ids = ["1CBS", "4HHB"]
+
+# Fetch multiple structures (e.g., "full" type) and save the result
+results = query.get_multiple_structures(
+    entry_ids,
+    query_type="full",
+    encoding="cif",
+    download=True,
+    compress_gzip=True,
+    file_directory="model-output"
+)
+
+print(results)
+```
+
+The `.get_multiple_structures()` method is ammenable to any of the available types of queries via the `query_type` argument:
+
+| Query type method             | Corresponding `query_type` value     |
+|-------------------------------|--------------------------------------|
+| `.get_full_structure()`       | `full`                               |
+| `.get_ligand()`               | `ligand`                             |
+| `.get_atoms()`                | `atoms`                              |
+| `.get_residue_interaction()`  | `residue_interaction`                |
+| `.get_residue_surroundings()` | `residue_surroundings`               |
+| `.get_surrounding_ligands()`  | `surrounding_ligands`                |
+| `.get_symmetry_mates()`       | `symmetry_mates`                     |
+| `.get_assembly()`             | `assembly`                           |

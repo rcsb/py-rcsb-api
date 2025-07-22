@@ -43,44 +43,62 @@ class QueryTests(unittest.TestCase):
         self.assertEqual(response_json.status_code, 200)
 
     def testExec(self) -> None:
-        with self.subTest("1. Batching into requests with fewer Ids"):
+        msg = "1. Batching into requests with fewer Ids"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             input_ids = []
             for _ in range(165):
                 input_ids.append("4HHB")
             query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": input_ids}, return_data_list=["exptl"])
-            query_obj.exec()
+            resD = query_obj.exec()
+            logger.info("len(resD['data']['entries']): %r", len(resD["data"]["entries"]))
             # assert that the batch and merge functions are called
             # assert len of results is same as num of input ids
 
     def testLowercaseIds(self) -> None:
-        with self.subTest(msg="1. List of IDs"):
+        msg = "1. List of IDs"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="entries", input_ids=["4hhb"], return_data_list=["exptl.method"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="2. Dictionary of IDs"):
+        msg = "2. Dictionary of IDs"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": ["4hhb", "1iye"]}, return_data_list=["exptl"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="2. IDs with separators"):
+        msg = "3. IDs with separators"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="interfaces", input_ids=["4hhb-1.1"], return_data_list=["rcsb_interface_info.interface_area"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="3. Pubmed IDs"):
+        msg = "4. Pubmed IDs"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="pubmed", input_ids=[6726807], return_data_list=["rcsb_pubmed_doi"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="3. UniProt IDs"):
+        msg = "5. UniProt IDs"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="uniprot", input_ids=["p68871"], return_data_list=["rcsb_id"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
@@ -106,17 +124,24 @@ class QueryTests(unittest.TestCase):
         pass
 
     def testDocs(self) -> None:
-        with self.subTest(msg="1. Initialize Schema"):
+        msg = "1. Initialize Schema"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             schema = DataSchema()
 
-        with self.subTest(msg="2. README 1"):
+        msg = "2. README 1"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["exptl.method"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="3. README 2"):
+        msg = "3. README 2"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(
                     input_type="polymer_entities",
@@ -129,36 +154,49 @@ class QueryTests(unittest.TestCase):
                         "identity",
                     ],
                 )
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="4. Quickstart 1"):
+        msg = "4. Quickstart 1"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["exptl.method"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="5. Quickstart 2, autocompletion"):
+        msg = "5. Quickstart 2, autocompletion"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query_obj = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["exptl"])
-                query_obj.exec()
+                resD = query_obj.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="4. Helpful methods, get_editor_link()"):
+        msg = "5. Helpful methods, get_editor_link()"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["exptl"])
             response = requests.get(query.get_editor_link(), timeout=5)
             self.assertEqual(response.status_code, 200)
 
-        with self.subTest(msg="5. Helpful methods, find_paths()"):
+        msg = "5. Helpful methods, find_paths()"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 schema.find_paths(input_type="entries", return_data_name="id")
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="6. Helpful methods, get_input_id_dict"):
+        msg = "5. Helpful methods, get_input_id_dict()"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             test_dict = schema.get_input_id_dict("polymer_entity_instance")
             polymer_instance_keys = ["entry_id", "asym_id"]
             for key in polymer_instance_keys:
@@ -166,7 +204,9 @@ class QueryTests(unittest.TestCase):
             for value in test_dict.values():
                 self.assertIsNotNone(value)
 
-        with self.subTest(msg="7. Troubleshooting, Not a unique field"):
+        msg = "6. Troubleshooting, Not a unique field"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             with self.assertRaises(ValueError):
                 query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["id"])
                 try:
@@ -175,14 +215,19 @@ class QueryTests(unittest.TestCase):
                     self.fail(f"Failed unexpectedly: {error}")
 
     def testAddExamples(self) -> None:
-        with self.subTest(msg="1. Entries"):
+        msg = "1. Entries"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="entries", input_ids=["1STP", "2JEF", "1CDG"], return_data_list=["entries.rcsb_id", "struct.title", "exptl.method"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="2. Primary Citation"):
+        msg = "2. Primary Citation"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="entries",
@@ -195,11 +240,14 @@ class QueryTests(unittest.TestCase):
                         "rcsb_primary_citation.pdbx_database_id_DOI",
                     ],
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="3. Polymer Entities"):
+        msg = "3. Polymer Entities"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="polymer_entities",
@@ -212,11 +260,14 @@ class QueryTests(unittest.TestCase):
                         "identity",
                     ],
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="4. Polymer Instances"):
+        msg = "4. Polymer Instances"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="polymer_entity_instances",
@@ -228,22 +279,28 @@ class QueryTests(unittest.TestCase):
                         "rcsb_polymer_instance_annotation.type",
                     ],
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="5. Carbohydrates"):
+        msg = "5. Carbohydrates"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="branched_entities",
                     input_ids=["5FMB_2", "6L63_3"],
                     return_data_list=["pdbx_entity_branch.type", "pdbx_entity_branch_descriptor.type", "pdbx_entity_branch_descriptor.descriptor"],
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="6. Sequence Positional Features"):
+        msg = "6. Sequence Positional Features"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="polymer_entity_instances",
@@ -255,11 +312,14 @@ class QueryTests(unittest.TestCase):
                         "rcsb_polymer_instance_feature.feature_positions.end_seq_id",
                     ],
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="7. Reference Sequence Identifiers"):
+        msg = "7. Reference Sequence Identifiers"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="entries",
@@ -270,11 +330,14 @@ class QueryTests(unittest.TestCase):
                         "polymer_entities.rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.database_name",
                     ],
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="8. Chemical Components"):
+        msg = "8. Chemical Components"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="chem_comps",
@@ -288,21 +351,30 @@ class QueryTests(unittest.TestCase):
                         "rcsb_chem_comp_info.initial_release_date",
                     ],
                 )
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="9. Computed Structure Models"):
+        msg = "9. Computed Structure Models"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="entries", input_ids=["AF_AFP68871F1"], return_data_list=["ma_qa_metric_global.type", "ma_qa_metric_global.value"])
-                query.exec()
+                resD = query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testQuickstartNotebook(self) -> None:
-        with self.subTest(msg="1. Initialize Schema"):
+        msg = "1. Initialize Schema"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             schema = DataSchema()
-        with self.subTest(msg="2. GraphQL example query"):
+
+        msg = "2. GraphQL example query"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             ex_query = """
             {
             entry(entry_id: "4HHB") {
@@ -314,53 +386,73 @@ class QueryTests(unittest.TestCase):
             """
             response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=ex_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
-        with self.subTest(msg="4. Making Queries"):
+
+        msg = "4. Making Queries"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["nonpolymer_bound_components"])
                 resD = query.exec()
                 logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="5. input_ids, mult args"):
+
+        msg = "5. input_ids, mult args"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="polymer_entity_instances", input_ids=["4HHB.A"], return_data_list=["nonpolymer_bound_components"])
                 resD = query.exec()
                 logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="6. input_ids, list as entry input_ids"):
+
+        msg = "6. input_ids, list as entry input_ids"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["nonpolymer_bound_components"])
                 resD = query.exec()
                 logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="7. input_ids, list as polymer instance input_ids"):
+
+        msg = "7. input_ids, list as polymer instance input_ids"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="polymer_entity_instances", input_ids=["4HHB.A"], return_data_list=["nonpolymer_bound_components"])
                 resD = query.exec()
                 logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="8. return_data_list, Not a unique field error"):
+
+        msg = "8. return_data_list, Not a unique field error"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             with self.assertRaises(ValueError):
                 query = DataQuery(input_type="polymer_entity_instances", input_ids=["4HHB.A"], return_data_list=["polymer_composition"])
-                resD = query.exec()
-                logger.info("resD: %r", resD)
+                query.exec()
         with self.subTest(msg="9. return_data_list, find_paths() methods"):
             try:
                 schema = DataSchema()
                 schema.find_paths("polymer_entity_instances", "polymer_composition")
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="10. return_data_list, corrected query with non-redundant field"):
+
+        msg = "10. return_data_list, corrected query with non-redundant field"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["rcsb_entry_info.polymer_composition"])
                 resD = query.exec()
                 logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="11. find_field_names()"):
+
+        msg = "11. find_field_names()"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 schema.find_field_names("polymer_composition")
             except Exception as error:
@@ -369,14 +461,20 @@ class QueryTests(unittest.TestCase):
                 schema.find_field_names("comp")
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="12. More complex queries, multiple ids"):
+
+        msg = "12. More complex queries, multiple ids"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(input_type="entries", input_ids=["4HHB", "12CA", "3PQR"], return_data_list=["nonpolymer_bound_components"])
                 resD = query.exec()
                 logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="13. More complex queries, multiple return data"):
+
+        msg = "13. More complex queries, multiple return data"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 query = DataQuery(
                     input_type="entries", input_ids=["4HHB"], return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"]
@@ -401,8 +499,29 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
+    def testDifferentPathsToRedundantTarget(self) -> None:
+        msg = "1. Different paths to different types of chem_comp.id"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
+            try:
+                query = DataQuery(
+                    input_type="entries",
+                    input_ids=["1A07", "5HYX", "4HHB"],
+                    return_data_list=[
+                        "polymer_entities.chem_comp_nstd_monomers.chem_comp.id",
+                        "branched_entities.chem_comp_monomers.chem_comp.id",
+                        "nonpolymer_entities.nonpolymer_comp.chem_comp.id"
+                    ]
+                )
+                resD = query.exec()
+                logger.info("resD: %r", resD)
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
     def testSearchDataNotebook(self) -> None:
-        with self.subTest(msg="1. Construct search API query and request"):
+        msg = "1. Construct search API query and request"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             # search API query and request
             try:
                 q1 = attrs.rcsb_entity_source_organism.taxonomy_lineage.name == "COVID-19 virus"
@@ -419,7 +538,10 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             self.assertGreaterEqual(len(list(result_list)), 10)
-        with self.subTest(msg="2. Construct data API query and parse result"):
+
+        msg = "2. Construct data API query and parse result"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 data_query = DataQuery(
                     input_type="entries",
@@ -433,43 +555,50 @@ class QueryTests(unittest.TestCase):
                         "citation.pdbx_database_id_DOI",
                     ],
                 )
-                data_query.exec()
+                resD = data_query.exec()
+                logger.info("resD: %r", resD)
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
             try:
                 json = data_query.get_response()["data"]["entries"]  # type: ignore
-                json[0]["rcsb_id"]
-                json[0]["nonpolymer_entities"]
-                json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"]
-                json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_instance_validation_score"][0]["is_subject_of_investigation"]
-                json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_entity_instance_container_identifiers"]["comp_id"]
-                json[0]["citation"][0]["title"]
-                json[0]["citation"][0]["pdbx_database_id_DOI"]
+                logger.info("%r", json[0]["rcsb_id"])
+                logger.info("%r", json[0]["nonpolymer_entities"])
+                logger.info("%r", json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"])
+                logger.info("%r", json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_instance_validation_score"][0]["is_subject_of_investigation"])
+                logger.info("%r", json[0]["nonpolymer_entities"][0]["nonpolymer_entity_instances"][0]["rcsb_nonpolymer_entity_instance_container_identifiers"]["comp_id"])
+                logger.info("%r", json[0]["citation"][0]["title"])
+                logger.info("%r", json[0]["citation"][0]["pdbx_database_id_DOI"])
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testAllStructures(self) -> None:
         from rcsbapi.data import ALL_STRUCTURES
 
-        with self.subTest("1. Test entries ALL_STRUCTURES"):
+        msg = "1. Test entries ALL_STRUCTURES"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 data_query = DataQuery(
                     input_type="entries",
                     input_ids=ALL_STRUCTURES,
                     return_data_list=["exptl.method"],
                 )
-                data_query.exec()
+                resD = data_query.exec()
+                logger.info("len(resD['data']['entries']): %r", len(resD["data"]["entries"]))
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest("2. Test chem_comps ALL_STRUCTURES"):
+        msg = "2. Test chem_comps ALL_STRUCTURES"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 data_query = DataQuery(
                     input_type="chem_comps",
                     input_ids=ALL_STRUCTURES,
                     return_data_list=["chem_comps.rcsb_id"],
                 )
-                data_query.exec()
+                resD = data_query.exec()
+                logger.info("len(resD['data']['chem_comps']): %r", len(resD["data"]["chem_comps"]))
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
@@ -483,8 +612,8 @@ def buildQuery() -> unittest.TestSuite:
     # suiteSelect.addTest(QueryTests("testDocs"))
     # suiteSelect.addTest(QueryTests("testAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
-    # suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
-    # suiteSelect.addTest(QueryTests("testAllStructures"))
+    suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
 
 
