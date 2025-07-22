@@ -27,7 +27,7 @@ logger.setLevel(logging.INFO)
 
 
 class SchemaTests(unittest.TestCase):
-    def test_schema_version(self) -> None:
+    def testSchemaVersion(self) -> None:
         msg = "1. Compare entry schema"
         with self.subTest(msg=msg):
             logger.info("Running subtest %s", msg)
@@ -263,6 +263,7 @@ class SchemaTests(unittest.TestCase):
                 input_type="polymer_entity_instances", return_data_list=["rcsb_polymer_instance_annotation"], input_ids=["4HHB.A", "AF_AFA0A009IHW8F1.B"]
             )
             response_json = requests.post(headers={"Content-Type": "application/json"}, json=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            logger.info("response: %r", response_json)
             self.assertNotIn("errors", response_json.keys())
 
         msg = "2. regex for _entities"
@@ -272,6 +273,7 @@ class SchemaTests(unittest.TestCase):
                 input_type="polymer_entities", return_data_list=["rcsb_polymer_entity_feature"], input_ids=["AF_AFA0A009IHW8F1_1", "4HHB_1"]
             )
             response_json = requests.post(headers={"Content-Type": "application/json"}, json=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            logger.info("response: %r", response_json)
             self.assertNotIn("errors", response_json.keys())
 
         msg = "3. regex for entries"
@@ -279,6 +281,7 @@ class SchemaTests(unittest.TestCase):
             logger.info("Running subtest %s", msg)
             query = DATA_SCHEMA.construct_query(input_type="entries", return_data_list=["exptl"], input_ids=["7XIW", "4HHB"])
             response_json = requests.post(headers={"Content-Type": "application/json"}, json=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            logger.info("response: %r", response_json)
             self.assertNotIn("errors", response_json.keys())
 
         msg = "4. regex for assemblies"
@@ -290,6 +293,7 @@ class SchemaTests(unittest.TestCase):
                 input_ids=["4HHB-1", "MA_MACOFFESLACC100000G1I2-2"]
             )
             response_json = requests.post(headers={"Content-Type": "application/json"}, json=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            logger.info("response: %r", response_json)
             self.assertNotIn("errors", response_json.keys())
 
         msg = "5. regex for interfaces"
@@ -299,6 +303,7 @@ class SchemaTests(unittest.TestCase):
                 input_type="interfaces", return_data_list=["rcsb_interface_container_identifiers.assembly_id"], input_ids=["MA_MACOFFESLACC100000G1I2-1.1", "7XIW-1.2"]
             )
             response_json = requests.post(headers={"Content-Type": "application/json"}, json=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            logger.info("response: %r", response_json)
             self.assertNotIn("errors", response_json.keys())
 
         msg = "6. regex with a singular type"
@@ -306,6 +311,7 @@ class SchemaTests(unittest.TestCase):
             logger.info("Running subtest %s", msg)
             query = DATA_SCHEMA.construct_query(input_type="entry", return_data_list=["exptl"], input_ids=["4HHB"])
             response_json = requests.post(headers={"Content-Type": "application/json"}, json=query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            logger.info("response: %r", response_json)
             self.assertNotIn("errors", response_json.keys())
             self.assertNotIn("errors", response_json.keys())
 
@@ -416,33 +422,86 @@ class SchemaTests(unittest.TestCase):
         msg = "1. Remove assembly paths that have a parallel/equivalent path"
         with self.subTest(msg=msg):
             logger.info("Running subtest %s", msg)
-            # 481 is the node index of an assemblies node
             paths = [
-                [1, 481, 3],
-                [1, 2, 3],
-                [1, 2, 3, 4],
+                "entry.polymer_entities.polymer_entity_instances",
+                "entry.polymer_entities.polymer_entity_instances.rcsb_id",
+                "entry.assemblies.polymer_entity_instances.rcsb_id",  # This one should be removed based on equivalent path through "polymer_entities"
+                "entry.exptl.method"
             ]
+            idx_path_list = []
+            for field_path in paths:
+                index_paths = DATA_SCHEMA._parse_dot_path(field_path)
+                logger.info("Index paths for %r:", field_path)
+                for index_path in index_paths:
+                    logger.info("  %r: %r", index_path, DATA_SCHEMA._idx_path_to_name_path(index_path))
+                    idx_path_list.append(index_path)
 
-            weigh_paths = DATA_SCHEMA._weigh_node(paths, [481])
-            self.assertEqual(len(weigh_paths), 2)
+            # Remove paths that don't begin at 'entry' root node
+            full_idx_paths = []
+            input_type_idx = DATA_SCHEMA._root_to_idx["entry"]
+            logger.info("Input type ('entry') index: %r", input_type_idx)
+            for idx_path in idx_path_list:
+                if idx_path[0] == input_type_idx:
+                    full_idx_paths.append(idx_path)
+            logger.info("Filtered index paths:")
+            for index_path in full_idx_paths:
+                logger.info("  %r: %r", index_path, DATA_SCHEMA._idx_path_to_name_path(index_path))
+
+            # Get the weigh node indexes of the 'assemblies' node (note: the root node index is excluded)
+            assemblies_node_index_list = DATA_SCHEMA._find_weigh_nodes(["assemblies"])
+            logger.info("'assemblies' node index list: %r", assemblies_node_index_list)
+
+            weigh_paths = DATA_SCHEMA._weigh_node(full_idx_paths, assemblies_node_index_list)
+            logger.info("Weighed index paths:")
+            for index_path in weigh_paths:
+                logger.info("  %r: %r", index_path, DATA_SCHEMA._idx_path_to_name_path(index_path))
+
+            self.assertEqual(len(weigh_paths), 3)
 
         msg = "2. Do not remove paths without an equivalent path"
         with self.subTest(msg=msg):
             logger.info("Running subtest %s", msg)
-            # 481 is the node index of an assemblies node
             paths = [
-                [1, 481, 3, 4, 5],
-                [1, 2, 3, 4, 5, 6],
-                [1, 481],
+                "entry.polymer_entities.polymer_entity_instances",
+                "entry.polymer_entities.polymer_entity_instances.rcsb_id",
+                "entry.assemblies.polymer_entity_instances.rcsb_polymer_instance_annotation.annotation_id",
+                "entry.polymer_entities.polymer_entity_instances.rcsb_polymer_instance_annotation.type",
+                "entry.exptl.method"
             ]
+            idx_path_list = []
+            for field_path in paths:
+                index_paths = DATA_SCHEMA._parse_dot_path(field_path)
+                logger.info("Index paths for %r:", field_path)
+                for index_path in index_paths:
+                    logger.info("  %r: %r", index_path, DATA_SCHEMA._idx_path_to_name_path(index_path))
+                    idx_path_list.append(index_path)
 
-            weigh_paths = DATA_SCHEMA._weigh_node(paths, [481])
-            self.assertEqual(len(weigh_paths), 3)
+            # Remove paths that don't begin at 'entry' root node
+            full_idx_paths = []
+            input_type_idx = DATA_SCHEMA._root_to_idx["entry"]
+            logger.info("Input type ('entry') index: %r", input_type_idx)
+            for idx_path in idx_path_list:
+                if idx_path[0] == input_type_idx:
+                    full_idx_paths.append(idx_path)
+            logger.info("Filtered index paths:")
+            for index_path in full_idx_paths:
+                logger.info("  %r: %r", index_path, DATA_SCHEMA._idx_path_to_name_path(index_path))
+
+            # Get the weigh node indexes of the 'assemblies' node (note: the root node index is excluded)
+            assemblies_node_index_list = DATA_SCHEMA._find_weigh_nodes(["assemblies"])
+            logger.info("'assemblies' node index list: %r", assemblies_node_index_list)
+
+            weigh_paths = DATA_SCHEMA._weigh_node(full_idx_paths, assemblies_node_index_list)
+            logger.info("Weighed index paths:")
+            for index_path in weigh_paths:
+                logger.info("  %r: %r", index_path, DATA_SCHEMA._idx_path_to_name_path(index_path))
+
+            self.assertEqual(len(weigh_paths), 5)
 
 
 def buildSchema() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
-    suiteSelect.addTest(SchemaTests("test_schema_version"))
+    suiteSelect.addTest(SchemaTests("testSchemaVersion"))
     suiteSelect.addTest(SchemaTests("testFetch"))
     suiteSelect.addTest(SchemaTests("testConstructRootDict"))
     suiteSelect.addTest(SchemaTests("regexChecks"))
