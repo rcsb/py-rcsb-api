@@ -6,14 +6,14 @@
 # # Now call the method on the instance
 # response = model_query_instance.get_full_structure(
 #     entry_id="1tqn",
-#     model_nums="1,2",
+#     model_nums=[1, 2],
 #     encoding="cif",
 #     copy_all_categories=False,
 #     transform=None,
 #     download=False,
 #     # file_directory="C:/Users/Krish/Documents/gitRCSB/py-rcsb-api/tests/test-output",
 #     # filename="1tqn_full_structure.cif",
-#     compress_gzip=True,
+#     # compress_gzip=True,
 # )
 # print(response)
 
@@ -45,3 +45,21 @@
 # results = model_query_instance.get_multiple_structures(entry_ids, query_type="full", encoding="cif", download=True)
 
 # print(results)
+
+
+from rcsbapi.model import ModelQuery
+model_query = ModelQuery(
+    encoding="cif",
+    file_directory="model-output",
+    download=True
+)
+
+output_path = model_query.get_full_structure(
+    entry_id="1tqn",
+    filename="1tqn_structure.cif",
+    # encoding="cif",  <-- above default will be used, unless this is commented back in
+    # download=True,  <-- above default will be used, unless this is commented back in
+    # file_directory="model-output"  <-- above default will be used, unless this is commented back in
+)
+
+print(output_path)

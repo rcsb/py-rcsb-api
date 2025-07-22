@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 import urllib.parse
 import gzip
 import requests
@@ -17,7 +17,13 @@ class ModelQuery:
     formats, optional file saving, and gzip compression.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        encoding: Optional[Literal["cif", "bcif", "sdf", "mol", "mol2"]] = None,
+        file_directory: Optional[str] = None,
+        download: Optional[bool] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         self.base_url = const.MODELSERVER_API_BASE_URL
         self.modelserver_endpoint_map = {
             "full": "full",
@@ -30,6 +36,13 @@ class ModelQuery:
             "assembly": "assembly"
         }
         self._params_to_exclude_from_url = ['compress_gzip', 'file_directory']
+
+        self._default_params = {
+            "encoding": encoding,
+            "file_directory": file_directory,
+            "download": download,
+            "compress_gzip": compress_gzip,
+        }
 
     def _exec(self, query_type: str, entry_id: str, **kwargs):
         """
@@ -46,6 +59,14 @@ class ModelQuery:
         """
         endpoint = self._get_endpoint_for_type(query_type)
         url = f"{self.base_url}/{entry_id}/{endpoint}"
+
+        # Apply default parameters if not explicitly overridden
+        for key, default_value in self._default_params.items():
+            if key not in kwargs or kwargs[key] is None:
+                kwargs[key] = default_value
+
+        if 'model_nums' in kwargs and kwargs['model_nums'] is not None:
+            kwargs['model_nums'] = ",".join(str(num) for num in kwargs['model_nums'])
 
         # Prepare the query parameters
         query_params = {key: value for key, value in kwargs.items() if key not in self._params_to_exclude_from_url and value is not None}
@@ -91,7 +112,11 @@ class ModelQuery:
             elif query_params.get('download') and filename:
                 file_path = os.path.join(os.getcwd(), filename)
             elif query_params.get('download'):
-                file_path = os.path.join(os.getcwd(), f"{entry_id}_{query_type}.{file_extension}")
+                if query_type == "assembly" and 'name' in kwargs and kwargs['name'] is not None:
+                    file_name = f"{entry_id}_{query_type}-{kwargs['name']}.{file_extension}"
+                else:
+                    file_name = f"{entry_id}_{query_type}.{file_extension}"
+                file_path = os.path.join(os.getcwd(), file_name)
             else:
                 return file_content
 
@@ -132,26 +157,15 @@ class ModelQuery:
         Raises:
             ValueError: If query type is invalid.
         """
-        modelserver_endpoint_map = {
-            "full": "full",
-            "ligand": "ligand",
-            "atoms": "atoms",
-            "residue_interaction": "residueInteraction",
-            "residue_surroundings": "residueSurroundings",
-            "surrounding_ligands": "surroundingLigands",
-            "symmetry_mates": "symmetryMates",
-            "assembly": "assembly"
-        }
-
-        if query_type not in modelserver_endpoint_map:
+        if query_type not in self.modelserver_endpoint_map:
             raise ValueError(f"Unknown query type: {query_type}")
 
-        return modelserver_endpoint_map[query_type]
+        return self.modelserver_endpoint_map[query_type]
 
     def get_multiple_structures(
         self,
-        entry_ids: list[str],
-        query_type: Literal["full", "ligand", "atoms", "residueInteraction", "residueSurroundings", "surroundingLigands", "symmetryMates", "assembly"],
+        entry_ids: List[str],
+        query_type: Literal["full", "ligand", "atoms", "residue_interaction", "residue_surroundings", "surrounding_ligands", "symmetry_mates", "assembly"],
         **kwargs
     ):
         """
@@ -177,7 +191,7 @@ class ModelQuery:
     def get_full_structure(
             self,
             entry_id: str,
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
@@ -214,7 +228,7 @@ class ModelQuery:
             label_atom_id: Optional[str] = None,
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "sdf", "mol", "mol2", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
@@ -262,7 +276,7 @@ class ModelQuery:
             label_atom_id: Optional[str] = None,
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
@@ -312,7 +326,7 @@ class ModelQuery:
             type_symbol: Optional[str] = None,
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
@@ -364,7 +378,7 @@ class ModelQuery:
             type_symbol: Optional[str] = None,
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
@@ -417,7 +431,7 @@ class ModelQuery:
             omit_water: Optional[bool] = False,
             radius: Optional[float] = 5.0,
             assembly_name: Optional[str] = None,
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
@@ -458,7 +472,7 @@ class ModelQuery:
             self,
             entry_id: str,
             radius: Optional[float] = 5.0,
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
@@ -486,7 +500,7 @@ class ModelQuery:
             self,
             entry_id: str,
             name: Optional[str] = "1",
-            model_nums: Optional[str] = None,
+            model_nums: Optional[List[int]] = None,
             encoding: Optional[Literal["cif", "bcif"]] = "cif",
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
