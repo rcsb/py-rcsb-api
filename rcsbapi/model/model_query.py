@@ -22,8 +22,8 @@ class ModelQuery:
         self,
         encoding: Optional[Literal["cif", "bcif", "sdf", "mol", "mol2"]] = "cif",
         file_directory: Optional[str] = None,
-        download: Optional[bool] = None,
-        compress_gzip: Optional[bool] = None,
+        download: Optional[bool] = False,
+        compress_gzip: Optional[bool] = False,
     ):
         self.base_url = const.MODELSERVER_API_BASE_URL
         self.modelserver_endpoint_map = {
@@ -38,7 +38,9 @@ class ModelQuery:
         }
         self._params_to_exclude_from_url = ["compress_gzip", "file_directory"]
         self.encoding = encoding
-        self.file_directory = ...
+        self.file_directory = file_directory
+        self.download = download
+        self.compress_gzip = compress_gzip
 
         # Track number of requests
         self._request_counter = 0
@@ -201,13 +203,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
-        ...
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="full",
             entry_id=entry_id,
@@ -241,10 +244,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="ligand",
             entry_id=entry_id,
@@ -289,10 +296,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="atoms",
             entry_id=entry_id,
@@ -339,10 +350,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="residue_interaction",
             entry_id=entry_id,
@@ -391,10 +406,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="residue_surroundings",
             entry_id=entry_id,
@@ -444,10 +463,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="surrounding_ligands",
             entry_id=entry_id,
@@ -485,10 +508,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="symmetry_mates",
             entry_id=entry_id,
@@ -513,10 +540,14 @@ class ModelQuery:
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
-            download: Optional[bool] = False,
+            download: Optional[bool] = None,
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = False,):
+            compress_gzip: Optional[bool] = None,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        download = download if download else self.download
+        compress_gzip = compress_gzip if compress_gzip else self.compress_gzip
         return self._exec(
             query_type="assembly",
             entry_id=entry_id,

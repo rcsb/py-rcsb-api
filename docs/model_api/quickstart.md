@@ -399,3 +399,34 @@ The `.get_multiple_structures()` method is ammenable to any of the available typ
 | `.get_surrounding_ligands()`  | `surrounding_ligands`                |
 | `.get_symmetry_mates()`       | `symmetry_mates`                     |
 | `.get_assembly()`             | `assembly`                           |
+
+
+## ModelQuery Defaults 
+
+The `ModelQuery` class supports defining **default values** for common parameters at instantiation. These include:
+
+* `encoding`
+* `file_directory`
+* `download`
+* `compress_gzip`
+
+These default values will be automatically applied to all subsequent method calls (e.g., `.get_full_structure()`, `.get_ligand()`, etc.) unless you explicitly override them.
+
+```python
+from rcsbapi.model import ModelQuery
+
+# Set defaults during instantiation
+query = ModelQuery(
+    encoding="cif",
+    file_directory="model-output",
+    download=True,
+    compress_gzip=False
+)
+
+# Now run a query without repeating those arguments
+result = query.get_full_structure(
+    entry_id="2HHB",
+    filename="2HHB_full_structure.cif"
+)
+print(result)
+```
