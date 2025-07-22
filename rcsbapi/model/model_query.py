@@ -106,17 +106,17 @@ class ModelQuery:
                 file_path = os.path.abspath(os.path.join(file_directory, filename))
                 os.makedirs(file_directory, exist_ok=True)
 
-            elif query_params.get("download") and file_directory:
+            elif kwargs.get("download") and file_directory:
                 file_name = f"{entry_id}_{query_type}.{file_extension}"
                 file_path = os.path.abspath(os.path.join(file_directory, file_name))
                 os.makedirs(file_directory, exist_ok=True)
 
-            elif query_params.get("download") and filename:
+            elif kwargs.get("download") and filename:
                 file_path = os.path.abspath(os.path.join(os.getcwd(), filename))
 
-            elif query_params.get("download"):
+            elif kwargs.get("download"):
                 if query_type == "assembly" and "name" in kwargs and kwargs["name"] is not None:
-                    file_name = f"{entry_id}_{query_type}-{kwargs["name"]}.{file_extension}"
+                    file_name = f"{entry_id}_{query_type}-{kwargs['name']}.{file_extension}"
                 else:
                     file_name = f"{entry_id}_{query_type}.{file_extension}"
                 file_path = os.path.abspath(os.path.join(os.getcwd(), file_name))
