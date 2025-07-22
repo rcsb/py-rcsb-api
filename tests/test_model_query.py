@@ -27,8 +27,6 @@ class ModelQueryTests(unittest.TestCase):
                 result = self.model_query.get_full_structure(
                     entry_id="2HHB",
                     encoding="cif",
-                    download=True,
-                    file_directory="model-output"
                 )
                 logger.info("Query completed successfully, result beginning and end: %s\n...\n%s", result[:500], result[-700:])
                 self.assertTrue("_atom_site.Cartn_x" in result)
