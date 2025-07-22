@@ -1,4 +1,5 @@
 import os
+import time
 from typing import Optional, Literal, List
 import urllib.parse
 import gzip
@@ -35,7 +36,7 @@ class ModelQuery:
             "symmetry_mates": "symmetryMates",
             "assembly": "assembly"
         }
-        self._params_to_exclude_from_url = ['compress_gzip', 'file_directory']
+        self._params_to_exclude_from_url = ["compress_gzip", "file_directory"]
 
         self._default_params = {
             "encoding": encoding,
@@ -43,6 +44,9 @@ class ModelQuery:
             "download": download,
             "compress_gzip": compress_gzip,
         }
+
+        # Track number of requests
+        self._request_counter = 0
 
     def _exec(self, query_type: str, entry_id: str, **kwargs):
         """
@@ -65,8 +69,8 @@ class ModelQuery:
             if key not in kwargs or kwargs[key] is None:
                 kwargs[key] = default_value
 
-        if 'model_nums' in kwargs and kwargs['model_nums'] is not None:
-            kwargs['model_nums'] = ",".join(str(num) for num in kwargs['model_nums'])
+        if "model_nums" in kwargs and kwargs["model_nums"] is not None:
+            kwargs["model_nums"] = ",".join(str(num) for num in kwargs["model_nums"])
 
         # Prepare the query parameters
         query_params = {key: value for key, value in kwargs.items() if key not in self._params_to_exclude_from_url and value is not None}
@@ -75,6 +79,11 @@ class ModelQuery:
         full_url = f"{url}?{encoded_params}"
 
         try:
+            self._request_counter += 1
+            if self._request_counter >= config.MODEL_API_REQUESTS_PER_SECOND:
+                time.sleep(1)
+                self._request_counter = 0
+
             response = requests.get(full_url, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})  # Use the constructed URL
             response.raise_for_status()  # Raise an error for bad responses
 
@@ -112,8 +121,8 @@ class ModelQuery:
             elif query_params.get('download') and filename:
                 file_path = os.path.join(os.getcwd(), filename)
             elif query_params.get('download'):
-                if query_type == "assembly" and 'name' in kwargs and kwargs['name'] is not None:
-                    file_name = f"{entry_id}_{query_type}-{kwargs['name']}.{file_extension}"
+                if query_type == "assembly" and "name" in kwargs and kwargs["name"] is not None:
+                    file_name = f"{entry_id}_{query_type}-{kwargs["name"]}.{file_extension}"
                 else:
                     file_name = f"{entry_id}_{query_type}.{file_extension}"
                 file_path = os.path.join(os.getcwd(), file_name)
@@ -121,12 +130,15 @@ class ModelQuery:
                 return file_content
 
             if kwargs.get('compress_gzip', False):
+                # Update path to include .gz suffix
+                file_path += '.gz'
+
                 # Compress the content before saving
                 if encoding == 'BCIF':
-                    with gzip.open(file_path + '.gz', 'wb') as file:
+                    with gzip.open(file_path, 'wb') as file:
                         file.write(file_content)
                 else:
-                    with gzip.open(file_path + '.gz', 'w') as file:
+                    with gzip.open(file_path, 'w') as file:
                         file.write(file_content)
             else:
                 # Write without compression
