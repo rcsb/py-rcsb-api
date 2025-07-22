@@ -17,12 +17,18 @@ class ModelQueryTests(unittest.TestCase):
         self.entry_ids = ["1tqn", "4HHB", "1STP"]
         logger.info("Test setup completed.")
 
+    def log_first_10_lines(self, result: str) -> str:
+        return "\n".join(result.splitlines()[:10])
+
     def test_get_full_structure(self) -> None:
         with self.subTest(msg="1. Full structure query with additional parameters"):
             logger.info("1. Starting Full structure query with additional parameters")
             try:
                 result = self.model_query.get_full_structure(
-                    entry_id=self.entry_id, encoding="cif", model_nums="1", transform="rotate", copy_all_categories=True
+                    entry_id="2HHB",
+                    encoding="cif",
+                    download=True,
+                    file_directory="model-output"
                 )
                 logger.info("Query completed successfully, result beginning and end: %s\n...\n%s", result[:500], result[-700:])
                 self.assertTrue("_atom_site.Cartn_x" in result)
@@ -35,7 +41,7 @@ class ModelQueryTests(unittest.TestCase):
                 result = self.model_query.get_full_structure(
                     entry_id="krish", encoding="cif", model_nums="2", copy_all_categories=False
                 )
-                logger.info("Query result: %s", result)
+                logger.info("Query result: %s", self.log_first_10_lines(result))
                 self.assertIn("error", str(result).lower(), "Expected 'error' in result output")
             except Exception as e:
                 logger.error("Full structure query with illegal parameters failed with exception: %s", e)
@@ -44,10 +50,8 @@ class ModelQueryTests(unittest.TestCase):
         with self.subTest(msg="1. Ligand query with additional parameters"):
             logger.info("1. Starting Ligand query with additional parameters")
             try:
-                result = self.model_query.get_ligand(
-                    entry_id=self.entry_id, label_asym_id="A", encoding="cif", label_seq_id=10, auth_comp_id="A00"
-                )
-                logger.info("Ligand query completed successfully, result: %s", result)
+                result = self.model_query.get_ligand(entry_id="4HHB", label_comp_id="HEM")
+                logger.info("Ligand query completed successfully, result: %s", self.log_first_10_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Ligand query failed with exception: %s", e)
@@ -56,10 +60,8 @@ class ModelQueryTests(unittest.TestCase):
         with self.subTest(msg="1. Atoms query with additional parameters"):
             logger.info("1. Starting Atoms query with additional parameters")
             try:
-                result = self.model_query.get_atoms(
-                    entry_id=self.entry_id, label_entity_id="A", encoding="cif", label_atom_id="CA", model_nums="1"
-                )
-                logger.info("Atoms query completed successfully, result: %s", result)
+                result = self.model_query.get_atoms(entry_id="4HHB", label_comp_id="HEM")
+                logger.info("Atoms query completed successfully, result: %s", self.log_first_10_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Atoms query failed with exception: %s", e)
@@ -69,9 +71,12 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Residue interaction query with expanded parameters")
             try:
                 result = self.model_query.get_residue_interaction(
-                    entry_id=self.entry_id, radius=10.0, encoding="cif", assembly_name="1", model_nums="1"
+                    entry_id="4HHB",
+                    label_comp_id="HEM",
+                    label_asym_id="E",
+                    radius=5.0,
                 )
-                logger.info("Residue interaction query completed successfully, result: %s", result)
+                logger.info("Residue interaction query completed successfully, result: %s", self.log_first_10_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Residue interaction query failed with exception: %s", e)
@@ -81,9 +86,12 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Residue surroundings query with expanded parameters")
             try:
                 result = self.model_query.get_residue_surroundings(
-                    entry_id=self.entry_id, radius=10.0, encoding="cif", label_entity_id="A", auth_comp_id="A00"
+                    entry_id="4HHB",
+                    label_comp_id="HEM",
+                    label_asym_id="E",
+                    radius=5.0,
                 )
-                logger.info("Residue surroundings query completed successfully, result: %s", result)
+                logger.info("Residue surroundings query completed successfully, result: %s", self.log_first_10_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Residue surroundings query failed with exception: %s", e)
@@ -93,9 +101,12 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Surrounding ligands query with additional parameters")
             try:
                 result = self.model_query.get_surrounding_ligands(
-                    entry_id=self.entry_id, radius=10.0, encoding="cif", omit_water=True
+                    entry_id="1TQN",
+                    label_comp_id="ALA",
+                    label_seq_id=284,
+                    radius=5.0,
                 )
-                logger.info("Surrounding ligands query completed successfully, result: %s", result)
+                logger.info("Surrounding ligands query completed successfully, result: %s", self.log_first_10_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Surrounding ligands query failed with exception: %s", e)
@@ -104,10 +115,8 @@ class ModelQueryTests(unittest.TestCase):
         with self.subTest(msg="1. Symmetry mates query with expanded parameters"):
             logger.info("1. Starting Symmetry mates query with expanded parameters")
             try:
-                result = self.model_query.get_symmetry_mates(
-                    entry_id=self.entry_id, radius=10.0, encoding="cif", model_nums="1"
-                )
-                logger.info("Symmetry mates query completed successfully, result: %s", result)
+                result = self.model_query.get_symmetry_mates(entry_id="1TQN")
+                logger.info("Symmetry mates query completed successfully, result: %s", self.log_first_10_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Symmetry mates query failed with exception: %s", e)
@@ -116,10 +125,8 @@ class ModelQueryTests(unittest.TestCase):
         with self.subTest(msg="1. Assembly query with additional parameters"):
             logger.info("1. Starting Assembly query with additional parameters")
             try:
-                result = self.model_query.get_assembly(
-                    entry_id=self.entry_id, name="1", encoding="cif", model_nums="1", transform="rotate"
-                )
-                logger.info("Assembly query completed successfully, result: %s", result)
+                result = self.model_query.get_assembly(entry_id="13PK", name="3")
+                logger.info("Assembly query completed successfully, result: %s", self.log_first_10_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Assembly query failed with exception: %s", e)

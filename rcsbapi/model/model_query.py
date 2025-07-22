@@ -20,7 +20,7 @@ class ModelQuery:
 
     def __init__(
         self,
-        encoding: Optional[Literal["cif", "bcif", "sdf", "mol", "mol2"]] = None,
+        encoding: Optional[Literal["cif", "bcif", "sdf", "mol", "mol2"]] = "cif",
         file_directory: Optional[str] = None,
         download: Optional[bool] = None,
         compress_gzip: Optional[bool] = None,
@@ -37,13 +37,8 @@ class ModelQuery:
             "assembly": "assembly"
         }
         self._params_to_exclude_from_url = ["compress_gzip", "file_directory"]
-
-        self._default_params = {
-            "encoding": encoding,
-            "file_directory": file_directory,
-            "download": download,
-            "compress_gzip": compress_gzip,
-        }
+        self.encoding = encoding
+        self.file_directory = ...
 
         # Track number of requests
         self._request_counter = 0
@@ -64,11 +59,6 @@ class ModelQuery:
         endpoint = self._get_endpoint_for_type(query_type)
         url = f"{self.base_url}/{entry_id}/{endpoint}"
 
-        # Apply default parameters if not explicitly overridden
-        for key, default_value in self._default_params.items():
-            if key not in kwargs or kwargs[key] is None:
-                kwargs[key] = default_value
-
         if "model_nums" in kwargs and kwargs["model_nums"] is not None:
             kwargs["model_nums"] = ",".join(str(num) for num in kwargs["model_nums"])
 
@@ -88,43 +78,43 @@ class ModelQuery:
             response.raise_for_status()  # Raise an error for bad responses
 
             # Get encoding type (defaults to CIF if not provided)
-            encoding = query_params.get('encoding', 'CIF').upper()
+            encoding = query_params.get("encoding", "CIF").upper()
 
             # Handle response based on encoding type
-            if encoding == 'BCIF':
+            if encoding == "BCIF":
                 file_content = response.content
-                file_extension = 'bcif'
-            elif encoding == 'SDF':
+                file_extension = "bcif"
+            elif encoding == "SDF":
                 file_content = response.text
-                file_extension = 'sdf'
-            elif encoding == 'MOL':
+                file_extension = "sdf"
+            elif encoding == "MOL":
                 file_content = response.text
-                file_extension = 'mol'
-            elif encoding == 'MOL2':
+                file_extension = "mol"
+            elif encoding == "MOL2":
                 file_content = response.text
-                file_extension = 'mol2'
+                file_extension = "mol2"
             else:
                 file_content = response.text
-                file_extension = 'cif'
+                file_extension = "cif"
 
-            filename = kwargs.get('filename')
-            file_directory = kwargs.get('file_directory')
+            filename = kwargs.get("filename")
+            file_directory = kwargs.get("file_directory")
 
             if filename and file_directory:
                 file_path = os.path.abspath(os.path.join(file_directory, filename))
                 os.makedirs(file_directory, exist_ok=True)
 
-            elif query_params.get('download') and file_directory:
+            elif query_params.get("download") and file_directory:
                 file_name = f"{entry_id}_{query_type}.{file_extension}"
                 file_path = os.path.abspath(os.path.join(file_directory, file_name))
                 os.makedirs(file_directory, exist_ok=True)
 
-            elif query_params.get('download') and filename:
+            elif query_params.get("download") and filename:
                 file_path = os.path.abspath(os.path.join(os.getcwd(), filename))
 
-            elif query_params.get('download'):
+            elif query_params.get("download"):
                 if query_type == "assembly" and "name" in kwargs and kwargs["name"] is not None:
-                    file_name = f"{entry_id}_{query_type}-{kwargs['name']}.{file_extension}"
+                    file_name = f"{entry_id}_{query_type}-{kwargs["name"]}.{file_extension}"
                 else:
                     file_name = f"{entry_id}_{query_type}.{file_extension}"
                 file_path = os.path.abspath(os.path.join(os.getcwd(), file_name))
@@ -132,24 +122,24 @@ class ModelQuery:
             else:
                 return file_content
 
-            if kwargs.get('compress_gzip', False):
+            if kwargs.get("compress_gzip", False):
                 # Update path to include .gz suffix
-                file_path += '.gz'
+                file_path += ".gz"
 
                 # Compress the content before saving
-                if encoding == 'BCIF':
-                    with gzip.open(file_path, 'wb') as file:
+                if encoding == "BCIF":
+                    with gzip.open(file_path, "wb") as file:
                         file.write(file_content)
                 else:
-                    with gzip.open(file_path, 'w') as file:
-                        file.write(file_content)
+                    with gzip.open(file_path, "wb") as file:
+                        file.write(file_content.encode('utf-8'))
             else:
                 # Write without compression
-                if encoding == 'BCIF':
-                    with open(file_path, 'wb') as file:
+                if encoding == "BCIF":
+                    with open(file_path, "wb") as file:
                         file.write(file_content)
                 else:
-                    with open(file_path, 'w', encoding='utf-8') as file:  # Check to see if right encoding
+                    with open(file_path, "w", encoding="utf-8") as file:
                         file.write(file_content)
 
             # Return the file path of the downloaded file
@@ -188,7 +178,7 @@ class ModelQuery:
 
         Args:
             entry_ids (list[str]): List of structure IDs to query.
-            query_type (str): The type of query to execute (e.g., 'full', 'ligand', etc.).
+            query_type (str): The type of query to execute (e.g., "full", "ligand", etc.).
             **kwargs: Additional query parameters to pass to the API.
 
         Returns:
@@ -207,7 +197,7 @@ class ModelQuery:
             self,
             entry_id: str,
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,
@@ -215,6 +205,9 @@ class ModelQuery:
             filename: Optional[str] = None,
             file_directory: Optional[str] = None,
             compress_gzip: Optional[bool] = False,):
+        encoding = encoding if encoding else self.encoding
+        file_directory = file_directory if file_directory else self.file_directory
+        ...
         return self._exec(
             query_type="full",
             entry_id=entry_id,
@@ -244,7 +237,7 @@ class ModelQuery:
             auth_atom_id: Optional[str] = None,
             type_symbol: Optional[str] = None,
             model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "sdf", "mol", "mol2", "bcif"]] = "cif",
+            encoding: Optional[Literal["cif", "sdf", "mol", "mol2", "bcif"]] = None,
             copy_all_categories: Optional[bool] = False,
             data_source: Optional[str] = None,
             transform: Optional[str] = None,

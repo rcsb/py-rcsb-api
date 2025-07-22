@@ -432,8 +432,12 @@ class QueryTests(unittest.TestCase):
             logger.info("Running subtest %s", msg)
             with self.assertRaises(ValueError):
                 query = DataQuery(input_type="polymer_entity_instances", input_ids=["4HHB.A"], return_data_list=["polymer_composition"])
-                query.exec()
-        with self.subTest(msg="9. return_data_list, find_paths() methods"):
+                resD = query.exec()
+                logger.info("resD: %r", resD)
+
+        msg = "9. return_data_list, find_paths() methods"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 schema = DataSchema()
                 schema.find_paths("polymer_entity_instances", "polymer_composition")
@@ -478,22 +482,6 @@ class QueryTests(unittest.TestCase):
             try:
                 query = DataQuery(
                     input_type="entries", input_ids=["4HHB"], return_data_list=["citation.title", "nonpolymer_bound_components", "rcsb_entry_info.polymer_composition"]
-                )
-                resD = query.exec()
-                logger.info("resD: %r", resD)
-            except Exception as error:
-                self.fail(f"Failed unexpectedly: {error}")
-
-        with self.subTest(msg="14. More complex queries, multiple return data with same endpoint"):
-            try:
-                query = DataQuery(
-                    input_type="entries",
-                    input_ids=["1A07"],
-                    return_data_list=[
-                        "polymer_entities.chem_comp_nstd_monomers.chem_comp.id",
-                        "branched_entities.chem_comp_monomers.chem_comp.id",
-                        "nonpolymer_entities.nonpolymer_comp.chem_comp.id",
-                    ]
                 )
                 resD = query.exec()
                 logger.info("resD: %r", resD)
@@ -606,13 +594,14 @@ class QueryTests(unittest.TestCase):
 
 def buildQuery() -> unittest.TestSuite:
     suiteSelect = unittest.TestSuite()
-    # suiteSelect.addTest(QueryTests("testGetEditorLink"))
-    # suiteSelect.addTest(QueryTests("testExec"))
-    # suiteSelect.addTest(QueryTests("testLowercaseIds"))
-    # suiteSelect.addTest(QueryTests("testBatchIDs"))
-    # suiteSelect.addTest(QueryTests("testDocs"))
-    # suiteSelect.addTest(QueryTests("testAddExamples"))
+    suiteSelect.addTest(QueryTests("testGetEditorLink"))
+    suiteSelect.addTest(QueryTests("testExec"))
+    suiteSelect.addTest(QueryTests("testLowercaseIds"))
+    suiteSelect.addTest(QueryTests("testBatchIDs"))
+    suiteSelect.addTest(QueryTests("testDocs"))
+    suiteSelect.addTest(QueryTests("testAddExamples"))
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
+    suiteSelect.addTest(QueryTests("testDifferentPathsToRedundantTarget"))
     suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
     suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
