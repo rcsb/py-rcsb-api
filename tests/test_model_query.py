@@ -17,8 +17,28 @@ class ModelQueryTests(unittest.TestCase):
         self.entry_ids = ["1tqn", "4HHB", "1STP"]
         logger.info("Test setup completed.")
 
-    def log_first_10_lines(self, result: str) -> str:
-        return "\n".join(result.splitlines()[:10])
+    def log_first_and_last_lines(self, result: str) -> str:
+        """
+        Return the first 10 and last 15 lines of the given multiline string.
+
+        Useful for logging or previewing large content while skipping the middle portion.
+
+        Parameters:
+            result (str): The input string containing multiple lines.
+
+        Returns:
+            str: A string with the first 10 lines, an ellipsis separator if needed,
+                and the last 15 lines (or fewer if not enough lines).
+        """
+        lines = result.splitlines()
+        first_10 = lines[:10]
+        last_15 = lines[-15:] if len(lines) > 10 else lines[10:]
+        combined = first_10
+        if len(lines) > 25:
+            combined += ["...", *last_15]
+        else:
+            combined += last_15
+        return "\n".join(combined)
 
     def test_get_full_structure(self) -> None:
         with self.subTest(msg="1. Full structure query with additional parameters"):
@@ -49,7 +69,7 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Ligand query with additional parameters")
             try:
                 result = self.model_query.get_ligand(entry_id="4HHB", label_comp_id="HEM")
-                logger.info("Ligand query completed successfully, result: %s", self.log_first_10_lines(result))
+                logger.info("Ligand query completed successfully, result: %s", self.log_first_and_last_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Ligand query failed with exception: %s", e)
@@ -59,7 +79,7 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Atoms query with additional parameters")
             try:
                 result = self.model_query.get_atoms(entry_id="4HHB", label_comp_id="HEM")
-                logger.info("Atoms query completed successfully, result: %s", self.log_first_10_lines(result))
+                logger.info("Atoms query completed successfully, result: %s", self.log_first_and_last_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Atoms query failed with exception: %s", e)
@@ -74,7 +94,7 @@ class ModelQueryTests(unittest.TestCase):
                     label_asym_id="E",
                     radius=5.0,
                 )
-                logger.info("Residue interaction query completed successfully, result: %s", self.log_first_10_lines(result))
+                logger.info("Residue interaction query completed successfully, result: %s", self.log_first_and_last_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Residue interaction query failed with exception: %s", e)
@@ -89,7 +109,7 @@ class ModelQueryTests(unittest.TestCase):
                     label_asym_id="E",
                     radius=5.0,
                 )
-                logger.info("Residue surroundings query completed successfully, result: %s", self.log_first_10_lines(result))
+                logger.info("Residue surroundings query completed successfully, result: %s", self.log_first_and_last_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Residue surroundings query failed with exception: %s", e)
@@ -104,7 +124,7 @@ class ModelQueryTests(unittest.TestCase):
                     label_seq_id=284,
                     radius=5.0,
                 )
-                logger.info("Surrounding ligands query completed successfully, result: %s", self.log_first_10_lines(result))
+                logger.info("Surrounding ligands query completed successfully, result: %s", self.log_first_and_last_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Surrounding ligands query failed with exception: %s", e)
@@ -114,7 +134,7 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Symmetry mates query with expanded parameters")
             try:
                 result = self.model_query.get_symmetry_mates(entry_id="1TQN")
-                logger.info("Symmetry mates query completed successfully, result: %s", self.log_first_10_lines(result))
+                logger.info("Symmetry mates query completed successfully, result: %s", self.log_first_and_last_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Symmetry mates query failed with exception: %s", e)
@@ -124,7 +144,7 @@ class ModelQueryTests(unittest.TestCase):
             logger.info("1. Starting Assembly query with additional parameters")
             try:
                 result = self.model_query.get_assembly(entry_id="13PK", name="3")
-                logger.info("Assembly query completed successfully, result: %s", self.log_first_10_lines(result))
+                logger.info("Assembly query completed successfully, result: %s", self.log_first_and_last_lines(result))
                 self.assertIsNotNone(result)
             except Exception as e:
                 logger.error("Assembly query failed with exception: %s", e)

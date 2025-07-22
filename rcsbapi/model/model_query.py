@@ -270,6 +270,29 @@ class ModelQuery:
             compress_gzip: Optional[bool] = None,):
         """
         Retrieves ligand-related information, including components and interactions.
+  
+        Parameters:
+            entry_id (str): The PDB ID of the structure.
+            label_entity_id (str, optional): Entity identifier using label nomenclature.
+            label_asym_id (str, optional): Asymmetric unit ID using label nomenclature.
+            auth_asym_id (str, optional): Asymmetric unit ID using author-provided nomenclature.
+            label_comp_id (str, optional): Ligand component ID using label nomenclature.
+            auth_comp_id (str, optional): Ligand component ID using author nomenclature.
+            label_seq_id (int, optional): Residue sequence number (label nomenclature).
+            auth_seq_id (int, optional): Residue sequence number (author nomenclature).
+            pdbx_PDB_ins_code (str, optional): Insertion code for distinguishing alternate residue IDs.
+            label_atom_id (str, optional): Atom name using label nomenclature.
+            auth_atom_id (str, optional): Atom name using author nomenclature.
+            type_symbol (str, optional): Atomic element symbol (e.g., "C", "N", "O").
+            model_nums (List[int], optional): Specific model numbers to retrieve.
+            encoding (str, optional): Output format, one of: "cif", "sdf", "mol", "mol2", "bcif".
+            copy_all_categories (bool, optional): Whether to include all data categories in the output.
+            data_source (str, optional): Source of the structure data.
+            transform (str, optional): Transformation ID for biological assemblies or specific views.
+            download (bool, optional): If True, save the result to disk.
+            filename (str, optional): Custom filename for saving the output.
+            file_directory (str, optional): Directory path to save the output file.
+            compress_gzip (bool, optional): If True, compress the file using gzip.
         """
         encoding = encoding if encoding else self.encoding
         file_directory = file_directory if file_directory else self.file_directory
