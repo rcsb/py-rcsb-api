@@ -18,7 +18,7 @@ class ModelQuery:
     """
 
     def __init__(self):
-        self.base_url = const.BASE_MODELSERVER_URL
+        self.base_url = const.MODELSERVER_API_BASE_URL
         self.modelserver_endpoint_map = {
             "full": "full",
             "ligand": "ligand",

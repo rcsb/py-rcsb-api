@@ -66,9 +66,9 @@ class Const:
     SEQUENCE_API_GRAPHQL_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
     SEQUENCE_API_SCHEMA_DIR: str = "sequence/resources"
     SEQUENCE_API_SCHEMA_FILENAME: str = "seq_api_schema.json"
-
-    BASE_MODELSERVER_URL: str = "https://models.rcsb.org/v1"
-    JSON_MODELSERVER_URL: str = "https://models.rcsb.org/openapi.json"
+    
+    MODELSERVER_API_BASE_URL: str = "https://models.rcsb.org/v1"
+    MODELSERVER_API_SCHEMA_URL: str = "https://models.rcsb.org/openapi.json"
 
     SINGULAR_TO_PLURAL: MappingProxyType[str, str] = field(default_factory=lambda: MappingProxyType({
         "entry": "entries",
