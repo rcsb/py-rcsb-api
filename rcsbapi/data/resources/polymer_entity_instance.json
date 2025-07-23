@@ -2330,6 +2330,22 @@
                 }
             ]
         },
+        "rcsb_polymer_instance_info": {
+            "type": "object",
+            "properties": {
+                "modeled_residue_count": {
+                    "type": "integer",
+                    "description": "The number of modeled residues in the polymer instance.",
+                    "rcsb_description": [
+                        {
+                            "text": "The number of modeled residues in the polymer instance.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
         "rcsb_polymer_struct_conn": {
             "type": "array",
             "items": {
@@ -2796,5 +2812,5 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Core Polymer Entity Instance",
     "description": "JSON schema for entity instance core data.",
-    "$comment": "schema_version: 10.0.3"
+    "$comment": "schema_version: 10.0.4"
 }

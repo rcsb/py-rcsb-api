@@ -12,8 +12,6 @@ Tests for all functions of the search file.
 """
 
 import logging
-import platform
-import resource
 import time
 import unittest
 import os
@@ -48,9 +46,6 @@ class SearchTests(unittest.TestCase):
         self.__2mnr = os.path.join(self.__dirPath, "2mnr.cif")
 
     def tearDown(self) -> None:
-        unitS = "MB" if platform.system() == "Darwin" else "GB"
-        rusageMax = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        logger.info("Maximum resident memory size %.4f %s", rusageMax / 10 ** 6, unitS)
         endTime = time.time()
         logger.info("Completed %s at %s (%.4f seconds)", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 

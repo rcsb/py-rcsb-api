@@ -30,9 +30,13 @@ jobs:
     parameters: {tox: 'py39', python: '3.9', os: 'linux'}
   - template: azure-template-tox-job.yml
     parameters: {tox: 'py39', python: '3.9', os: 'macos'}
+  - template: azure-template-tox-job.yml
+    parameters: {tox: 'py39', python: '3.9', os: 'windows'}
   #
   - template: azure-template-publish-job.yml
-    parameters: {tox: 'py39', python: '3.9', os: 'macos'}
-  - template: azure-template-publish-job.yml
     parameters: {tox: 'py39', python: '3.9', os: 'linux'}
+  # - template: azure-template-publish-job.yml
+  #   parameters: {tox: 'py39', python: '3.9', os: 'macos'}
+  # - template: azure-template-publish-job.yml
+  #   parameters: {tox: 'py39', python: '3.9', os: 'windows'}
   #

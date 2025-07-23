@@ -5114,6 +5114,18 @@
                             "deprecationReason": null
                         },
                         {
+                            "name": "rcsb_polymer_instance_info",
+                            "description": null,
+                            "args": [],
+                            "type": {
+                                "kind": "OBJECT",
+                                "name": "RcsbPolymerInstanceInfo",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "rcsb_polymer_struct_conn",
                             "description": null,
                             "args": [],
@@ -30494,6 +30506,29 @@
                             "type": {
                                 "kind": "SCALAR",
                                 "name": "String",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        }
+                    ],
+                    "inputFields": null,
+                    "interfaces": [],
+                    "enumValues": null,
+                    "possibleTypes": null
+                },
+                {
+                    "kind": "OBJECT",
+                    "name": "RcsbPolymerInstanceInfo",
+                    "description": "",
+                    "fields": [
+                        {
+                            "name": "modeled_residue_count",
+                            "description": "The number of modeled residues in the polymer instance.",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "Int",
                                 "ofType": null
                             },
                             "isDeprecated": false,

@@ -575,17 +575,22 @@ class GQLSchema(ABC):
                     )
                     raise ValueError(error_msg)
                 idx_paths = shortest_full_paths
+
             final_idx: int = idx_paths[0][-1]
             shortest_path: List[int] = idx_paths[0][1:]
-            return_data_paths[final_idx] = shortest_path
+
+            # Store all paths per final_idx (avoid overwrite)
+            if final_idx not in return_data_paths:
+                return_data_paths[final_idx] = [shortest_path]
+            else:
+                if shortest_path not in return_data_paths[final_idx]:
+                    return_data_paths[final_idx].append(shortest_path)
 
         if (complete_path != len(return_data_list)) and (suppress_autocomplete_warning is False):
             info_list = []
-            for path in return_data_paths.values():
-                # PREVIOUSLY:
-                # assert len(path) == 1
-                # info_list.append(".".join(self._idx_path_to_name_path(path[0][1:])))
-                info_list.append(".".join(self._idx_path_to_name_path(path)))
+            for path_group in return_data_paths.values():
+                for path in path_group:
+                    info_list.append(".".join(self._idx_path_to_name_path(path)))
             if (added_rcsb_id is True) and ("rcsb_id" in info_list):
                 info_list.remove("rcsb_id")
 
@@ -961,10 +966,11 @@ class GQLSchema(ABC):
         )
         # return_data_query_list is a list of queries, each one corresponding to one field in return_data_list
         return_data_query_list: List[dict[int, Any] | List[int] | List[dict[int, Any] | int]] = []
-        for return_field_idx, path in return_data_path_dict.items():
-            # Format the paths with the correct nesting of fields. Still using indices at this point
-            return_field_query_dict = self._idxs_to_idx_dict(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
-            return_data_query_list.append(return_field_query_dict)
+        for return_field_idx, path_group in return_data_path_dict.items():
+            for path in path_group:
+                # Format the paths with the correct nesting of fields. Still using indices at this point
+                return_field_query_dict = self._idxs_to_idx_dict(idx_list=path, autopopulated_fields=self._get_descendant_fields(return_field_idx))
+                return_data_query_list.append(return_field_query_dict)
 
         # Merge all the queries in merge_query_list so there are no redundant paths
         idx_query_body = self._merge_query_list(return_data_query_list)  # type: ignore[arg-type]

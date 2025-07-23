@@ -1,0 +1,2495 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "0.9.12",
+        "title": "ModelServer",
+        "description": "The ModelServer is a service for accessing subsets of macromolecular model data."
+    },
+    "tags": [
+        {
+            "name": "General"
+        }
+    ],
+    "paths": {
+        "/v1/{id}/assembly": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Computes structural assembly.",
+                "operationId": "assembly",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Assembly name.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "1"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Computes structural assembly.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Computes structural assembly.",
+                "operationId": "assembly-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "name": "1"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Computes structural assembly.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/{id}/atoms": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Atoms satisfying the given criteria.",
+                "operationId": "atoms",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "label_entity_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "pdbx_PDB_ins_code",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "type_symbol",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Atoms satisfying the given criteria.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Atoms satisfying the given criteria.",
+                "operationId": "atoms-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "atom_site": [
+                                    {
+                                        "label_seq_id": 30,
+                                        "label_asym_id": "A"
+                                    },
+                                    {
+                                        "label_seq_id": 31,
+                                        "label_asym_id": "A"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Atoms satisfying the given criteria.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/{id}/full": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "The full structure.",
+                "operationId": "full",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The full structure.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "The full structure.",
+                "operationId": "full-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The full structure.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/{id}/ligand": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Coordinates of the first group satisfying the given criteria.",
+                "operationId": "ligand",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "label_entity_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "pdbx_PDB_ins_code",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "type_symbol",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Coordinates of the first group satisfying the given criteria.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Coordinates of the first group satisfying the given criteria.",
+                "operationId": "ligand-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "atom_site": [
+                                    {
+                                        "label_seq_id": 30,
+                                        "label_asym_id": "A"
+                                    },
+                                    {
+                                        "label_seq_id": 31,
+                                        "label_asym_id": "A"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Coordinates of the first group satisfying the given criteria.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/{id}/residueInteraction": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Identifies all residues within the given radius from the source residue. Takes crystal symmetry into account.",
+                "operationId": "residueInteraction",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "label_entity_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "pdbx_PDB_ins_code",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "type_symbol",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Value in Angstroms.",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 5
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "assembly_name",
+                        "in": "query",
+                        "description": "Assembly name. If none is provided, crystal symmetry (where available) or deposited model is used.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Identifies all residues within the given radius from the source residue. Takes crystal symmetry into account.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Identifies all residues within the given radius from the source residue. Takes crystal symmetry into account.",
+                "operationId": "residueInteraction-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "atom_site": [
+                                    {
+                                        "label_seq_id": 30,
+                                        "label_asym_id": "A"
+                                    },
+                                    {
+                                        "label_seq_id": 31,
+                                        "label_asym_id": "A"
+                                    }
+                                ],
+                                "radius": 5
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Identifies all residues within the given radius from the source residue. Takes crystal symmetry into account.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/{id}/residueSurroundings": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Identifies all residues within the given radius from the source residue.",
+                "operationId": "residueSurroundings",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "label_entity_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "pdbx_PDB_ins_code",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "type_symbol",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Value in Angstroms.",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 5
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Identifies all residues within the given radius from the source residue.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Identifies all residues within the given radius from the source residue.",
+                "operationId": "residueSurroundings-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "atom_site": [
+                                    {
+                                        "label_seq_id": 30,
+                                        "label_asym_id": "A"
+                                    },
+                                    {
+                                        "label_seq_id": 31,
+                                        "label_asym_id": "A"
+                                    }
+                                ],
+                                "radius": 5
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Identifies all residues within the given radius from the source residue.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/{id}/surroundingLigands": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Identifies (complete) ligands within the given radius from the source atom set. Takes crystal symmetry into account.",
+                "operationId": "surroundingLigands",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "label_entity_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_asym_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_comp_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_seq_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "pdbx_PDB_ins_code",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "label_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "auth_atom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "type_symbol",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Value in Angstroms.",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 5
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "omit_water",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "assembly_name",
+                        "in": "query",
+                        "description": "Assembly name. If none is provided, crystal symmetry (where available) or deposited model is used.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Identifies (complete) ligands within the given radius from the source atom set. Takes crystal symmetry into account.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Identifies (complete) ligands within the given radius from the source atom set. Takes crystal symmetry into account.",
+                "operationId": "surroundingLigands-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "atom_site": [
+                                    {
+                                        "label_seq_id": 30,
+                                        "label_asym_id": "A"
+                                    },
+                                    {
+                                        "label_seq_id": 31,
+                                        "label_asym_id": "A"
+                                    }
+                                ],
+                                "radius": 5
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Identifies (complete) ligands within the given radius from the source atom set. Takes crystal symmetry into account.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/{id}/symmetryMates": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Computes crystal symmetry mates within the specified radius.",
+                "operationId": "symmetryMates",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Value in Angstroms.",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 5
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Computes crystal symmetry mates within the specified radius.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Computes crystal symmetry mates within the specified radius.",
+                "operationId": "symmetryMates-post",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    },
+                    {
+                        "name": "model_nums",
+                        "in": "query",
+                        "description": "A comma-separated list of model ids (i.e. 1,2). If set, only include atoms with the corresponding '_atom_site.pdbx_PDB_model_num' field.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "encoding",
+                        "in": "query",
+                        "description": "Determines the output encoding (text based 'CIF' or binary 'BCIF'). Ligands can also be exported as 'SDF', 'MOL', or 'MOL2'.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "cif",
+                                "bcif",
+                                "sdf",
+                                "mol",
+                                "mol2"
+                            ],
+                            "default": "cif"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "copy_all_categories",
+                        "in": "query",
+                        "description": "If true, copy all categories from the input file.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "data_source",
+                        "in": "query",
+                        "description": "Allows to control how the provided data source ID maps to input file (as specified by the server instance config).",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "transform",
+                        "in": "query",
+                        "description": "Transformation to apply to coordinates in '_atom_site'. Accepts a 4x4 transformation matrix, provided as array of 16 float values.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "description": "If true, browser will download text files.",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "style": "simple"
+                    },
+                    {
+                        "name": "filename",
+                        "in": "query",
+                        "description": "Controls the filename for downloaded files. Will force download if specified.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "style": "simple"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "radius": 5
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Computes crystal symmetry mates within the specified radius.",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/query-many": {
+            "get": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Executes multiple queries at the same time and writes them as separate data blocks.",
+                "operationId": "query-many",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "URI encoded JSON object with the query definiton.",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "{\"queries\":[{\"entryId\":\"1cbs\",\"query\":\"residueInteraction\",\"params\":{\"atom_site\":[{\"label_comp_id\":\"REA\"}],\"radius\":5}},{\"entryId\":\"1tqn\",\"query\":\"full\",\"copy_all_categories\":true}],\"encoding\":\"cif\",\"asTarGz\":false}",
+                        "style": "simple"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Separate CIF data blocks with the result",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "General"
+                ],
+                "summary": "Executes multiple queries at the same time and writes them as separate data blocks.",
+                "operationId": "query-many-post",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object"
+                            },
+                            "example": {
+                                "queries": [
+                                    {
+                                        "entryId": "1cbs",
+                                        "query": "residueInteraction",
+                                        "params": {
+                                            "atom_site": [
+                                                {
+                                                    "label_comp_id": "REA"
+                                                }
+                                            ],
+                                            "radius": 5
+                                        }
+                                    },
+                                    {
+                                        "entryId": "1tqn",
+                                        "query": "full",
+                                        "copy_all_categories": true
+                                    }
+                                ],
+                                "encoding": "cif",
+                                "asTarGz": false
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Separate CIF data blocks with the result",
+                        "content": {
+                            "text/plain": {},
+                            "application/octet-stream": {}
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "parameters": {
+            "id": {
+                "name": "id",
+                "in": "path",
+                "description": "Id of the entry (i.e. 1tqn).",
+                "required": true,
+                "schema": {
+                    "type": "string"
+                },
+                "style": "simple"
+            }
+        }
+    }
+}

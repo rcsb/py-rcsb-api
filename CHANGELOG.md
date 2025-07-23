@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.3.0 (2025-07-23)
+
+- Add support for [Model Server API](https://models.rcsb.org/) via new module `rcsbapi.model`. Use this to fetch structure/coordinate data from PDB entries and ligands as well as mmCIF metadata. (PR [#73](https://github.com/rcsb/py-rcsb-api/pull/73))
+  - [Documentation](https://rcsbapi.readthedocs.io/en/latest/model_api/quickstart.html) and [Jupyter notebook](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/model_quickstart.ipynb) are provided
+- Fixed bug with `rcsbapi.data` Data API module, in which requesting multiple data items with redundant target field names was causing them to be overwritten in the final constructed query (PR [#74](https://github.com/rcsb/py-rcsb-api/pull/74))
+- Added Azure testing support for Windows (PR [#75](https://github.com/rcsb/py-rcsb-api/pull/75))
+- Add model server API schema: 0.9.12
+- Update search schemas: 1.50.1 -> 1.52.1
+- Update data schemas: 
+  - polymer_entity_instance schema 10.0.3 -> 10.0.4
+
 ## v1.2.0 (2025-07-11)
 
 - Add support for [Sequence Coordinates API](https://sequence-coordinates.rcsb.org/) via new module `rcsbapi.sequence`. Use this to fetch alignments between sequences from different databases as well as sequence-level annotations integrated from external resources and RCSB PDB. (PRs [#46](https://github.com/rcsb/py-rcsb-api/pull/46), [#68](https://github.com/rcsb/py-rcsb-api/pull/68))
