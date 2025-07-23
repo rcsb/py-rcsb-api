@@ -48,6 +48,13 @@ Contents
    seq_api/additional_examples.md
    seq_api/api.rst
 
+.. toctree::
+   :caption: Model Server API
+   :maxdepth: 2
+
+   model_api/quickstart.md
+   model_api/api.rst
+
 License
 -------
 
