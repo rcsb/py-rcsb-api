@@ -6,7 +6,6 @@ import gzip
 import requests
 from rcsbapi.const import const
 from rcsbapi.config import config
-# from model_schema import ModelSchema
 
 
 class ModelQuery:
@@ -201,17 +200,18 @@ class ModelQuery:
         return results
 
     def get_full_structure(
-            self,
-            entry_id: str,
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Retrieve the full atomic model of a specified entry from the ModelServer.
 
@@ -246,28 +246,29 @@ class ModelQuery:
         )
 
     def get_ligand(
-            self,
-            entry_id: str,
-            label_entity_id: Optional[str] = None,
-            label_asym_id: Optional[str] = None,
-            auth_asym_id: Optional[str] = None,
-            label_comp_id: Optional[str] = None,
-            auth_comp_id: Optional[str] = None,
-            label_seq_id: Optional[int] = None,
-            auth_seq_id: Optional[int] = None,
-            pdbx_PDB_ins_code: Optional[str] = None,
-            label_atom_id: Optional[str] = None,
-            auth_atom_id: Optional[str] = None,
-            type_symbol: Optional[str] = None,
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "sdf", "mol", "mol2", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        label_entity_id: Optional[str] = None,
+        label_asym_id: Optional[str] = None,
+        auth_asym_id: Optional[str] = None,
+        label_comp_id: Optional[str] = None,
+        auth_comp_id: Optional[str] = None,
+        label_seq_id: Optional[int] = None,
+        auth_seq_id: Optional[int] = None,
+        pdbx_PDB_ins_code: Optional[str] = None,
+        label_atom_id: Optional[str] = None,
+        auth_atom_id: Optional[str] = None,
+        type_symbol: Optional[str] = None,
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "sdf", "mol", "mol2", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Retrieves ligand-related information, including components and interactions.
 
@@ -324,28 +325,29 @@ class ModelQuery:
         )
 
     def get_atoms(
-            self,
-            entry_id: str,
-            label_entity_id: Optional[str] = None,
-            label_asym_id: Optional[str] = None,
-            auth_asym_id: Optional[str] = None,
-            label_comp_id: Optional[str] = None,
-            auth_comp_id: Optional[str] = None,
-            label_seq_id: Optional[int] = None,
-            auth_seq_id: Optional[int] = None,
-            pdbx_PDB_ins_code: Optional[str] = None,
-            label_atom_id: Optional[str] = None,
-            auth_atom_id: Optional[str] = None,
-            type_symbol: Optional[str] = None,
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        label_entity_id: Optional[str] = None,
+        label_asym_id: Optional[str] = None,
+        auth_asym_id: Optional[str] = None,
+        label_comp_id: Optional[str] = None,
+        auth_comp_id: Optional[str] = None,
+        label_seq_id: Optional[int] = None,
+        auth_seq_id: Optional[int] = None,
+        pdbx_PDB_ins_code: Optional[str] = None,
+        label_atom_id: Optional[str] = None,
+        auth_atom_id: Optional[str] = None,
+        type_symbol: Optional[str] = None,
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Fetches atom-level details.
         """
@@ -379,30 +381,31 @@ class ModelQuery:
         )
 
     def get_residue_interaction(
-            self,
-            entry_id: str,
-            label_entity_id: Optional[str] = None,
-            label_asym_id: Optional[str] = None,
-            auth_asym_id: Optional[str] = None,
-            label_comp_id: Optional[str] = None,
-            auth_comp_id: Optional[str] = None,
-            label_seq_id: Optional[int] = None,
-            auth_seq_id: Optional[int] = None,
-            pdbx_PDB_ins_code: Optional[str] = None,
-            label_atom_id: Optional[str] = None,
-            auth_atom_id: Optional[str] = None,
-            type_symbol: Optional[str] = None,
-            radius: Optional[float] = 5.0,
-            assembly_name: Optional[str] = None,
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        label_entity_id: Optional[str] = None,
+        label_asym_id: Optional[str] = None,
+        auth_asym_id: Optional[str] = None,
+        label_comp_id: Optional[str] = None,
+        auth_comp_id: Optional[str] = None,
+        label_seq_id: Optional[int] = None,
+        auth_seq_id: Optional[int] = None,
+        pdbx_PDB_ins_code: Optional[str] = None,
+        label_atom_id: Optional[str] = None,
+        auth_atom_id: Optional[str] = None,
+        type_symbol: Optional[str] = None,
+        radius: Optional[float] = 5.0,
+        assembly_name: Optional[str] = None,
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Retrieves data on interactions between residues.
         """
@@ -438,30 +441,31 @@ class ModelQuery:
         )
 
     def get_residue_surroundings(
-            self,
-            entry_id: str,
-            label_entity_id: Optional[str] = None,
-            label_asym_id: Optional[str] = None,
-            auth_asym_id: Optional[str] = None,
-            label_comp_id: Optional[str] = None,
-            auth_comp_id: Optional[str] = None,
-            label_seq_id: Optional[int] = None,
-            auth_seq_id: Optional[int] = None,
-            pdbx_PDB_ins_code: Optional[str] = None,
-            label_atom_id: Optional[str] = None,
-            auth_atom_id: Optional[str] = None,
-            type_symbol: Optional[str] = None,
-            radius: Optional[float] = 5.0,
-            assembly_name: Optional[str] = None,
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        label_entity_id: Optional[str] = None,
+        label_asym_id: Optional[str] = None,
+        auth_asym_id: Optional[str] = None,
+        label_comp_id: Optional[str] = None,
+        auth_comp_id: Optional[str] = None,
+        label_seq_id: Optional[int] = None,
+        auth_seq_id: Optional[int] = None,
+        pdbx_PDB_ins_code: Optional[str] = None,
+        label_atom_id: Optional[str] = None,
+        auth_atom_id: Optional[str] = None,
+        type_symbol: Optional[str] = None,
+        radius: Optional[float] = 5.0,
+        assembly_name: Optional[str] = None,
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Provides information about residues surrounding a given structure.
         """
@@ -497,31 +501,32 @@ class ModelQuery:
         )
 
     def get_surrounding_ligands(
-            self,
-            entry_id: str,
-            label_entity_id: Optional[str] = None,
-            label_asym_id: Optional[str] = None,
-            auth_asym_id: Optional[str] = None,
-            label_comp_id: Optional[str] = None,
-            auth_comp_id: Optional[str] = None,
-            label_seq_id: Optional[int] = None,
-            auth_seq_id: Optional[int] = None,
-            pdbx_PDB_ins_code: Optional[str] = None,
-            label_atom_id: Optional[str] = None,
-            auth_atom_id: Optional[str] = None,
-            type_symbol: Optional[str] = None,
-            omit_water: Optional[bool] = False,
-            radius: Optional[float] = 5.0,
-            assembly_name: Optional[str] = None,
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        label_entity_id: Optional[str] = None,
+        label_asym_id: Optional[str] = None,
+        auth_asym_id: Optional[str] = None,
+        label_comp_id: Optional[str] = None,
+        auth_comp_id: Optional[str] = None,
+        label_seq_id: Optional[int] = None,
+        auth_seq_id: Optional[int] = None,
+        pdbx_PDB_ins_code: Optional[str] = None,
+        label_atom_id: Optional[str] = None,
+        auth_atom_id: Optional[str] = None,
+        type_symbol: Optional[str] = None,
+        omit_water: Optional[bool] = False,
+        radius: Optional[float] = 5.0,
+        assembly_name: Optional[str] = None,
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Provides information about ligands surrounding a given structure.
         """
@@ -558,18 +563,19 @@ class ModelQuery:
         )
 
     def get_symmetry_mates(
-            self,
-            entry_id: str,
-            radius: Optional[float] = 5.0,
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        radius: Optional[float] = 5.0,
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Retrieves symmetry-related data.
         """
@@ -593,18 +599,19 @@ class ModelQuery:
         )
 
     def get_assembly(
-            self,
-            entry_id: str,
-            name: Optional[str] = "1",
-            model_nums: Optional[List[int]] = None,
-            encoding: Optional[Literal["cif", "bcif"]] = None,
-            copy_all_categories: Optional[bool] = False,
-            data_source: Optional[str] = None,
-            transform: Optional[str] = None,
-            download: Optional[bool] = None,
-            filename: Optional[str] = None,
-            file_directory: Optional[str] = None,
-            compress_gzip: Optional[bool] = None,):
+        self,
+        entry_id: str,
+        name: Optional[str] = "1",
+        model_nums: Optional[List[int]] = None,
+        encoding: Optional[Literal["cif", "bcif"]] = None,
+        copy_all_categories: Optional[bool] = False,
+        data_source: Optional[str] = None,
+        transform: Optional[str] = None,
+        download: Optional[bool] = None,
+        filename: Optional[str] = None,
+        file_directory: Optional[str] = None,
+        compress_gzip: Optional[bool] = None,
+    ):
         """
         Fetches information about molecular assemblies.
         """
