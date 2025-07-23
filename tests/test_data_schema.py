@@ -27,6 +27,14 @@ logger.setLevel(logging.INFO)
 
 
 class SchemaTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.__startTime = time.time()
+        logger.info("Starting %s at %s", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
+
+    def tearDown(self) -> None:
+        endTime = time.time()
+        logger.info("Completed %s at %s (%.4f seconds)", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
+
     def testSchemaVersion(self) -> None:
         msg = "1. Compare entry schema"
         with self.subTest(msg=msg):

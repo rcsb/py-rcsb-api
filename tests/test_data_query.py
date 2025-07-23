@@ -29,11 +29,11 @@ logger.setLevel(logging.INFO)
 class QueryTests(unittest.TestCase):
     def setUp(self) -> None:
         self.__startTime = time.time()
-        logger.info("Starting %s at %s", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
+        logger.info("Starting %s at %s", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
 
     def tearDown(self) -> None:
         endTime = time.time()
-        logger.info("Completed %s at %s (%.4f seconds)", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
+        logger.info("Completed %s at %s (%.4f seconds)", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
     def testGetEditorLink(self) -> None:
         # query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
