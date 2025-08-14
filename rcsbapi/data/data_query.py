@@ -168,26 +168,26 @@ class DataQuery:
     def exec(self, batch_size: int = None, progress_bar: bool = False, max_retries: int = 5, retry_delay: int = 1, max_concurrency: int = None) -> Dict[str, Any]:
         """POST a GraphQL query and get response concurrently using httpx
 
+        Args:
+            batch_size (int, optional): size of ID batches to split up input ID list into and perform sub-requests. Defaults to 'config.DATA_API_BATCH_ID_SIZE'.
+            progress_bar (bool, optional): display a progress bar when executing query. Defaults to False.
+            max_retries (int, optional): maximum number of retries to attempt for each individual sub-request (in case of timeouts or errors). Defaults to 5.
+            retry_delay (int, optional): delay in seconds to wait for each retry. Defaults to 1.
+            max_concurrency (int, optional): maximum number of sub-requests to run concurrently. Defaults to config.DATA_API_MAX_CONCURRENT_REQUESTS.
+
         Returns:
-            Dict[str, Any]: JSON object
+            Dict[str, Any]: JSON object containing the compiled query result (aggregated across all sub-requests)
         """
-        print("CONFIG batch, max:", config.DATA_API_BATCH_ID_SIZE, config.DATA_API_MAX_CONCURRENT_REQUESTS)
         batch_size = batch_size if batch_size else config.DATA_API_BATCH_ID_SIZE
         max_concurrency = max_concurrency if max_concurrency else config.DATA_API_MAX_CONCURRENT_REQUESTS
-        print("USING batch, max:", batch_size, max_concurrency)
 
         result = asyncio.run(self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_delay=retry_delay, max_concurrency=max_concurrency))
 
         return result
 
     async def _async_exec(self, batch_size: int = None, progress_bar: bool = False, max_concurrency: int = None, max_retries: int = 5, retry_delay: int = 1) -> Dict[str, Any]:
-        """POST a GraphQL query and get response concurrently using httpx
-
-        Returns:
-            Dict[str, Any]: JSON object
+        """Run the asynchronous batch of requests.
         """
-        print("USING batch, max:", batch_size, max_concurrency)
-
         if len(self._input_ids) > batch_size:
             batched_ids: Union[List[List[str]]] = self._batch_ids(batch_size)
         else:
@@ -230,6 +230,8 @@ class DataQuery:
         return response_json
 
     async def _submit_request(self, client: httpx.AsyncClient, query_body: str, semaphores: asyncio.Semaphore, max_retries: int = 3, retry_delay: int = 1):
+        """Submit one batch sub-request.
+        """
         for attempt in range(1, max_retries + 1):
             try:
                 async with semaphores:
