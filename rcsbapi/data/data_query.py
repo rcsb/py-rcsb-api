@@ -324,7 +324,7 @@ class AllStructures:
         for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
             all_ids: List[str] = []
             for endpoint in endpoints:
-                response = httpx.get(endpoint, timeout=60, headers={"User-Agent": const.USER_AGENT})
+                response = httpx.get(endpoint, timeout=60, headers={"User-Agent": const.USER_AGENT}, follow_redirects=True)
                 if response.status_code == 200:
                     all_ids.extend(json.loads(response.text))
                 else:

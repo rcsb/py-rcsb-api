@@ -39,7 +39,7 @@ class QueryTests(unittest.TestCase):
         # query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
         query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": ["4HHB", "1IYE"]}, return_data_list=["exptl"])
         url = query_obj.get_editor_link()
-        response_json = httpx.get(url, timeout=10)
+        response_json = httpx.get(url, timeout=10, follow_redirects=True)
         self.assertEqual(response_json.status_code, 200)
 
     def testExec(self) -> None:
@@ -183,7 +183,7 @@ class QueryTests(unittest.TestCase):
         with self.subTest(msg=msg):
             logger.info("Running subtest %s", msg)
             query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["exptl"])
-            response = httpx.get(query.get_editor_link(), timeout=5)
+            response = httpx.get(query.get_editor_link(), timeout=5, follow_redirects=True)
             self.assertEqual(response.status_code, 200)
 
         msg = "5. Helpful methods, find_paths()"

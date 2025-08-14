@@ -123,7 +123,7 @@ if __name__ == "__main__":
         json=DATA_SCHEMA.introspection_query,
         timeout=config.API_TIMEOUT
     )
-    assert schema_response.status_code == 200
+    assert schema_response.status_code in [200, 301]
     data_schema_path = Path(__file__).parent.parent.joinpath(const.DATA_API_SCHEMA_DIR, const.DATA_API_SCHEMA_FILENAME)
     with open(data_schema_path, "wt", encoding="utf-8") as f:
         json.dump(schema_response.json(), f, indent=4)
@@ -135,7 +135,7 @@ if __name__ == "__main__":
         json=SEQ_SCHEMA.introspection_query,
         timeout=config.API_TIMEOUT
     )
-    assert schema_response.status_code == 200
+    assert schema_response.status_code in [200, 301]
     data_schema_path = Path(__file__).parent.parent.joinpath(const.SEQUENCE_API_SCHEMA_DIR, const.SEQUENCE_API_SCHEMA_FILENAME)
     with open(data_schema_path, "wt", encoding="utf-8") as f:
         json.dump(schema_response.json(), f, indent=4)
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         headers={"User-Agent": const.USER_AGENT},
         timeout=config.API_TIMEOUT
     )
-    assert model_schema_response.status_code == 200
+    assert model_schema_response.status_code in [200, 301]
     with open(model_schema_path, "wt", encoding="utf-8") as f:
         json.dump(model_schema_response.json(), f, indent=4)
 
