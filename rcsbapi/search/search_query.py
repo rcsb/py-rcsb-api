@@ -224,6 +224,8 @@ class SearchQuery(ABC):
         sort: Optional[List[Sort]] = None,
         return_explain_metadata: bool = False,
         scoring_strategy: Optional[ScoringStrategy] = None,
+        max_retries: int = 3,
+        retry_delay: int = 1,
     ) -> Union["Session", int]:
         # pylint: disable=dangerous-default-value
         """Evaluate this query and return an iterator of all result IDs"""
@@ -243,6 +245,8 @@ class SearchQuery(ABC):
             sort=sort,
             return_explain_metadata=return_explain_metadata,
             scoring_strategy=scoring_strategy,
+            max_retries=max_retries,
+            retry_delay=retry_delay,
         )
 
         response = session.to_dict()
@@ -282,6 +286,8 @@ class SearchQuery(ABC):
         sort: Optional[List[Sort]] = None,
         return_explain_metadata: bool = False,
         scoring_strategy: Optional[ScoringStrategy] = None,
+        max_retries: int = 3,
+        retry_delay: int = 1,
     ) -> Union["Session", int]:
         # pylint: disable=dangerous-default-value
         """Evaluate this query and return an iterator of all result IDs"""
@@ -297,6 +303,8 @@ class SearchQuery(ABC):
             sort=sort,
             return_explain_metadata=return_explain_metadata,
             scoring_strategy=scoring_strategy,
+            max_retries=max_retries,
+            retry_delay=retry_delay,
         )
 
     @overload
@@ -1206,8 +1214,8 @@ class NestedAttributeQueryChecker:
                 other for pair in SEARCH_SCHEMA.nested_attribute_schema if attribute in pair
                 for other in pair if other != attribute
             }
-            logging.warning(
-                "Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery.\n"
+            logger.warning(
+                "WARNING: Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery.\n"
                 "Please wrap it using NestedAttributeQuery(...)\n"
                 "Other attributes commonly used with '%s': %s",
                 attribute,
@@ -1784,7 +1792,9 @@ class Session(Iterable[str]):
         group_by_return_type: Optional[Literal["groups", "representatives"]] = None,
         sort: Optional[List[Sort]] = None,
         return_explain_metadata: bool = False,
-        scoring_strategy: Optional[ScoringStrategy] = None
+        scoring_strategy: Optional[ScoringStrategy] = None,
+        max_retries: int = 3,
+        retry_delay: int = 1,
     ):
         self.query_id = Session.make_uuid()
         self.query = query.assign_ids()
@@ -1802,6 +1812,10 @@ class Session(Iterable[str]):
         self._return_counts = return_counts
         self._return_explain_metadata = return_explain_metadata
         self._scoring_strategy = scoring_strategy
+
+        # Request retry settings
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
 
         # request_option results
         self.facets: Optional[Dict] = None
@@ -1885,22 +1899,34 @@ class Session(Iterable[str]):
         )
         return query_dict
 
-    def _single_query(self, start=0) -> Optional[Dict]:
+    def _single_query(self, start: int = 0) -> Optional[Dict]:
         "Fires a single query"
-        params = self._make_params(start)
-        logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = httpx.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
-        response.raise_for_status()
-        if response.status_code == httpx.codes.OK:
-            return response.json()
-        elif response.status_code == httpx.codes.NO_CONTENT:
-            return None
-        else:
-            raise httpx.HTTPStatusError(
-                f"Unexpected status: {response.status_code}",
-                request=response.request,
-                response=response
-            )
+        for attempt in range(1, self.max_retries + 1):
+            try:
+                params = self._make_params(start)
+                logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
+                response = httpx.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
+                response.raise_for_status()
+                if response.status_code == httpx.codes.OK:
+                    return response.json()
+                elif response.status_code == httpx.codes.NO_CONTENT:
+                    return None
+                else:
+                    raise httpx.HTTPStatusError(
+                        f"Unexpected status: {response.status_code}",
+                        request=response.request,
+                        response=response
+                    )
+            except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                if attempt == self.max_retries:
+                    logger.error(
+                        "Final retry attempt %r failed. Exiting. If issue persists, try reducing 'config.SEARCH_API_REQUESTS_PER_SECOND'.",
+                        attempt
+                    )
+                    raise
+                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self.retry_delay)
+                time.sleep(self.retry_delay)
+                self.retry_delay *= 2  # exponential backoff
 
     def __iter__(self) -> Union[Iterator[str], Iterator]:
         "Generator for all results as a list of identifiers"
@@ -1980,10 +2006,10 @@ class Session(Iterable[str]):
     def get_query_builder_link(self) -> str:
         """URL to view this query on the RCSB PDB website query builder"""
 
-        # --- Warning ---
-        logging.warning("Warning: For complex queries, the Advanced Search builder page may not be compatible and so links may not render correctly. "
-                        "Please use the `.get_editor_link()` method to access the Search API Query Editor instead.")
-        # --- Warning ---
+        logger.warning(
+            "WARNING: For complex queries, the Advanced Search builder page may not be compatible and so links may not render correctly.\n"
+            "         Please use the `.get_editor_link()` method to access the Search API Query Editor instead.\n"
+        )
 
         params = self._make_params()
         params["request_options"]["paginate"]["rows"] = 25

@@ -229,7 +229,7 @@ class DataQuery:
         self._response = response_json
         return response_json
 
-    async def _submit_request(self, client: httpx.AsyncClient, query_body: str, semaphores: asyncio.Semaphore, max_retries: int = 3, retry_delay: int = 1):
+    async def _submit_request(self, client: httpx.AsyncClient, query_body: str, semaphores: asyncio.Semaphore, max_retries: int = 5, retry_delay: int = 1):
         """Submit one batch sub-request.
         """
         for attempt in range(1, max_retries + 1):
@@ -242,7 +242,7 @@ class DataQuery:
                     )
                 if resp.status_code in [429, 500, 502, 503, 504]:
                     logger.error("Request attempt returned status code %r", resp.status_code)
-                    raise httpx.HTTPStatusError("Retryable status", request=resp.request, response=resp)
+                    raise httpx.HTTPStatusError("Request failed", request=resp.request, response=resp)
 
                 data = resp.json()
                 self._parse_gql_error(data)
