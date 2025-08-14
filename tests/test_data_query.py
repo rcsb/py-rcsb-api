@@ -22,6 +22,8 @@ from rcsbapi.data import DataSchema, DataQuery
 from rcsbapi.config import config
 from rcsbapi.const import const
 
+logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -384,7 +386,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = httpx.post(headers={"Content-Type": "application/graphql"}, data=ex_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            response_json = httpx.post(headers={"Content-Type": "application/graphql"}, content=ex_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
 
         msg = "4. Making Queries"

@@ -255,7 +255,6 @@ class GQLSchema(ABC):
         )
         if schema_response.status_code == 200:
             return dict(schema_response.json())
-        # logger.info("Loading data schema from file")
         current_dir = Path(Path(__file__).resolve()).parent
         json_file_path = Path(current_dir) / "resources" / fallback_file_name
         with Path.open(json_file_path, encoding="utf-8") as schema_file:
@@ -597,7 +596,8 @@ class GQLSchema(ABC):
             path_msg = "".join(f'\n        "{item}",' for item in info_list)
             logger.warning(
                 "\n"
-                "Some paths are being autocompleted based on the current API. If this code is meant for long-term use, use the set of fully qualified paths below:\n"
+                "NOTE: Some paths are being autocompleted based on the current API. If this code is meant for long-term use,\n"
+                "      use the set of fully qualified paths below:\n"
                 "    ["
                 "%s\n"
                 "    ]", path_msg

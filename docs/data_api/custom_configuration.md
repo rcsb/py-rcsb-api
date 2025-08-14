@@ -6,15 +6,15 @@ There are a handful of global settings that are configurable via the `rcsbapi.co
 
 The default configuration settings are as follows:
 
-| Setting Name                       | Default Value | Description                                                                                                     |
+| Configuration Setting                       | Default Value | Description                                                                                                     |
 | ---------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
 | `API_TIMEOUT`                      | 100           | Timeout in seconds for all API calls                                                                            |
 | `SEARCH_API_REQUESTS_PER_SECOND`   | 10            | Requests per second limit for the Search API                                                                    |
 | `MODEL_API_REQUESTS_PER_SECOND`    | 10            | Requests per second limit for the Model API                                                                     |
-| `SUPPRESS_AUTOCOMPLETE_WARNING`    | False         | Turn off autocompletion warnings from being raised for Data API queries                                         |
+| `SUPPRESS_AUTOCOMPLETE_WARNING`    | `False`         | Turn off autocompletion warnings from being raised for Data API queries                                         |
 | `DATA_API_BATCH_ID_SIZE`           | 200           | Size of batches to use for batching input ID list to Data API (reduce this if encountering timeouts or errors)  |
 | `DATA_API_MAX_CONCURRENT_REQUESTS` | 5             | Max number of Data API requests to run concurrently (e.g., when input ID list is split into many small batches) |
-| `INPUT_ID_LIMIT`                   | 5000          | Threshold for warning user that input ID list for Data API query is very large and may hinder performance       |
+| `INPUT_ID_LIMIT`                   | 50_000          | Threshold for warning user that input ID list for Data API query is very large and may take a while to complete       |
 
 
 ### Overriding settings

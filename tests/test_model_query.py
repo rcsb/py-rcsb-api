@@ -3,6 +3,8 @@ import os
 import logging
 from rcsbapi.model import ModelQuery
 
+logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

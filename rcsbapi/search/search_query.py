@@ -1846,13 +1846,13 @@ class Session(Iterable[str]):
         if self._group_by:
             if (self._group_by.aggregation_method == "matching_deposit_group_id") and (self.return_type != "entry"):
                 logger.warning(
-                    'group_by "matching_deposit_group_id" must be used with return_type "entry". Return type has been changed to "entry".'
+                    "WARNING: group_by 'matching_deposit_group_id' must be used with return_type 'entry'. Return type has been changed to 'entry'."
                 )
                 setattr(self, "return_type", "entry")
 
             if (self._group_by.aggregation_method in ["sequence_identity", "matching_uniprot_accession"]) and (self.return_type != "polymer_entity"):
                 logger.warning(
-                    'group_by "%s" must be used with return_type "polymer_entity". Return type has been changed to "polymer_entity".',
+                    "WARNING: group_by '%s' must be used with return_type 'polymer_entity'. Return type has been changed to 'polymer_entity'.",
                     self._group_by.aggregation_method
                 )
                 setattr(self, "return_type", "polymer_entity")

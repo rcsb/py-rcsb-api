@@ -22,6 +22,8 @@ from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import config
 from rcsbapi.const import const
 
+logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

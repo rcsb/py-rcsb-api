@@ -42,11 +42,11 @@ class DataQuery:
         if not isinstance(input_ids, AllStructures):
             if isinstance(input_ids, list):
                 if len(input_ids) > config.INPUT_ID_LIMIT:
-                    logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
+                    logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.INPUT_ID_LIMIT)
             if isinstance(input_ids, dict):
                 for value in input_ids.values():
                     if len(value) > config.INPUT_ID_LIMIT:
-                        logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
+                        logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.INPUT_ID_LIMIT)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
@@ -224,7 +224,7 @@ class DataQuery:
         if "data" in response_json:
             query_response = response_json["data"][self._input_type]
             if query_response is None or (isinstance(query_response, list) and len(query_response) == 0):
-                logger.warning("Input produced no results. Check that input ids are valid")
+                logger.warning("WARNING: Input produced no results. Check that input IDs are valid.")
 
         self._response = response_json
         return response_json
