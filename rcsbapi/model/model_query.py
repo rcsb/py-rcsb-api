@@ -3,7 +3,7 @@ import time
 from typing import Optional, Literal, List
 import urllib.parse
 import gzip
-import requests
+import httpx
 from rcsbapi.const import const
 from rcsbapi.config import config
 
@@ -75,7 +75,7 @@ class ModelQuery:
                 time.sleep(1)
                 self._request_counter = 0
 
-            response = requests.get(full_url, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})  # Use the constructed URL
+            response = httpx.get(full_url, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})  # Use the constructed URL
             response.raise_for_status()  # Raise an error for bad responses
 
             # Get encoding type (defaults to CIF if not provided)
@@ -151,7 +151,7 @@ class ModelQuery:
             # Return the file path of the downloaded file
             return file_path
 
-        except requests.exceptions.RequestException as e:
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"An error occurred: {e}")
             return None
 

@@ -28,7 +28,7 @@ from typing import (
     overload,
 )
 
-import requests
+import httpx
 from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.search.search_schema import SearchSchema
@@ -131,7 +131,7 @@ def fileUpload(filepath: str, fmt: str = "cif") -> str:
     should then be passed through as part of the value parameter,
     along with the format of the file."""
     with open(filepath, mode="rb") as f:
-        res = requests.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=config.API_TIMEOUT)
+        res = httpx.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=config.API_TIMEOUT)
         try:
             spec = res.json()["key"]
         except KeyError:
@@ -1889,14 +1889,18 @@ class Session(Iterable[str]):
         "Fires a single query"
         params = self._make_params(start)
         logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
+        response = httpx.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
         response.raise_for_status()
-        if response.status_code == requests.codes.ok:
+        if response.status_code == httpx.codes.OK:
             return response.json()
-        elif response.status_code == requests.codes.no_content:
+        elif response.status_code == httpx.codes.NO_CONTENT:
             return None
         else:
-            raise requests.HTTPError(f"Unexpected status: {response.status_code}")
+            raise httpx.HTTPStatusError(
+                f"Unexpected status: {response.status_code}",
+                request=response.request,
+                response=response
+            )
 
     def __iter__(self) -> Union[Iterator[str], Iterator]:
         "Generator for all results as a list of identifiers"

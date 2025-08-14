@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
 from dataclasses import field as dcfield
 import urllib.parse
-import requests
+import httpx
 
 from rcsbapi.const import const
 from rcsbapi.config import config
@@ -90,7 +90,7 @@ class SeqQuery(ABC):
         # Assert attribute exists for mypy
         assert hasattr(self, "_query"), \
             f"{self.__class__.__name__} must define '_query' attribute."
-        response_json = requests.post(
+        response_json = httpx.post(
             json=dict(self._query),
             url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
             timeout=config.API_TIMEOUT,
@@ -109,7 +109,7 @@ class SeqQuery(ABC):
         """Look through responses to see if there are errors. If so, throw an HTTP error, """
         if "errors" in response_json.keys():
             error = response_json["errors"][0]
-            raise requests.HTTPError(
+            raise Exception(
                 f'\n{error["message"]}\n'
                 f"Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query"
             )

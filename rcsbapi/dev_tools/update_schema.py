@@ -13,7 +13,7 @@ are in the .const file.
 import json
 from pathlib import Path
 from typing import Dict, Literal, List
-import requests
+import httpx
 
 try:
     from rcsbapi.search.search_query import SEARCH_SCHEMA  # instance of SearchSchema
@@ -117,10 +117,10 @@ if __name__ == "__main__":
         data_version_dict[file_name] = data_version
 
     # Update full GraphQL Data API schema
-    schema_response = requests.post(
+    schema_response = httpx.post(
+        url=const.DATA_API_ENDPOINT,
         headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
         json=DATA_SCHEMA.introspection_query,
-        url=const.DATA_API_ENDPOINT,
         timeout=config.API_TIMEOUT
     )
     assert schema_response.status_code == 200
@@ -129,10 +129,10 @@ if __name__ == "__main__":
         json.dump(schema_response.json(), f, indent=4)
 
     # Update full GraphQL Sequence API schema
-    schema_response = requests.post(
+    schema_response = httpx.post(
+        url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
         headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
         json=SEQ_SCHEMA.introspection_query,
-        url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
         timeout=config.API_TIMEOUT
     )
     assert schema_response.status_code == 200
@@ -144,8 +144,8 @@ if __name__ == "__main__":
     model_schema_url = const.MODELSERVER_API_SCHEMA_URL
     model_schema_path = Path(__file__).parent.parent.joinpath(const.MODELSERVER_API_SCHEMA_FILEPATH)
 
-    model_schema_response = requests.get(
-        model_schema_url,
+    model_schema_response = httpx.get(
+        url=model_schema_url,
         headers={"User-Agent": const.USER_AGENT},
         timeout=config.API_TIMEOUT
     )

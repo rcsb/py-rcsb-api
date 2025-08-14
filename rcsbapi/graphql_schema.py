@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple, Any
 import json
 import logging
 from pathlib import Path
-import requests
+import httpx
 from graphql import validate, parse, build_client_schema
 import rustworkx as rx
 from rcsbapi.const import const
@@ -191,7 +191,7 @@ class GQLSchema(ABC):
         { name description type{ kind ofType{ name kind ofType{ inputFields {name type { kind ofType { name kind ofType { ofType { kind name ofType {kind name}} } } } }
         kind name ofType{name kind} } } } } } } } }"""
         }
-        response = requests.post(
+        response = httpx.post(
             headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
             json=root_query,
             url=self.pdb_url,
@@ -247,7 +247,7 @@ class GQLSchema(ABC):
         Returns:
             Dict: JSON response of introspection request
         """
-        schema_response = requests.post(
+        schema_response = httpx.post(
             headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
             json=self.introspection_query,
             url=self.pdb_url,

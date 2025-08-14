@@ -19,11 +19,13 @@ logger = logging.getLogger(__name__)
 
 
 class Config:
-    API_TIMEOUT: int = 60
+    API_TIMEOUT: int = 100                       # Timeout in seconds for all API calls
     SEARCH_API_REQUESTS_PER_SECOND: int = 10
     MODEL_API_REQUESTS_PER_SECOND: int = 10
-    SUPPRESS_AUTOCOMPLETE_WARNING: bool = False
-    INPUT_ID_LIMIT: int = 5000
+    SUPPRESS_AUTOCOMPLETE_WARNING: bool = False  # Turn off autocompletion warnings from being raised for Data API queries
+    DATA_API_BATCH_ID_SIZE: int = 200            # Size of batches to use for batching input ID list to Data API (reduce this if encountering timeouts or errors)
+    DATA_API_MAX_CONCURRENT_REQUESTS: int = 5    # Max number of Data API requests to run concurrently (e.g., when input ID list is split into many small batches)
+    INPUT_ID_LIMIT: int = 5000                   # Threshold for warning user that input ID list for Data API query is very large and may hinder performance
 
     def __setattr__(self, name: str, value: Any) -> None:
         """Verify attribute exists when a user tries to set a configuration parameter, and ensure proper typing.

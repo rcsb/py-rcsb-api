@@ -16,7 +16,7 @@ import time
 import unittest
 import os
 from itertools import islice
-import requests
+import httpx
 from rcsbapi.const import const
 from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import group
@@ -192,7 +192,7 @@ class SearchTests(unittest.TestCase):
         try:
             set(session)
             ok = False
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Malformed query test results: ok : (%r)", ok)
@@ -742,7 +742,7 @@ class SearchTests(unittest.TestCase):
             resultL = list(q1())
             ok = len(resultL) > 100000
             logger.info("Large search resultL length: (%d) ok: (%r)", len(resultL), ok)
-        except requests.exceptions.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = False
         self.assertTrue(ok)
 
@@ -783,7 +783,7 @@ class SearchTests(unittest.TestCase):
                 .exec("assembly")
             resultL = list(query)
             ok = len(resultL) < 0  # set this to false as it should fail
-        except requests.exceptions.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Mismatch test: ok: (%r)", ok)
@@ -858,7 +858,7 @@ class SearchTests(unittest.TestCase):
         q2 = SeqMotifQuery("FFFFF", sequence_type="dna")  # test a DNA query, this should yield no results
         try:
             result = list(q2())
-        except requests.exceptions.HTTPError as e:
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             logger.error("HTTPError occurred: %s", e)
             result = []
         ok = len(result) == 0
@@ -881,7 +881,7 @@ class SearchTests(unittest.TestCase):
         q5 = SeqMotifQuery("ATUAC")  # An rna query with T should yield no results
         try:
             result = list(q5())
-        except requests.exceptions.HTTPError as e:
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             logger.error("HTTPError occurred: %s", e)
             result = []
         ok = len(result) == 0
@@ -900,7 +900,7 @@ class SearchTests(unittest.TestCase):
         try:
             q1 = SeqMotifQuery("AAAA", "nothing", "nothing")  # this should fail
             _ = list(q1())
-        except requests.exceptions.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("SeqMotif Query with invalid parameters failed successfully: (%r)", ok)
@@ -1107,7 +1107,7 @@ class SearchTests(unittest.TestCase):
                                         file_url="https://files.rcsb.org/view/4HHB.cif",
                                         file_format="pdb")
             result = list(q11())
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("File url query with wrong file format failed successfully : (%r)", ok)
@@ -1280,7 +1280,7 @@ class SearchTests(unittest.TestCase):
                                      descriptor_type="something",  # unsupported parameter
                                      match_type="something")  # unsupported parameter
             result = list(q9())
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Descriptor query type with invalid parameters failed successfully : (%r)", ok)
@@ -1369,7 +1369,7 @@ class SearchTests(unittest.TestCase):
         q9 = AttributeQuery("invalid_identifier", operator="exact_match", value="ERROR", service="textx")
         try:
             _ = q9()
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Counting results of Attribute query type with invalid parameters failed successfully : (%r)", ok)
