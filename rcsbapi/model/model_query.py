@@ -1,11 +1,14 @@
 import os
 import time
+import logging
 from typing import Optional, Literal, List
 import urllib.parse
 import gzip
 import httpx
 from rcsbapi.const import const
 from rcsbapi.config import config
+
+logger = logging.getLogger(__name__)
 
 
 class ModelQuery:
@@ -152,7 +155,7 @@ class ModelQuery:
             return file_path
 
         except (httpx.RequestError, httpx.HTTPStatusError) as e:
-            print(f"An error occurred: {e}")
+            logger.error("Request error: %r", e)
             return None
 
     def _get_endpoint_for_type(self, query_type: str) -> str:

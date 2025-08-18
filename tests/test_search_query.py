@@ -82,7 +82,7 @@ class SearchTests(unittest.TestCase):
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
         session = Session(Group("and", [q1]))
         result = session._single_query()  # pylint takes issue with this as this is a protected method
-        print(result)
+        logger.info("Single query result: %r", result)
         ok = result is not None
         self.assertTrue(ok)
         logger.info("Single query test results: ok : (%r)", ok)
@@ -114,7 +114,6 @@ class SearchTests(unittest.TestCase):
         q3 = ~q1
         # Lots of results
         first = next(iter(q3()))
-        # print(first)
         ok = first is not None
         self.assertTrue(ok)
         ok = first != "5T89"
@@ -1211,6 +1210,7 @@ class SearchTests(unittest.TestCase):
         result = list(q1())
         ok = len(result) > 0
         logger.info("Basic query with default values results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # query with type = formula and match subset = True
         q2 = ChemSimilarityQuery(value="C12 H28 O4",
@@ -1219,6 +1219,7 @@ class SearchTests(unittest.TestCase):
         result = list(q2())
         ok = len(result) > 0
         logger.info("Query with type = formula and match subset = True results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (sterospecific) or graph-relaxed-stereo
         q3 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -1228,6 +1229,7 @@ class SearchTests(unittest.TestCase):
         result = list(q3())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and graph-relaxed-stereo results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (including stereoisomers) or graph-relaxed
         q4 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -1237,6 +1239,7 @@ class SearchTests(unittest.TestCase):
         result = list(q4())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and graph-relaxed results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (quick screen) or fingerprint-similarity
         q5 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -1246,6 +1249,7 @@ class SearchTests(unittest.TestCase):
         result = list(q5())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and fingerprint-similarity results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = InChI, match type = substructure (sterospecific) or sub-struct-graph-relaxed-stereo
         q6 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
@@ -1255,6 +1259,7 @@ class SearchTests(unittest.TestCase):
         result = list(q6())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and sub-struct-graph-relaxed-stereo results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = InChI, match type = substructure (including stereoisomers) or sub-struct-graph-relaxed
         q7 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
@@ -1264,6 +1269,7 @@ class SearchTests(unittest.TestCase):
         result = list(q7())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and sub-struct-graph-relaxed results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = InChI, match type = exact match or graph-exact
         q8 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
@@ -1273,6 +1279,7 @@ class SearchTests(unittest.TestCase):
         result = list(q8())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and graph-exact results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Invalid query with invalid parameters
         ok = False
@@ -1531,7 +1538,7 @@ class SearchTests(unittest.TestCase):
             value="experimental",
         )
         result = q1(return_type="polymer_instance", facets=[ff2]).facets
-        print(f"filterfacet:\n {result}")
+        logger.info("filterfacet: %r", result)
         ok = len(result) > 0
         self.assertTrue(ok)
         logger.info("Filter Facet query results: result length : (%d), ok : (%r)", len(result), ok)

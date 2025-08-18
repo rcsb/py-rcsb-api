@@ -41,12 +41,12 @@ class DataQuery:
 
         if not isinstance(input_ids, AllStructures):
             if isinstance(input_ids, list):
-                if len(input_ids) > config.INPUT_ID_LIMIT:
-                    logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.INPUT_ID_LIMIT)
+                if len(input_ids) > config.DATA_API_INPUT_ID_LIMIT:
+                    logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.DATA_API_INPUT_ID_LIMIT)
             if isinstance(input_ids, dict):
                 for value in input_ids.values():
-                    if len(value) > config.INPUT_ID_LIMIT:
-                        logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.INPUT_ID_LIMIT)
+                    if len(value) > config.DATA_API_INPUT_ID_LIMIT:
+                        logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.DATA_API_INPUT_ID_LIMIT)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
