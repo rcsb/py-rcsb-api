@@ -1,5 +1,6 @@
 import logging
 import time
+import sys
 import urllib.parse
 import re
 from typing import Any, Union, List, Dict, Optional, Tuple
@@ -10,6 +11,14 @@ from tqdm import tqdm
 from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import config
 from rcsbapi.const import const
+
+try:
+    # Detect if running inside IPython/Jupyter
+    if "ipykernel" in sys.modules:
+        import nest_asyncio
+        nest_asyncio.apply()
+except ImportError:
+    pass
 
 logger = logging.getLogger(__name__)
 
