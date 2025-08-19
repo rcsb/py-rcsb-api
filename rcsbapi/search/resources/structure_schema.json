@@ -4732,7 +4732,7 @@
                             "context": "brief"
                         }
                     ],
-                    "rcsb_current_maximum_value": 1752624000000.0,
+                    "rcsb_current_maximum_value": 1754352000000.0,
                     "rcsb_current_minimum_value": 931305600000.0
                 },
                 "initial_release_date": {
@@ -4761,7 +4761,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1753228800000.0,
+                    "rcsb_current_maximum_value": 1755043200000.0,
                     "rcsb_current_minimum_value": 105235200000.0
                 },
                 "release_status": {
@@ -14977,7 +14977,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1748131200000.0,
+                        "rcsb_current_maximum_value": 1753056000000.0,
                         "rcsb_current_minimum_value": -29926281600000.0
                     },
                     "pdbx_frequency": {
@@ -17535,7 +17535,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 12719.0,
+                        "rcsb_current_maximum_value": 13833.0,
                         "rcsb_current_minimum_value": 1.0
                     },
                     "num_real_images": {
@@ -26181,7 +26181,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1752537600000.0,
+                    "rcsb_current_maximum_value": 1754265600000.0,
                     "rcsb_current_minimum_value": 82339200000.0
                 },
                 "has_released_experimental_data": {
@@ -26243,7 +26243,7 @@
                             "priority_order": 25
                         }
                     ],
-                    "rcsb_current_maximum_value": 1753228800000.0,
+                    "rcsb_current_maximum_value": 1755043200000.0,
                     "rcsb_current_minimum_value": 201312000000.0
                 },
                 "major_revision": {
@@ -26293,7 +26293,7 @@
                             "priority_order": 30
                         }
                     ],
-                    "rcsb_current_maximum_value": 1753228800000.0,
+                    "rcsb_current_maximum_value": 1755043200000.0,
                     "rcsb_current_minimum_value": 1472601600000.0
                 },
                 "status_code": {
@@ -30809,7 +30809,7 @@
                             }
                         ],
                         "rcsb_current_maximum_value": 1119.43,
-                        "rcsb_current_minimum_value": -242.62
+                        "rcsb_current_minimum_value": -288.36
                     },
                     "R_free_details": {
                         "type": "string",
@@ -35198,7 +35198,7 @@
                             "priority_order": 18
                         }
                     ],
-                    "rcsb_current_maximum_value": 40659774.0,
+                    "rcsb_current_maximum_value": 40768417.0,
                     "rcsb_current_minimum_value": 5.0
                 }
             },
@@ -35346,7 +35346,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1083211.0,
+                        "rcsb_current_maximum_value": 1083773.0,
                         "rcsb_current_minimum_value": 1.0
                     },
                     "identity": {
@@ -39146,7 +39146,7 @@
                                                 0.75
                                             ],
                                             "path": "rcsb_polymer_entity_container_identifiers.reference_sequence_identifiers.entity_sequence_coverage",
-                                            "rcsb_current_minimum_value": 0.001098901098901099,
+                                            "rcsb_current_minimum_value": 0.003875968992248062,
                                             "rcsb_current_maximum_value": 1.0
                                         }
                                     ]

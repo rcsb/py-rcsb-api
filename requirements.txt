@@ -1,4 +1,5 @@
-requests >= 2.0.0
+httpx >= 0.26.0
+nest_asyncio >= 1.6.0  # Needed for running async in Python notebooks
 rustworkx
 graphql-core
 tqdm

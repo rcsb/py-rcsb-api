@@ -37,6 +37,7 @@ Contents
    data_api/quickstart.md
    data_api/query_construction.md
    data_api/implementation_details.md
+   data_api/custom_configuration.md
    data_api/additional_examples.md
    data_api/api.rst
 

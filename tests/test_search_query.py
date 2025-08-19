@@ -16,13 +16,16 @@ import time
 import unittest
 import os
 from itertools import islice
-import requests
+import httpx
 from rcsbapi.const import const
+from rcsbapi.config import config
 from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import group
 from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group, NestedAttributeQuery, NestedAttributeQueryChecker
+
+logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -44,6 +47,8 @@ class SearchTests(unittest.TestCase):
         self.__4hhbpdb1 = os.path.join(self.__dirPath, "4hhb.pdb1")
         self.__4hhbpdb1Gz = os.path.join(self.__dirPath, "4hhb.pdb1.gz")
         self.__2mnr = os.path.join(self.__dirPath, "2mnr.cif")
+
+        config.MAX_RETRIES = 3
 
     def tearDown(self) -> None:
         endTime = time.time()
@@ -80,7 +85,7 @@ class SearchTests(unittest.TestCase):
         q1 = AttributeQuery("rcsb_entry_container_identifiers.entry_id", operator="in", value=["4HHB", "2GS2"])
         session = Session(Group("and", [q1]))
         result = session._single_query()  # pylint takes issue with this as this is a protected method
-        print(result)
+        logger.info("Single query result: %r", result)
         ok = result is not None
         self.assertTrue(ok)
         logger.info("Single query test results: ok : (%r)", ok)
@@ -112,7 +117,6 @@ class SearchTests(unittest.TestCase):
         q3 = ~q1
         # Lots of results
         first = next(iter(q3()))
-        # print(first)
         ok = first is not None
         self.assertTrue(ok)
         ok = first != "5T89"
@@ -192,7 +196,7 @@ class SearchTests(unittest.TestCase):
         try:
             set(session)
             ok = False
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Malformed query test results: ok : (%r)", ok)
@@ -742,7 +746,7 @@ class SearchTests(unittest.TestCase):
             resultL = list(q1())
             ok = len(resultL) > 100000
             logger.info("Large search resultL length: (%d) ok: (%r)", len(resultL), ok)
-        except requests.exceptions.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = False
         self.assertTrue(ok)
 
@@ -783,7 +787,7 @@ class SearchTests(unittest.TestCase):
                 .exec("assembly")
             resultL = list(query)
             ok = len(resultL) < 0  # set this to false as it should fail
-        except requests.exceptions.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Mismatch test: ok: (%r)", ok)
@@ -858,7 +862,7 @@ class SearchTests(unittest.TestCase):
         q2 = SeqMotifQuery("FFFFF", sequence_type="dna")  # test a DNA query, this should yield no results
         try:
             result = list(q2())
-        except requests.exceptions.HTTPError as e:
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             logger.error("HTTPError occurred: %s", e)
             result = []
         ok = len(result) == 0
@@ -881,7 +885,7 @@ class SearchTests(unittest.TestCase):
         q5 = SeqMotifQuery("ATUAC")  # An rna query with T should yield no results
         try:
             result = list(q5())
-        except requests.exceptions.HTTPError as e:
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             logger.error("HTTPError occurred: %s", e)
             result = []
         ok = len(result) == 0
@@ -900,7 +904,7 @@ class SearchTests(unittest.TestCase):
         try:
             q1 = SeqMotifQuery("AAAA", "nothing", "nothing")  # this should fail
             _ = list(q1())
-        except requests.exceptions.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("SeqMotif Query with invalid parameters failed successfully: (%r)", ok)
@@ -1107,7 +1111,7 @@ class SearchTests(unittest.TestCase):
                                         file_url="https://files.rcsb.org/view/4HHB.cif",
                                         file_format="pdb")
             result = list(q11())
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("File url query with wrong file format failed successfully : (%r)", ok)
@@ -1209,6 +1213,7 @@ class SearchTests(unittest.TestCase):
         result = list(q1())
         ok = len(result) > 0
         logger.info("Basic query with default values results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # query with type = formula and match subset = True
         q2 = ChemSimilarityQuery(value="C12 H28 O4",
@@ -1217,6 +1222,7 @@ class SearchTests(unittest.TestCase):
         result = list(q2())
         ok = len(result) > 0
         logger.info("Query with type = formula and match subset = True results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (sterospecific) or graph-relaxed-stereo
         q3 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -1226,6 +1232,7 @@ class SearchTests(unittest.TestCase):
         result = list(q3())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and graph-relaxed-stereo results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (including stereoisomers) or graph-relaxed
         q4 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -1235,6 +1242,7 @@ class SearchTests(unittest.TestCase):
         result = list(q4())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and graph-relaxed results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = SMILES, match type = similar ligands (quick screen) or fingerprint-similarity
         q5 = ChemSimilarityQuery(value="Cc1c(sc[n+]1Cc2cnc(nc2N)C)CCO",
@@ -1244,6 +1252,7 @@ class SearchTests(unittest.TestCase):
         result = list(q5())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, SMILES, and fingerprint-similarity results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = InChI, match type = substructure (sterospecific) or sub-struct-graph-relaxed-stereo
         q6 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
@@ -1253,6 +1262,7 @@ class SearchTests(unittest.TestCase):
         result = list(q6())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and sub-struct-graph-relaxed-stereo results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = InChI, match type = substructure (including stereoisomers) or sub-struct-graph-relaxed
         q7 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
@@ -1262,6 +1272,7 @@ class SearchTests(unittest.TestCase):
         result = list(q7())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and sub-struct-graph-relaxed results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Query with type = descriptor, descriptor type = InChI, match type = exact match or graph-exact
         q8 = ChemSimilarityQuery(value="InChI=1S/C13H10N2O4/c16-10-6-5-9(11(17)14-10)15-12(18)7-3-1-2-4-8(7)13(15)19/h1-4,9H,5-6H2,(H,14,16,17)/t9-/m0/s1",
@@ -1271,6 +1282,7 @@ class SearchTests(unittest.TestCase):
         result = list(q8())
         ok = len(result) > 0
         logger.info("Query with using type - descriptor, InChI, and graph-exact results: result length : (%d), ok : (%r)", len(result), ok)
+        self.assertTrue(ok)
 
         # Invalid query with invalid parameters
         ok = False
@@ -1280,7 +1292,7 @@ class SearchTests(unittest.TestCase):
                                      descriptor_type="something",  # unsupported parameter
                                      match_type="something")  # unsupported parameter
             result = list(q9())
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Descriptor query type with invalid parameters failed successfully : (%r)", ok)
@@ -1369,7 +1381,7 @@ class SearchTests(unittest.TestCase):
         q9 = AttributeQuery("invalid_identifier", operator="exact_match", value="ERROR", service="textx")
         try:
             _ = q9()
-        except requests.HTTPError:
+        except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
         logger.info("Counting results of Attribute query type with invalid parameters failed successfully : (%r)", ok)
@@ -1529,7 +1541,7 @@ class SearchTests(unittest.TestCase):
             value="experimental",
         )
         result = q1(return_type="polymer_instance", facets=[ff2]).facets
-        print(f"filterfacet:\n {result}")
+        logger.info("filterfacet: %r", result)
         ok = len(result) > 0
         self.assertTrue(ok)
         logger.info("Filter Facet query results: result length : (%d), ok : (%r)", len(result), ok)

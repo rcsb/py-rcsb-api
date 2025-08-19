@@ -180,7 +180,7 @@ class DataSchema(GQLSchema):
                 f'  schema.get_input_id_dict("{input_type}")'
             )
 
-    def find_field_names(self, search_string: str) -> list[str]:
+    def find_field_names(self, search_string: str) -> List[str]:
         """Find field names that fully or partially match the search string.
 
         Args:
@@ -191,7 +191,7 @@ class DataSchema(GQLSchema):
             ValueError: thrown when no fields match search_string
 
         Returns:
-            list[str]: list of matching field names
+            List[str]: list of matching field names
         """
         return super().find_field_names(search_string)
 

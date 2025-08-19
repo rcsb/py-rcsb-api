@@ -14,13 +14,15 @@ Tests for all functions of the Data API module.
 import logging
 import time
 import unittest
-import requests
+import httpx
 
 from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import NestedAttributeQuery, AttributeQuery
 from rcsbapi.data import DataSchema, DataQuery
 from rcsbapi.config import config
 from rcsbapi.const import const
+
+logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -39,7 +41,7 @@ class QueryTests(unittest.TestCase):
         # query_str = '{ entries(entry_ids: ["4HHB", "1IYE"]) {\n  exptl {\n     method_details\n     method\n     details\n     crystals_number\n  }\n}}'
         query_obj = DataQuery(input_type="entries", input_ids={"entry_ids": ["4HHB", "1IYE"]}, return_data_list=["exptl"])
         url = query_obj.get_editor_link()
-        response_json = requests.get(url, timeout=10)
+        response_json = httpx.get(url, timeout=10, follow_redirects=True)
         self.assertEqual(response_json.status_code, 200)
 
     def testExec(self) -> None:
@@ -183,7 +185,7 @@ class QueryTests(unittest.TestCase):
         with self.subTest(msg=msg):
             logger.info("Running subtest %s", msg)
             query = DataQuery(input_type="entries", input_ids=["4HHB"], return_data_list=["exptl"])
-            response = requests.get(query.get_editor_link(), timeout=5)
+            response = httpx.get(query.get_editor_link(), timeout=5, follow_redirects=True)
             self.assertEqual(response.status_code, 200)
 
         msg = "5. Helpful methods, find_paths()"
@@ -384,7 +386,7 @@ class QueryTests(unittest.TestCase):
             }
             }
             """
-            response_json = requests.post(headers={"Content-Type": "application/graphql"}, data=ex_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
+            response_json = httpx.post(headers={"Content-Type": "application/graphql"}, content=ex_query, url=const.DATA_API_ENDPOINT, timeout=config.API_TIMEOUT).json()
             self.assertNotIn("errors", response_json.keys())
 
         msg = "4. Making Queries"

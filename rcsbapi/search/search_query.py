@@ -28,7 +28,7 @@ from typing import (
     overload,
 )
 
-import requests
+import httpx
 from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.search.search_schema import SearchSchema
@@ -131,7 +131,7 @@ def fileUpload(filepath: str, fmt: str = "cif") -> str:
     should then be passed through as part of the value parameter,
     along with the format of the file."""
     with open(filepath, mode="rb") as f:
-        res = requests.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=config.API_TIMEOUT)
+        res = httpx.post(const.UPLOAD_URL, files={"file": f}, data={"format": fmt}, timeout=config.API_TIMEOUT)
         try:
             spec = res.json()["key"]
         except KeyError:
@@ -224,6 +224,8 @@ class SearchQuery(ABC):
         sort: Optional[List[Sort]] = None,
         return_explain_metadata: bool = False,
         scoring_strategy: Optional[ScoringStrategy] = None,
+        max_retries: int = None,
+        retry_backoff: int = None,
     ) -> Union["Session", int]:
         # pylint: disable=dangerous-default-value
         """Evaluate this query and return an iterator of all result IDs"""
@@ -243,6 +245,8 @@ class SearchQuery(ABC):
             sort=sort,
             return_explain_metadata=return_explain_metadata,
             scoring_strategy=scoring_strategy,
+            max_retries=max_retries,
+            retry_backoff=retry_backoff,
         )
 
         response = session.to_dict()
@@ -282,6 +286,8 @@ class SearchQuery(ABC):
         sort: Optional[List[Sort]] = None,
         return_explain_metadata: bool = False,
         scoring_strategy: Optional[ScoringStrategy] = None,
+        max_retries: int = None,
+        retry_backoff: int = None,
     ) -> Union["Session", int]:
         # pylint: disable=dangerous-default-value
         """Evaluate this query and return an iterator of all result IDs"""
@@ -297,6 +303,8 @@ class SearchQuery(ABC):
             sort=sort,
             return_explain_metadata=return_explain_metadata,
             scoring_strategy=scoring_strategy,
+            max_retries=max_retries,
+            retry_backoff=retry_backoff,
         )
 
     @overload
@@ -1206,13 +1214,15 @@ class NestedAttributeQueryChecker:
                 other for pair in SEARCH_SCHEMA.nested_attribute_schema if attribute in pair
                 for other in pair if other != attribute
             }
-            logging.warning(
-                "Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery.\n"
-                "Please wrap it using NestedAttributeQuery(...)\n"
-                "Other attributes commonly used with '%s': %s",
+            logger.warning(
+                "WARNING: Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery (see docs: %s).\n"
+                "    Please wrap it using: `NestedAttributeQuery( AttributeQuery('%s', ...), AttributeQuery(<PARTNER_ATTRIBUTE>, ...) )`\n"
+                "    Possible partner attributes for '%s': %r",
+                attribute,
+                "https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#nested-attributes",
                 attribute,
                 attribute,
-                ', '.join(sorted(nested_partners)) if nested_partners else "None"
+                nested_partners
             )
 
 
@@ -1784,7 +1794,9 @@ class Session(Iterable[str]):
         group_by_return_type: Optional[Literal["groups", "representatives"]] = None,
         sort: Optional[List[Sort]] = None,
         return_explain_metadata: bool = False,
-        scoring_strategy: Optional[ScoringStrategy] = None
+        scoring_strategy: Optional[ScoringStrategy] = None,
+        max_retries: int = None,
+        retry_backoff: int = None,
     ):
         self.query_id = Session.make_uuid()
         self.query = query.assign_ids()
@@ -1802,6 +1814,14 @@ class Session(Iterable[str]):
         self._return_counts = return_counts
         self._return_explain_metadata = return_explain_metadata
         self._scoring_strategy = scoring_strategy
+
+        # Request retry and rate limit settings
+        self._max_retries = max_retries if max_retries else config.MAX_RETRIES
+        self._retry_backoff = retry_backoff if retry_backoff else config.RETRY_BACKOFF
+        self._last_request_time = time.monotonic()
+        self._request_count = 0
+        self._request_limit_time_interval = 10  # request rate limits are applied over 10s window
+        self._requests_per_window_limit = config.SEARCH_API_REQUESTS_PER_SECOND * self._request_limit_time_interval
 
         # request_option results
         self.facets: Optional[Dict] = None
@@ -1846,13 +1866,13 @@ class Session(Iterable[str]):
         if self._group_by:
             if (self._group_by.aggregation_method == "matching_deposit_group_id") and (self.return_type != "entry"):
                 logger.warning(
-                    'group_by "matching_deposit_group_id" must be used with return_type "entry". Return type has been changed to "entry".'
+                    "WARNING: group_by 'matching_deposit_group_id' must be used with return_type 'entry'. Return type has been changed to 'entry'."
                 )
                 setattr(self, "return_type", "entry")
 
             if (self._group_by.aggregation_method in ["sequence_identity", "matching_uniprot_accession"]) and (self.return_type != "polymer_entity"):
                 logger.warning(
-                    'group_by "%s" must be used with return_type "polymer_entity". Return type has been changed to "polymer_entity".',
+                    "WARNING: group_by '%s' must be used with return_type 'polymer_entity'. Return type has been changed to 'polymer_entity'.",
                     self._group_by.aggregation_method
                 )
                 setattr(self, "return_type", "polymer_entity")
@@ -1885,23 +1905,68 @@ class Session(Iterable[str]):
         )
         return query_dict
 
-    def _single_query(self, start=0) -> Optional[Dict]:
-        "Fires a single query"
-        params = self._make_params(start)
-        logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
-        response = requests.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
-        response.raise_for_status()
-        if response.status_code == requests.codes.ok:
-            return response.json()
-        elif response.status_code == requests.codes.no_content:
-            return None
-        else:
-            raise requests.HTTPError(f"Unexpected status: {response.status_code}")
+    def _single_query(self, start: int = 0) -> Optional[Dict]:
+        """Fires a single query, with retry behavior and rate limiting.
+        """
+        retry_backoff = self._retry_backoff
+        for attempt in range(1, self._max_retries + 1):
+            try:
+                # First check if request rate-limit reached
+                self._rate_limiter()
+                #
+                # Now perform the actual request
+                params = self._make_params(start)
+                logger.debug("Querying %s for results %s-%s", self.url, start, start + self.rows - 1)
+                response = httpx.post(self.url, json=params, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
+                response.raise_for_status()
+                if response.status_code == httpx.codes.OK:
+                    return response.json()
+                elif response.status_code == httpx.codes.NO_CONTENT:
+                    return None
+                else:
+                    raise httpx.HTTPStatusError(
+                        f"Unexpected status: {response.status_code}",
+                        request=response.request,
+                        response=response
+                    )
+            except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                if attempt == self._max_retries:
+                    logger.error(
+                        "Final retry attempt %r failed with exception:\n    %r\n"
+                        "Check query and parameters. If issue persists, try reducing 'config.SEARCH_API_REQUESTS_PER_SECOND'.",
+                        attempt,
+                        e
+                    )
+                    raise
+                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
+                time.sleep(retry_backoff)
+                retry_backoff *= 2  # exponential backoff
+
+    def _rate_limiter(self):
+        """Check if request rate-limit has been reached, and if so, sleep until it can be reset.
+        """
+        now = time.monotonic()
+        elapsed = now - self._last_request_time
+        if elapsed >= self._request_limit_time_interval:
+            self._last_request_time = now
+            self._request_count = 0
+        if self._request_count >= self._requests_per_window_limit:
+            sleep_time = self._requests_per_window_limit - elapsed
+            if sleep_time > 0:
+                logger.info(
+                    "Request rate limit reached (%r requests/ %r seconds). Sleeping for %.1f seconds...",
+                    self._requests_per_window_limit,
+                    self._request_limit_time_interval,
+                    sleep_time
+                )
+                time.sleep(sleep_time)
+            self._last_request_time = time.monotonic()
+            self._request_count = 0
+        self._request_count += 1
 
     def __iter__(self) -> Union[Iterator[str], Iterator]:
         "Generator for all results as a list of identifiers"
         start = 0
-        req_count = 0
         response = self._single_query(start=start)
         if response is None:
             return  # be explicit for mypy
@@ -1925,10 +1990,6 @@ class Session(Iterable[str]):
             # If grouping is applied, result set could be lower than rows
             if not self._group_by:
                 assert len(result_set) == self.rows
-            req_count += 1
-            if req_count == config.SEARCH_API_REQUESTS_PER_SECOND:
-                time.sleep(1.2)  # This prevents the user from bottlenecking the server with requests.
-                req_count = 0
             response = self._single_query(start=start)
             assert isinstance(response, dict)
             if "result_set" in response:
@@ -1976,10 +2037,10 @@ class Session(Iterable[str]):
     def get_query_builder_link(self) -> str:
         """URL to view this query on the RCSB PDB website query builder"""
 
-        # --- Warning ---
-        logging.warning("Warning: For complex queries, the Advanced Search builder page may not be compatible and so links may not render correctly. "
-                        "Please use the `.get_editor_link()` method to access the Search API Query Editor instead.")
-        # --- Warning ---
+        logger.warning(
+            "WARNING: For complex queries, the Advanced Search builder page may not be compatible and so links may not render correctly.\n"
+            "    Please use the `.get_editor_link()` method to access the Search API Query Editor instead.\n"
+        )
 
         params = self._make_params()
         params["request_options"]["paginate"]["rows"] = 25

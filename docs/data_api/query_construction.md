@@ -88,7 +88,10 @@ input_ids=["4HHB.A", "4HHB.B"]
 input_ids={"instance_ids": ["4HHB.A", "4HHB.B"]}
 ```
 
-While it is generally more efficient and easier to interpret results if you use a refined list of IDs, if you would like to request a set of data for all IDs within an `input_type`, you can use the `ALL_STRUCTURES` variable. This will set `input_ids` to all IDs for the given `input_type` if supported.
+#### Fetching data for *all* structures
+While it is generally more efficient and easier to interpret results if you use a refined list of IDs, if you would like to request a set of data for *all IDs*, you can use the `ALL_STRUCTURES` variable. This will set `input_ids` to all IDs of the given `input_type` if supported.
+
+This is currently supported for `input_type` of `entries` or `chem_comps`.
 
 ```python
 from rcsbapi.data import DataQuery as Query
@@ -103,9 +106,30 @@ query = Query(
 )
 
 # Executing the query with a progress bar
-query.exec(progress_bar=True)
+result_dict = query.exec(progress_bar=True)
+print(len(result_dict["data"]["entries"]))
+```
 
-print(query.get_response())
+#### Batching large queries
+When executing large queries, the package will automatically batch the `input_ids` before requesting and merge the responses into one JSON object. The default batch size is 300 (as defined by `config.DATA_API_BATCH_ID_SIZE`), but this value can be adjusted in the `exec` method as shown below (or overwriting the [configuration value](custom_configuration.md)). Additionally, to see a progress bar that tracks which batches have been completed, you can set `progress_bar` to `True` as done below.
+
+```python
+from rcsbapi.data import DataQuery as Query
+from rcsbapi.data import ALL_STRUCTURES
+
+query = Query(
+    input_type="entries",
+    input_ids=ALL_STRUCTURES,
+    return_data_list=["exptl.method"]
+)
+
+# Executing query with larger batch size and progress bar
+result_dict = query.exec(
+  batch_size=7000,
+  progress_bar=True
+)
+
+print(len(result_dict["data"]["entries"]))
 ```
 
 ### return_data_list
@@ -172,29 +196,6 @@ print(result_dict)
     ]
   }
 }
-```
-
-### Executing Large Queries
-When executing large queries, the package will batch the `input_ids` before requesting and merge the responses into one JSON object. The default batch size is 5,000, but this value can be adjusted in the `exec` method. To see a progress bar that tracks which batches have been completed, you can set `progress_bar` to `True`.
-
-```python
-from rcsbapi.data import DataQuery as Query
-from rcsbapi.data import ALL_STRUCTURES
-
-query = Query(
-    input_type="entries",
-    input_ids=ALL_STRUCTURES,
-    return_data_list=["exptl.method"]
-)
-
-# Executing query with larger batch size
-# and progress bar
-query.exec(
-  batch_size=7000,
-  progress_bar=True
-)
-
-print(query.get_response())
 ```
 
 ## Helpful Methods

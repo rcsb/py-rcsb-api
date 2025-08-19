@@ -28,9 +28,6 @@ jobs:
         addToPath: true
       displayName: setup python
     #
-    #- checkout: self
-    #  submodules: true
-    #
     - download: current
       artifact: ${{ format('sw_{0}_{1}', parameters.tox,  parameters.os) }}
 
@@ -53,13 +50,3 @@ jobs:
       - script: twine upload --verbose --skip-existing -r pypi  --config-file $(pypicred.secureFilePath) $(Pipeline.Workspace)/${{ format('sw_u_{0}_{1}', parameters.tox, parameters.os) }}/*
         displayName: "Linux upload sdist and source wheel to PyPi ..."
         continueOnError: true
-    #
-    # - ${{ if startsWith(parameters.os, 'macos') }}:
-    #   - script: twine upload --verbose --skip-existing -r pypi  --config-file $(pypicred.secureFilePath) $(Pipeline.Workspace)/${{ format('sw_{0}_{1}', parameters.tox, parameters.os) }}/*
-    #     displayName: "Mac upload sdist and binary wheel to PyPi ..."
-    #     continueOnError: true
-    # #
-    # - ${{ if startsWith(parameters.os, 'windows') }}:
-    #   - script: twine upload --verbose --skip-existing -r pypi --config-file %pypicred.secureFilePath% %Pipeline.Workspace%\${{ format('sw_{0}_{1}', parameters.tox, parameters.os) }}\*
-    #     displayName: "Windows upload sdist and binary wheel to PyPi ..."
-    #     continueOnError: true
