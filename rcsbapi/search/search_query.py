@@ -1215,12 +1215,14 @@ class NestedAttributeQueryChecker:
                 for other in pair if other != attribute
             }
             logger.warning(
-                "WARNING: Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery.\n"
-                "Please wrap it using NestedAttributeQuery(...)\n"
-                "Other attributes commonly used with '%s': %s",
+                "WARNING: Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery (see docs: %s).\n"
+                "    Please wrap it using: `NestedAttributeQuery( AttributeQuery('%s', ...), AttributeQuery(<PARTNER_ATTRIBUTE>, ...) )`\n"
+                "    Possible partner attributes for '%s': %r",
+                attribute,
+                "https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#nested-attributes",
                 attribute,
                 attribute,
-                ', '.join(sorted(nested_partners)) if nested_partners else "None"
+                nested_partners
             )
 
 
@@ -1930,8 +1932,10 @@ class Session(Iterable[str]):
             except (httpx.RequestError, httpx.HTTPStatusError) as e:
                 if attempt == self._max_retries:
                     logger.error(
-                        "Final retry attempt %r failed. Exiting. If issue persists, try reducing 'config.SEARCH_API_REQUESTS_PER_SECOND'.",
-                        attempt
+                        "Final retry attempt %r failed with exception:\n    %r\n"
+                        "Check query and parameters. If issue persists, try reducing 'config.SEARCH_API_REQUESTS_PER_SECOND'.",
+                        attempt,
+                        e
                     )
                     raise
                 logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
@@ -1949,7 +1953,7 @@ class Session(Iterable[str]):
         if self._request_count >= self._requests_per_window_limit:
             sleep_time = self._requests_per_window_limit - elapsed
             if sleep_time > 0:
-                logger.warning(
+                logger.info(
                     "Request rate limit reached (%r requests/ %r seconds). Sleeping for %.1f seconds...",
                     self._requests_per_window_limit,
                     self._request_limit_time_interval,
@@ -2035,7 +2039,7 @@ class Session(Iterable[str]):
 
         logger.warning(
             "WARNING: For complex queries, the Advanced Search builder page may not be compatible and so links may not render correctly.\n"
-            "         Please use the `.get_editor_link()` method to access the Search API Query Editor instead.\n"
+            "    Please use the `.get_editor_link()` method to access the Search API Query Editor instead.\n"
         )
 
         params = self._make_params()

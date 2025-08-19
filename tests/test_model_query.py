@@ -43,8 +43,9 @@ class ModelQueryTests(unittest.TestCase):
         return "\n".join(combined)
 
     def test_get_full_structure(self) -> None:
-        with self.subTest(msg="1. Full structure query with additional parameters"):
-            logger.info("1. Starting Full structure query with additional parameters")
+        msg = "1. Full structure query with additional parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_full_structure(
                     entry_id="2HHB",
@@ -55,8 +56,9 @@ class ModelQueryTests(unittest.TestCase):
             except Exception as e:
                 logger.error("Full structure query failed with exception: %s", e)
 
-        with self.subTest(msg="2. Full structure query with illegal parameters"):
-            logger.info("2. Starting Full structure query with illegal parameters")
+        msg = "2. Full structure query with illegal parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_full_structure(
                     entry_id="krish", encoding="cif", model_nums=[2], copy_all_categories=False
@@ -67,8 +69,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Full structure query with illegal parameters failed with exception: %s", e)
 
     def test_get_ligand(self) -> None:
-        with self.subTest(msg="1. Ligand query with additional parameters"):
-            logger.info("1. Starting Ligand query with additional parameters")
+        msg = "1. Ligand query with additional parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_ligand(entry_id="4HHB", label_comp_id="HEM")
                 logger.info("Ligand query completed successfully, result: %s", self.log_first_and_last_lines(result))
@@ -77,8 +80,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Ligand query failed with exception: %s", e)
 
     def test_get_atoms(self) -> None:
-        with self.subTest(msg="1. Atoms query with additional parameters"):
-            logger.info("1. Starting Atoms query with additional parameters")
+        msg = "1. Atoms query with additional parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_atoms(entry_id="4HHB", label_comp_id="HEM")
                 logger.info("Atoms query completed successfully, result: %s", self.log_first_and_last_lines(result))
@@ -87,8 +91,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Atoms query failed with exception: %s", e)
 
     def test_get_residue_interaction(self) -> None:
-        with self.subTest(msg="1. Residue interaction query with expanded parameters"):
-            logger.info("1. Starting Residue interaction query with expanded parameters")
+        msg = "1. Residue interaction query with expanded parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_residue_interaction(
                     entry_id="4HHB",
@@ -102,8 +107,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Residue interaction query failed with exception: %s", e)
 
     def test_get_residue_surroundings(self) -> None:
-        with self.subTest(msg="1. Residue surroundings query with expanded parameters"):
-            logger.info("1. Starting Residue surroundings query with expanded parameters")
+        msg = "1. Residue surroundings query with expanded parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_residue_surroundings(
                     entry_id="4HHB",
@@ -117,8 +123,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Residue surroundings query failed with exception: %s", e)
 
     def test_get_surrounding_ligands(self) -> None:
-        with self.subTest(msg="1. Surrounding ligands query with additional parameters"):
-            logger.info("1. Starting Surrounding ligands query with additional parameters")
+        msg = "1. Surrounding ligands query with additional parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_surrounding_ligands(
                     entry_id="1TQN",
@@ -132,8 +139,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Surrounding ligands query failed with exception: %s", e)
 
     def test_get_symmetry_mates(self) -> None:
-        with self.subTest(msg="1. Symmetry mates query with expanded parameters"):
-            logger.info("1. Starting Symmetry mates query with expanded parameters")
+        msg = "1. Symmetry mates query with expanded parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_symmetry_mates(entry_id="1TQN")
                 logger.info("Symmetry mates query completed successfully, result: %s", self.log_first_and_last_lines(result))
@@ -142,8 +150,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Symmetry mates query failed with exception: %s", e)
 
     def test_get_assembly(self) -> None:
-        with self.subTest(msg="1. Assembly query with additional parameters"):
-            logger.info("1. Starting Assembly query with additional parameters")
+        msg = "1. Assembly query with additional parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_assembly(entry_id="13PK", name="3")
                 logger.info("Assembly query completed successfully, result: %s", self.log_first_and_last_lines(result))
@@ -152,8 +161,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Assembly query failed with exception: %s", e)
 
     def test_download_file(self) -> None:
-        with self.subTest(msg="1. Full structure download with compression and extra params"):
-            logger.info("1. Starting Full structure download with compression and extra params")
+        msg = "1. Full structure download with extra params"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 file_path = self.model_query.get_full_structure(
                     entry_id=self.entry_id, encoding="cif", download=True, filename="1tqn_full_structure.cif",
@@ -166,8 +176,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Download failed with exception: %s", e)
 
     def test_download_compressed_file(self) -> None:
-        with self.subTest(msg="1. Full structure download with compression and extra params"):
-            logger.info("1. Starting Full structure download with compression and extra params")
+        msg = "1. Full structure download with compression and extra params"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 file_path = self.model_query.get_full_structure(
                     entry_id=self.entry_id, encoding="cif", download=True, filename="1tqn_full_structure.cif",
@@ -180,8 +191,9 @@ class ModelQueryTests(unittest.TestCase):
                 logger.error("Download failed with exception: %s", e)
 
     def test_get_multiple_structures(self) -> None:
-        with self.subTest(msg="1. Get multiple structures with expanded parameters"):
-            logger.info("1. Starting Get multiple structures query with expanded parameters")
+        msg = "1. Get multiple structures with expanded parameters"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
             try:
                 result = self.model_query.get_multiple_structures(
                     entry_ids=self.entry_ids, query_type="full", encoding="cif", model_nums=[1], transform="rotate"

@@ -143,8 +143,9 @@ class ModelQuery:
                 return file_content
 
             if kwargs.get("compress_gzip", False):
-                # Update path to include .gz suffix
-                file_path += ".gz"
+                if not file_path.lower().endswith(".gz"):
+                    # Update path to include .gz suffix
+                    file_path += ".gz"
 
                 # Compress the content before saving
                 if encoding == "BCIF":
@@ -213,8 +214,10 @@ class ModelQuery:
             except (httpx.RequestError, httpx.HTTPStatusError) as e:
                 if attempt == self._max_retries:
                     logger.error(
-                        "Final retry attempt %r failed. Exiting. If issue persists, try reducing 'config.MODEL_API_REQUESTS_PER_SECOND'.",
-                        attempt
+                        "Final retry attempt %r failed with exception:\n    %r\n"
+                        "Check query and parameters. If issue persists, try reducing 'config.MODEL_API_REQUESTS_PER_SECOND'.",
+                        attempt,
+                        e
                     )
                     raise
                 logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
@@ -232,7 +235,7 @@ class ModelQuery:
         if self._request_count >= self._requests_per_window_limit:
             sleep_time = self._request_limit_time_interval - elapsed
             if sleep_time > 0:
-                logger.warning(
+                logger.info(
                     "Request rate limit reached (%r requests/ %r seconds). Sleeping for %.1f seconds...",
                     self._requests_per_window_limit,
                     self._request_limit_time_interval,

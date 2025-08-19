@@ -244,35 +244,36 @@ class DataQuery:
     async def _submit_request(self, client: httpx.AsyncClient, query_body: str, semaphores: asyncio.Semaphore, max_retries: int, retry_backoff: int):
         """Submit one batch sub-request, with retry behavior and rate limiting.
         """
-        for attempt in range(1, max_retries + 1):
-            try:
-                async with semaphores:
+        async with semaphores:
+            for attempt in range(1, max_retries + 1):
+                try:
                     # First check if request rate-limit reached
                     await self._rate_limiter()
                     #
-                    resp = await client.post(
+                    # Now perform the actual request
+                    response = await client.post(
                         url=const.DATA_API_ENDPOINT,
                         headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
                         json={"query": query_body}
                     )
-                if resp.status_code in [429, 500, 502, 503, 504]:
-                    logger.error("Request attempt returned status code %r", resp.status_code)
-                    raise httpx.HTTPStatusError("Request failed", request=resp.request, response=resp)
+                    response.raise_for_status()  # Raise an error for bad responses
 
-                data = resp.json()
-                self._parse_gql_error(data)
-                return data
+                    response_json = response.json()
+                    self._parse_gql_error(response_json)
+                    return response_json
 
-            except (httpx.RequestError, httpx.HTTPStatusError) as e:
-                if attempt == max_retries:
-                    logger.error(
-                        "Final retry attempt %r failed. Exiting. If issue persists, try reducing 'config.DATA_API_BATCH_ID_SIZE' and/or 'config.DATA_API_MAX_CONCURRENT_REQUESTS'.",
-                        attempt
-                    )
-                    raise
-                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
-                await asyncio.sleep(retry_backoff)
-                retry_backoff *= 2  # exponential backoff
+                except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                    if attempt == max_retries:
+                        logger.error(
+                            "Final retry attempt %r failed with exception:\n    %r\n"
+                            "Check query and parameters. If issue persists, try reducing 'config.DATA_API_BATCH_ID_SIZE' and/or 'config.DATA_API_MAX_CONCURRENT_REQUESTS'.",
+                            attempt,
+                            e
+                        )
+                        raise
+                    logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
+                    await asyncio.sleep(retry_backoff)
+                    retry_backoff *= 2  # exponential backoff
 
     async def _rate_limiter(self):
         """Check if request rate-limit has been reached, and if so, sleep until it can be reset.
@@ -287,7 +288,7 @@ class DataQuery:
             if self._request_count >= self._requests_per_window_limit:
                 sleep_time = self._request_limit_time_interval - elapsed
                 if sleep_time > 0:
-                    logger.warning(
+                    logger.info(
                         "Request rate limit reached (%r requests/ %r seconds). Sleeping for %.1f seconds...",
                         self._requests_per_window_limit,
                         self._request_limit_time_interval,

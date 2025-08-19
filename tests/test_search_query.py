@@ -18,6 +18,7 @@ import os
 from itertools import islice
 import httpx
 from rcsbapi.const import const
+from rcsbapi.config import config
 from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import group
 from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery, SeqSimilarityQuery, SeqMotifQuery, StructSimilarityQuery, StructMotifResidue, StructMotifQuery
@@ -46,6 +47,8 @@ class SearchTests(unittest.TestCase):
         self.__4hhbpdb1 = os.path.join(self.__dirPath, "4hhb.pdb1")
         self.__4hhbpdb1Gz = os.path.join(self.__dirPath, "4hhb.pdb1.gz")
         self.__2mnr = os.path.join(self.__dirPath, "2mnr.cif")
+
+        config.MAX_RETRIES = 3
 
     def tearDown(self) -> None:
         endTime = time.time()
