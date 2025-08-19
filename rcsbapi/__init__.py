@@ -5,8 +5,3 @@ __license__ = "MIT"
 __version__ = "1.3.0"
 
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)
-
-import logging
-
-logging.basicConfig(level=logging.WARNING, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
-logger = logging.getLogger()

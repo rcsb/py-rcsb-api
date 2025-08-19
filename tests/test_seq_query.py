@@ -17,6 +17,8 @@ import unittest
 
 from rcsbapi.sequence.seq_query import Alignments, GroupAlignments, Annotations, GroupAnnotations, GroupAnnotationsSummary, AnnotationFilterInput
 
+logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

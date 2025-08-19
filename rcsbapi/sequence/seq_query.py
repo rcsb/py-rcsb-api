@@ -1,15 +1,19 @@
+import time
+import logging
 from typing import Dict, List, Any, Optional, Union
 from types import MappingProxyType
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, fields
 from dataclasses import field as dcfield
 import urllib.parse
-import requests
+import httpx
 
 from rcsbapi.const import const
 from rcsbapi.config import config
 from rcsbapi.sequence import SEQ_SCHEMA
 from rcsbapi.graphql_schema import SchemaEnum
+
+logger = logging.getLogger(__name__)
 
 
 class SeqEnums(SchemaEnum):
@@ -53,7 +57,7 @@ class SeqQuery(ABC):
 
         return request_dict
 
-    def get_query(self) -> MappingProxyType[str, Any]:
+    def get_query(self) -> MappingProxyType:
         assert hasattr(self, "_query")
         return self._query  # type: ignore
 
@@ -85,19 +89,65 @@ class SeqQuery(ABC):
 
         return query
 
-    def exec(self) -> Dict[str, Any]:
-        """execute given query and return JSON response"""
+    def exec(self, max_retries: int = None, retry_backoff: int = None) -> Dict[str, Any]:
+        """Execute given query and return JSON response.
+
+        Args:
+            max_retries (int, optional): maximum number of retries to attempt for each individual sub-request (in case of timeouts or errors). Defaults to `config.MAX_RETRIES`.
+            retry_backoff (int, optional): delay in seconds to wait for each retry. Defaults to `config.RETRY_BACKOFF`.
+
+        Returns:
+            Dict[str, Any]: JSON object containing the query result
+        """
         # Assert attribute exists for mypy
         assert hasattr(self, "_query"), \
             f"{self.__class__.__name__} must define '_query' attribute."
-        response_json = requests.post(
-            json=dict(self._query),
-            url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
-            timeout=config.API_TIMEOUT,
-            headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT}
-        ).json()
-        self._parse_gql_error(response_json)
+
+        # Request retry and rate limit settings
+        max_retries = max_retries if max_retries else config.MAX_RETRIES
+        retry_backoff = retry_backoff if retry_backoff else config.RETRY_BACKOFF
+
+        response_json = self._submit_request(max_retries, retry_backoff)
+
         return dict(response_json)
+
+    def _submit_request(self, max_retries, retry_backoff):
+        """Submit a single request, with retry behavior.
+        """
+        for attempt in range(1, max_retries + 1):
+            try:
+                response = httpx.post(
+                    url=const.SEQUENCE_API_GRAPHQL_ENDPOINT,
+                    json=dict(self._query),
+                    timeout=config.API_TIMEOUT,
+                    headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT}
+                )
+                response.raise_for_status()  # Raise an error for bad responses
+                response_json = response.json()
+                self._parse_gql_error(response_json)
+                #
+                if response.status_code == httpx.codes.OK:
+                    return response_json
+                elif response.status_code == httpx.codes.NO_CONTENT:
+                    return None
+                else:
+                    raise httpx.HTTPStatusError(
+                        f"Unexpected status: {response.status_code}",
+                        request=response.request,
+                        response=response
+                    )
+            except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                if attempt == max_retries:
+                    logger.error(
+                        "Final retry attempt %r failed with exception:\n    %r\n"
+                        "Check query and parameters.",
+                        attempt,
+                        e
+                    )
+                    raise
+                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
+                time.sleep(retry_backoff)
+                retry_backoff *= 2  # exponential backoff
 
     def get_editor_link(self) -> str:
         """Get link to GraphiQL editor with given query populated"""
@@ -109,7 +159,7 @@ class SeqQuery(ABC):
         """Look through responses to see if there are errors. If so, throw an HTTP error, """
         if "errors" in response_json.keys():
             error = response_json["errors"][0]
-            raise requests.HTTPError(
+            raise Exception(
                 f'\n{error["message"]}\n'
                 f"Run <query object name>.get_editor_link() to get a link to GraphiQL editor with query"
             )
@@ -131,7 +181,7 @@ class Alignments(SeqQuery):
             The key must match fields in `return_data_list`. Values currently include "offset" and "first"
 
     Attrs:
-        _query (MappingProxyType): Attribute for storing GraphQL query
+        _query (MappingProxyType[str, Any]): Attribute for storing GraphQL query
     """
     db_from: str
     db_to: str
@@ -140,7 +190,7 @@ class Alignments(SeqQuery):
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
     data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
-    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -160,21 +210,21 @@ class Annotations(SeqQuery):
         sources (List[str]): List defining the annotation collections to be requested
         reference (SequenceReference): Query sequence database
         return_data_list (List[str]): Requested data fields
-        filters (list["AnnotationFilterInput"], optional): Select what annotations will be retrieved
+        filters (List["AnnotationFilterInput"], optional): Select what annotations will be retrieved
         range: (List[int], optional): Optional integer list to filter annotations to a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
 
     Attrs:
-        _query (MappingProxyType): Attribute for storing GraphQL query
+        _query (MappingProxyType[str, Any]): Attribute for storing GraphQL query
     """
     query_id: str
     sources: List[str]
     reference: str
     return_data_list: List[str]
-    filters: Optional[list["AnnotationFilterInput"]] = None
+    filters: Optional[List["AnnotationFilterInput"]] = None
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -191,22 +241,22 @@ class GroupAlignments(SeqQuery):
 
     Args:
         group_id (str): Database sequence identifier for group
-        return_data_list (list[str]): Requested data fields
-        filter (list[str], optional): Optional string list of allowed identifiers for group members
+        return_data_list (List[str]): Requested data fields
+        filter (List[str], optional): Optional string list of allowed identifiers for group members
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
             The key must match fields in `return_data_list`. Values currently include "offset" and "first"
 
     Attrs:
-        _query (MappingProxyType): Attribute for storing GraphQL query
+        _query (MappingProxyType[str, Any]): Attribute for storing GraphQL query
     """
     group: str
     group_id: str
     return_data_list: List[str]
-    filter: Optional[list[str]] = None
+    filter: Optional[List[str]] = None
     suppress_autocomplete_warning: bool = False
     data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
-    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -224,13 +274,13 @@ class GroupAnnotations(SeqQuery):
     Args:
         group (GroupReference): Query sequence database
         group_id (str): Database sequence identifier for group
-        sources (list[AnnotationReference]): List defining the annotation collections to be requested
-        return_data_list (list[str]): Requested data fields
-        filters (list[AnnotationFilterInput]): Optional annotation filter by type or target identifier
+        sources (List[AnnotationReference]): List defining the annotation collections to be requested
+        return_data_list (List[str]): Requested data fields
+        filters (List[AnnotationFilterInput]): Optional annotation filter by type or target identifier
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
 
     Attrs:
-        _query (MappingProxyType): Attribute for storing GraphQL query
+        _query (MappingProxyType[str, Any]): Attribute for storing GraphQL query
     """
     group: str
     group_id: str
@@ -238,7 +288,7 @@ class GroupAnnotations(SeqQuery):
     return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()
@@ -256,13 +306,13 @@ class GroupAnnotationsSummary(SeqQuery):
     Args:
         group (GroupReference): Query sequence database
         group_id (str): Database sequence identifier for group
-        sources (list[AnnotationReference]): List defining the annotation collections to be requested
-        return_data_list (list[str]): Request data fields
-        filters (list[AnnotationFilterInput], optional): Optional annotation filter by type or target identifier
+        sources (List[AnnotationReference]): List defining the annotation collections to be requested
+        return_data_list (List[str]): Request data fields
+        filters (List[AnnotationFilterInput], optional): Optional annotation filter by type or target identifier
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
 
     Attrs:
-        _query (MappingProxyType): Attribute for storing GraphQL query
+        _query (MappingProxyType[str, Any]): Attribute for storing GraphQL query
     """
     group: str
     group_id: str
@@ -270,7 +320,7 @@ class GroupAnnotationsSummary(SeqQuery):
     return_data_list: List[str]
     filters: Optional[List["AnnotationFilterInput"]] = None
     suppress_autocomplete_warning: bool = False
-    _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
+    _query: MappingProxyType = dcfield(default_factory=lambda: MappingProxyType({}))
 
     def to_dict(self) -> Dict[str, Any]:
         return super().to_dict()

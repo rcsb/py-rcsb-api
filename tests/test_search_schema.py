@@ -20,6 +20,8 @@ from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import SEARCH_SCHEMA
 from rcsbapi.const import const
 
+logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 

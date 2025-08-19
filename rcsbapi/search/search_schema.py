@@ -9,7 +9,7 @@ from pathlib import Path
 import re
 import warnings
 from typing import List, Dict, Union
-import requests
+import httpx
 from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
@@ -220,7 +220,7 @@ class SearchSchema:
     def _fetch_schema(self, url: str):
         "Request the current schema from the web"
         logger.info("Requesting %s", url)
-        response = requests.get(url, timeout=None, headers={"User-Agent": const.USER_AGENT})
+        response = httpx.get(url, timeout=None, headers={"User-Agent": const.USER_AGENT}, follow_redirects=True)
         if response.status_code == 200:
             return response.json()
         else:

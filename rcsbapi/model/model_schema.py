@@ -1,5 +1,5 @@
 from typing import Dict, List, Optional
-import requests
+import httpx
 from rcsbapi.const import const
 from rcsbapi.config import config
 
@@ -10,10 +10,11 @@ class ModelSchema:
         Initialize ModelSchema.
         """
         try:
-            response = requests.get(const.MODELSERVER_API_SCHEMA_URL, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
+            url = url if url else const.MODELSERVER_API_SCHEMA_URL
+            response = httpx.get(url, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
             response.raise_for_status()
             attr_data = response.json()
-        except requests.RequestException as e:
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             raise RuntimeError(f"Failed to fetch schema from {url}: {e}")
 
         self.Attr = attr_data

@@ -1,4 +1,4 @@
-requests >= 2.0.0
+httpx >= 0.26.0
 rustworkx
 graphql-core
 tqdm

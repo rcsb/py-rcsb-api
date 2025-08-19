@@ -1,10 +1,11 @@
 import logging
+import time
 import urllib.parse
 import re
-import time
 from typing import Any, Union, List, Dict, Optional, Tuple
 import json
-import requests
+import asyncio
+import httpx
 from tqdm import tqdm
 from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import config
@@ -41,15 +42,17 @@ class DataQuery:
 
         if not isinstance(input_ids, AllStructures):
             if isinstance(input_ids, list):
-                if len(input_ids) > config.INPUT_ID_LIMIT:
-                    logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
+                if len(input_ids) > config.DATA_API_INPUT_ID_LIMIT:
+                    logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.DATA_API_INPUT_ID_LIMIT)
             if isinstance(input_ids, dict):
                 for value in input_ids.values():
-                    if len(value) > config.INPUT_ID_LIMIT:
-                        logger.warning("More than %d input_ids. Query will be slower to complete.", config.INPUT_ID_LIMIT)
+                    if len(value) > config.DATA_API_INPUT_ID_LIMIT:
+                        logger.warning("WARNING: More than %d IDs were provided as input. Query may take several minutes to complete.", config.DATA_API_INPUT_ID_LIMIT)
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
+        #
+        # GraphQL query as a string
         self._query: Dict[str, Any] = DATA_SCHEMA.construct_query(
             input_type=self._input_type,
             input_ids=self._input_ids,
@@ -57,9 +60,16 @@ class DataQuery:
             add_rcsb_id=add_rcsb_id,
             suppress_autocomplete_warning=suppress_autocomplete_warning
         )
-        """GraphQL query as a string"""
+        #
+        # JSON response to query, will be assigned after executing
         self._response: Optional[Dict[str, Any]] = None
-        """JSON response to query, will be assigned after executing"""
+        #
+        # Other request settings
+        self._rate_limit_lock = None
+        self._last_request_time = time.monotonic()
+        self._request_count = 0
+        self._request_limit_time_interval = 10  # request rate limits are applied over 10s window
+        self._requests_per_window_limit = config.DATA_API_REQUESTS_PER_SECOND * self._request_limit_time_interval
 
     def _process_input_ids(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]]) -> Tuple[str, List[str]]:
         """Convert input_type to plural if possible.
@@ -165,45 +175,134 @@ class DataQuery:
         editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
         return str(editor_base_link + urllib.parse.quote(str(self._query["query"])))
 
-    def exec(self, batch_size: int = 5000, progress_bar: bool = False) -> Dict[str, Any]:
-        """POST a GraphQL query and get response
+    def exec(self, batch_size: int = None, progress_bar: bool = False, max_retries: int = None, retry_backoff: int = None, max_concurrency: int = None) -> Dict[str, Any]:
+        """POST a GraphQL query and get response concurrently using httpx
+
+        Args:
+            batch_size (int, optional): size of ID batches to split up input ID list into and perform sub-requests. Defaults to `config.DATA_API_BATCH_ID_SIZE`.
+            progress_bar (bool, optional): display a progress bar when executing query. Defaults to False.
+            max_retries (int, optional): maximum number of retries to attempt for each individual sub-request (in case of timeouts or errors). Defaults to `config.MAX_RETRIES`.
+            retry_backoff (int, optional): delay in seconds to wait for each retry. Defaults to `config.RETRY_BACKOFF`.
+            max_concurrency (int, optional): maximum number of sub-requests to run concurrently. Defaults to `config.DATA_API_MAX_CONCURRENT_REQUESTS`.
 
         Returns:
-            Dict[str, Any]: JSON object
+            Dict[str, Any]: JSON object containing the compiled query result (aggregated across all sub-requests)
         """
+        result = asyncio.run(self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_backoff=retry_backoff, max_concurrency=max_concurrency))
+
+        return result
+
+    async def _async_exec(self, batch_size: int = None, progress_bar: bool = False, max_concurrency: int = None, max_retries: int = None, retry_backoff: int = None) -> Dict[str, Any]:
+        """Run the asynchronous batch of requests.
+        """
+        batch_size = batch_size if batch_size else config.DATA_API_BATCH_ID_SIZE
+        max_concurrency = max_concurrency if max_concurrency else config.DATA_API_MAX_CONCURRENT_REQUESTS
+        max_retries = max_retries if max_retries else config.MAX_RETRIES
+        retry_backoff = retry_backoff if retry_backoff else config.RETRY_BACKOFF
+
         if len(self._input_ids) > batch_size:
-            batched_ids: Union[List[List[str]], tqdm] = self._batch_ids(batch_size)
+            batched_ids: Union[List[List[str]]] = self._batch_ids(batch_size)
         else:
             batched_ids = [self._input_ids]
-        response_json: Dict[str, Any] = {}
 
-        if progress_bar is True:
-            batched_ids = tqdm(batched_ids)
+        semaphores = asyncio.Semaphore(max_concurrency)
 
-        for id_batch in batched_ids:
-            query_body = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query["query"])
-            part_response = requests.post(
-                headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
-                json={"query": query_body},
-                url=const.DATA_API_ENDPOINT,
-                timeout=config.API_TIMEOUT
-            ).json()
-            self._parse_gql_error(part_response)
-            time.sleep(0.2)
-            if not response_json:
-                response_json = part_response
+        async with httpx.AsyncClient(timeout=config.API_TIMEOUT) as client:
+            tasks = []
+            for id_batch in batched_ids:
+                query_body = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query["query"])
+                tasks.append(
+                    self._submit_request(client, query_body, semaphores, max_retries, retry_backoff)
+                )
+            if progress_bar:
+                results = []
+                with tqdm(total=len(tasks)) as pbar:
+                    for coro in asyncio.as_completed(tasks):
+                        result = await coro
+                        results.append(result)
+                        pbar.update(1)
             else:
-                response_json = self._merge_response(response_json, part_response)
+                results = await asyncio.gather(*tasks)
 
-        if "data" in response_json.keys():
+        # Merge results
+        response_json: Dict[str, Any] = {}
+        for part_response in results:
+            if response_json:
+                response_json = self._merge_response(response_json, part_response)
+            else:
+                response_json = part_response
+
+        # Validate data
+        if "data" in response_json:
             query_response = response_json["data"][self._input_type]
-            if query_response is None:
-                logger.warning("Input produced no results. Check that input ids are valid")
-            if isinstance(query_response, list):
-                if len(query_response) == 0:
-                    logger.warning("Input produced no results. Check that input ids are valid")
+            if query_response is None or (isinstance(query_response, list) and len(query_response) == 0):
+                logger.warning("WARNING: Input produced no results. Check that input IDs are valid.")
+
         self._response = response_json
         return response_json
+
+    async def _submit_request(self, client: httpx.AsyncClient, query_body: str, semaphores: asyncio.Semaphore, max_retries: int, retry_backoff: int):
+        """Submit one batch sub-request, with retry behavior and rate limiting.
+        """
+        async with semaphores:
+            for attempt in range(1, max_retries + 1):
+                try:
+                    # First check if request rate-limit reached
+                    await self._rate_limiter()
+                    #
+                    # Now perform the actual request
+                    response = await client.post(
+                        url=const.DATA_API_ENDPOINT,
+                        headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+                        json={"query": query_body}
+                    )
+                    response.raise_for_status()  # Raise an error for bad responses
+
+                    response_json = response.json()
+                    self._parse_gql_error(response_json)
+                    return response_json
+
+                except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                    if attempt == max_retries:
+                        logger.error(
+                            "Final retry attempt %r failed with exception:\n    %r\n"
+                            "Check query and parameters. If issue persists, try reducing 'config.DATA_API_BATCH_ID_SIZE' and/or 'config.DATA_API_MAX_CONCURRENT_REQUESTS'.",
+                            attempt,
+                            e
+                        )
+                        raise
+                    logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
+                    await asyncio.sleep(retry_backoff)
+                    retry_backoff *= 2  # exponential backoff
+
+    async def _rate_limiter(self):
+        """Check if request rate-limit has been reached, and if so, sleep until it can be reset.
+        """
+        lock = await self._get_rate_limit_lock()
+        async with lock:
+            now = time.monotonic()
+            elapsed = now - self._last_request_time
+            if elapsed >= self._request_limit_time_interval:
+                self._last_request_time = now
+                self._request_count = 0
+            if self._request_count >= self._requests_per_window_limit:
+                sleep_time = self._request_limit_time_interval - elapsed
+                if sleep_time > 0:
+                    logger.info(
+                        "Request rate limit reached (%r requests/ %r seconds). Sleeping for %.1f seconds...",
+                        self._requests_per_window_limit,
+                        self._request_limit_time_interval,
+                        sleep_time
+                    )
+                    await asyncio.sleep(sleep_time)
+                self._last_request_time = time.monotonic()
+                self._request_count = 0
+            self._request_count += 1
+
+    async def _get_rate_limit_lock(self):
+        if self._rate_limit_lock is None:
+            self._rate_limit_lock = asyncio.Lock()
+        return self._rate_limit_lock
 
     def _parse_gql_error(self, response_json: Dict[str, Any]) -> None:
         if "errors" in response_json.keys():
@@ -260,17 +359,17 @@ class AllStructures:
         """
         self.ALL_STRUCTURES = self.reload()
 
-    def reload(self) -> dict[str, List[str]]:
+    def reload(self) -> Dict[str, List[str]]:
         """Build dictionary of IDs based on endpoints defined in const
 
         Returns:
-            dict[str, List[str]]: ALL_STRUCTURES object
+            Dict[str, List[str]]: ALL_STRUCTURES object
         """
         ALL_STRUCTURES = {}
         for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():
             all_ids: List[str] = []
             for endpoint in endpoints:
-                response = requests.get(endpoint, timeout=60, headers={"User-Agent": const.USER_AGENT})
+                response = httpx.get(endpoint, timeout=60, headers={"User-Agent": const.USER_AGENT}, follow_redirects=True)
                 if response.status_code == 200:
                     all_ids.extend(json.loads(response.text))
                 else:
