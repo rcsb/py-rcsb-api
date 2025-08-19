@@ -92,14 +92,6 @@ class SchemaTests(unittest.TestCase):
             online_major_minor_version = ".".join(online_schema_version.split(".")[:2])
             self.assertEqual(local_major_minor_version, online_major_minor_version)
 
-    def setUp(self) -> None:
-        self.__startTime = time.time()
-        logger.info("Starting %s at %s", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()))
-
-    def tearDown(self) -> None:
-        endTime = time.time()
-        logger.info("Completed %s at %s (%.4f seconds)", self.id().split(".")[-1], time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
-
     def testFetch(self) -> None:
         fetched_schema = DATA_SCHEMA.fetch_schema()
         self.assertNotIn("errors", fetched_schema.keys())
