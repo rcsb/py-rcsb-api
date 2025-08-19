@@ -26,7 +26,19 @@ class ModelQuery:
         file_directory: Optional[str] = None,
         download: Optional[bool] = False,
         compress_gzip: Optional[bool] = False,
+        max_retries: int = None,
+        retry_backoff: int = None,
     ):
+        """Query object for Model Server API requests.
+
+        Args:
+            encoding (str, optional): Default encoding format to use for all requests. Defaults to "cif".
+            file_directory (str, optional): Default file directory to use for all requests. Defaults to current working directory.
+            download (bool, optional): Default download flag to use for all requests. Defaults to False.
+            compress_gzip (bool, optional): Default setting for GZIP compression to use for all requests. Defaults to False.
+            max_retries (int, optional): Default number of max retries to perform for all requests. Defaults to `config.MAX_RETRIES`.
+            retry_backoff (int, optional): Default retry backoff delay to wait between failed requets. Defaults to `config.RETRY_BACKOFF`.
+        """
         self.base_url = const.MODELSERVER_API_BASE_URL
         self.modelserver_endpoint_map = {
             "full": "full",
@@ -44,8 +56,13 @@ class ModelQuery:
         self.download = download
         self.compress_gzip = compress_gzip
 
-        # Track number of requests
-        self._request_counter = 0
+        # Request retry and rate limit settings
+        self._max_retries = max_retries if max_retries else config.MAX_RETRIES
+        self._retry_backoff = retry_backoff if retry_backoff else config.RETRY_BACKOFF
+        self._last_request_time = time.monotonic()
+        self._request_count = 0
+        self._request_limit_time_interval = 10  # request rate limits are applied over 10s window
+        self._requests_per_window_limit = config.MODEL_API_REQUESTS_PER_SECOND * self._request_limit_time_interval
 
     def _exec(self, query_type: str, entry_id: str, **kwargs):
         """
@@ -73,13 +90,7 @@ class ModelQuery:
         full_url = f"{url}?{encoded_params}"
 
         try:
-            self._request_counter += 1
-            if self._request_counter >= config.MODEL_API_REQUESTS_PER_SECOND:
-                time.sleep(1)
-                self._request_counter = 0
-
-            response = httpx.get(full_url, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})  # Use the constructed URL
-            response.raise_for_status()  # Raise an error for bad responses
+            response = self._submit_request(full_url)
 
             # Get encoding type (defaults to CIF if not provided)
             encoding = query_params.get("encoding", "CIF").upper()
@@ -175,6 +186,62 @@ class ModelQuery:
             raise ValueError(f"Unknown query type: {query_type}")
 
         return self.modelserver_endpoint_map[query_type]
+
+    def _submit_request(self, url):
+        """Submit a single request, with retry behavior and rate limiting.
+        """
+        retry_backoff = self._retry_backoff
+        for attempt in range(1, self._max_retries + 1):
+            try:
+                # First check if request rate-limit reached
+                self._rate_limiter()
+                #
+                # Now perform the actual request
+                response = httpx.get(url, timeout=config.API_TIMEOUT, headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT})
+                response.raise_for_status()  # Raise an error for bad responses
+                #
+                if response.status_code == httpx.codes.OK:
+                    return response
+                elif response.status_code == httpx.codes.NO_CONTENT:
+                    return None
+                else:
+                    raise httpx.HTTPStatusError(
+                        f"Unexpected status: {response.status_code}",
+                        request=response.request,
+                        response=response
+                    )
+            except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                if attempt == self._max_retries:
+                    logger.error(
+                        "Final retry attempt %r failed. Exiting. If issue persists, try reducing 'config.MODEL_API_REQUESTS_PER_SECOND'.",
+                        attempt
+                    )
+                    raise
+                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
+                time.sleep(retry_backoff)
+                retry_backoff *= 2  # exponential backoff
+
+    def _rate_limiter(self):
+        """Check if request rate-limit has been reached, and if so, sleep until it can be reset.
+        """
+        now = time.monotonic()
+        elapsed = now - self._last_request_time
+        if elapsed >= self._request_limit_time_interval:
+            self._last_request_time = now
+            self._request_count = 0
+        if self._request_count >= self._requests_per_window_limit:
+            sleep_time = self._request_limit_time_interval - elapsed
+            if sleep_time > 0:
+                logger.warning(
+                    "Request rate limit reached (%r requests/ %r seconds). Sleeping for %.1f seconds...",
+                    self._requests_per_window_limit,
+                    self._request_limit_time_interval,
+                    sleep_time
+                )
+                time.sleep(sleep_time)
+            self._last_request_time = time.monotonic()
+            self._request_count = 0
+        self._request_count += 1
 
     def get_multiple_structures(
         self,

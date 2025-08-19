@@ -1,4 +1,5 @@
 import logging
+import time
 import urllib.parse
 import re
 from typing import Any, Union, List, Dict, Optional, Tuple
@@ -50,6 +51,8 @@ class DataQuery:
 
         self._input_type, self._input_ids = self._process_input_ids(input_type, input_ids)
         self._return_data_list = return_data_list
+        #
+        # GraphQL query as a string
         self._query: Dict[str, Any] = DATA_SCHEMA.construct_query(
             input_type=self._input_type,
             input_ids=self._input_ids,
@@ -57,9 +60,16 @@ class DataQuery:
             add_rcsb_id=add_rcsb_id,
             suppress_autocomplete_warning=suppress_autocomplete_warning
         )
-        """GraphQL query as a string"""
+        #
+        # JSON response to query, will be assigned after executing
         self._response: Optional[Dict[str, Any]] = None
-        """JSON response to query, will be assigned after executing"""
+        #
+        # Other request settings
+        self._rate_limit_lock = asyncio.Lock()
+        self._last_request_time = time.monotonic()
+        self._request_count = 0
+        self._request_limit_time_interval = 10  # request rate limits are applied over 10s window
+        self._requests_per_window_limit = config.DATA_API_REQUESTS_PER_SECOND * self._request_limit_time_interval
 
     def _process_input_ids(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]]) -> Tuple[str, List[str]]:
         """Convert input_type to plural if possible.
@@ -165,29 +175,31 @@ class DataQuery:
         editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
         return str(editor_base_link + urllib.parse.quote(str(self._query["query"])))
 
-    def exec(self, batch_size: int = None, progress_bar: bool = False, max_retries: int = 5, retry_delay: int = 1, max_concurrency: int = None) -> Dict[str, Any]:
+    def exec(self, batch_size: int = None, progress_bar: bool = False, max_retries: int = None, retry_backoff: int = None, max_concurrency: int = None) -> Dict[str, Any]:
         """POST a GraphQL query and get response concurrently using httpx
 
         Args:
-            batch_size (int, optional): size of ID batches to split up input ID list into and perform sub-requests. Defaults to 'config.DATA_API_BATCH_ID_SIZE'.
+            batch_size (int, optional): size of ID batches to split up input ID list into and perform sub-requests. Defaults to `config.DATA_API_BATCH_ID_SIZE`.
             progress_bar (bool, optional): display a progress bar when executing query. Defaults to False.
-            max_retries (int, optional): maximum number of retries to attempt for each individual sub-request (in case of timeouts or errors). Defaults to 5.
-            retry_delay (int, optional): delay in seconds to wait for each retry. Defaults to 1.
-            max_concurrency (int, optional): maximum number of sub-requests to run concurrently. Defaults to config.DATA_API_MAX_CONCURRENT_REQUESTS.
+            max_retries (int, optional): maximum number of retries to attempt for each individual sub-request (in case of timeouts or errors). Defaults to `config.MAX_RETRIES`.
+            retry_backoff (int, optional): delay in seconds to wait for each retry. Defaults to `config.RETRY_BACKOFF`.
+            max_concurrency (int, optional): maximum number of sub-requests to run concurrently. Defaults to `config.DATA_API_MAX_CONCURRENT_REQUESTS`.
 
         Returns:
             Dict[str, Any]: JSON object containing the compiled query result (aggregated across all sub-requests)
         """
-        batch_size = batch_size if batch_size else config.DATA_API_BATCH_ID_SIZE
-        max_concurrency = max_concurrency if max_concurrency else config.DATA_API_MAX_CONCURRENT_REQUESTS
-
-        result = asyncio.run(self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_delay=retry_delay, max_concurrency=max_concurrency))
+        result = asyncio.run(self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_backoff=retry_backoff, max_concurrency=max_concurrency))
 
         return result
 
-    async def _async_exec(self, batch_size: int = None, progress_bar: bool = False, max_concurrency: int = None, max_retries: int = 5, retry_delay: int = 1) -> Dict[str, Any]:
+    async def _async_exec(self, batch_size: int = None, progress_bar: bool = False, max_concurrency: int = None, max_retries: int = None, retry_backoff: int = None) -> Dict[str, Any]:
         """Run the asynchronous batch of requests.
         """
+        batch_size = batch_size if batch_size else config.DATA_API_BATCH_ID_SIZE
+        max_concurrency = max_concurrency if max_concurrency else config.DATA_API_MAX_CONCURRENT_REQUESTS
+        max_retries = max_retries if max_retries else config.MAX_RETRIES
+        retry_backoff = retry_backoff if retry_backoff else config.RETRY_BACKOFF
+
         if len(self._input_ids) > batch_size:
             batched_ids: Union[List[List[str]]] = self._batch_ids(batch_size)
         else:
@@ -200,7 +212,7 @@ class DataQuery:
             for id_batch in batched_ids:
                 query_body = re.sub(r"\[([^]]+)\]", f"{id_batch}".replace("'", '"'), self._query["query"])
                 tasks.append(
-                    self._submit_request(client, query_body, semaphores, max_retries=max_retries, retry_delay=retry_delay)
+                    self._submit_request(client, query_body, semaphores, max_retries, retry_backoff)
                 )
             if progress_bar:
                 results = []
@@ -229,12 +241,15 @@ class DataQuery:
         self._response = response_json
         return response_json
 
-    async def _submit_request(self, client: httpx.AsyncClient, query_body: str, semaphores: asyncio.Semaphore, max_retries: int = 5, retry_delay: int = 1):
-        """Submit one batch sub-request.
+    async def _submit_request(self, client: httpx.AsyncClient, query_body: str, semaphores: asyncio.Semaphore, max_retries: int, retry_backoff: int):
+        """Submit one batch sub-request, with retry behavior and rate limiting.
         """
         for attempt in range(1, max_retries + 1):
             try:
                 async with semaphores:
+                    # First check if request rate-limit reached
+                    await self._rate_limiter()
+                    #
                     resp = await client.post(
                         url=const.DATA_API_ENDPOINT,
                         headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
@@ -255,9 +270,32 @@ class DataQuery:
                         attempt
                     )
                     raise
-                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_delay)
-                await asyncio.sleep(retry_delay)
-                retry_delay *= 2  # exponential backoff
+                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
+                await asyncio.sleep(retry_backoff)
+                retry_backoff *= 2  # exponential backoff
+
+    async def _rate_limiter(self):
+        """Check if request rate-limit has been reached, and if so, sleep until it can be reset.
+        """
+        async with self._rate_limit_lock:
+            now = time.monotonic()
+            elapsed = now - self._last_request_time
+            if elapsed >= self._request_limit_time_interval:
+                self._last_request_time = now
+                self._request_count = 0
+            if self._request_count >= self._requests_per_window_limit:
+                sleep_time = self._request_limit_time_interval - elapsed
+                if sleep_time > 0:
+                    logger.warning(
+                        "Request rate limit reached (%r requests/ %r seconds). Sleeping for %.1f seconds...",
+                        self._requests_per_window_limit,
+                        self._request_limit_time_interval,
+                        sleep_time
+                    )
+                    await asyncio.sleep(sleep_time)
+                self._last_request_time = time.monotonic()
+                self._request_count = 0
+            self._request_count += 1
 
     def _parse_gql_error(self, response_json: Dict[str, Any]) -> None:
         if "errors" in response_json.keys():
