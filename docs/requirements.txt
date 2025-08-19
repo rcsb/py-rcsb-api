@@ -5,7 +5,8 @@ sphinx-rtd-theme==0.5.2
 typing-extensions==3.7.4.3
 myst-parser==1.0.0
 jinja2<3.1
-requests >= 2.0.0
+httpx >= 0.26.0
+nest_asyncio >= 1.6.0  # Needed for running async in Python notebooks
 rustworkx
 graphql-core
 tqdm
