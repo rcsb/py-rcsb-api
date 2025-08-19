@@ -160,7 +160,7 @@ class Annotations(SeqQuery):
         sources (List[str]): List defining the annotation collections to be requested
         reference (SequenceReference): Query sequence database
         return_data_list (List[str]): Requested data fields
-        filters (list["AnnotationFilterInput"], optional): Select what annotations will be retrieved
+        filters (List["AnnotationFilterInput"], optional): Select what annotations will be retrieved
         range: (List[int], optional): Optional integer list to filter annotations to a particular region
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
 
@@ -171,7 +171,7 @@ class Annotations(SeqQuery):
     sources: List[str]
     reference: str
     return_data_list: List[str]
-    filters: Optional[list["AnnotationFilterInput"]] = None
+    filters: Optional[List["AnnotationFilterInput"]] = None
     range: Optional[List[int]] = None
     suppress_autocomplete_warning: bool = False
     _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
@@ -191,8 +191,8 @@ class GroupAlignments(SeqQuery):
 
     Args:
         group_id (str): Database sequence identifier for group
-        return_data_list (list[str]): Requested data fields
-        filter (list[str], optional): Optional string list of allowed identifiers for group members
+        return_data_list (List[str]): Requested data fields
+        filter (List[str], optional): Optional string list of allowed identifiers for group members
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
         data_list_args (Optional[Dict[str, Dict[str, Union[int, str]]]]): Optional dictionary specifying field-level arguments for entries in `return_data_list`.
             The key must match fields in `return_data_list`. Values currently include "offset" and "first"
@@ -203,7 +203,7 @@ class GroupAlignments(SeqQuery):
     group: str
     group_id: str
     return_data_list: List[str]
-    filter: Optional[list[str]] = None
+    filter: Optional[List[str]] = None
     suppress_autocomplete_warning: bool = False
     data_list_args: Optional[Dict[str, Dict[str, Union[int, str]]]] = None
     _query: MappingProxyType[str, Any] = dcfield(default_factory=lambda: MappingProxyType({}))
@@ -224,9 +224,9 @@ class GroupAnnotations(SeqQuery):
     Args:
         group (GroupReference): Query sequence database
         group_id (str): Database sequence identifier for group
-        sources (list[AnnotationReference]): List defining the annotation collections to be requested
-        return_data_list (list[str]): Requested data fields
-        filters (list[AnnotationFilterInput]): Optional annotation filter by type or target identifier
+        sources (List[AnnotationReference]): List defining the annotation collections to be requested
+        return_data_list (List[str]): Requested data fields
+        filters (List[AnnotationFilterInput]): Optional annotation filter by type or target identifier
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
 
     Attrs:
@@ -256,9 +256,9 @@ class GroupAnnotationsSummary(SeqQuery):
     Args:
         group (GroupReference): Query sequence database
         group_id (str): Database sequence identifier for group
-        sources (list[AnnotationReference]): List defining the annotation collections to be requested
-        return_data_list (list[str]): Request data fields
-        filters (list[AnnotationFilterInput], optional): Optional annotation filter by type or target identifier
+        sources (List[AnnotationReference]): List defining the annotation collections to be requested
+        return_data_list (List[str]): Request data fields
+        filters (List[AnnotationFilterInput], optional): Optional annotation filter by type or target identifier
         suppress_autocomplete_warning (bool, optional): Suppress warning message about field path autocompletion. Defaults to False.
 
     Attrs:

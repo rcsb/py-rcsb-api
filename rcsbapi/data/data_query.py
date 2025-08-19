@@ -358,11 +358,11 @@ class AllStructures:
         """
         self.ALL_STRUCTURES = self.reload()
 
-    def reload(self) -> dict[str, List[str]]:
+    def reload(self) -> Dict[str, List[str]]:
         """Build dictionary of IDs based on endpoints defined in const
 
         Returns:
-            dict[str, List[str]]: ALL_STRUCTURES object
+            Dict[str, List[str]]: ALL_STRUCTURES object
         """
         ALL_STRUCTURES = {}
         for input_type, endpoints in const.INPUT_TYPE_TO_ALL_STRUCTURES_ENDPOINT.items():

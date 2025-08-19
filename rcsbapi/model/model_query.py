@@ -253,7 +253,7 @@ class ModelQuery:
         Fetch multiple structures at once based on a list of entry_ids.
 
         Args:
-            entry_ids (list[str]): List of structure IDs to query.
+            entry_ids (List[str]): List of structure IDs to query.
             query_type (str): The type of query to execute (e.g., "full", "ligand", etc.).
             **kwargs: Additional query parameters to pass to the API.
 

@@ -33,7 +33,7 @@ class FieldNode:
         index (int): graph index
     """
 
-    def __init__(self, kind: str, node_type: str, name: str, description: str, args: List[dict[str, str | None]]) -> None:
+    def __init__(self, kind: str, node_type: str, name: str, description: str, args: List[Dict[str, str | None]]) -> None:
         """
         Initialize FieldNodes.
 
@@ -52,7 +52,7 @@ class FieldNode:
         self.kind: str = kind
         self.of_kind: str = ""
         self.type: str = node_type
-        self.args: List[dict[str, str | None]] = args
+        self.args: List[Dict[str, str | None]] = args
         self.index: None | int = None
 
     def __repr__(self) -> str:
@@ -109,7 +109,7 @@ class TypeNode:
         """List of FieldNodes associated with the GraphQL type.
 
         Args:
-            field_list (Union[None, list[FieldNode]]): list of FieldNodes
+            field_list (Union[None, List[FieldNode]]): list of FieldNodes
         """
         self.field_list = field_list
 
@@ -141,18 +141,18 @@ class GQLSchema(ABC):
         """JSON resulting from full introspection of the GraphQL schema"""
 
         self._type_to_idx_dict: Dict[str, int] = {}
-        self._field_to_idx_dict: Dict[str, list[int]] = {}
+        self._field_to_idx_dict: Dict[str, List[int]] = {}
         """Dict where keys are field names and values are lists of indices.
         Indices of redundant fields are appended to the list under the field name. (ex: {id: [[43, 116, 317...]})"""
         self._root_introspection = self._request_root_types()
         """Request root types of the GraphQL schema and their required arguments"""
         self._client_schema = build_client_schema(self.schema["data"])
         """GraphQLSchema object from graphql package, used for query validation"""
-        self._type_fields_dict: Dict[str, dict[Any, Any]] = self._construct_type_dict()
+        self._type_fields_dict: Dict[str, Dict[Any, Any]] = self._construct_type_dict()
         """Dict where keys are type names and the values are their associated fields"""
         self._field_names_list = self._construct_name_list()
         """list of all field names"""
-        self._root_dict: Dict[str, list[dict[str, Any]]] = self._construct_root_dict()
+        self._root_dict: Dict[str, List[Dict[str, Any]]] = self._construct_root_dict()
         self._schema_graph: rx.PyDiGraph[FieldNode | TypeNode, None | int] = rx.PyDiGraph()
         self._schema_graph = self._recurse_build_schema(self._schema_graph, "Query")
         self._root_to_idx: Dict[str, int] = self._make_root_to_idx()
@@ -165,10 +165,10 @@ class GQLSchema(ABC):
         """Find the indices of FieldNodes by name to facilitate weighing of given nodes
 
         Args:
-            weigh_node_names (list[str]): list of FieldNode names to weigh
+            weigh_node_names (List[str]): list of FieldNode names to weigh
 
         Returns:
-            list[int]: list of corresponding FieldNode indices
+            List[int]: list of corresponding FieldNode indices
         """
         node_idxs: List[int] = []
         for node_name in weigh_node_names:
@@ -179,7 +179,7 @@ class GQLSchema(ABC):
                 node_idxs.remove(self._root_to_idx[node_name])
         return node_idxs
 
-    def _request_root_types(self) -> dict[str, Any]:
+    def _request_root_types(self) -> Dict[str, Any]:
         """
         Make an introspection query to get information about schema's root types.
 
@@ -199,17 +199,17 @@ class GQLSchema(ABC):
         )
         return dict(response.json())
 
-    def _construct_root_dict(self) -> dict[str, list[dict[str, Any]]]:
+    def _construct_root_dict(self) -> Dict[str, List[Dict[str, Any]]]:
         """Build a dictionary to organize information about schema root types.
 
         Returns:
-            dict[str, list[Dict]]: Dict where keys are the type names.
+            Dict[str, List[Dict]]: Dict where keys are the type names.
             Values are lists of dictionaries with information about arguments.
 
             ex: {"alignments": [{'name': 'from', 'description': 'Query sequence database'...}, ...], ...}
         """
         response = self._root_introspection
-        root_dict: Dict[str, list[dict[str, str]]] = {}
+        root_dict: Dict[str, List[Dict[str, str]]] = {}
         root_fields_list = response["data"]["__schema"]["queryType"]["fields"]
         for name_arg_dict in root_fields_list:
             root_name = name_arg_dict["name"]
@@ -240,7 +240,7 @@ class GQLSchema(ABC):
         # call `_abstract_fetch_schema` here with the appropriate schema for the API
         pass
 
-    def _abstract_fetch_schema(self, fallback_file_name: str) -> dict[str, Any]:
+    def _abstract_fetch_schema(self, fallback_file_name: str) -> Dict[str, Any]:
         """
         Make an introspection query to get full Data API schema. Also found in resources folder as "seq_api_schema.json".
 
@@ -260,14 +260,14 @@ class GQLSchema(ABC):
         with Path.open(json_file_path, encoding="utf-8") as schema_file:
             return dict(json.load(schema_file))
 
-    def _construct_type_dict(self) -> dict[str, dict[str, dict[str, str]]]:
+    def _construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         """Construct dictionary of GraphQL types and their associated fields.
 
         Args:
             schema (Dict): GraphQL schema
 
         Returns:
-            dict[str, dict[str, dict[str, str]]]: Dict where keys are GraphQL types and values are lists of field names
+            Dict[str, Dict[str, Dict[str, str]]]: Dict where keys are GraphQL types and values are lists of field names
         """
         all_types_dict: Dict[Any, Any] = self.schema["data"]["__schema"]["types"]
         type_fields_dict = {}
@@ -283,11 +283,11 @@ class GQLSchema(ABC):
             type_fields_dict[type_name] = field_dict
         return type_fields_dict
 
-    def _construct_name_list(self) -> list[str]:
+    def _construct_name_list(self) -> List[str]:
         """Construct a list of all field names in the schema. Used to determine whether a field is known or redundant.
 
         Returns:
-            list[str]: list of all fields
+            List[str]: list of all fields
         """
         field_names_list = []
         for type_name, field_dict in self._type_fields_dict.items():
@@ -398,14 +398,14 @@ class GQLSchema(ABC):
                         return field["description"]
         return ""
 
-    def _make_args_dict(self, args: Dict[str, Any]) -> dict[str, str | None]:
+    def _make_args_dict(self, args: Dict[str, Any]) -> Dict[str, str | None]:
         """format field arguments
 
         Args:
             args (Dict[str, Any]): args listed in _type_fields_dict
 
         Returns:
-            dict[str, str | None]: formatted args
+            Dict[str, str | None]: formatted args
         """
         name = args["name"]
         ofType = args["type"]["ofType"]
@@ -418,7 +418,7 @@ class GQLSchema(ABC):
 
         return {"name": name, "ofType": ofType, "kind": kind, "ofKind": ofKind}
 
-    def _make_root_to_idx(self) -> dict[str, int]:
+    def _make_root_to_idx(self) -> Dict[str, int]:
         """Create dictionary where keys are root type names and values are indices"""
         root_to_idx: Dict[str, int] = {}
         # Assumes 0 is the index for root Query node.
@@ -428,7 +428,7 @@ class GQLSchema(ABC):
             root_to_idx[root_node.name] = root_node.index
         return root_to_idx
 
-    def _get_descendant_fields(self, node_idx: int, visited: None | set[int] = None) -> list[int | dict[int, Any]]:
+    def _get_descendant_fields(self, node_idx: int, visited: None | set[int] = None) -> List[int | Dict[int, Any]]:
         """Find all fields returning scalars under a node
 
         Args:
@@ -439,13 +439,13 @@ class GQLSchema(ABC):
             ValueError: A loop was created during recursion, meaning the field index was too general and would result in infinite recursion
 
         Returns:
-            list[int | dict[int, Any]]: index paths that are nested
+            List[int | Dict[int, Any]]: index paths that are nested
         """
         if visited is None:
             visited = set()
 
         field_name = self._idx_to_name(node_idx)
-        result: List[int | dict[int, Any]] = []
+        result: List[int | Dict[int, Any]] = []
         children_idx = list(self._schema_graph.neighbors(node_idx))
 
         for idx in children_idx:
@@ -480,13 +480,13 @@ class GQLSchema(ABC):
         return_data_list: List[str],
         added_rcsb_id: bool,
         suppress_autocomplete_warning: bool,
-    ) -> dict[int, list[int]]:
+    ) -> Dict[int, List[int]]:
         """Find matching index path for each return field. Raise error if not specific enough.
 
         Returns:
-            dict[int, list[int]]: dictionary where the key is the index of the final field and the value is a list of indices representing the matching path
+            Dict[int, List[int]]: dictionary where the key is the index of the final field and the value is a list of indices representing the matching path
         """
-        return_data_paths: Dict[int, list[int]] = {}
+        return_data_paths: Dict[int, List[int]] = {}
         complete_path: int = 0
 
         for field in return_data_list:
@@ -511,13 +511,13 @@ class GQLSchema(ABC):
                     if possible_path_list[i: i + len(path_list)] == path_list:
                         matching_paths.append(".".join(possible_path_list))
 
-            idx_paths: List[list[int]] = []
+            idx_paths: List[List[int]] = []
             if len(matching_paths) > 0:
                 for path in matching_paths:
                     idx_paths.extend(self._parse_dot_path(path))
 
             # remove paths not beginning with input_type
-            full_idx_paths: List[list[int]] = list(idx_paths)
+            full_idx_paths: List[List[int]] = list(idx_paths)
             input_type_idx = self._root_to_idx[query_type]
             for idx_path in idx_paths:
                 if idx_path[0] != input_type_idx:
@@ -558,8 +558,8 @@ class GQLSchema(ABC):
 
             # If path isn't in possible_paths_list, try using the graph to validate the path. Allows for queries with loops and paths that have repeated nodes.
             if len(idx_paths) == 0:
-                possible_dot_paths: List[list[int]] = self._parse_dot_path(field)  # Throws an error if path is invalid
-                shortest_full_paths: List[list[int]] = self._compare_paths(start_idx, possible_dot_paths)
+                possible_dot_paths: List[List[int]] = self._parse_dot_path(field)  # Throws an error if path is invalid
+                shortest_full_paths: List[List[int]] = self._compare_paths(start_idx, possible_dot_paths)
                 if len(shortest_full_paths) > 1:
                     shortest_name_paths = [".".join([self._idx_to_name(idx) for idx in path[1:] if isinstance(self._schema_graph[idx], FieldNode)]) for path in shortest_full_paths]
                     shortest_name_paths.sort()
@@ -639,7 +639,7 @@ class GQLSchema(ABC):
 
         return paths
 
-    def _format_args(self, arg_dict: Dict[str, list[Any]] | dict[str, str], input_value: str | list[str] | int) -> str:
+    def _format_args(self, arg_dict: Dict[str, List[Any]] | Dict[str, str], input_value: str | List[str] | int) -> str:
         """Add double quotes or omit quotes around a single GraphQL argument.
 
         Args:
@@ -669,12 +669,12 @@ class GQLSchema(ABC):
         """Function that recursively finds a list of indices that matches a list of field names.
 
         Args:
-            dot_path (list[str]): list of field names to find index matches for
-            idx_list (list[int]): list of matching indices, appended to as matches are found during recursion
+            dot_path (List[str]): list of field names to find index matches for
+            idx_list (List[int]): list of matching indices, appended to as matches are found during recursion
             node_idx (int): index to be searched for a child node matching the next field name
 
         Returns:
-            list[int]: a list of indices matching the given dot_path. If no path is found, an empty list is returned.
+            List[int]: a list of indices matching the given dot_path. If no path is found, an empty list is returned.
         """
         if len(dot_path) == 0:
             idx_list.append(node_idx)
@@ -690,7 +690,7 @@ class GQLSchema(ABC):
             continue
         return []
 
-    def _parse_dot_path(self, dot_path: str) -> list[list[int]]:
+    def _parse_dot_path(self, dot_path: str) -> List[List[int]]:
         """Parse dot-separated field names into lists of matching node indices. ex: "prd.chem_comp.id" --> [[57, 81, 116], [610, 81, 116], [858, 81, 116]].
 
         Args:
@@ -701,11 +701,11 @@ class GQLSchema(ABC):
             ValueError: thrown if no path matches dot_path
 
         Returns:
-            list[list[int]]: list of paths where each path is a list of FieldNode indices matching the given dot_path
+            List[List[int]]: list of paths where each path is a list of FieldNode indices matching the given dot_path
         """
         path_list = dot_path.split(".")
         node_matches: List[int] = self._field_to_idx_dict[path_list[0]]
-        idx_path_list: List[list[int]] = []
+        idx_path_list: List[List[int]] = []
         for node_idx in node_matches:
             found_path: List[int] = []
             found_path = self._find_idx_path(path_list[1:], found_path, node_idx)
@@ -717,19 +717,19 @@ class GQLSchema(ABC):
 
         return idx_path_list
 
-    def _compare_paths(self, start_node_index: int, dot_paths: List[list[int]]) -> list[list[int]]:
+    def _compare_paths(self, start_node_index: int, dot_paths: List[List[int]]) -> List[List[int]]:
         """Compare length of paths from the starting node to dot notation paths, returning the shortest paths.
 
         Args:
             start_node_index (int): the index of query's input_type
                 ex: input_type entry --> 20
-            dot_paths (list[list[int]]):  a list of paths where each path is a list of node indices matching a dot notation string
+            dot_paths (List[List[int]]):  a list of paths where each path is a list of node indices matching a dot notation string
 
         Raises:
             ValueError: thrown when there is no path from the input_type node to the return data nodes.
 
         Returns:
-            list[list[int]]: list of shortest paths from the input_type node index to the index of the final field given in dot notation.
+            List[List[int]]: list of shortest paths from the input_type node index to the index of the final field given in dot notation.
                 ex: input_type "entry" and "exptl.method" would return a list of shortest path(s) with indices from "entry" to "method".
         """
         all_paths: List[List[int]] = []
@@ -768,14 +768,14 @@ class GQLSchema(ABC):
         """
         return str(self._schema_graph[idx].name)  # casting as string for mypy
 
-    def _idx_path_to_name_path(self, idx_path: List[int]) -> list[str]:
+    def _idx_path_to_name_path(self, idx_path: List[int]) -> List[str]:
         """Take a path of graph indices and return a path of field names.
 
         Args:
-            idx_path (list[int]): List of node indices (can be both TypeNodes and FieldNodes)
+            idx_path (List[int]): List of node indices (can be both TypeNodes and FieldNodes)
 
         Returns:
-            list[str]: List of field names, removing TypeNodes.
+            List[str]: List of field names, removing TypeNodes.
         """
         name_path: List[str] = []
         for idx in idx_path:
@@ -783,7 +783,7 @@ class GQLSchema(ABC):
                 name_path.append(self._schema_graph[idx].name)  # noqa: PERF401
         return name_path
 
-    def find_paths(self, input_type: str, return_data_name: str, descriptions: bool = False) -> list[str] | dict[str, str]:
+    def find_paths(self, input_type: str, return_data_name: str, descriptions: bool = False) -> List[str] | Dict[str, str]:
         """Find path from input_type to any nodes matching return_data_name.
 
         Args:
@@ -792,8 +792,8 @@ class GQLSchema(ABC):
             descriptions (bool, optional): whether to include descriptions for the final field of each path. Default is False.
 
         Returns:
-            Union[list[str], Dict]
-                list[str]: list of paths to nodes with names that match return_data_name
+            Union[List[str], Dict]
+                List[str]: list of paths to nodes with names that match return_data_name
                 Dict: if description is True, a dictionary with paths as keys and descriptions as values is returned.
         """
         paths: List[List[int]] = []
@@ -819,7 +819,7 @@ class GQLSchema(ABC):
         dot_paths.sort()
         return dot_paths
 
-    def _read_enum(self, type_name: str) -> list[str]:
+    def _read_enum(self, type_name: str) -> List[str]:
         """Parse given type name into a list of enumeration values.
 
         Args:
@@ -924,23 +924,23 @@ class GQLSchema(ABC):
     def _construct_query_rustworkx(
         self,
         query_type: str,
-        query_args: Dict[str, str] | dict[str, list[Any]],
+        query_args: Dict[str, str] | Dict[str, List[Any]],
         return_data_list: List[str],
         add_rcsb_id: bool = False,
         suppress_autocomplete_warning: bool = False,
-    ) -> dict[str, Any]:
+    ) -> Dict[str, Any]:
         """Construct a GraphQL query as a dict. This function signature is enforced.
 
         Args:
             query_type (str): type of query to make (ex: "entries", "alignments", "annotations", etc.)
-            query_args (dict[str, str] | dict[str, list[Any]]): dict of query_type-specific args
-            return_data_list (list[str]): list of fields to request
+            query_args (Dict[str, str] | Dict[str, List[Any]]): dict of query_type-specific args
+            return_data_list (List[str]): list of fields to request
             add_rcsb_id (bool): automatically request rcsb_id at the top of the query (for Data API only). Default is False.
             suppress_autocomplete_warning (bool, optional): Whether to suppress warning when
                 autocompletion of paths is used. Defaults to False.
 
         Returns:
-            dict[str, Any]: GraphQL query as dict.
+            Dict[str, Any]: GraphQL query as dict.
                 Dict is JSON format needed for POST requests (https://sequence-coordinates.rcsb.org/#gql-api)
         """
         # Build first line of query where arguments are given
@@ -957,7 +957,7 @@ class GQLSchema(ABC):
             return_data_list.insert(0, f"{query_type}.rcsb_id")
             added_rcsb_id = True
 
-        return_data_path_dict: Dict[int, list[int]] = self._return_fields_to_paths(
+        return_data_path_dict: Dict[int, List[int]] = self._return_fields_to_paths(
             start_idx=start_idx,
             query_type=query_type,
             return_data_list=return_data_list,
@@ -965,7 +965,7 @@ class GQLSchema(ABC):
             suppress_autocomplete_warning=suppress_autocomplete_warning,
         )
         # return_data_query_list is a list of queries, each one corresponding to one field in return_data_list
-        return_data_query_list: List[dict[int, Any] | List[int] | List[dict[int, Any] | int]] = []
+        return_data_query_list: List[Dict[int, Any] | List[int] | List[Dict[int, Any] | int]] = []
         for return_field_idx, path_group in return_data_path_dict.items():
             for path in path_group:
                 # Format the paths with the correct nesting of fields. Still using indices at this point
@@ -983,18 +983,18 @@ class GQLSchema(ABC):
             return {"query": query}
         raise ValueError(validation_error_list)
 
-    def _merge_query_list(self, query_list: List[dict[int, Any] | List[int]]) -> List[dict[int, Any] | List[int]]:
+    def _merge_query_list(self, query_list: List[Dict[int, Any] | List[int]]) -> List[Dict[int, Any] | List[int]]:
         """Merge a list of query dicts, returning a merged query with unique indices/index dictionaries.
 
         Args:
-            query_list (ist[dict[int, Any]  |  int]): list where each item is a query to a field
+            query_list (ist[Dict[int, Any]  |  int]): list where each item is a query to a field
                 specified by return_data_list in construct_query
 
         Returns:
-            list[dict[int, Any] | int]: List of indices and index dicts representing the merged query
+            List[Dict[int, Any] | int]: List of indices and index dicts representing the merged query
         """
         if isinstance(query_list[0], list):
-            result: List[dict[int, Any] | List[int]] | List[int] = query_list[0]
+            result: List[Dict[int, Any] | List[int]] | List[int] = query_list[0]
         result = [query_list[0]]
 
         for path in query_list[1:]:
@@ -1018,20 +1018,20 @@ class GQLSchema(ABC):
 
     def _merge_queries(
         self,
-        dict_1: Dict[int, Any] | list[int | dict[int, Any]] | int,
-        dict_2: Dict[int, Any] | list[int | dict[int, Any]] | int,
-    ) -> list[dict[int, Any] | int] | list[dict[int, Any]] | list[int]:
+        dict_1: Dict[int, Any] | List[int | Dict[int, Any]] | int,
+        dict_2: Dict[int, Any] | List[int | Dict[int, Any]] | int,
+    ) -> List[Dict[int, Any] | int] | List[Dict[int, Any]] | List[int]:
         """Merge two dictionaries without overwriting values.
 
         Args:
-            dict_1 (dict[int, Any] | list[int  |  dict[int, Any]] | int): _description_
-            dict_2 (dict[int, Any] | list[int  |  dict[int, Any]] | int): _description_
+            dict_1 (Dict[int, Any] | List[int  |  Dict[int, Any]] | int): _description_
+            dict_2 (Dict[int, Any] | List[int  |  Dict[int, Any]] | int): _description_
 
         Raises:
             ValueError: _description_
 
         Returns:
-            list[dict[int, Any] | int] | list[dict[int, Any]] | list[int]: _description_
+            List[Dict[int, Any] | int] | List[Dict[int, Any]] | List[int]: _description_
         """
         # Case where both queries are dicts:
         #   If share keys --> merge values
@@ -1065,18 +1065,18 @@ class GQLSchema(ABC):
     def _idxs_to_idx_dict(
         self,
         idx_list: List[int],
-        autopopulated_fields: List[int | dict[int, Any]],
+        autopopulated_fields: List[int | Dict[int, Any]],
         partial_query: Dict[Any, Any] | None = None,
-    ) -> Dict[int, Any] | List[int] | List[dict[int, Any] | int]:
+    ) -> Dict[int, Any] | List[int] | List[Dict[int, Any] | int]:
         """Construct a query with correct nesting of dicts/lists
 
         Args:
-            idx_list (list[int]): list of indices to a return_date_list field
-            autopopulated_fields (list[int  |  dict[int, Any]]): fields underneath return_data_list field (can be empty)
-            partial_query (dict[Any, Any] | None, optional): the query as it gets constructed by recursion. Defaults to None.
+            idx_list (List[int]): list of indices to a return_date_list field
+            autopopulated_fields (List[int  |  Dict[int, Any]]): fields underneath return_data_list field (can be empty)
+            partial_query (Dict[Any, Any] | None, optional): the query as it gets constructed by recursion. Defaults to None.
 
         Returns:
-            dict[int, Any] | list[int] | list[dict[int, Any] | int]: query dict/list with nesting
+            Dict[int, Any] | List[int] | List[Dict[int, Any] | int]: query dict/list with nesting
         """
         if partial_query is None:
             partial_query = {}
@@ -1093,7 +1093,7 @@ class GQLSchema(ABC):
         else:
             return {idx_list[0]: self._idxs_to_idx_dict(idx_list[1:], autopopulated_fields=autopopulated_fields)}
 
-    def _idx_dict_to_name_dict(self, idx_fields: List[dict[int, Any] | int] | dict[int, Any] | int, query_args: Dict[str, Any]) -> dict[str, Any] | list[str] | str:
+    def _idx_dict_to_name_dict(self, idx_fields: List[Dict[int, Any] | int] | Dict[int, Any] | int, query_args: Dict[str, Any]) -> Dict[str, Any] | List[str] | str:
         """Convert dictionary of indices to dictionary of field names and add arguments if applicable."""
         query_dict = {}
         if isinstance(idx_fields, dict):
@@ -1111,13 +1111,13 @@ class GQLSchema(ABC):
         else:
             return self._idx_to_name(idx_fields)
 
-    def add_field_args(self, field_name: str, args: List[dict[str, Any]], query_args: Dict[str, Any]) -> str:
+    def add_field_args(self, field_name: str, args: List[Dict[str, Any]], query_args: Dict[str, Any]) -> str:
         """Add arguments to a field, returning the fieldname and args as a formatted string.
 
         Args:
             field_name (str): name of the field
-            args (list[dict[str, Any]]): args of a field, retrieved from the GraphQL schema/FieldNode object
-            query_args (dict[str, Any]): dictionary where keys are argument name and values are user input
+            args (List[Dict[str, Any]]): args of a field, retrieved from the GraphQL schema/FieldNode object
+            query_args (Dict[str, Any]): dictionary where keys are argument name and values are user input
 
         Returns:
             str: field name, potentially with arguments applied (e.g., field(arg: val))
@@ -1191,14 +1191,14 @@ class GQLSchema(ABC):
         query = f"query{{{first_line}{{\n{formatted_query_body}}}}}"
         return query
 
-    def get_input_id_dict(self, input_type: str) -> dict[str, str]:
+    def get_input_id_dict(self, input_type: str) -> Dict[str, str]:
         """Get keys input dictionary for given input_type.
 
         Args:
             input_type (str): GraphQL input_type (ex: alignments)
 
         Returns:
-            dict[str, str]: dictionary where keys are argument names and values are descriptions
+            Dict[str, str]: dictionary where keys are argument names and values are descriptions
         """
         if input_type not in self._root_dict:
             error_msg = "Not a valid input_type, no available input_id dictionary"
@@ -1214,7 +1214,7 @@ class GQLSchema(ABC):
         return input_dict
 
     @abstractmethod
-    def find_field_names(self, search_string: str) -> list[str]:
+    def find_field_names(self, search_string: str) -> List[str]:
         """Find field names that fully or partially match the search string.
         NOTE: made abstractmethod so that it will be included in the autogenerated documentation of child classes
 
@@ -1226,7 +1226,7 @@ class GQLSchema(ABC):
             ValueError: thrown when no fields match search_string
 
         Returns:
-            list[str]: list of matching field names
+            List[str]: list of matching field names
         """
         if not isinstance(search_string, str):
             error_msg = f"Please input a string instead of {type(search_string)}"  # type: ignore[unreachable]

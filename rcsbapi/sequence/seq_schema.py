@@ -23,7 +23,7 @@ class SeqSchema(GQLSchema):
     def construct_query(  # type: ignore[override]
         self,
         query_type: str,
-        query_args: Dict[str, str] | dict[str, list[Any]],
+        query_args: Dict[str, str] | Dict[str, List[Any]],
         return_data_list: List[str],
         suppress_autocomplete_warning: bool = False
     ) -> Dict[str, Any]:
@@ -32,8 +32,8 @@ class SeqSchema(GQLSchema):
 
         Args:
             query_type (str): type of query to make (ex: Alignments, Annotations, etc)
-            query_args (dict[str, str] | dict[str, list[Any]]): dict of query_type-specific args
-            return_data_list (list[str]): list of fields to request data for
+            query_args (Dict[str, str] | Dict[str, List[Any]]): dict of query_type-specific args
+            return_data_list (List[str]): list of fields to request data for
             suppress_autocomplete_warning (bool, optional): Whether to suppress warning when
                 autocompletion of paths is used. Defaults to False.
 
@@ -68,7 +68,7 @@ class SeqSchema(GQLSchema):
     def _construct_query_rustworkx(
         self,
         query_type: str,
-        query_args: Dict[str, str] | dict[str, list[Any]],
+        query_args: Dict[str, str] | Dict[str, List[Any]],
         return_data_list: List[str],
         suppress_autocomplete_warning: bool = False
     ) -> Dict[str, Any]:
@@ -76,13 +76,13 @@ class SeqSchema(GQLSchema):
 
         Args:
             query_type (str): type of query to make (ex: Alignments, Annotations, etc)
-            query_args (dict[str, str] | dict[str, list[Any]]): dict of query_type-specific args
-            return_data_list (list[str]): list of fields to request data for
+            query_args (Dict[str, str] | Dict[str, List[Any]]): dict of query_type-specific args
+            return_data_list (List[str]): list of fields to request data for
             suppress_autocomplete_warning (bool, optional): Whether to suppress warning when
                 autocompletion of paths is used. Defaults to False.
 
         Returns:
-            dict[str, Any]: GraphQL query as dict.
+            Dict[str, Any]: GraphQL query as dict.
                 Dict is JSON format needed for POST requests (https://sequence-coordinates.rcsb.org/#gql-api)
         """
         return super()._construct_query_rustworkx(
@@ -92,7 +92,7 @@ class SeqSchema(GQLSchema):
             suppress_autocomplete_warning=suppress_autocomplete_warning,
         )
 
-    def find_field_names(self, search_string: str) -> list[str]:
+    def find_field_names(self, search_string: str) -> List[str]:
         """Find field names that fully or partially match the search string.
 
         Args:
@@ -103,7 +103,7 @@ class SeqSchema(GQLSchema):
             ValueError: thrown when no fields match search_string
 
         Returns:
-            list[str]: list of matching field names
+            List[str]: list of matching field names
         """
         return super().find_field_names(search_string)
 
