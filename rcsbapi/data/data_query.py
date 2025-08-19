@@ -1,5 +1,6 @@
 import logging
 import time
+import sys
 import urllib.parse
 import re
 from typing import Any, Union, List, Dict, Optional, Tuple
@@ -70,6 +71,17 @@ class DataQuery:
         self._request_count = 0
         self._request_limit_time_interval = 10  # request rate limits are applied over 10s window
         self._requests_per_window_limit = config.DATA_API_REQUESTS_PER_SECOND * self._request_limit_time_interval
+        self._apply_nest_asyncio_if_needed()
+
+    def _apply_nest_asyncio_if_needed(self):
+        try:
+            # Detect if running inside IPython/Jupyter
+            if "ipykernel" in sys.modules:
+                import nest_asyncio
+                nest_asyncio.apply()
+        except ImportError:
+            # nest_asyncio not installed, just skip
+            pass
 
     def _process_input_ids(self, input_type: str, input_ids: Union[List[str], Dict[str, str], Dict[str, List[str]]]) -> Tuple[str, List[str]]:
         """Convert input_type to plural if possible.
