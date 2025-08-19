@@ -65,7 +65,7 @@ class DataQuery:
         self._response: Optional[Dict[str, Any]] = None
         #
         # Other request settings
-        self._rate_limit_lock = asyncio.Lock()
+        self._rate_limit_lock = None
         self._last_request_time = time.monotonic()
         self._request_count = 0
         self._request_limit_time_interval = 10  # request rate limits are applied over 10s window
@@ -277,7 +277,8 @@ class DataQuery:
     async def _rate_limiter(self):
         """Check if request rate-limit has been reached, and if so, sleep until it can be reset.
         """
-        async with self._rate_limit_lock:
+        lock = await self._get_rate_limit_lock()
+        async with lock:
             now = time.monotonic()
             elapsed = now - self._last_request_time
             if elapsed >= self._request_limit_time_interval:
@@ -296,6 +297,11 @@ class DataQuery:
                 self._last_request_time = time.monotonic()
                 self._request_count = 0
             self._request_count += 1
+
+    async def _get_rate_limit_lock(self):
+        if self._rate_limit_lock is None:
+            self._rate_limit_lock = asyncio.Lock()
+        return self._rate_limit_lock
 
     def _parse_gql_error(self, response_json: Dict[str, Any]) -> None:
         if "errors" in response_json.keys():
