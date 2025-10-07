@@ -86,15 +86,22 @@ jobs:
     #  Build artifacts if this is a test target (i.e. labeled as py##)
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
-      - script: pip install --upgrade pip twine setuptools wheel
+      - script: pip install --upgrade pip build twine
         displayName: "Acquire build tools"
-      - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-        displayName: "Build source dist"
-      - script: python setup.py  bdist_wheel --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-        displayName: "Build wheel"
-    #
-      - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/udist"
-        displayName: "Build source dist"
+      # - script: pip install --upgrade pip twine setuptools wheel
+      #   displayName: "Acquire build tools"
+
+      - script: python -m build --sdist --wheel --outdir "$(System.DefaultWorkingDirectory)/dist"
+        displayName: "Build source and wheel distributions"
+      # - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/dist"
+      #   displayName: "Build source dist"
+      # - script: python setup.py  bdist_wheel --dist-dir "$(System.DefaultWorkingDirectory)/dist"
+      #   displayName: "Build wheel"
+
+      - script: python -m build --sdist --outdir "$(System.DefaultWorkingDirectory)/udist"
+        displayName: "Build source distribution to udist"
+      # - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/udist"
+      #   displayName: "Build source dist"
       #
       # Check the install artifacts
       - script: ls -lR "$(System.DefaultWorkingDirectory)/dist" "$(System.DefaultWorkingDirectory)/udist"
