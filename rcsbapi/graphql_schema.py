@@ -543,8 +543,8 @@ class GQLSchema(ABC):
                         f"{path_choice_msg}"
                         f"\n  ...\n\n"
                         f"For all paths run:\n"
-                        f"  from rcsbapi.data import Schema\n"
-                        f"  schema = Schema()\n"
+                        f"  from rcsbapi.data import DataSchema\n"
+                        f"  schema = DataSchema()\n"
                         f'  schema.find_paths("{query_type}", "{path_list[-1]}")'
                     )
                     raise ValueError(error_msg)

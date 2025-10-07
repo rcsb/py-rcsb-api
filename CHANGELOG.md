@@ -1,11 +1,17 @@
 # Changelog
 
+## v1.4.1 (2025-10-07)
+
+- Switch from using `setup.py` to `pyproject.toml` (Issue [#67](https://github.com/rcsb/py-rcsb-api/issues/67))
+- End support for Python 3.8 (due to [PEP 639](https://peps.python.org/pep-0639/#specification))
+- Fix and improve formatting of several warning messages
+
 ## v1.4.0 (2025-08-19)
 
 - Switch from using `requests` to [`httpx`](https://www.python-httpx.org/) (Issue [#33](https://github.com/rcsb/py-rcsb-api/issues/33))
-- Add asynchronous request support for Data API (`rcsbapi.data`) to speed up requests
-- Add retry support for Search API (`rcsbapi.search`), Data API (`rcsbapi.data`), Model Server API (`rcsbapi.model`), and Sequence Coordinate API (`rcsbapi.sequence`) requests
-- Adjust and add default settings to `rcsbapi.config` configuration
+- Add asynchronous request support for Data API (`rcsbapi.data`) to speed up requests ([see config settings](https://rcsbapi.readthedocs.io/en/latest/data_api/custom_configuration.html))
+- Add retry support for Search API (`rcsbapi.search`), Data API (`rcsbapi.data`), Model Server API (`rcsbapi.model`), and Sequence Coordinate API (`rcsbapi.sequence`) requests ([see config settings](https://rcsbapi.readthedocs.io/en/latest/data_api/custom_configuration.html))
+- Adjust and add default settings to `rcsbapi.config` configuration ([see config settings](https://rcsbapi.readthedocs.io/en/latest/data_api/custom_configuration.html))
 - Stop overriding logging configuration within package—this should be done by client applications (Issue [#52](https://github.com/rcsb/py-rcsb-api/issues/52))
 - Fixed bug associated with `typing` observed for Python 3.8
 

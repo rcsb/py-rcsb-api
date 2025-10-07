@@ -1164,9 +1164,15 @@ class NestedAttributeQuery(Group):
                     # Determine the other attribute in the pair
                     other_attr = attribute2 if attr == attribute1 else attribute1
                     message += (
-                        f"\nAttribute '{attr}' is a nested attribute; however, attribute '{other_attr}' is not a valid partner.\n"
-                        f"Please wrap it correctly using NestedAttributeQuery(...)\n"
-                        f"Valid attributes that can be used with '{attr}': {', '.join(sorted(nested_partners)) if nested_partners else 'None'}"
+                        f"\nERROR: Attribute '{attr}' is a nested attribute; however, attribute '{other_attr}' is not a valid partner.\n"
+                        f"Please wrap it correctly using `NestedAttributeQuery(...)` with a valid partner "
+                        "(see docs: https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#nested-attributes):\n\n"
+                        "    from rcsbapi.search import NestedAttributeQuery, AttributeQuery\n"
+                        "    NestedAttributeQuery(\n"
+                        f'        AttributeQuery("{attr}",  <OPERATOR>,  <VALUE>),\n'
+                        "        AttributeQuery(<PARTNER_ATTRIBUTE>,  <OPERATOR>,  <VALUE>)\n"
+                        "    )\n\n"
+                        f"    Possible partner attributes for '{attr}': {list(sorted(nested_partners)) if nested_partners else 'None'}\n"
                     )
             logging.error(message)
 
@@ -1208,21 +1214,35 @@ class NestedAttributeQueryChecker:
 
     def _validate_single_attribute_query(self, query: AttributeQuery, within_nested_block: bool):
         attribute = query.params.get("attribute")
+        operator = query.params.get("operator")
+        value = query.params.get("value")
         is_nested = any(attribute in pair for pair in SEARCH_SCHEMA.nested_attribute_schema)
         if is_nested and not within_nested_block:
             nested_partners = {
                 other for pair in SEARCH_SCHEMA.nested_attribute_schema if attribute in pair
                 for other in pair if other != attribute
             }
+
+            if value:
+                attr_query_1 = f'        AttributeQuery("{attribute}", "{operator}", "{value}"),'
+            else:
+                attr_query_1 = f'        AttributeQuery("{attribute}", "{operator}"),'
+            attr_query_2 = '        AttributeQuery(<PARTNER_ATTRIBUTE>,  <OPERATOR>,  <VALUE>)'
+
             logger.warning(
-                "WARNING: Attribute '%s' is a nested attribute and must be used *only* inside a NestedAttributeQuery (see docs: %s).\n"
-                "    Please wrap it using: `NestedAttributeQuery( AttributeQuery('%s', ...), AttributeQuery(<PARTNER_ATTRIBUTE>, ...) )`\n"
-                "    Possible partner attributes for '%s': %r",
+                "\n"
+                "WARNING: Attribute '%s' is a nested attribute and must be wrapped with a `NestedAttributeQuery(...)` (see docs: %s).\n\n"
+                "    from rcsbapi.search import NestedAttributeQuery, AttributeQuery\n"
+                "    NestedAttributeQuery(\n"
+                "%s\n%s\n"
+                "    )\n\n"
+                "    Possible partner attributes for '%s': %r\n",
                 attribute,
                 "https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#nested-attributes",
+                attr_query_1,
+                attr_query_2,
                 attribute,
-                attribute,
-                nested_partners
+                list(nested_partners)
             )
 
 

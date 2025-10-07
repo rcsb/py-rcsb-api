@@ -3576,7 +3576,7 @@
                             "priority_order": 80
                         }
                     ],
-                    "rcsb_current_maximum_value": 52.0,
+                    "rcsb_current_maximum_value": 64.0,
                     "rcsb_current_minimum_value": 0.0
                 },
                 "atom_count_heavy": {
@@ -3684,7 +3684,7 @@
                             "context": "brief"
                         }
                     ],
-                    "rcsb_current_maximum_value": 1754352000000.0,
+                    "rcsb_current_maximum_value": 1757635200000.0,
                     "rcsb_current_minimum_value": 711158400000.0
                 },
                 "initial_release_date": {
@@ -3713,7 +3713,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1755043200000.0,
+                    "rcsb_current_maximum_value": 1759276800000.0,
                     "rcsb_current_minimum_value": 105235200000.0
                 },
                 "release_status": {
