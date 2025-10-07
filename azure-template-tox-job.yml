@@ -64,17 +64,14 @@ jobs:
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
       - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}', parameters.tox) }}
         displayName: 'Running tox task'
     - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.13')) }}:
       - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}-py313', parameters.tox) }}
         displayName: 'Running tox task'
     - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.9')) }}:
       - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}-py39', parameters.tox) }}
         displayName: 'Running tox task'
     #
@@ -83,20 +80,10 @@ jobs:
     - ${{ if startsWith(parameters.tox, 'py') }}:
       - script: pip install --upgrade pip build twine
         displayName: "Acquire build tools"
-      # - script: pip install --upgrade pip twine setuptools wheel
-      #   displayName: "Acquire build tools"
-
       - script: python -m build --sdist --wheel --outdir "$(System.DefaultWorkingDirectory)/dist"
         displayName: "Build source and wheel distributions"
-      # - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-      #   displayName: "Build source dist"
-      # - script: python setup.py  bdist_wheel --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-      #   displayName: "Build wheel"
-
       - script: python -m build --sdist --outdir "$(System.DefaultWorkingDirectory)/udist"
         displayName: "Build source distribution to udist"
-      # - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/udist"
-      #   displayName: "Build source dist"
       #
       # Check the install artifacts
       - script: ls -lR "$(System.DefaultWorkingDirectory)/dist" "$(System.DefaultWorkingDirectory)/udist"
