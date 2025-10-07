@@ -56,45 +56,34 @@ jobs:
     - script: "python -c \"import sys; print(sys.version); print(sys.executable)\""
       displayName: show python information
     #
-    - script: python -m pip install --upgrade pip tox
+    - script: python -m pip install --upgrade pip tox build
       displayName: 'Install tools'
       #
-    - script: pip install -r requirements.txt
+    - script: pip install .[tests]
       displayName: 'Install dependencies'
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
       - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}', parameters.tox) }}
         displayName: 'Running tox task'
-    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.12')) }}:
+    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.13')) }}:
       - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
-          ${{ format('python -m tox -e {0}-py312', parameters.tox) }}
+          ${{ format('python -m tox -e {0}-py313', parameters.tox) }}
         displayName: 'Running tox task'
     - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.9')) }}:
       - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
           ${{ format('python -m tox -e {0}-py39', parameters.tox) }}
-        displayName: 'Running tox task'
-    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.8')) }}:
-      - script: |
-          export CONFIG_SUPPORT_TOKEN_ENV=$(VAR_CONFIG_SUPPORT_TOKEN_ENV)
-          ${{ format('python -m tox -e {0}-py38', parameters.tox) }}
         displayName: 'Running tox task'
     #
     #  Build artifacts if this is a test target (i.e. labeled as py##)
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
-      - script: pip install --upgrade pip twine setuptools wheel
+      - script: pip install --upgrade pip build twine
         displayName: "Acquire build tools"
-      - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-        displayName: "Build source dist"
-      - script: python setup.py  bdist_wheel --dist-dir "$(System.DefaultWorkingDirectory)/dist"
-        displayName: "Build wheel"
-    #
-      - script: python setup.py  sdist --dist-dir "$(System.DefaultWorkingDirectory)/udist"
-        displayName: "Build source dist"
+      - script: python -m build --sdist --wheel --outdir "$(System.DefaultWorkingDirectory)/dist"
+        displayName: "Build source and wheel distributions"
+      - script: python -m build --sdist --outdir "$(System.DefaultWorkingDirectory)/udist"
+        displayName: "Build source distribution to udist"
       #
       # Check the install artifacts
       - script: ls -lR "$(System.DefaultWorkingDirectory)/dist" "$(System.DefaultWorkingDirectory)/udist"

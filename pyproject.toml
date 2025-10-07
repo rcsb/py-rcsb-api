@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rcsb-api"
+description = "Python package interface for RCSB.org API services"
+readme = "README.md"
+requires-python = ">=3.9,<4.0"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE.md"]
+authors = [
+  { name = "Dennis Piehl", email = "dennis.piehl@rcsb.org" }
+]
+keywords = ["RCSB", "PDB", "bioinformatics", "API", "protein", "structure"]
+classifiers = [
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+  "Operating System :: OS Independent",
+  "Natural Language :: English",
+  "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.26.0",
+    "nest_asyncio>=1.6.0",
+    "rustworkx",
+    "graphql-core",
+    "tqdm"
+]
+dynamic = ["version"]  # Automatically extract version from __init__.py
+
+[project.urls]
+Homepage = "https://github.com/rcsb/py-rcsb-api"
+Repository = "https://github.com/rcsb/py-rcsb-api"
+Issues = "https://github.com/rcsb/py-rcsb-api/issues"
+Documentation = "https://rcsbapi.readthedocs.io/"
+Changelog = "https://github.com/rcsb/py-rcsb-api/blob/master/CHANGELOG.md"
+
+[project.optional-dependencies]
+tests = ["tox", "pylint", "black>=21.5b1", "flake8", "coverage"]
+docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]  # should match docs/requirements.txt
+# dev = ["check-manifest"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rcsbapi*"]  # Only include `rcsbapi` package for installation here
+exclude = ["tests*", "docs*"]  # Not necessasry, but as an extra precaution to prevent their installation; however, these are added to MANIFEST for source distribution
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.rst", "*.txt", "*.cfg", "*.json", "rcsbapi/*/resources/*"]
+
+[tool.setuptools.dynamic]
+version = { attr = "rcsbapi.__version__" }

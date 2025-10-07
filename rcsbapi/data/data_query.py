@@ -272,6 +272,7 @@ class DataQuery:
                     return response_json
 
                 except (httpx.RequestError, httpx.HTTPStatusError) as e:
+                    logger.debug("Retry attempt %r failed with exception:\n    %r\n", attempt, e)
                     if attempt == max_retries:
                         logger.error(
                             "Final retry attempt %r failed with exception:\n    %r\n"
@@ -280,7 +281,7 @@ class DataQuery:
                             e
                         )
                         raise
-                    logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
+                    logger.debug("Retrying in %r seconds...", retry_backoff)
                     await asyncio.sleep(retry_backoff)
                     retry_backoff *= 2  # exponential backoff
 
@@ -320,11 +321,11 @@ class DataQuery:
                 error_msg_list.append(error_dict["message"])
                 combined_error_msg: str = ""
                 for i, error_msg in enumerate(error_msg_list):
-                    combined_error_msg += f"{i+1}. {error_msg}\n"
+                    combined_error_msg += f"{i + 1}. {error_msg}\n"
                 raise ValueError(f"{combined_error_msg}.\n\nRun <query object name>.get_editor_link() to get a link to GraphiQL editor with query")
 
     def _batch_ids(self, batch_size: int) -> List[List[str]]:  # assumes that plural types have only one arg, which is true right now
-        """split queries with large numbers of input_ids into smaller batches
+        """Split queries with large numbers of input_ids into smaller batches
 
         Args:
             batch_size (int): max size of batches
