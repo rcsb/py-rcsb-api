@@ -12,7 +12,7 @@ license-files = ["LICENSE", "NOTICE.md"]
 authors = [
   { name = "Dennis Piehl", email = "dennis.piehl@rcsb.org" }
 ]
-keywords = ["RCSB", "PDB", "bioinformatics", "API", "structure", "protein"]
+keywords = ["RCSB", "PDB", "bioinformatics", "API", "protein", "structure"]
 classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
@@ -36,8 +36,7 @@ dependencies = [
     "graphql-core",
     "tqdm"
 ]
-# Automatically extract version from __init__.py
-dynamic = ["version"]
+dynamic = ["version"]  # Automatically extract version from __init__.py
 
 [project.urls]
 Homepage = "https://github.com/rcsb/py-rcsb-api"
@@ -48,8 +47,7 @@ Changelog = "https://github.com/rcsb/py-rcsb-api/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
 tests = ["tox", "pylint", "black>=21.5b1", "flake8", "coverage"]
-# should match docs/requirements.txt
-docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]
+docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]  # should match docs/requirements.txt
 # dev = ["check-manifest"]
 
 [tool.setuptools.packages.find]
@@ -62,8 +60,3 @@ exclude = ["tests*", "docs*"]  # Not necessasry, but as an extra precaution to p
 
 [tool.setuptools.dynamic]
 version = { attr = "rcsbapi.__version__" }
-
-# # is below necessary?
-# [tool.coverage.run]
-# source = ["rcsbapi"]
-# branch = true
