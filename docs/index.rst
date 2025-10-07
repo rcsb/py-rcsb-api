@@ -8,11 +8,14 @@ Use it to search and fetch macromolecular structure data from RCSB PDB `at RCSB.
 Availability
 ------------
 
-Get it from PyPI:
+Install it from PyPI via ``pip`` or ``uv``:
 
 .. code-block:: bash
 
    pip install rcsb-api
+
+   # or, if using uv:
+   uv pip install rcsb-api
 
 Or, download from `GitHub <https://github.com/rcsb/py-rcsb-api>`_
 

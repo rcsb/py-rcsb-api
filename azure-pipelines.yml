@@ -20,22 +20,22 @@ schedules:
 
 jobs:
   - template: azure-template-tox-job.yml
-    parameters: {tox: 'format_pep8', python: '3.9', os: 'linux'}
+    parameters: {tox: 'format_pep8', python: '3.13', os: 'linux'}
   - template: azure-template-tox-job.yml
-    parameters: {tox: 'lint_pylint', python: '3.9', os: 'linux'}
+    parameters: {tox: 'lint_pylint', python: '3.13', os: 'linux'}
   - template: azure-template-tox-job.yml
-    parameters: {tox: 'test_coverage', python: '3.9', os: 'linux'}
-    #
+    parameters: {tox: 'test_coverage', python: '3.13', os: 'linux'}
+  #
   - template: azure-template-tox-job.yml
     parameters: {tox: 'py39', python: '3.9', os: 'linux'}
+  #
   - template: azure-template-tox-job.yml
     parameters: {tox: 'py313', python: '3.13', os: 'linux'}
-  #
   - template: azure-template-tox-job.yml
-    parameters: {tox: 'py39', python: '3.9', os: 'macos'}
+    parameters: {tox: 'py313', python: '3.13', os: 'macos'}
   - template: azure-template-tox-job.yml
-    parameters: {tox: 'py39', python: '3.9', os: 'windows'}
+    parameters: {tox: 'py313', python: '3.13', os: 'windows'}
   #
   - template: azure-template-publish-job.yml
-    parameters: {tox: 'py39', python: '3.9', os: 'linux'}
+    parameters: {tox: 'py313', python: '3.13', os: 'linux'}
   #
