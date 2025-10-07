@@ -63,7 +63,7 @@ exclude = ["tests*", "docs*"]  # Not necessasry, but as an extra precaution to p
 [tool.setuptools.dynamic]
 version = { attr = "rcsbapi.__version__" }
 
-# is below necessary?
-[tool.coverage.run]
-source = ["rcsbapi"]
-branch = true
+# # is below necessary?
+# [tool.coverage.run]
+# source = ["rcsbapi"]
+# branch = true
