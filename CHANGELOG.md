@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.1 (2025-10-07)
+
+- Switch from using `setup.py` to `pyproject.toml` (Issue ...)
+- End support for Python 3.8 (due to [PEP 639](https://peps.python.org/pep-0639/#specification))
+
 ## v1.4.0 (2025-08-19)
 
 - Switch from using `requests` to [`httpx`](https://www.python-httpx.org/) (Issue [#33](https://github.com/rcsb/py-rcsb-api/issues/33))

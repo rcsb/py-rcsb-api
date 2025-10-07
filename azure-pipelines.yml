@@ -27,11 +27,9 @@ jobs:
     parameters: {tox: 'test_coverage', python: '3.9', os: 'linux'}
     #
   - template: azure-template-tox-job.yml
-    parameters: {tox: 'py38', python: '3.8', os: 'linux'}
-  - template: azure-template-tox-job.yml
     parameters: {tox: 'py39', python: '3.9', os: 'linux'}
   - template: azure-template-tox-job.yml
-    parameters: {tox: 'py312', python: '3.12', os: 'linux'}
+    parameters: {tox: 'py313', python: '3.13', os: 'linux'}
   #
   - template: azure-template-tox-job.yml
     parameters: {tox: 'py39', python: '3.9', os: 'macos'}

@@ -11,7 +11,7 @@
 Python interface for RCSB Protein Data Bank API services at [RCSB.org](https://www.rcsb.org/).
 
 ## Installation
-This package requires Python 3.8 or later.
+This package requires Python 3.9 or later.
 
 Get it from PyPI:
 

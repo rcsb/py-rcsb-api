@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "rcsb-api"
 description = "Python package interface for RCSB.org API services"
 readme = "README.md"
-requires-python = ">=3.8,<4.0"
+requires-python = ">=3.9,<4.0"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE.md"]
 authors = [
@@ -17,11 +17,11 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",
   "Topic :: Scientific/Engineering :: Bio-Informatics",
