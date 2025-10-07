@@ -31,7 +31,7 @@
         "https://pypi.org/project/rcsb-api/",
         "https://rcsbapi.readthedocs.io/en/latest/index.html"
     ],
-    "softwareRequirements": "https://github.com/rcsb/py-rcsb-api/blob/master/requirements.txt",
+    "softwareRequirements": "https://github.com/rcsb/py-rcsb-api/blob/master/pyproject.toml",
     "version": "1.1.2",
     "codemeta:contIntegration": {
         "id": "https://dev.azure.com/rcsb/RCSB%20PDB%20Python%20Projects/_build/latest?definitionId=40&branchName=master"

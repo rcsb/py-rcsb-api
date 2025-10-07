@@ -56,10 +56,10 @@ jobs:
     - script: "python -c \"import sys; print(sys.version); print(sys.executable)\""
       displayName: show python information
     #
-    - script: python -m pip install --upgrade pip tox
+    - script: python -m pip install --upgrade pip tox build
       displayName: 'Install tools'
       #
-    - script: pip install -r requirements.txt
+    - script: pip install .[tests]
       displayName: 'Install dependencies'
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
