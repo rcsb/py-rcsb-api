@@ -12,7 +12,10 @@ Example:
     # Override the default warning suppression flag
     config.SUPPRESS_AUTOCOMPLETE_WARNING = True
 """
+from __future__ import annotations
+
 import logging
+from pydoc import locate
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -40,7 +43,7 @@ class Config:
             raise AttributeError(f"'{name}' is not a valid attribute of Config class")
 
         # Enforce consistent typing
-        expected_type = self.__annotations__.get(name, None)
+        expected_type = locate(self.__annotations__.get(name, None))
         if expected_type and not isinstance(value, expected_type):
             raise TypeError(f"Expected type '{expected_type.__name__}' for attribute '{name}', but got '{type(value).__name__}'")
         super().__setattr__(name, value)
