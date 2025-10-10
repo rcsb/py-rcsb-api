@@ -3713,7 +3713,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1759276800000.0,
+                    "rcsb_current_maximum_value": 1759881600000.0,
                     "rcsb_current_minimum_value": 105235200000.0
                 },
                 "release_status": {
@@ -5003,8 +5003,8 @@
                         },
                         "additionalProperties": false
                     },
-                    "minItems": 1,
                     "uniqueItems": true,
+                    "minItems": 1,
                     "rcsb_nested_indexing": true
                 }
             },
@@ -5160,8 +5160,9 @@
     "required": [
         "rcsb_id"
     ],
+    "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-dw-col-core_drugbank.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Chemical Text Service Metadata",
     "description": "",
-    "$comment": "Schema version: 1.52.1"
+    "$comment": "Schema version: 1.53.0"
 }

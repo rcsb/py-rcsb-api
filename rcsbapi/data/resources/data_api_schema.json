@@ -762,7 +762,7 @@
                         },
                         {
                             "name": "pdbx_struct_oper_list_ids",
-                            "description": "Optional list of operator ids (pdbx_struct_oper_list.id) as appears in pdbx_struct_assembly_gen.oper_expression. One operator id per operand in the expression (most cases have only 1 operator). If it's not given then identity operator is assumed.",
+                            "description": "Optional list of operator ids (pdbx_struct_oper_list.id) as appears in pdbx_struct_assembly_gen.oper_expression.",
                             "args": [],
                             "type": {
                                 "kind": "LIST",
@@ -1199,9 +1199,13 @@
                             "description": null,
                             "args": [],
                             "type": {
-                                "kind": "OBJECT",
-                                "name": "RcsbBranchedEntityContainerIdentifiers",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "RcsbBranchedEntityContainerIdentifiers",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -4014,9 +4018,13 @@
                             "description": null,
                             "args": [],
                             "type": {
-                                "kind": "OBJECT",
-                                "name": "RcsbNonpolymerEntityContainerIdentifiers",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "OBJECT",
+                                    "name": "RcsbNonpolymerEntityContainerIdentifiers",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -4608,7 +4616,7 @@
                         },
                         {
                             "name": "rcsb_cluster_flexibility",
-                            "description": "Indicates intrinsic flexibility of protein structures determined from structural variations between different depositions and chains in asymmetric units of the same protein in PDB (95% sequence identity).",
+                            "description": null,
                             "args": [],
                             "type": {
                                 "kind": "OBJECT",
@@ -4712,7 +4720,7 @@
                         },
                         {
                             "name": "rcsb_membrane_lineage",
-                            "description": "Members of the membrane protein classification lineage.",
+                            "description": null,
                             "args": [],
                             "type": {
                                 "kind": "LIST",
@@ -4728,7 +4736,7 @@
                         },
                         {
                             "name": "rcsb_membrane_lineage_provenance_code",
-                            "description": "Mpstruc keyword denotes original annotation, Homology keyword denotes annotation inferred by homology.\n\nAllowable values:\nMpstruc, Homology\n",
+                            "description": "Mpstruc keyword denotes original annotation, Homology keyword denotes annotation inferred by homology.\n\nAllowable values:\nHomology, Mpstruc\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -19433,7 +19441,7 @@
                         },
                         {
                             "name": "provenance_source",
-                            "description": "Code identifying the individual, organization or program that\n assigned the annotation.\n\nExamples:\nMCSA\n",
+                            "description": "Code identifying the individual, organization or program that assigned the annotation.\n\nExamples:\nMCSA\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -19630,7 +19638,7 @@
                         },
                         {
                             "name": "feature_positions",
-                            "description": "This container groups together chain-level identifiers of the assigned features.",
+                            "description": null,
                             "args": [],
                             "type": {
                                 "kind": "LIST",
@@ -19658,7 +19666,7 @@
                         },
                         {
                             "name": "provenance_source",
-                            "description": "Code identifying the individual, organization or program that\n assigned the feature.\n\nExamples:\nMCSA\n",
+                            "description": "Code identifying the individual, organization or program that assigned the feature.\n\nExamples:\nMCSA\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -20398,7 +20406,7 @@
                         },
                         {
                             "name": "provenance_code",
-                            "description": "The resource name for the related binding affinity reference.\n\nAllowable values:\nPDBBind, Binding MOAD, BindingDB\n",
+                            "description": "The resource name for the related binding affinity reference.\n\nAllowable values:\nBinding MOAD, BindingDB, PDBBind\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -20414,7 +20422,7 @@
                         },
                         {
                             "name": "reference_sequence_identity",
-                            "description": "Data point provided by BindingDB. Percent identity between PDB sequence and reference sequence.\n\nExamples:\nnull, null, null\n",
+                            "description": "Data point provided by BindingDB. Percent identity between PDB sequence and reference sequence.",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -20438,7 +20446,7 @@
                         },
                         {
                             "name": "type",
-                            "description": "Binding affinity measurement given in one of the following types:  The concentration constants: IC50: the concentration of ligand that reduces enzyme activity by 50%;  EC50: the concentration of compound that generates a half-maximal response;  The binding constant:  Kd: dissociation constant;  Ka: association constant;  Ki: enzyme inhibition constant;  The thermodynamic parameters:  delta G: Gibbs free energy of binding (for association reaction);  delta H: change in enthalpy associated with a chemical reaction;  delta S: change in entropy associated with a chemical reaction.\n\nAllowable values:\nIC50, EC50, Kd, Ka, Ki, &Delta;G, &Delta;H, -T&Delta;S\n",
+                            "description": "Binding affinity measurement given in one of the following types:  The concentration constants: IC50: the concentration of ligand that reduces enzyme activity by 50%;  EC50: the concentration of compound that generates a half-maximal response;  The binding constant:  Kd: dissociation constant;  Ka: association constant;  Ki: enzyme inhibition constant;  The thermodynamic parameters:  delta G: Gibbs free energy of binding (for association reaction);  delta H: change in enthalpy associated with a chemical reaction;  delta S: change in entropy associated with a chemical reaction.\n\nAllowable values:\n&Delta;G, &Delta;H, -T&Delta;S, EC50, IC50, Ka, Kd, Ki\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -21832,9 +21840,13 @@
                             "description": "A type or category of the feature.\n\nAllowable values:\nBINDING_SITE, CATH, ECOD, MOGUL_ANGLE_OUTLIER, MOGUL_BOND_OUTLIER, RSCC_OUTLIER, RSRZ_OUTLIER, SCOP, STEREO_OUTLIER, UNOBSERVED_ATOM_XYZ, UNOBSERVED_RESIDUE_XYZ, ZERO_OCCUPANCY_ATOM_XYZ, ZERO_OCCUPANCY_RESIDUE_XYZ\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -23253,7 +23265,7 @@
                         },
                         {
                             "name": "provenance_code",
-                            "description": "Allowable values: PDBFlex.",
+                            "description": "Provenance code indicating the origin of the flexibility data.\n\nAllowable values:\nPDBFlex\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -23279,9 +23291,13 @@
                             "description": "Identifier for a cluster at the specified level of sequence identity within the cluster data set.",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "Int",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Int",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -23291,9 +23307,13 @@
                             "description": "Sequence identity expressed as an integer percent value.",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "Int",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "Int",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -24805,7 +24825,7 @@
                     "fields": [
                         {
                             "name": "id",
-                            "description": "ID (accession) from external resource linked to this entry.",
+                            "description": "ID (accession) from external resource linked to this entry.\n\nExamples:\n1BMR\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -24821,23 +24841,19 @@
                         },
                         {
                             "name": "link",
-                            "description": "Link to this entry in external resource.",
+                            "description": "Link to this entry in external resource",
                             "args": [],
                             "type": {
-                                "kind": "NON_NULL",
-                                "name": null,
-                                "ofType": {
-                                    "kind": "SCALAR",
-                                    "name": "String",
-                                    "ofType": null
-                                }
+                                "kind": "SCALAR",
+                                "name": "String",
+                                "ofType": null
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
                         },
                         {
                             "name": "type",
-                            "description": "Internal identifier for external resource.\n\nAllowable values:\nOLDERADO, BMRB, NDB, NAKB, SB GRID, PROTEIN DIFFRACTION, EM DATA RESOURCE\n",
+                            "description": "Internal identifier for external resources\n\nAllowable values:\nBMRB, EM DATA RESOURCE, NAKB, NDB, OLDERADO, PROTEIN DIFFRACTION, SB GRID\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -25811,7 +25827,7 @@
                         },
                         {
                             "name": "revision_date",
-                            "description": "The release date of the latest revision item.",
+                            "description": "The release date of the latest revision item.\n\nExamples:\n2020-02-11, 2018-10-23\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -26324,9 +26340,13 @@
                             "description": "A type or category of the annotation.\n\nAllowable values:\nSUBJECT_OF_INVESTIGATION\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -26653,9 +26673,13 @@
                             "description": "A type or category of the feature.\n\nAllowable values:\nSUBJECT_OF_INVESTIGATION\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -27079,9 +27103,13 @@
                             "description": "A type or category of the annotation.\n\nAllowable values:\nHAS_COVALENT_LINKAGE, HAS_METAL_COORDINATION_LINKAGE, HAS_NO_COVALENT_LINKAGE, IS_RSCC_OUTLIER, IS_RSRZ_OUTLIER\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -28435,7 +28463,7 @@
                         },
                         {
                             "name": "length",
-                            "description": "An length of the this segment of the alignment.",
+                            "description": "The length of this segment of the alignment.",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -28565,9 +28593,13 @@
                             "description": "A type or category of the annotation.\n\nAllowable values:\nCARD, GO, GlyCosmos, GlyGen, InterPro, MemProtMD, OPM, PDBTM, Pfam, mpstruc\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -29033,12 +29065,16 @@
                         },
                         {
                             "name": "type",
-                            "description": "A type or category of the feature.\n\nAllowable values:\nCARD_MODEL, IMGT_ANTIBODY_DESCRIPTION, IMGT_ANTIBODY_DOMAIN_NAME, IMGT_ANTIBODY_GENE_ALLELE_NAME, IMGT_ANTIBODY_ORGANISM_NAME, IMGT_ANTIBODY_PROTEIN_NAME, IMGT_ANTIBODY_RECEPTOR_DESCRIPTION, IMGT_ANTIBODY_RECEPTOR_TYPE, Pfam, SABDAB_ANTIBODY_ANTIGEN_NAME, SABDAB_ANTIBODY_NAME, SABDAB_ANTIBODY_TARGET, artifact, modified_monomer, mutation, hydropathy, disorder, disorder_binding\n",
+                            "description": "A type or category of the feature.\n\nAllowable values:\nCARD_MODEL, IMGT_ANTIBODY_DESCRIPTION, IMGT_ANTIBODY_DOMAIN_NAME, IMGT_ANTIBODY_GENE_ALLELE_NAME, IMGT_ANTIBODY_ORGANISM_NAME, IMGT_ANTIBODY_PROTEIN_NAME, IMGT_ANTIBODY_RECEPTOR_DESCRIPTION, IMGT_ANTIBODY_RECEPTOR_TYPE, Pfam, SABDAB_ANTIBODY_ANTIGEN_NAME, SABDAB_ANTIBODY_NAME, SABDAB_ANTIBODY_TARGET, artifact, disorder, disorder_binding, hydropathy, modified_monomer, mutation\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -29371,7 +29407,7 @@
                     "fields": [
                         {
                             "name": "aggregation_method",
-                            "description": "Method used to establish group membership\n\nAllowable values:\nsequence_identity, matching_uniprot_accession\n",
+                            "description": "Method used to establish group membership\n\nAllowable values:\nmatching_uniprot_accession, sequence_identity\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -29454,7 +29490,7 @@
                         },
                         {
                             "name": "length",
-                            "description": "An length of the this segment of the alignment.",
+                            "description": "The length of this segment of the alignment.",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -29967,7 +30003,7 @@
                     "fields": [
                         {
                             "name": "names",
-                            "description": "Protein name annotated by the UniProtKB or macromolecular name assigned by the PDB",
+                            "description": "Protein name annotated by the UniProtKB or macromolecular name assigned by the PDB.",
                             "args": [],
                             "type": {
                                 "kind": "LIST",
@@ -29983,7 +30019,7 @@
                         },
                         {
                             "name": "provenance_source",
-                            "description": "Allowable values: PDB Preferred Name, PDB Description, UniProt Name.",
+                            "description": "Provenance source for the combined protein names.\n\nAllowable values:\nPDB Description, PDB Preferred Name, UniProt Name\n",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",
@@ -30101,9 +30137,13 @@
                             "description": "A type or category of the annotation.\n\nAllowable values:\nCATH, ECOD, GlyGen, SCOP, SCOP2\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -30288,12 +30328,16 @@
                         },
                         {
                             "name": "type",
-                            "description": "A type or category of the feature.\n\nAllowable values:\nANGLE_OUTLIER, ANGLE_OUTLIERS, AVERAGE_OCCUPANCY, BEND, BINDING_SITE, BOND_OUTLIER, BOND_OUTLIERS, C-MANNOSYLATION_SITE, CATH, CHIRAL_OUTLIERS, CIS-PEPTIDE, CLASHES, ECOD, HELIX_P, HELX_LH_PP_P, HELX_RH_3T_P, HELX_RH_AL_P, HELX_RH_PI_P, LIGAND_COVALENT_LINKAGE, LIGAND_INTERACTION, LIGAND_METAL_COORDINATION_LINKAGE, MA_QA_METRIC_LOCAL_TYPE_CONTACT_PROBABILITY, MA_QA_METRIC_LOCAL_TYPE_DISTANCE, MA_QA_METRIC_LOCAL_TYPE_ENERGY, MA_QA_METRIC_LOCAL_TYPE_IPTM, MA_QA_METRIC_LOCAL_TYPE_NORMALIZED_SCORE, MA_QA_METRIC_LOCAL_TYPE_OTHER, MA_QA_METRIC_LOCAL_TYPE_PAE, MA_QA_METRIC_LOCAL_TYPE_PLDDT, MA_QA_METRIC_LOCAL_TYPE_PLDDT_ALL-ATOM, MA_QA_METRIC_LOCAL_TYPE_PLDDT_ALL-ATOM_[0,1], MA_QA_METRIC_LOCAL_TYPE_PLDDT_[0,1], MA_QA_METRIC_LOCAL_TYPE_PTM, MA_QA_METRIC_LOCAL_TYPE_ZSCORE, MEMBRANE_SEGMENT, MOGUL_ANGLE_OUTLIER, MOGUL_ANGLE_OUTLIERS, MOGUL_BOND_OUTLIER, MOGUL_BOND_OUTLIERS, MOGUL_RING_OUTLIERS, MOGUL_TORSION_OUTLIERS, N-GLYCOSYLATION_SITE, NATOMS_EDS, O-GLYCOSYLATION_SITE, OWAB, PLANE_OUTLIERS, Q_SCORE, RAMACHANDRAN_OUTLIER, ROTAMER_OUTLIER, RSCC, RSCC_OUTLIER, RSR, RSRZ, RSRZ_OUTLIER, S-GLYCOSYLATION_SITE, SABDAB_ANTIBODY_HEAVY_CHAIN_SUBCLASS, SABDAB_ANTIBODY_LIGHT_CHAIN_SUBCLASS, SABDAB_ANTIBODY_LIGHT_CHAIN_TYPE, SCOP, SCOP2B_SUPERFAMILY, SCOP2_FAMILY, SCOP2_SUPERFAMILY, SHEET, STEREO_OUTLIER, STRN, SYMM_CLASHES, TURN_TY1_P, UNASSIGNED_SEC_STRUCT, UNOBSERVED_ATOM_XYZ, UNOBSERVED_RESIDUE_XYZ, ZERO_OCCUPANCY_ATOM_XYZ, ZERO_OCCUPANCY_RESIDUE_XYZ, ASA\n",
+                            "description": "A type or category of the feature.\n\nAllowable values:\nANGLE_OUTLIER, ANGLE_OUTLIERS, ASA, AVERAGE_OCCUPANCY, BEND, BINDING_SITE, BOND_OUTLIER, BOND_OUTLIERS, C-MANNOSYLATION_SITE, CATH, CHIRAL_OUTLIERS, CIS-PEPTIDE, CLASHES, ECOD, HELIX_P, HELX_LH_PP_P, HELX_RH_3T_P, HELX_RH_AL_P, HELX_RH_PI_P, LIGAND_COVALENT_LINKAGE, LIGAND_INTERACTION, LIGAND_METAL_COORDINATION_LINKAGE, MA_QA_METRIC_LOCAL_TYPE_CONTACT_PROBABILITY, MA_QA_METRIC_LOCAL_TYPE_DISTANCE, MA_QA_METRIC_LOCAL_TYPE_ENERGY, MA_QA_METRIC_LOCAL_TYPE_IPTM, MA_QA_METRIC_LOCAL_TYPE_NORMALIZED_SCORE, MA_QA_METRIC_LOCAL_TYPE_OTHER, MA_QA_METRIC_LOCAL_TYPE_PAE, MA_QA_METRIC_LOCAL_TYPE_PLDDT, MA_QA_METRIC_LOCAL_TYPE_PLDDT_ALL-ATOM, MA_QA_METRIC_LOCAL_TYPE_PLDDT_ALL-ATOM_[0,1], MA_QA_METRIC_LOCAL_TYPE_PLDDT_[0,1], MA_QA_METRIC_LOCAL_TYPE_PTM, MA_QA_METRIC_LOCAL_TYPE_ZSCORE, MEMBRANE_SEGMENT, MOGUL_ANGLE_OUTLIER, MOGUL_ANGLE_OUTLIERS, MOGUL_BOND_OUTLIER, MOGUL_BOND_OUTLIERS, MOGUL_RING_OUTLIERS, MOGUL_TORSION_OUTLIERS, N-GLYCOSYLATION_SITE, NATOMS_EDS, O-GLYCOSYLATION_SITE, OWAB, PLANE_OUTLIERS, Q_SCORE, RAMACHANDRAN_OUTLIER, ROTAMER_OUTLIER, RSCC, RSCC_OUTLIER, RSR, RSRZ, RSRZ_OUTLIER, S-GLYCOSYLATION_SITE, SABDAB_ANTIBODY_HEAVY_CHAIN_SUBCLASS, SABDAB_ANTIBODY_LIGHT_CHAIN_SUBCLASS, SABDAB_ANTIBODY_LIGHT_CHAIN_TYPE, SCOP, SCOP2B_SUPERFAMILY, SCOP2_FAMILY, SCOP2_SUPERFAMILY, SHEET, STEREO_OUTLIER, STRN, SYMM_CLASHES, TURN_TY1_P, UNASSIGNED_SEC_STRUCT, UNOBSERVED_ATOM_XYZ, UNOBSERVED_RESIDUE_XYZ, ZERO_OCCUPANCY_ATOM_XYZ, ZERO_OCCUPANCY_RESIDUE_XYZ\n",
                             "args": [],
                             "type": {
-                                "kind": "SCALAR",
-                                "name": "String",
-                                "ofType": null
+                                "kind": "NON_NULL",
+                                "name": null,
+                                "ofType": {
+                                    "kind": "SCALAR",
+                                    "name": "String",
+                                    "ofType": null
+                                }
                             },
                             "isDeprecated": false,
                             "deprecationReason": null
@@ -31516,7 +31560,7 @@
                     "fields": [
                         {
                             "name": "clusters",
-                            "description": "Clusters describe grouping of 'identical' subunits.",
+                            "description": "Clusters describe grouping of identical subunits.",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -31536,7 +31580,7 @@
                         },
                         {
                             "name": "kind",
-                            "description": "The granularity at which the symmetry calculation is performed. In 'Global Symmetry' all polymeric subunits in assembly are used. In 'Local Symmetry' only a subset of polymeric subunits is considered. In 'Pseudo Symmetry' the threshold for subunits similarity is relaxed.\n\nAllowable values:\nGlobal Symmetry, Pseudo Symmetry, Local Symmetry\n",
+                            "description": "The granularity at which the symmetry calculation is performed. In 'Global Symmetry' all polymeric\n subunits in assembly are used. In 'Local Symmetry' only a subset of polymeric subunits is considered.\n In 'Pseudo Symmetry' the threshold for subunits similarity is relaxed.\n\nAllowable values:\nGlobal Symmetry, Local Symmetry, Pseudo Symmetry\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -31552,7 +31596,7 @@
                         },
                         {
                             "name": "oligomeric_state",
-                            "description": "Oligomeric state refers to a composition of polymeric subunits in quaternary structure. Quaternary structure may be composed either exclusively of several copies of identical subunits, in which case they are termed homo-oligomers, or alternatively by at least one copy of different subunits (hetero-oligomers). Quaternary structure composed of a single subunit is denoted as 'Monomer'.\n\nExamples:\nMonomer, Homo 2-mer, Hetero 3-mer\n",
+                            "description": "Oligomeric state refers to a composition of polymeric subunits in quaternary structure.\n Quaternary structure may be composed either exclusively of several copies of identical subunits,\n in which case they are termed homo-oligomers, or alternatively by at least one copy of different\n subunits (hetero-oligomers). Quaternary structure composed of a single subunit is denoted as 'Monomer'.\n\nExamples:\nHomo 2-mer, Homo 2-mer, Hetero 3-mer\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -31584,7 +31628,7 @@
                         },
                         {
                             "name": "stoichiometry",
-                            "description": "Each type of different subunits is assigned a latter. The number of equivalent subunits is added as a coefficient after each letter (except 1 which is not added explicitly).",
+                            "description": "Stoichiometry of a complex represents the quantitative description and composition of its subunits.",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -31604,7 +31648,7 @@
                         },
                         {
                             "name": "symbol",
-                            "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Sch\u00f6nflies notation. Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry.\n\nExamples:\nC1, D3, H\n",
+                            "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Schoenflies notation.\n Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry.\n\nExamples:\nC1, D3, N\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -31620,7 +31664,7 @@
                         },
                         {
                             "name": "type",
-                            "description": "Symmetry type refers to point group or helical symmetry of identical polymeric subunits. Contains point group types (e.g. Cyclic, Dihedral) or Helical for helical symmetry.\n\nAllowable values:\nAsymmetric, Cyclic, Dihedral, Tetrahedral, Octahedral, Icosahedral, Helical\n",
+                            "description": "Symmetry type refers to point group or helical symmetry of identical polymeric subunits.\n Contains point group types (e.g. Cyclic, Dihedral) or Helical for helical symmetry.\n\nAllowable values:\nAsymmetric, Cyclic, Dihedral, Helical, Icosahedral, Octahedral, Tetrahedral\n",
                             "args": [],
                             "type": {
                                 "kind": "NON_NULL",
@@ -31757,7 +31801,7 @@
                         },
                         {
                             "name": "order",
-                            "description": "The number of times (order of rotation) that a subunit can be repeated by a rotation operation, being transformed into a new state indistinguishable from its starting state.",
+                            "description": "The number of times (order of rotation) that a subunit can be repeated by a rotation operation,\n being transformed into a new state indistinguishable from its starting state.",
                             "args": [],
                             "type": {
                                 "kind": "SCALAR",

@@ -555,6 +555,186 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "rcsb_assembly_annotation": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "annotation_id": {
+                        "type": "string",
+                        "description": "An identifier for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "An identifier for the annotation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "assignment_version": {
+                        "type": "string",
+                        "description": "Identifies the version of the annotation assignment.",
+                        "rcsb_description": [
+                            {
+                                "text": "Identifies the version of the annotation assignment.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A description for the annotation.",
+                        "rcsb_description": [
+                            {
+                                "text": "A description for the annotation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "A name for the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A name for the annotation.",
+                                "context": "dictionary"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Assembly Features",
+                                "priority_order": 105
+                            }
+                        ]
+                    },
+                    "provenance_source": {
+                        "type": "string",
+                        "examples": [
+                            "MCSA"
+                        ],
+                        "description": "Code identifying the individual, organization or program that assigned the annotation.",
+                        "rcsb_description": [
+                            {
+                                "text": "Code identifying the individual, organization or program that assigned the annotation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "MCSA"
+                        ],
+                        "description": "A type or category of the annotation.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "MCSA",
+                                "detail": "A set of catalytically active residues according to the M-CSA.",
+                                "name": "Mechanism and Catalytic Site Atlas"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "A type or category of the annotation.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "additional_properties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "enum": [
+                                        "MCSA_MOTIF_COMPATIBILITY"
+                                    ],
+                                    "description": "The additional property name.",
+                                    "rcsb_enum_annotated": [
+                                        {
+                                            "value": "MCSA_MOTIF_COMPATIBILITY",
+                                            "detail": "Internal enum that captures whether a M-CSA motif supports visualization and/or structure motif searching."
+                                        }
+                                    ],
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The additional property name.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "values": {
+                                    "type": "array",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
+                                        ],
+                                        "examples": [
+                                            "SUPPORTED"
+                                        ],
+                                        "description": "The value(s) of the additional property.",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "The value(s) of the additional property.",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true,
+            "rcsb_nested_indexing_context": [
+                {
+                    "category_name": "annotation_type",
+                    "category_path": "rcsb_assembly_annotation.type",
+                    "context_attributes": [
+                        {
+                            "context_value": "MCSA",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        "Glutamate racemase",
+                                        "Leucyl aminopeptidase"
+                                    ],
+                                    "path": "rcsb_assembly_annotation.name"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
         "rcsb_assembly_container_identifiers": {
             "type": "object",
             "properties": {
@@ -600,6 +780,24 @@
                         }
                     ]
                 },
+                "interface_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "examples": [
+                            "1A00-1.1"
+                        ],
+                        "description": "List of binary interface Ids within the assembly (it points to interface id collection).",
+                        "rcsb_description": [
+                            {
+                                "text": "List of binary interface Ids within the assembly (it points to interface id collection).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
                 "rcsb_id": {
                     "type": "string",
                     "examples": [
@@ -616,13 +814,6 @@
                             "context": "dictionary"
                         }
                     ]
-                },
-                "interface_ids": {
-                    "type": "array",
-                    "description": "List of binary interface Ids within the assembly (it points to interface id collection).",
-                    "items": {
-                        "type": "string"
-                    }
                 }
             },
             "additionalProperties": false,
@@ -630,6 +821,233 @@
                 "assembly_id",
                 "entry_id"
             ]
+        },
+        "rcsb_assembly_feature": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "assignment_version": {
+                        "type": "string",
+                        "description": "Identifies the version of the feature assignment.",
+                        "rcsb_description": [
+                            {
+                                "text": "Identifies the version of the feature assignment.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "A description for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "A description for the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "feature_id": {
+                        "type": "string",
+                        "description": "An identifier for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "An identifier for the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "A name for the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "A name for the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "provenance_source": {
+                        "type": "string",
+                        "examples": [
+                            "MCSA"
+                        ],
+                        "description": "Code identifying the individual, organization or program that assigned the feature.",
+                        "rcsb_description": [
+                            {
+                                "text": "Code identifying the individual, organization or program that assigned the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "MCSA"
+                        ],
+                        "description": "A type or category of the feature.",
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "MCSA",
+                                "detail": "A set of catalytically active residues according to the M-CSA.",
+                                "name": "Mechanism and Catalytic Site Atlas"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "A type or category of the feature.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "additional_properties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "enum": [
+                                        "MCSA_MOTIF_COMPATIBILITY"
+                                    ],
+                                    "description": "The additional property name.",
+                                    "rcsb_enum_annotated": [
+                                        {
+                                            "value": "MCSA_MOTIF_COMPATIBILITY",
+                                            "detail": "Internal enum that captures whether a M-CSA motif supports visualization and/or structure motif searching."
+                                        }
+                                    ],
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The additional property name.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "values": {
+                                    "type": "array",
+                                    "items": {
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "integer"
+                                            },
+                                            {
+                                                "type": "number"
+                                            }
+                                        ],
+                                        "examples": [
+                                            "SUPPORTED"
+                                        ],
+                                        "description": "The value(s) of the additional property.",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "The value(s) of the additional property.",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false
+                    },
+                    "feature_positions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "asym_id": {
+                                    "type": "string",
+                                    "examples": [
+                                        "A",
+                                        "B"
+                                    ],
+                                    "description": "An identifier of polymer chain (label_asym_id) corresponding to the feature assignment.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "An identifier of polymer chain (label_asym_id) corresponding to the feature assignment.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "beg_seq_id": {
+                                    "type": "integer",
+                                    "description": "An identifier for the monomer at which this segment of the feature begins.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "An identifier for the monomer at which this segment of the feature begins.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "end_seq_id": {
+                                    "type": "integer",
+                                    "description": "An identifier for the monomer at which this segment of the feature ends.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "An identifier for the monomer at which this segment of the feature ends.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "struct_oper_list": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "examples": [
+                                            "P",
+                                            "63"
+                                        ],
+                                        "description": "Identifies the list of operations from the category pdbx_struct_oper_list. One item in array per operator applied. The order follows how operators are applied.",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "Identifies the list of operations from the category pdbx_struct_oper_list. One item in array per operator applied. The order follows how operators are applied.",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false,
+                                    "minLength": 1,
+                                    "maxLength": 2
+                                },
+                                "values": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number",
+                                        "examples": [
+                                            1.5,
+                                            0.25
+                                        ],
+                                        "description": "The value(s) of the feature over the monomer segment.",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "The value(s) of the feature over the monomer segment.",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "asym_id",
+                                "beg_seq_id",
+                                "struct_oper_list"
+                            ]
+                        },
+                        "uniqueItems": false
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
         },
         "rcsb_assembly_info": {
             "type": "object",
@@ -880,6 +1298,96 @@
                         {
                             "group_name": "Assembly Features",
                             "priority_order": 45
+                        }
+                    ]
+                },
+                "num_heterologous_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of heterologous (both binding sites are different) interface entities",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of heterologous (both binding sites are different) interface entities",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_heteromeric_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of heteromeric (both partners are different polymeric entities) interface entities",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of heteromeric (both partners are different polymeric entities) interface entities",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_homomeric_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of homomeric (both partners are the same polymeric entity) interface entities",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of homomeric (both partners are the same polymeric entity) interface entities",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of polymer-polymer interface entities, grouping equivalent interfaces at the entity level (i.e. same entity_ids on either side, with similar but not identical binding sites)",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of polymer-polymer interface entities, grouping equivalent interfaces at the entity level (i.e. same entity_ids on either side, with similar but not identical binding sites)",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_interfaces": {
+                    "type": "integer",
+                    "description": "Number of geometrically equivalent (i.e. same asym_ids on either side) polymer-polymer interfaces in the assembly",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of geometrically equivalent (i.e. same asym_ids on either side) polymer-polymer interfaces in the assembly",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_isologous_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of isologous (both binding sites are same, i.e. interface is symmetric) interface entities",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of isologous (both binding sites are same, i.e. interface is symmetric) interface entities",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_na_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of nucleic acid-nucleic acid interface entities",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of nucleic acid-nucleic acid interface entities",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_prot_na_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of protein-nucleic acid interface entities",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of protein-nucleic acid interface entities",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "num_protein_interface_entities": {
+                    "type": "integer",
+                    "description": "Number of protein-protein interface entities",
+                    "rcsb_description": [
+                        {
+                            "text": "Number of protein-protein interface entities",
+                            "context": "dictionary"
                         }
                     ]
                 },
@@ -1306,6 +1814,26 @@
                         }
                     ]
                 },
+                "total_assembly_buried_surface_area": {
+                    "type": "number",
+                    "description": "Total buried surface area calculated as the sum of buried surface areas over all interfaces",
+                    "rcsb_description": [
+                        {
+                            "text": "Total buried surface area calculated as the sum of buried surface areas over all interfaces",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "total_number_interface_residues": {
+                    "type": "integer",
+                    "description": "Total number of interfacing residues in the assembly, calculated as the sum of interfacing residues over all interfaces",
+                    "rcsb_description": [
+                        {
+                            "text": "Total number of interfacing residues in the assembly, calculated as the sum of interfacing residues over all interfaces",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
                 "unmodeled_polymer_monomer_count": {
                     "type": "integer",
                     "description": "The number of unmodeled polymer monomers in the assembly coordinate data. This is\n the total count of monomers with unreported coordinate data for all polymer\n entity instances in the generated assembly coordinate data.",
@@ -1328,56 +1856,411 @@
                             "priority_order": 35
                         }
                     ]
-                },
-                "num_interfaces": {
-                    "type": "integer",
-                    "description": "Number of geometrically equivalent (i.e. same asym_ids on either side) polymer-polymer interfaces in the assembly"
-                },
-                "num_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of polymer-polymer interface entities, grouping equivalent interfaces at the entity level (i.e. same entity_ids on either side, with similar but not identical binding sites)"
-                },
-                "num_homomeric_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of homomeric (both partners are the same polymeric entity) interface entities"
-                },
-                "num_heteromeric_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of heteromeric (both partners are different polymeric entities) interface entities"
-                },
-                "num_isologous_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of isologous (both binding sites are same, i.e. interface is symmetric) interface entities"
-                },
-                "num_heterologous_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of heterologous (both binding sites are different) interface entities"
-                },
-                "num_protein_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of protein-protein interface entities"
-                },
-                "num_na_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of nucleic acid-nucleic acid interface entities"
-                },
-                "num_prot-na_interface_entities": {
-                    "type": "integer",
-                    "description": "Number of protein-nucleic acid interface entities"
-                },
-                "total_assembly_buried_surface_area": {
-                    "type": "number",
-                    "description": "Total buried surface area calculated as the sum of buried surface areas over all interfaces"
-                },
-                "total_number_interface_residues": {
-                    "type": "integer",
-                    "description": "Total number of interfacing residues in the assembly, calculated as the sum of interfacing residues over all interfaces"
                 }
             },
             "additionalProperties": false,
             "required": [
                 "entry_id"
             ]
+        },
+        "rcsb_latest_revision": {
+            "type": "object",
+            "properties": {
+                "major_revision": {
+                    "type": "integer",
+                    "description": "The major version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The major version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "minor_revision": {
+                    "type": "integer",
+                    "description": "The minor version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The minor version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "revision_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "examples": [
+                        "2020-02-11",
+                        "2018-10-23"
+                    ],
+                    "description": "The release date of the latest revision item.",
+                    "rcsb_description": [
+                        {
+                            "text": "The release date of the latest revision item.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "rcsb_struct_symmetry": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "kind": {
+                        "type": "string",
+                        "enum": [
+                            "Global Symmetry",
+                            "Local Symmetry",
+                            "Pseudo Symmetry"
+                        ],
+                        "description": "The granularity at which the symmetry calculation is performed. In 'Global Symmetry' all polymeric\n subunits in assembly are used. In 'Local Symmetry' only a subset of polymeric subunits is considered.\n In 'Pseudo Symmetry' the threshold for subunits similarity is relaxed.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "The granularity at which the symmetry calculation is performed. In 'Global Symmetry' all polymeric\n subunits in assembly are used. In 'Local Symmetry' only a subset of polymeric subunits is considered.\n In 'Pseudo Symmetry' the threshold for subunits similarity is relaxed.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Symmetry Class",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Assembly Features",
+                                "priority_order": 100
+                            }
+                        ]
+                    },
+                    "oligomeric_state": {
+                        "type": "string",
+                        "examples": [
+                            "Homo 2-mer",
+                            "Homo 2-mer",
+                            "Hetero 3-mer"
+                        ],
+                        "description": "Oligomeric state refers to a composition of polymeric subunits in quaternary structure.\n Quaternary structure may be composed either exclusively of several copies of identical subunits,\n in which case they are termed homo-oligomers, or alternatively by at least one copy of different\n subunits (hetero-oligomers). Quaternary structure composed of a single subunit is denoted as 'Monomer'.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Oligomeric state refers to a composition of polymeric subunits in quaternary structure.\n Quaternary structure may be composed either exclusively of several copies of identical subunits,\n in which case they are termed homo-oligomers, or alternatively by at least one copy of different\n subunits (hetero-oligomers). Quaternary structure composed of a single subunit is denoted as 'Monomer'.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Oligomeric State",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Assembly Features",
+                                "priority_order": 90
+                            }
+                        ]
+                    },
+                    "stoichiometry": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "description": "Stoichiometry of a complex represents the quantitative description and composition of its subunits.",
+                            "rcsb_description": [
+                                {
+                                    "text": "Stoichiometry of a complex represents the quantitative description and composition of its subunits.",
+                                    "context": "dictionary"
+                                }
+                            ]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                    },
+                    "symbol": {
+                        "type": "string",
+                        "examples": [
+                            "C1",
+                            "D3",
+                            "N"
+                        ],
+                        "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Schoenflies notation.\n Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Schoenflies notation.\n Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Symmetry Symbol",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Assembly Features",
+                                "priority_order": 85
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "Asymmetric",
+                            "Cyclic",
+                            "Dihedral",
+                            "Helical",
+                            "Icosahedral",
+                            "Octahedral",
+                            "Tetrahedral"
+                        ],
+                        "description": "Symmetry type refers to point group or helical symmetry of identical polymeric subunits.\n Contains point group types (e.g. Cyclic, Dihedral) or Helical for helical symmetry.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Symmetry type refers to point group or helical symmetry of identical polymeric subunits.\n Contains point group types (e.g. Cyclic, Dihedral) or Helical for helical symmetry.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Symmetry Type",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Assembly Features",
+                                "priority_order": 95
+                            }
+                        ]
+                    },
+                    "rotation_axes": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "end": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number",
+                                        "description": "coordinate",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "coordinate",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false,
+                                    "minItems": 3,
+                                    "maxItems": 3,
+                                    "description": "Describes x,y,z coordinates of the end point of the symmetry axis."
+                                },
+                                "order": {
+                                    "type": "integer",
+                                    "description": "The number of times (order of rotation) that a subunit can be repeated by a rotation operation,\n being transformed into a new state indistinguishable from its starting state.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The number of times (order of rotation) that a subunit can be repeated by a rotation operation,\n being transformed into a new state indistinguishable from its starting state.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "start": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number",
+                                        "description": "coordinate",
+                                        "rcsb_description": [
+                                            {
+                                                "text": "coordinate",
+                                                "context": "dictionary"
+                                            }
+                                        ]
+                                    },
+                                    "uniqueItems": false,
+                                    "minItems": 3,
+                                    "maxItems": 3,
+                                    "description": "Describes x,y,z coordinates of the start point of the symmetry axis."
+                                }
+                            },
+                            "additionalProperties": false,
+                            "description": "The orientation of the principal rotation (symmetry) axis.",
+                            "required": [
+                                "end",
+                                "start"
+                            ]
+                        },
+                        "uniqueItems": true,
+                        "minItems": 1,
+                        "description": "Specifies a single or multiple rotation axes through the same point."
+                    },
+                    "clusters": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "members": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "asym_id": {
+                                                "type": "string",
+                                                "description": "Internal chain ID used in mmCIF files to uniquely identify structural elements in the asymmetric unit.",
+                                                "rcsb_description": [
+                                                    {
+                                                        "text": "Internal chain ID used in mmCIF files to uniquely identify structural elements in the asymmetric unit.",
+                                                        "context": "dictionary"
+                                                    }
+                                                ]
+                                            },
+                                            "pdbx_struct_oper_list_ids": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                },
+                                                "minItems": 1,
+                                                "description": "Optional list of operator ids (pdbx_struct_oper_list.id) as appears in pdbx_struct_assembly_gen.oper_expression."
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "description": "Subunits that belong to the cluster, identified by asym_id and optionally by assembly operator id(s).",
+                                        "required": [
+                                            "asym_id"
+                                        ]
+                                    },
+                                    "minItems": 1,
+                                    "uniqueItems": true
+                                },
+                                "avg_rmsd": {
+                                    "type": "number",
+                                    "description": "Average RMSD between members of a given cluster.",
+                                    "rcsb_search_context": [
+                                        "default-match"
+                                    ],
+                                    "rcsb_units": "angstroms",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "Average RMSD between members of a given cluster.",
+                                            "context": "dictionary"
+                                        },
+                                        {
+                                            "text": "Average RMSD",
+                                            "context": "brief"
+                                        }
+                                    ]
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "members"
+                            ]
+                        },
+                        "uniqueItems": true,
+                        "minItems": 1,
+                        "description": "Clusters describe grouping of identical subunits."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "clusters",
+                    "kind",
+                    "oligomeric_state",
+                    "stoichiometry",
+                    "symbol",
+                    "type"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true
+        },
+        "rcsb_struct_symmetry_lineage": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "depth": {
+                        "type": "integer",
+                        "description": "Hierarchy depth.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Hierarchy depth.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "id": {
+                        "type": "string",
+                        "examples": [
+                            "Global Symmetry.Cyclic.C2.Homo 2-mer"
+                        ],
+                        "description": "Automatically assigned ID to uniquely identify the symmetry term in the Protein Symmetry Browser.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Automatically assigned ID to uniquely identify the symmetry term in the Protein Symmetry Browser.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Protein Symmetry (Browser ID)",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Assembly Features",
+                                "priority_order": 80
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "examples": [
+                            "Asymmetric",
+                            "Global Symmetry",
+                            "C1",
+                            "Hetero 3-mer"
+                        ],
+                        "description": "A human-readable term describing protein symmetry.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A human-readable term describing protein symmetry.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Symmetry Name",
+                                "context": "brief"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true
         },
         "rcsb_id": {
             "type": "string",
@@ -1396,616 +2279,25 @@
                 }
             ]
         },
-        "rcsb_struct_symmetry": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-                "type": "object",
-                "required": [
-                    "symbol",
-                    "type",
-                    "stoichiometry",
-                    "oligomeric_state",
-                    "clusters",
-                    "kind"
-                ],
-                "properties": {
-                    "symbol": {
-                        "type": "string",
-                        "examples": [
-                            "C1",
-                            "D3",
-                            "H"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Symmetry Symbol",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Assembly Features",
-                                "priority_order": 100
-                            }
-                        ],
-                        "description": "Symmetry symbol refers to point group or helical symmetry of identical polymeric subunits in Sch\u00f6nflies notation. Contains point group symbol (e.g., C2, C5, D2, T, O, I) or H for helical symmetry."
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "Asymmetric",
-                            "Cyclic",
-                            "Dihedral",
-                            "Tetrahedral",
-                            "Octahedral",
-                            "Icosahedral",
-                            "Helical"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Symmetry Type",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Assembly Features",
-                                "priority_order": 115
-                            }
-                        ],
-                        "description": "Symmetry type refers to point group or helical symmetry of identical polymeric subunits. Contains point group types (e.g. Cyclic, Dihedral) or Helical for helical symmetry."
-                    },
-                    "stoichiometry": {
-                        "type": "array",
-                        "minItems": 1,
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "string",
-                            "description": "Each type of different subunits is assigned a latter. The number of equivalent subunits is added as a coefficient after each letter (except 1 which is not added explicitly)."
-                        },
-                        "description": "Stoichiometry of a complex represents the quantitative description and composition of its subunits."
-                    },
-                    "oligomeric_state": {
-                        "type": "string",
-                        "examples": [
-                            "Monomer",
-                            "Homo 2-mer",
-                            "Hetero 3-mer"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Oligomeric State",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Assembly Features",
-                                "priority_order": 110
-                            }
-                        ],
-                        "description": "Oligomeric state refers to a composition of polymeric subunits in quaternary structure. Quaternary structure may be composed either exclusively of several copies of identical subunits, in which case they are termed homo-oligomers, or alternatively by at least one copy of different subunits (hetero-oligomers). Quaternary structure composed of a single subunit is denoted as 'Monomer'."
-                    },
-                    "clusters": {
-                        "type": "array",
-                        "minItems": 1,
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "object",
-                            "required": [
-                                "members"
-                            ],
-                            "properties": {
-                                "members": {
-                                    "type": "array",
-                                    "minItems": 1,
-                                    "uniqueItems": true,
-                                    "items": {
-                                        "type": "object",
-                                        "description": "Subunits that belong to the cluster, identified by asym_id and optionally by assembly operator id(s).",
-                                        "required": [
-                                            "asym_id"
-                                        ],
-                                        "properties": {
-                                            "asym_id": {
-                                                "type": "string",
-                                                "description": "Internal chain ID used in mmCIF files to uniquely identify structural elements in the asymmetric unit."
-                                            },
-                                            "pdbx_struct_oper_list_ids": {
-                                                "type": "array",
-                                                "minItems": 1,
-                                                "items": {
-                                                    "type": "string"
-                                                },
-                                                "description": "Optional list of operator ids (pdbx_struct_oper_list.id) as appears in pdbx_struct_assembly_gen.oper_expression. One operator id per operand in the expression (most cases have only 1 operator). If it's not given then identity operator is assumed."
-                                            }
-                                        },
-                                        "additionalProperties": false
-                                    }
-                                },
-                                "avg_rmsd": {
-                                    "type": "number",
-                                    "rcsb_search_context": [
-                                        "default-match"
-                                    ],
-                                    "rcsb_units": "angstroms",
-                                    "rcsb_description": [
-                                        {
-                                            "text": "Average RMSD",
-                                            "context": "brief"
-                                        }
-                                    ],
-                                    "description": "Average RMSD between members of a given cluster."
-                                }
-                            },
-                            "additionalProperties": false
-                        },
-                        "description": "Clusters describe grouping of 'identical' subunits."
-                    },
-                    "rotation_axes": {
-                        "type": "array",
-                        "minItems": 1,
-                        "uniqueItems": true,
-                        "items": {
-                            "type": "object",
-                            "required": [
-                                "start",
-                                "end"
-                            ],
-                            "properties": {
-                                "start": {
-                                    "type": "array",
-                                    "minItems": 3,
-                                    "maxItems": 3,
-                                    "items": {
-                                        "type": "number",
-                                        "description": "coordinate"
-                                    },
-                                    "description": "Describes x,y,z coordinate of the start point of the symmetry axis."
-                                },
-                                "end": {
-                                    "type": "array",
-                                    "minItems": 3,
-                                    "maxItems": 3,
-                                    "items": {
-                                        "type": "number",
-                                        "description": "coordinate"
-                                    },
-                                    "description": "Describes x,y,z coordinates of the end point of the symmetry axis."
-                                },
-                                "order": {
-                                    "type": "integer",
-                                    "description": "The number of times (order of rotation) that a subunit can be repeated by a rotation operation, being transformed into a new state indistinguishable from its starting state."
-                                }
-                            },
-                            "additionalProperties": false,
-                            "description": "The orientation of the principal rotation (symmetry) axis."
-                        },
-                        "description": "Specifies a single or multiple rotation axes through the same point."
-                    },
-                    "kind": {
-                        "type": "string",
-                        "enum": [
-                            "Global Symmetry",
-                            "Pseudo Symmetry",
-                            "Local Symmetry"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Symmetry Class",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Assembly Features",
-                                "priority_order": 120
-                            }
-                        ],
-                        "description": "The granularity at which the symmetry calculation is performed. In 'Global Symmetry' all polymeric subunits in assembly are used. In 'Local Symmetry' only a subset of polymeric subunits is considered. In 'Pseudo Symmetry' the threshold for subunits similarity is relaxed."
-                    }
-                },
-                "additionalProperties": false
-            },
-            "rcsb_nested_indexing": true
-        },
         "rcsb_struct_symmetry_provenance_code": {
             "type": "string",
-            "description": "The title and version of software package used for symmetry calculations."
-        },
-        "rcsb_struct_symmetry_lineage": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "examples": [
-                            "Global Symmetry.Cyclic.C2.Homo 2-mer"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Protein Symmetry (Browser ID)",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Assembly Features",
-                                "priority_order": 125
-                            }
-                        ],
-                        "description": "Automatically assigned ID to uniquely identify the symmetry term in the Protein Symmetry Browser."
-                    },
-                    "name": {
-                        "type": "string",
-                        "examples": [
-                            "Asymmetric",
-                            "Global Symmetry",
-                            "C1",
-                            "Hetero 3-mer"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Symmetry Name",
-                                "context": "brief"
-                            }
-                        ],
-                        "description": "A human-readable term describing protein symmetry."
-                    },
-                    "depth": {
-                        "type": "integer",
-                        "description": "Hierarchy depth.",
-                        "rcsb_search_context": [
-                            "default-match"
-                        ]
-                    }
-                },
-                "additionalProperties": false
-            },
-            "rcsb_nested_indexing": true
-        },
-        "rcsb_assembly_feature": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "assignment_version": {
-                        "type": "string",
-                        "description": "Identifies the version of the feature assignment."
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "A description for the feature."
-                    },
-                    "feature_id": {
-                        "type": "string",
-                        "description": "An identifier for the feature."
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "A name for the feature."
-                    },
-                    "provenance_source": {
-                        "type": "string",
-                        "examples": [
-                            "MCSA"
-                        ],
-                        "description": "Code identifying the individual, organization or program that\n assigned the feature."
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "MCSA"
-                        ],
-                        "description": "A type or category of the feature.",
-                        "rcsb_enum_annotated": [
-                            {
-                                "value": "MCSA",
-                                "detail": "A set of catalytically active residues according to the M-CSA.",
-                                "name": "Mechanism and Catalytic Site Atlas"
-                            }
-                        ]
-                    },
-                    "feature_positions": {
-                        "type": "array",
-                        "description": "This container groups together chain-level identifiers of the assigned features.",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "beg_seq_id": {
-                                    "type": "integer",
-                                    "description": "An identifier for the monomer at which this segment of the feature begins."
-                                },
-                                "end_seq_id": {
-                                    "type": "integer",
-                                    "description": "An identifier for the monomer at which this segment of the feature ends."
-                                },
-                                "values": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "number",
-                                        "examples": [
-                                            1.5,
-                                            0.25
-                                        ],
-                                        "description": "The value(s) of the feature over the monomer segment."
-                                    },
-                                    "uniqueItems": false
-                                },
-                                "asym_id": {
-                                    "type": "string",
-                                    "examples": [
-                                        "A",
-                                        "B"
-                                    ],
-                                    "description": "An identifier of polymer chain (label_asym_id) corresponding to the feature assignment."
-                                },
-                                "struct_oper_list": {
-                                    "type": "array",
-                                    "description": "pdbx_struct_oper_list_ids of the chain instance.",
-                                    "items": {
-                                        "type": "string",
-                                        "maxLength": 2,
-                                        "minLength": 1,
-                                        "examples": [
-                                            [
-                                                "1"
-                                            ],
-                                            [
-                                                "P",
-                                                "63"
-                                            ]
-                                        ],
-                                        "description": "Identifies the list of operations from the category pdbx_struct_oper_list. One item in array per operator applied. The order follows how operators are applied."
-                                    }
-                                }
-                            },
-                            "additionalProperties": false,
-                            "required": [
-                                "beg_seq_id",
-                                "asym_id",
-                                "struct_oper_list"
-                            ]
-                        },
-                        "uniqueItems": false
-                    },
-                    "additional_properties": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "name": {
-                                    "type": "string",
-                                    "enum": [
-                                        "MCSA_MOTIF_COMPATIBILITY"
-                                    ],
-                                    "description": "The additional property name.",
-                                    "rcsb_enum_annotated": [
-                                        {
-                                            "value": "MCSA_MOTIF_COMPATIBILITY",
-                                            "detail": "Internal enum that captures whether a M-CSA motif supports visualization and/or structure motif searching."
-                                        }
-                                    ]
-                                },
-                                "values": {
-                                    "type": "array",
-                                    "items": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "integer"
-                                            },
-                                            {
-                                                "type": "number"
-                                            }
-                                        ],
-                                        "examples": [
-                                            "SUPPORTED"
-                                        ],
-                                        "description": "The value(s) of the additional property."
-                                    },
-                                    "uniqueItems": false
-                                }
-                            },
-                            "additionalProperties": false
-                        },
-                        "uniqueItems": false
-                    }
-                },
-                "additionalProperties": false
-            },
-            "minItems": 1,
-            "uniqueItems": true
-        },
-        "rcsb_assembly_annotation": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "annotation_id": {
-                        "type": "string",
-                        "description": "An identifier for the annotation.",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_full_text_priority": 10,
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Assembly Features",
-                                "priority_order": 100
-                            }
-                        ]
-                    },
-                    "assignment_version": {
-                        "type": "string",
-                        "description": "Identifies the version of the annotation assignment."
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "A description for the annotation."
-                    },
-                    "name": {
-                        "type": "string",
-                        "description": "A name for the annotation.",
-                        "rcsb_search_context": [
-                            "exact-match",
-                            "full-text"
-                        ],
-                        "rcsb_full_text_priority": 10,
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Assembly Features",
-                                "priority_order": 105
-                            }
-                        ]
-                    },
-                    "provenance_source": {
-                        "type": "string",
-                        "examples": [
-                            "MCSA"
-                        ],
-                        "description": "Code identifying the individual, organization or program that\n assigned the annotation."
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "MCSA"
-                        ],
-                        "description": "A type or category of the annotation.",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_full_text_priority": 10,
-                        "rcsb_enum_annotated": [
-                            {
-                                "value": "MCSA",
-                                "detail": "A set of catalytically active residues according to the M-CSA.",
-                                "name": "Mechanism and Catalytic Site Atlas"
-                            }
-                        ]
-                    },
-                    "additional_properties": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "name": {
-                                    "type": "string",
-                                    "enum": [
-                                        "MCSA_MOTIF_COMPATIBILITY"
-                                    ],
-                                    "description": "The additional property name.",
-                                    "rcsb_enum_annotated": [
-                                        {
-                                            "value": "MCSA_MOTIF_COMPATIBILITY",
-                                            "detail": "Internal enum that captures whether a M-CSA motif supports visualization and/or structure motif searching."
-                                        }
-                                    ]
-                                },
-                                "values": {
-                                    "type": "array",
-                                    "items": {
-                                        "anyOf": [
-                                            {
-                                                "type": "string"
-                                            },
-                                            {
-                                                "type": "integer"
-                                            },
-                                            {
-                                                "type": "number"
-                                            }
-                                        ],
-                                        "examples": [
-                                            "SUPPORTED"
-                                        ],
-                                        "description": "The value(s) of the additional property."
-                                    },
-                                    "uniqueItems": false
-                                }
-                            },
-                            "additionalProperties": false
-                        },
-                        "uniqueItems": false
-                    }
-                },
-                "additionalProperties": false
-            },
-            "minItems": 1,
-            "uniqueItems": true,
-            "rcsb_nested_indexing": true,
-            "rcsb_nested_indexing_context": [
+            "description": "The title and version of software package used for symmetry calculations.",
+            "rcsb_description": [
                 {
-                    "category_name": "annotation_type",
-                    "category_path": "rcsb_assembly_annotation.type",
-                    "context_attributes": [
-                        {
-                            "context_value": "MCSA",
-                            "attributes": [
-                                {
-                                    "examples": [
-                                        "Glutamate racemase",
-                                        "Leucyl aminopeptidase"
-                                    ],
-                                    "path": "rcsb_assembly_annotation.name"
-                                }
-                            ]
-                        }
-                    ]
+                    "text": "The title and version of software package used for symmetry calculations.",
+                    "context": "dictionary"
                 }
             ]
-        },
-        "rcsb_latest_revision": {
-            "type": "object",
-            "properties": {
-                "major_revision": {
-                    "type": "integer",
-                    "description": "The major version number of the latest revision."
-                },
-                "minor_revision": {
-                    "type": "integer",
-                    "description": "The minor version number of the latest revision."
-                },
-                "revision_date": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The release date of the latest revision item."
-                }
-            }
         }
     },
     "additionalProperties": false,
     "required": [
-        "rcsb_id",
-        "rcsb_assembly_container_identifiers"
+        "rcsb_assembly_container_identifiers",
+        "rcsb_id"
     ],
+    "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_assembly.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Core Assembly",
-    "description": "JSON schema for assembly level core data. Combines RCSB Exchange Database schema: json-schema-min-pdbx_core_assembly.json and RCSB Data Warehouse schema: json-schema-core_assembly.json",
-    "$comment": "schema_version: 9.0.0"
+    "title": "schema: pdbx_core collection: pdbx_core_assembly version: 9.1.0",
+    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_assembly version 9.1.0. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_assembly.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 9.1.0"
 }

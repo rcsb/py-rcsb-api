@@ -2580,7 +2580,7 @@
                     "high_resolution": {
                         "type": "number",
                         "examples": [
-                            3
+                            3.0
                         ],
                         "description": "High resolution limit for this shell (angstroms)",
                         "rcsb_search_context": [
@@ -3266,7 +3266,7 @@
                     "average_exposure_time": {
                         "type": "number",
                         "examples": [
-                            2
+                            2.0
                         ],
                         "description": "The average exposure time for each image.",
                         "rcsb_search_context": [
@@ -3776,7 +3776,7 @@
                     "nominal_cs": {
                         "type": "number",
                         "examples": [
-                            2
+                            2.0
                         ],
                         "description": "The spherical aberration coefficient (Cs) in millimeters,\n of the objective lens.",
                         "rcsb_search_context": [
@@ -8629,7 +8629,7 @@
                         "type": "string",
                         "examples": [
                             3.1,
-                            7
+                            7.0
                         ],
                         "description": "The pH at which the NMR data were collected.",
                         "rcsb_description": [
@@ -11816,6 +11816,324 @@
             },
             "additionalProperties": false
         },
+        "rcsb_binding_affinity": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "comp_id": {
+                        "type": "string",
+                        "examples": [
+                            "0WE",
+                            "SPE",
+                            "CL"
+                        ],
+                        "description": "Ligand identifier.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Ligand identifier.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "link": {
+                        "type": "string",
+                        "description": "Link to external resource referencing the data.",
+                        "rcsb_description": [
+                            {
+                                "text": "Link to external resource referencing the data.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "provenance_code": {
+                        "type": "string",
+                        "enum": [
+                            "Binding MOAD",
+                            "BindingDB",
+                            "PDBBind"
+                        ],
+                        "description": "The resource name for the related binding affinity reference.",
+                        "rcsb_description": [
+                            {
+                                "text": "The resource name for the related binding affinity reference.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "reference_sequence_identity": {
+                        "type": "integer",
+                        "description": "Data point provided by BindingDB. Percent identity between PDB sequence and reference sequence.",
+                        "rcsb_description": [
+                            {
+                                "text": "Data point provided by BindingDB. Percent identity between PDB sequence and reference sequence.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "symbol": {
+                        "type": "string",
+                        "examples": [
+                            "~",
+                            "=",
+                            ">",
+                            "<",
+                            ">=",
+                            "<="
+                        ],
+                        "description": "Binding affinity symbol indicating approximate or precise strength of the binding.",
+                        "rcsb_description": [
+                            {
+                                "text": "Binding affinity symbol indicating approximate or precise strength of the binding.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "&Delta;G",
+                            "&Delta;H",
+                            "-T&Delta;S",
+                            "EC50",
+                            "IC50",
+                            "Ka",
+                            "Kd",
+                            "Ki"
+                        ],
+                        "examples": [
+                            "IC50",
+                            "EC50",
+                            "Kd",
+                            "Ka",
+                            "Ki"
+                        ],
+                        "description": "Binding affinity measurement given in one of the following types:  The concentration constants: IC50: the concentration of ligand that reduces enzyme activity by 50%;  EC50: the concentration of compound that generates a half-maximal response;  The binding constant:  Kd: dissociation constant;  Ka: association constant;  Ki: enzyme inhibition constant;  The thermodynamic parameters:  delta G: Gibbs free energy of binding (for association reaction);  delta H: change in enthalpy associated with a chemical reaction;  delta S: change in entropy associated with a chemical reaction.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "&Delta;G",
+                                "detail": "Gibbs free energy of binding (for association reaction)",
+                                "name": "dG",
+                                "units": "kilojoule_per_mole"
+                            },
+                            {
+                                "value": "&Delta;H",
+                                "detail": "Change in enthalpy associated with a chemical reaction",
+                                "name": "dH",
+                                "units": "kilojoule_per_mole"
+                            },
+                            {
+                                "value": "-T&Delta;S",
+                                "detail": "Change in entropy associated with a chemical reaction",
+                                "name": "-TdS",
+                                "units": "kilojoule_per_mole"
+                            },
+                            {
+                                "value": "EC50",
+                                "detail": "The concentration of compound that generates a half-maximal response",
+                                "name": "EC50",
+                                "units": "nanomole"
+                            },
+                            {
+                                "value": "IC50",
+                                "detail": "The concentration of ligand that reduces enzyme activity by 50%",
+                                "name": "IC50",
+                                "units": "nanomole"
+                            },
+                            {
+                                "value": "Ka",
+                                "detail": "Association constant",
+                                "name": "Ka",
+                                "units": "per_mole"
+                            },
+                            {
+                                "value": "Kd",
+                                "detail": "Dissociation constant",
+                                "name": "Kd",
+                                "units": "nanomole"
+                            },
+                            {
+                                "value": "Ki",
+                                "detail": "Enzyme inhibition constant",
+                                "name": "Ki",
+                                "units": "nanomole"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Binding affinity measurement given in one of the following types:  The concentration constants: IC50: the concentration of ligand that reduces enzyme activity by 50%;  EC50: the concentration of compound that generates a half-maximal response;  The binding constant:  Kd: dissociation constant;  Ka: association constant;  Ki: enzyme inhibition constant;  The thermodynamic parameters:  delta G: Gibbs free energy of binding (for association reaction);  delta H: change in enthalpy associated with a chemical reaction;  delta S: change in entropy associated with a chemical reaction.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Binding Affinity Type",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "unit": {
+                        "type": "string",
+                        "examples": [
+                            "nM",
+                            "kJ/mol"
+                        ],
+                        "description": "Binding affinity unit.  Dissociation constant Kd is normally in molar units (or millimolar , micromolar, nanomolar, etc).  Association constant Ka is normally expressed in inverse molar units (e.g. M-1).",
+                        "rcsb_description": [
+                            {
+                                "text": "Binding affinity unit.  Dissociation constant Kd is normally in molar units (or millimolar , micromolar, nanomolar, etc).  Association constant Ka is normally expressed in inverse molar units (e.g. M-1).",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "value": {
+                        "type": "number",
+                        "description": "Binding affinity value between a ligand and its target molecule.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Binding affinity value between a ligand and its target molecule.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Binding Affinity Value",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Nonpolymer Molecular Features",
+                                "priority_order": 20
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "comp_id",
+                    "link",
+                    "provenance_code",
+                    "type",
+                    "unit",
+                    "value"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true,
+            "rcsb_nested_indexing_context": [
+                {
+                    "category_name": "binding_affinity_type",
+                    "category_path": "rcsb_binding_affinity.type",
+                    "context_attributes": [
+                        {
+                            "context_value": "IC50",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        0.8,
+                                        14.0
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "EC50",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        0.18,
+                                        23000.0
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "Kd",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        6.5,
+                                        220000.0
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "Ka",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        7.5,
+                                        1700.0
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "Ki",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        4.0,
+                                        390000.0
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "&Delta;G",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        17.2,
+                                        21.4
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "&Delta;H",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        66.9,
+                                        123.0
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        },
+                        {
+                            "context_value": "-T&Delta;S",
+                            "attributes": [
+                                {
+                                    "examples": [
+                                        18.1,
+                                        47.2
+                                    ],
+                                    "path": "rcsb_binding_affinity.value"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
         "rcsb_comp_model_provenance": {
             "type": "object",
             "properties": {
@@ -12149,6 +12467,66 @@
             "required": [
                 "entry_id"
             ]
+        },
+        "rcsb_entry_group_membership": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "aggregation_method": {
+                        "type": "string",
+                        "enum": [
+                            "matching_deposit_group_id"
+                        ],
+                        "description": "Method used to establish group membership",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Method used to establish group membership",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "group_id": {
+                        "type": "string",
+                        "examples": [
+                            "G_1001001"
+                        ],
+                        "description": "A unique identifier for a group of entries",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A unique identifier for a group of entries",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Entry Group ID(s)",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "ID(s) and Keywords",
+                                "priority_order": 60
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "aggregation_method",
+                    "group_id"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true
         },
         "rcsb_entry_info": {
             "type": "object",
@@ -13506,6 +13884,117 @@
             "required": [
                 "structure_determination_methodology"
             ]
+        },
+        "rcsb_external_references": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "examples": [
+                            "1BMR"
+                        ],
+                        "description": "ID (accession) from external resource linked to this entry.",
+                        "rcsb_description": [
+                            {
+                                "text": "ID (accession) from external resource linked to this entry.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "link": {
+                        "type": "string",
+                        "description": "Link to this entry in external resource",
+                        "rcsb_description": [
+                            {
+                                "text": "Link to this entry in external resource",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "BMRB",
+                            "EM DATA RESOURCE",
+                            "NAKB",
+                            "NDB",
+                            "OLDERADO",
+                            "PROTEIN DIFFRACTION",
+                            "SB GRID"
+                        ],
+                        "examples": [
+                            "OLDERADO"
+                        ],
+                        "description": "Internal identifier for external resources",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_enum_annotated": [
+                            {
+                                "value": "BMRB",
+                                "detail": "A Repository for data from NMR spectroscopy on proteins, peptides, nucleic acids, and other biomolecules",
+                                "name": "BMRB"
+                            },
+                            {
+                                "value": "EM DATA RESOURCE",
+                                "detail": "Global resource for 3-dimensional Electron Microscopy (3DEM) structure data",
+                                "name": "EMDataResource"
+                            },
+                            {
+                                "value": "NAKB",
+                                "detail": "Three-dimensional structural information about nucleic acids",
+                                "name": "NAKB"
+                            },
+                            {
+                                "value": "NDB",
+                                "detail": "Three-dimensional structural information about nucleic acids",
+                                "name": "NDB"
+                            },
+                            {
+                                "value": "OLDERADO",
+                                "detail": "OLDERADO provides analysis of clustering and domain composition for NMR structure ensembles",
+                                "name": "OLDERADO"
+                            },
+                            {
+                                "value": "PROTEIN DIFFRACTION",
+                                "detail": "Integrated resource for reproducibility in macromolecular crystallography",
+                                "name": "Protein Diffraction"
+                            },
+                            {
+                                "value": "SB GRID",
+                                "detail": "Supports publication of X-ray diffraction, MicroED, LLSM datasets, as well as structural models",
+                                "name": "SBGrid"
+                            }
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Internal identifier for external resources",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Experimental Data Resource",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Linked External Resources",
+                                "priority_order": 5
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "type"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
         },
         "rcsb_ihm_dataset_list": {
             "type": "array",
@@ -17663,430 +18152,17 @@
                     "context": "dictionary"
                 }
             ]
-        },
-        "rcsb_entry_group_membership": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "group_id",
-                    "aggregation_method"
-                ],
-                "properties": {
-                    "group_id": {
-                        "type": "string",
-                        "examples": [
-                            "G_1001001"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "description": "A unique identifier for a group of entries",
-                        "rcsb_description": [
-                            {
-                                "text": "Entry Group ID(s)",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "ID(s) and Keywords",
-                                "priority_order": 100
-                            }
-                        ]
-                    },
-                    "aggregation_method": {
-                        "type": "string",
-                        "enum": [
-                            "matching_deposit_group_id"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "description": "Method used to establish group membership"
-                    }
-                },
-                "additionalProperties": false
-            },
-            "minItems": 1,
-            "uniqueItems": true,
-            "rcsb_nested_indexing": true
-        },
-        "rcsb_external_references": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "id",
-                    "type",
-                    "link"
-                ],
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "description": "ID (accession) from external resource linked to this entry."
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "OLDERADO",
-                            "BMRB",
-                            "NDB",
-                            "NAKB",
-                            "SB GRID",
-                            "PROTEIN DIFFRACTION",
-                            "EM DATA RESOURCE"
-                        ],
-                        "rcsb_enum_annotated": [
-                            {
-                                "value": "OLDERADO",
-                                "name": "OLDERADO",
-                                "detail": "OLDERADO provides analysis of clustering and domain composition for NMR structure ensembles"
-                            },
-                            {
-                                "value": "BMRB",
-                                "name": "BMRB",
-                                "detail": "A Repository for data from NMR spectroscopy on proteins, peptides, nucleic acids, and other biomolecules"
-                            },
-                            {
-                                "value": "EM DATA RESOURCE",
-                                "name": "EMDataResource",
-                                "detail": "Global resource for 3-dimensional Electron Microscopy (3DEM) structure data"
-                            },
-                            {
-                                "value": "NDB",
-                                "name": "NDB",
-                                "detail": "Three-dimensional structural information about nucleic acids"
-                            },
-                            {
-                                "value": "NAKB",
-                                "name": "NAKB",
-                                "detail": "Three-dimensional structural information about nucleic acids"
-                            },
-                            {
-                                "value": "PROTEIN DIFFRACTION",
-                                "name": "Protein Diffraction",
-                                "detail": "Integrated resource for reproducibility in macromolecular crystallography"
-                            },
-                            {
-                                "value": "SB GRID",
-                                "name": "SBGrid",
-                                "detail": "Supports publication of X-ray diffraction, MicroED, LLSM datasets, as well as structural models"
-                            }
-                        ],
-                        "description": "Internal identifier for external resource.",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Experimental Data Resource",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Linked External Resources",
-                                "priority_order": 5
-                            }
-                        ]
-                    },
-                    "link": {
-                        "type": "string",
-                        "description": "Link to this entry in external resource."
-                    }
-                },
-                "minItems": 1,
-                "uniqueItems": true,
-                "additionalProperties": false
-            }
-        },
-        "rcsb_binding_affinity": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "comp_id",
-                    "type",
-                    "value",
-                    "unit",
-                    "link",
-                    "provenance_code"
-                ],
-                "properties": {
-                    "comp_id": {
-                        "type": "string",
-                        "examples": [
-                            "0WE",
-                            "SPE",
-                            "CL"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "description": "Ligand identifier."
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "IC50",
-                            "EC50",
-                            "Kd",
-                            "Ka",
-                            "Ki",
-                            "&Delta;G",
-                            "&Delta;H",
-                            "-T&Delta;S"
-                        ],
-                        "rcsb_enum_annotated": [
-                            {
-                                "value": "IC50",
-                                "name": "IC50",
-                                "detail": "The concentration of ligand that reduces enzyme activity by 50%",
-                                "units": "nanomole"
-                            },
-                            {
-                                "value": "EC50",
-                                "name": "EC50",
-                                "detail": "The concentration of compound that generates a half-maximal response",
-                                "units": "nanomole"
-                            },
-                            {
-                                "value": "Kd",
-                                "name": "Kd",
-                                "detail": "Dissociation constant",
-                                "units": "nanomole"
-                            },
-                            {
-                                "value": "Ka",
-                                "name": "Ka",
-                                "detail": "Association constant",
-                                "units": "per_mole"
-                            },
-                            {
-                                "value": "Ki",
-                                "name": "Ki",
-                                "detail": "Enzyme inhibition constant",
-                                "units": "nanomole"
-                            },
-                            {
-                                "value": "&Delta;G",
-                                "name": "dG",
-                                "detail": "Gibbs free energy of binding (for association reaction)",
-                                "units": "kilojoule_per_mole"
-                            },
-                            {
-                                "value": "&Delta;H",
-                                "name": "dH",
-                                "detail": "Change in enthalpy associated with a chemical reaction",
-                                "units": "kilojoule_per_mole"
-                            },
-                            {
-                                "value": "-T&Delta;S",
-                                "name": "-TdS",
-                                "detail": "Change in entropy associated with a chemical reaction",
-                                "units": "kilojoule_per_mole"
-                            }
-                        ],
-                        "examples": [
-                            "IC50",
-                            "EC50",
-                            "Kd",
-                            "Ka",
-                            "Ki"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Binding Affinity Type",
-                                "context": "brief"
-                            }
-                        ],
-                        "description": "Binding affinity measurement given in one of the following types:  The concentration constants: IC50: the concentration of ligand that reduces enzyme activity by 50%;  EC50: the concentration of compound that generates a half-maximal response;  The binding constant:  Kd: dissociation constant;  Ka: association constant;  Ki: enzyme inhibition constant;  The thermodynamic parameters:  delta G: Gibbs free energy of binding (for association reaction);  delta H: change in enthalpy associated with a chemical reaction;  delta S: change in entropy associated with a chemical reaction."
-                    },
-                    "value": {
-                        "type": "number",
-                        "rcsb_search_context": [
-                            "default-match"
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Nonpolymer Molecular Features",
-                                "priority_order": 100
-                            }
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Binding Affinity Value",
-                                "context": "brief"
-                            }
-                        ],
-                        "description": "Binding affinity value between a ligand and its target molecule."
-                    },
-                    "unit": {
-                        "type": "string",
-                        "examples": [
-                            "nM",
-                            "kJ/mol"
-                        ],
-                        "description": "Binding affinity unit.  Dissociation constant Kd is normally in molar units (or millimolar , micromolar, nanomolar, etc).  Association constant Ka is normally expressed in inverse molar units (e.g. M-1)."
-                    },
-                    "symbol": {
-                        "type": "string",
-                        "examples": [
-                            "~",
-                            "=",
-                            ">",
-                            "<",
-                            ">=",
-                            "<="
-                        ],
-                        "description": "Binding affinity symbol indicating approximate or precise strength of the binding."
-                    },
-                    "reference_sequence_identity": {
-                        "type": "integer",
-                        "examples": [
-                            100,
-                            99,
-                            85
-                        ],
-                        "description": "Data point provided by BindingDB. Percent identity between PDB sequence and reference sequence."
-                    },
-                    "provenance_code": {
-                        "type": "string",
-                        "enum": [
-                            "PDBBind",
-                            "Binding MOAD",
-                            "BindingDB"
-                        ],
-                        "description": "The resource name for the related binding affinity reference."
-                    },
-                    "link": {
-                        "type": "string",
-                        "description": "Link to external resource referencing the data."
-                    }
-                },
-                "additionalProperties": false
-            },
-            "minItems": 1,
-            "uniqueItems": true,
-            "rcsb_nested_indexing": true,
-            "rcsb_nested_indexing_context": [
-                {
-                    "category_name": "binding_affinity_type",
-                    "category_path": "rcsb_binding_affinity.type",
-                    "context_attributes": [
-                        {
-                            "context_value": "IC50",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        0.8,
-                                        14
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "EC50",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        0.18,
-                                        23000.0
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "Kd",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        6.5,
-                                        220000.0
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "Ka",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        7.5,
-                                        1700.0
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "Ki",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        4,
-                                        390000.0
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "&Delta;G",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        17.2,
-                                        21.4
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "&Delta;H",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        66.9,
-                                        123
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "context_value": "-T&Delta;S",
-                            "attributes": [
-                                {
-                                    "path": "rcsb_binding_affinity.value",
-                                    "examples": [
-                                        18.1,
-                                        47.2
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
         }
     },
     "additionalProperties": false,
     "required": [
+        "rcsb_entry_container_identifiers",
         "rcsb_entry_info",
-        "rcsb_id",
-        "rcsb_entry_container_identifiers"
+        "rcsb_id"
     ],
+    "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_entry.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Core Entry",
-    "description": "JSON schema for entry level core data. Combines Exchange DB schema: json-schema-min-pdbx_core_entry.json and RCSB Data Warehouse schema: json-schema-core_entry.json",
-    "$comment": "schema_version: 9.0.4"
+    "title": "schema: pdbx_core collection: pdbx_core_entry version: 9.1.0",
+    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_entry version 9.1.0. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_entry.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 9.1.0"
 }

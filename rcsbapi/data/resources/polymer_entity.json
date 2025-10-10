@@ -1,51 +1,6 @@
 {
     "type": "object",
     "properties": {
-        "rcsb_cluster_membership": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "cluster_id": {
-                        "type": "integer",
-                        "description": "Identifier for a cluster at the specified level of sequence identity within the cluster data set.",
-                        "rcsb_search_context": [
-                            "default-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Identifier for a cluster at the specified level of sequence identity within the cluster data set.",
-                                "context": "dictionary"
-                            },
-                            {
-                                "text": "Cluster Identifier",
-                                "context": "brief"
-                            }
-                        ]
-                    },
-                    "identity": {
-                        "type": "integer",
-                        "description": "Sequence identity expressed as an integer percent value.",
-                        "rcsb_search_context": [
-                            "default-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Sequence identity expressed as an integer percent value.",
-                                "context": "dictionary"
-                            },
-                            {
-                                "text": "Cluster Sequence Identity",
-                                "context": "brief"
-                            }
-                        ]
-                    }
-                },
-                "additionalProperties": false
-            },
-            "uniqueItems": false,
-            "rcsb_nested_indexing": true
-        },
         "entity_poly": {
             "type": "object",
             "properties": {
@@ -271,7 +226,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 15
+                            "priority_order": 20
                         }
                     ]
                 },
@@ -304,7 +259,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 25
+                            "priority_order": 30
                         }
                     ]
                 },
@@ -361,7 +316,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 20
+                            "priority_order": 25
                         }
                     ]
                 },
@@ -1574,6 +1529,117 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "rcsb_cluster_flexibility": {
+            "type": "object",
+            "properties": {
+                "avg_rmsd": {
+                    "type": "number",
+                    "description": "Average RMSD refer to average pairwise RMSD (Root Mean Square Deviation of C-alpha atoms) between structures in the cluster (95% sequence identity) where a given entity belongs.",
+                    "rcsb_units": "angstroms",
+                    "rcsb_description": [
+                        {
+                            "text": "Average RMSD refer to average pairwise RMSD (Root Mean Square Deviation of C-alpha atoms) between structures in the cluster (95% sequence identity) where a given entity belongs.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "label": {
+                    "type": "string",
+                    "description": "Structural flexibility in the cluster (95% sequence identity) where a given entity belongs.",
+                    "rcsb_description": [
+                        {
+                            "text": "Structural flexibility in the cluster (95% sequence identity) where a given entity belongs.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "link": {
+                    "type": "string",
+                    "description": "Link to the associated PDBFlex database entry.",
+                    "rcsb_description": [
+                        {
+                            "text": "Link to the associated PDBFlex database entry.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "max_rmsd": {
+                    "type": "number",
+                    "description": "Maximal RMSD refer to maximal pairwise RMSD (Root Mean Square Deviation of C-alpha atoms) between structures in the cluster (95% sequence identity) where a given entity belongs.",
+                    "rcsb_units": "angstroms",
+                    "rcsb_description": [
+                        {
+                            "text": "Maximal RMSD refer to maximal pairwise RMSD (Root Mean Square Deviation of C-alpha atoms) between structures in the cluster (95% sequence identity) where a given entity belongs.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "provenance_code": {
+                    "type": "string",
+                    "enum": [
+                        "PDBFlex"
+                    ],
+                    "description": "Provenance code indicating the origin of the flexibility data.",
+                    "rcsb_description": [
+                        {
+                            "text": "Provenance code indicating the origin of the flexibility data.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "rcsb_cluster_membership": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "cluster_id": {
+                        "type": "integer",
+                        "description": "Identifier for a cluster at the specified level of sequence identity within the cluster data set.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Identifier for a cluster at the specified level of sequence identity within the cluster data set.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Cluster Identifier",
+                                "context": "brief"
+                            }
+                        ]
+                    },
+                    "identity": {
+                        "type": "integer",
+                        "description": "Sequence identity expressed as an integer percent value.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Sequence identity expressed as an integer percent value.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Cluster Sequence Identity",
+                                "context": "brief"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "cluster_id",
+                    "identity"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true
+        },
         "rcsb_entity_host_organism": {
             "type": "array",
             "items": {
@@ -1762,7 +1828,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 85
+                                            "priority_order": 90
                                         }
                                     ]
                                 },
@@ -1792,7 +1858,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 80
+                                            "priority_order": 85
                                         }
                                     ]
                                 }
@@ -1908,7 +1974,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 60
+                                "priority_order": 65
                             }
                         ]
                     },
@@ -1933,7 +1999,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 55
+                                "priority_order": 60
                             }
                         ]
                     },
@@ -2012,7 +2078,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 65
+                                "priority_order": 70
                             }
                         ]
                     },
@@ -2058,7 +2124,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 50
+                                            "priority_order": 55
                                         }
                                     ]
                                 },
@@ -2088,7 +2154,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 45
+                                            "priority_order": 50
                                         }
                                     ]
                                 }
@@ -2143,7 +2209,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 40
+                                            "priority_order": 45
                                         }
                                     ]
                                 }
@@ -2160,6 +2226,168 @@
             },
             "minItems": 1,
             "uniqueItems": true
+        },
+        "rcsb_genomic_lineage": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "depth": {
+                        "type": "integer",
+                        "description": "Classification hierarchy depth.",
+                        "rcsb_description": [
+                            {
+                                "text": "Classification hierarchy depth.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "id": {
+                        "type": "string",
+                        "examples": [
+                            "9606",
+                            "568815441",
+                            "414325"
+                        ],
+                        "description": "Automatically assigned ID that uniquely identifies taxonomy, chromosome or gene in the Genome Location Browser.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Automatically assigned ID that uniquely identifies taxonomy, chromosome or gene in the Genome Location Browser.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Chromosomal Locus (Browser ID)",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Polymer Molecular Features",
+                                "priority_order": 145
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "examples": [
+                            "Homo sapiens",
+                            "8",
+                            "defensin beta 103A"
+                        ],
+                        "description": "A human-readable term name.",
+                        "rcsb_description": [
+                            {
+                                "text": "A human-readable term name.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "rcsb_latest_revision": {
+            "type": "object",
+            "properties": {
+                "major_revision": {
+                    "type": "integer",
+                    "description": "The major version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The major version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "minor_revision": {
+                    "type": "integer",
+                    "description": "The minor version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The minor version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "revision_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "examples": [
+                        "2020-02-11",
+                        "2018-10-23"
+                    ],
+                    "description": "The release date of the latest revision item.",
+                    "rcsb_description": [
+                        {
+                            "text": "The release date of the latest revision item.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
+        "rcsb_membrane_lineage": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "depth": {
+                        "type": "integer",
+                        "description": "Hierarchy depth.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Hierarchy depth.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "id": {
+                        "type": "string",
+                        "examples": [
+                            "MONOTOPIC MEMBRANE PROTEINS.Oxidases.Monoamine Oxidase A"
+                        ],
+                        "description": "Automatically assigned ID for membrane classification term in the Membrane Protein Browser.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Automatically assigned ID for membrane classification term in the Membrane Protein Browser.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Membrane protein classification term.",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Membrane protein classification term.",
+                                "context": "dictionary"
+                            }
+                        ]
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true
         },
         "rcsb_polymer_entity": {
             "type": "object",
@@ -2178,7 +2406,7 @@
                     "type": "number",
                     "examples": [
                         40.0,
-                        105
+                        105.0
                     ],
                     "description": "Formula mass (KDa) of the entity.",
                     "rcsb_search_context": [
@@ -2198,7 +2426,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 30
+                            "priority_order": 35
                         }
                     ]
                 },
@@ -2321,7 +2549,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 70
+                            "priority_order": 75
                         }
                     ]
                 },
@@ -2344,7 +2572,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 75
+                            "priority_order": 80
                         }
                     ]
                 },
@@ -2423,7 +2651,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 90
+                                        "priority_order": 95
                                     }
                                 ]
                             },
@@ -2451,7 +2679,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 95
+                                        "priority_order": 100
                                     }
                                 ]
                             }
@@ -2588,11 +2816,16 @@
                             "type": "array",
                             "items": {
                                 "type": "string",
-                                "description": "Protein name annotated by the UniProtKB or macromolecular name assigned by the PDB",
+                                "description": "Protein name annotated by the UniProtKB or macromolecular name assigned by the PDB.",
                                 "rcsb_search_context": [
                                     "exact-match"
                                 ],
+                                "rcsb_full_text_priority": 10,
                                 "rcsb_description": [
+                                    {
+                                        "text": "Protein name annotated by the UniProtKB or macromolecular name assigned by the PDB.",
+                                        "context": "dictionary"
+                                    },
                                     {
                                         "text": "Polymer Entity Name Combined",
                                         "context": "brief"
@@ -2601,39 +2834,47 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 45
+                                        "priority_order": 15
                                     }
                                 ]
                             },
-                            "minItems": 1,
-                            "uniqueItems": true
+                            "uniqueItems": true,
+                            "minItems": 1
                         },
                         "provenance_source": {
                             "type": "string",
                             "enum": [
-                                "PDB Preferred Name",
                                 "PDB Description",
+                                "PDB Preferred Name",
                                 "UniProt Name"
                             ],
+                            "description": "Provenance source for the combined protein names.",
                             "rcsb_enum_annotated": [
                                 {
-                                    "value": "PDB Preferred Name",
-                                    "name": "PDB Preferred Name",
-                                    "detail": "A description of special aspects of the entity (_rcsb_macromolecular_names_combined.name)"
-                                },
-                                {
                                     "value": "PDB Description",
-                                    "name": "PDB Description",
-                                    "detail": "A description of the entity (_entity.pdbx_description)"
+                                    "detail": "PDB Description",
+                                    "name": "A description of the entity (_entity.pdbx_description)"
                                 },
                                 {
-                                    "value": "UniProt Recommended Name",
-                                    "name": "UniProt Recommended Name",
-                                    "detail": "Full name recommended by the UniProt consortium"
+                                    "value": "PDB Preferred Name",
+                                    "detail": "PDB Preferred Name",
+                                    "name": "A description of special aspects of the entity (_rcsb_macromolecular_names_combined.name)"
+                                },
+                                {
+                                    "value": "UniProt Name",
+                                    "detail": "UniProt Recommended Name",
+                                    "name": "Full name recommended by the UniProt consortium"
+                                }
+                            ],
+                            "rcsb_description": [
+                                {
+                                    "text": "Provenance source for the combined protein names.",
+                                    "context": "dictionary"
                                 }
                             ]
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 }
             },
             "additionalProperties": false
@@ -2727,10 +2968,10 @@
                                 },
                                 "length": {
                                     "type": "integer",
-                                    "description": "An length of the this segment of the alignment.",
+                                    "description": "The length of this segment of the alignment.",
                                     "rcsb_description": [
                                         {
-                                            "text": "An length of the this segment of the alignment.",
+                                            "text": "The length of this segment of the alignment.",
                                             "context": "dictionary"
                                         }
                                     ]
@@ -2781,7 +3022,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 100
+                                "priority_order": 105
                             }
                         ]
                     },
@@ -2842,7 +3083,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 105
+                                "priority_order": 110
                             }
                         ]
                     },
@@ -2992,7 +3233,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 110
+                                            "priority_order": 115
                                         }
                                     ]
                                 },
@@ -3017,7 +3258,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 115
+                                            "priority_order": 120
                                         }
                                     ]
                                 }
@@ -3102,7 +3343,10 @@
                         "uniqueItems": false
                     }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [
+                    "type"
+                ]
             },
             "minItems": 1,
             "uniqueItems": true,
@@ -3363,6 +3607,10 @@
                             {
                                 "text": "Uniprot accession codes assigned to polymeric entities.",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "UniProtKB Accession Number(s)",
+                                "context": "brief"
                             }
                         ]
                     },
@@ -3514,7 +3762,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 135
+                                        "priority_order": 140
                                     }
                                 ]
                             },
@@ -3561,7 +3809,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 130
+                                        "priority_order": 135
                                     }
                                 ]
                             }
@@ -3763,11 +4011,11 @@
                             "SABDAB_ANTIBODY_NAME",
                             "SABDAB_ANTIBODY_TARGET",
                             "artifact",
-                            "modified_monomer",
-                            "mutation",
-                            "hydropathy",
                             "disorder",
-                            "disorder_binding"
+                            "disorder_binding",
+                            "hydropathy",
+                            "modified_monomer",
+                            "mutation"
                         ],
                         "examples": [
                             "mutation",
@@ -3841,6 +4089,21 @@
                                 "name": "Cloning artifact, expression tag, linker"
                             },
                             {
+                                "value": "disorder",
+                                "detail": "Per-residue intrinsic disorder probability",
+                                "name": "Predicted disorder"
+                            },
+                            {
+                                "value": "disorder_binding",
+                                "detail": "Per-residue disorder-to-binding propensity score",
+                                "name": "Predicted binding disorder"
+                            },
+                            {
+                                "value": "hydropathy",
+                                "detail": "Per-residue hydropathy score",
+                                "name": "Hydropathy score"
+                            },
+                            {
                                 "value": "modified_monomer",
                                 "detail": "Modified chemical component",
                                 "name": "Modified chemical component"
@@ -3904,7 +4167,7 @@
                                 "value": {
                                     "type": "number",
                                     "examples": [
-                                        5,
+                                        5.0,
                                         0.25
                                     ],
                                     "description": "The value for the feature over this monomer segment.",
@@ -3920,7 +4183,7 @@
                                     "items": {
                                         "type": "number",
                                         "examples": [
-                                            5,
+                                            5.0,
                                             0.25
                                         ],
                                         "description": "The value(s) for the feature over this monomer segment.",
@@ -4013,7 +4276,10 @@
                         "uniqueItems": false
                     }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [
+                    "type"
+                ]
             },
             "minItems": 1,
             "uniqueItems": true
@@ -4042,7 +4308,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 120
+                                "priority_order": 125
                             }
                         ]
                     },
@@ -4069,7 +4335,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 125
+                                "priority_order": 130
                             }
                         ]
                     },
@@ -4291,6 +4557,121 @@
                     ]
                 }
             ]
+        },
+        "rcsb_polymer_entity_group_membership": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "aggregation_method": {
+                        "type": "string",
+                        "enum": [
+                            "matching_uniprot_accession",
+                            "sequence_identity"
+                        ],
+                        "description": "Method used to establish group membership",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "Method used to establish group membership",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "group_id": {
+                        "type": "string",
+                        "examples": [
+                            "1_100",
+                            "P00003"
+                        ],
+                        "description": "A unique identifier for a group of entities",
+                        "rcsb_search_context": [
+                            "exact-match"
+                        ],
+                        "rcsb_full_text_priority": 10,
+                        "rcsb_description": [
+                            {
+                                "text": "A unique identifier for a group of entities",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Polymer Entity Group ID(s)",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "ID(s) and Keywords",
+                                "priority_order": 65
+                            }
+                        ]
+                    },
+                    "similarity_cutoff": {
+                        "type": "number",
+                        "description": "Degree of similarity expressed as a floating-point number",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "Degree of similarity expressed as a floating-point number",
+                                "context": "dictionary"
+                            }
+                        ]
+                    },
+                    "aligned_regions": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "entity_beg_seq_id": {
+                                    "type": "integer",
+                                    "description": "An identifier for the monomer in the entity sequence at which this segment of the alignment begins.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "An identifier for the monomer in the entity sequence at which this segment of the alignment begins.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "length": {
+                                    "type": "integer",
+                                    "description": "The length of this segment of the alignment.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "The length of this segment of the alignment.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                },
+                                "ref_beg_seq_id": {
+                                    "type": "integer",
+                                    "description": "An identifier for the monomer in the reference sequence at which this segment of the alignment begins.",
+                                    "rcsb_description": [
+                                        {
+                                            "text": "An identifier for the monomer in the reference sequence at which this segment of the alignment begins.",
+                                            "context": "dictionary"
+                                        }
+                                    ]
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "uniqueItems": false
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "aggregation_method",
+                    "group_id"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true,
+            "rcsb_nested_indexing": true
         },
         "rcsb_polymer_entity_keywords": {
             "type": "object",
@@ -4831,253 +5212,29 @@
                 }
             ]
         },
-        "rcsb_polymer_entity_group_membership": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "required": [
-                    "group_id",
-                    "aggregation_method"
-                ],
-                "properties": {
-                    "group_id": {
-                        "type": "string",
-                        "examples": [
-                            "1_100",
-                            "P00003"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "description": "A unique identifier for a group of entities",
-                        "rcsb_description": [
-                            {
-                                "text": "Polymer Entity Group ID(s)",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "ID(s) and Keywords",
-                                "priority_order": 110
-                            }
-                        ]
-                    },
-                    "aggregation_method": {
-                        "type": "string",
-                        "enum": [
-                            "sequence_identity",
-                            "matching_uniprot_accession"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "description": "Method used to establish group membership"
-                    },
-                    "similarity_cutoff": {
-                        "type": "number",
-                        "rcsb_search_context": [
-                            "default-match"
-                        ],
-                        "description": "Degree of similarity expressed as a floating-point number"
-                    },
-                    "aligned_regions": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "entity_beg_seq_id": {
-                                    "type": "integer",
-                                    "description": "An identifier for the monomer in the entity sequence at which this segment of the alignment begins.",
-                                    "rcsb_description": [
-                                        {
-                                            "text": "An identifier for the monomer in the entity sequence at which this segment of the alignment begins.",
-                                            "context": "dictionary"
-                                        }
-                                    ]
-                                },
-                                "length": {
-                                    "type": "integer",
-                                    "description": "An length of the this segment of the alignment.",
-                                    "rcsb_description": [
-                                        {
-                                            "text": "An length of the this segment of the alignment.",
-                                            "context": "dictionary"
-                                        }
-                                    ]
-                                },
-                                "ref_beg_seq_id": {
-                                    "type": "integer",
-                                    "description": "An identifier for the monomer in the reference sequence at which this segment of the alignment begins.",
-                                    "rcsb_description": [
-                                        {
-                                            "text": "An identifier for the monomer in the reference sequence at which this segment of the alignment begins.",
-                                            "context": "dictionary"
-                                        }
-                                    ]
-                                }
-                            },
-                            "additionalProperties": false
-                        },
-                        "uniqueItems": false
-                    }
-                },
-                "additionalProperties": false
-            },
-            "minItems": 1,
-            "uniqueItems": true,
-            "rcsb_nested_indexing": true
-        },
-        "rcsb_genomic_lineage": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "examples": [
-                            "9606",
-                            "568815441",
-                            "414325"
-                        ],
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "rcsb_description": [
-                            {
-                                "text": "Chromosomal Locus (Browser ID)",
-                                "context": "brief"
-                            }
-                        ],
-                        "rcsb_search_group": [
-                            {
-                                "group_name": "Polymer Molecular Features",
-                                "priority_order": 110
-                            }
-                        ],
-                        "description": "Automatically assigned ID that uniquely identifies taxonomy, chromosome or gene in the Genome Location Browser."
-                    },
-                    "name": {
-                        "type": "string",
-                        "examples": [
-                            "Homo sapiens",
-                            "8",
-                            "defensin beta 103A"
-                        ],
-                        "description": "A human-readable term name."
-                    },
-                    "depth": {
-                        "type": "integer",
-                        "description": "Classification hierarchy depth."
-                    }
-                }
-            }
-        },
-        "rcsb_membrane_lineage": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "examples": [
-                            "MONOTOPIC MEMBRANE PROTEINS.Oxidases.Monoamine Oxidase A"
-                        ],
-                        "description": "Automatically assigned ID for membrane classification term in the Membrane Protein Browser."
-                    },
-                    "name": {
-                        "type": "string",
-                        "rcsb_search_context": [
-                            "exact-match"
-                        ],
-                        "description": "Membrane protein classification term."
-                    },
-                    "depth": {
-                        "type": "integer",
-                        "description": "Hierarchy depth.",
-                        "rcsb_search_context": [
-                            "default-match"
-                        ]
-                    }
-                },
-                "additionalProperties": false,
-                "description": "Members of the membrane protein classification lineage."
-            },
-            "rcsb_nested_indexing": true,
-            "description": "Information about integral membrane proteins whose crystallographic, or sometimes NMR or cryo-EM, structures have been determined to a resolution sufficient to identify TM helices of helix-bundle membrane proteins (typically 4 - 4.5 A). Mpstruc provides manually curated information about integral membrane proteins. These manual annotations are extended using sequence clusters and according to the following procedure:Single chain transmembrane proteins: Any PDB chain sharing 90% sequence identity to this transmembrane protein is assigned as a transmembrane protein as well, and shares the same transmembrane annotation.Multi-chain transmembrane proteins:If the reference mpstruc entry contains multiple protein entities, it is necessary to identify which of the entities are presumed to be transmembrane chains. This is done in conjunction with Uniprot annotations. Transmembrane protein entities are identified by checking if their corresponding Uniprot sequence has annotations labeled <i>transmembrane</i> or <i>intramembrane region</i>. For transmembrane entities, all members of the sequence cluster (90% sequence identity) are programmatically infered to be members of the same class of transmembrane proteins by applying the above procedure for single entity mpstruc entries. Annotations are denoned with 'Homology' provenance code."
-        },
         "rcsb_membrane_lineage_provenance_code": {
             "type": "string",
             "enum": [
-                "Mpstruc",
-                "Homology"
+                "Homology",
+                "Mpstruc"
             ],
-            "description": "Mpstruc keyword denotes original annotation, Homology keyword denotes annotation inferred by homology."
-        },
-        "rcsb_cluster_flexibility": {
-            "type": "object",
-            "properties": {
-                "link": {
-                    "type": "string",
-                    "description": "Link to the associated PDBFlex database entry."
-                },
-                "label": {
-                    "type": "string",
-                    "description": "Structural flexibility in the cluster (95% sequence identity) where a given entity belongs."
-                },
-                "avg_rmsd": {
-                    "type": "number",
-                    "rcsb_units": "angstroms",
-                    "description": "Average RMSD refer to average pairwise RMSD (Root Mean Square Deviation of C-alpha atoms) between structures in the cluster (95% sequence identity) where a given entity belongs."
-                },
-                "max_rmsd": {
-                    "type": "number",
-                    "rcsb_units": "angstroms",
-                    "description": "Maximal RMSD refer to maximal pairwise RMSD (Root Mean Square Deviation of C-alpha atoms) between structures in the cluster (95% sequence identity) where a given entity belongs."
-                },
-                "provenance_code": {
-                    "type": "string",
-                    "enum": [
-                        "PDBFlex"
-                    ]
+            "description": "Mpstruc keyword denotes original annotation, Homology keyword denotes annotation inferred by homology.",
+            "rcsb_description": [
+                {
+                    "text": "Mpstruc keyword denotes original annotation, Homology keyword denotes annotation inferred by homology.",
+                    "context": "dictionary"
                 }
-            },
-            "additionalProperties": false,
-            "description": "Indicates intrinsic flexibility of protein structures determined from structural variations between different depositions and chains in asymmetric units of the same protein in PDB (95% sequence identity)."
-        },
-        "rcsb_latest_revision": {
-            "type": "object",
-            "properties": {
-                "major_revision": {
-                    "type": "integer",
-                    "description": "The major version number of the latest revision."
-                },
-                "minor_revision": {
-                    "type": "integer",
-                    "description": "The minor version number of the latest revision."
-                },
-                "revision_date": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The release date of the latest revision item."
-                }
-            }
+            ]
         }
     },
     "additionalProperties": false,
-    "description": "JSON schema for polymer entity core.",
-    "$comment": "schema_version: 10.0.5",
     "required": [
-        "rcsb_id",
-        "rcsb_polymer_entity_container_identifiers"
+        "rcsb_polymer_entity_container_identifiers",
+        "rcsb_id"
     ],
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "Core Polymer Entity"
+    "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_polymer_entity.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "schema: pdbx_core collection: pdbx_core_polymer_entity version: 10.1.0",
+    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_polymer_entity version 10.1.0. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_polymer_entity.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 10.1.0"
 }
