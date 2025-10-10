@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.4.2 (2025-10-10)
+
+- Fix issue with annotations evaluation during config setting override, arising in Python 3.14 (Issue [#86](https://github.com/rcsb/py-rcsb-api/issues/86))
+- Add testing support for Python 3.14
+- Update search schemas: 1.52.1 -> 1.53.0
+- Update data schemas: 
+  - entry schema 9.0.4 -> 9.1.0
+  - polymer_entity schema 10.0.5 -> 10.1.0
+  - branched_entity schema 10.0.0 -> 10.1.0
+  - nonpolymer_entity schema 10.0.0 -> 10.1.0
+  - polymer_entity_instance schema 10.0.4 -> 10.1.0
+  - branched_entity_instance schema 9.0.0 -> 9.1.0
+  - nonpolymer_entity_instance schema 10.0.1 -> 10.1.0
+  - assembly schema 9.0.0 -> 9.1.0
+  - chem_comp schema 7.1.4 -> 7.2.0
+  - drugbank schema 1.3.2 -> 1.4.0
+
 ## v1.4.1 (2025-10-07)
 
 - Switch from using `setup.py` to `pyproject.toml` (Issue [#67](https://github.com/rcsb/py-rcsb-api/issues/67))

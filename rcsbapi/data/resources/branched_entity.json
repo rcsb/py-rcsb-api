@@ -906,7 +906,7 @@
                                 "value": {
                                     "type": "number",
                                     "examples": [
-                                        5,
+                                        5.0,
                                         0.25
                                     ],
                                     "description": "The value for the feature at this monomer.",
@@ -1190,6 +1190,47 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "rcsb_latest_revision": {
+            "type": "object",
+            "properties": {
+                "major_revision": {
+                    "type": "integer",
+                    "description": "The major version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The major version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "minor_revision": {
+                    "type": "integer",
+                    "description": "The minor version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The minor version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "revision_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "examples": [
+                        "2020-02-11",
+                        "2018-10-23"
+                    ],
+                    "description": "The release date of the latest revision item.",
+                    "rcsb_description": [
+                        {
+                            "text": "The release date of the latest revision item.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
         "rcsb_id": {
             "type": "string",
             "examples": [
@@ -1206,32 +1247,16 @@
                     "context": "dictionary"
                 }
             ]
-        },
-        "rcsb_latest_revision": {
-            "type": "object",
-            "properties": {
-                "major_revision": {
-                    "type": "integer",
-                    "description": "The major version number of the latest revision."
-                },
-                "minor_revision": {
-                    "type": "integer",
-                    "description": "The minor version number of the latest revision."
-                },
-                "revision_date": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The release date of the latest revision item."
-                }
-            }
         }
     },
     "additionalProperties": false,
     "required": [
+        "rcsb_branched_entity_container_identifiers",
         "rcsb_id"
     ],
+    "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_branched_entity.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Core Branched Entity",
-    "description": "JSON schema for branched entity core.",
-    "$comment": "schema_version: 10.0.0"
+    "title": "schema: pdbx_core collection: pdbx_core_branched_entity version: 10.1.0",
+    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_branched_entity version 10.1.0. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_branched_entity.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 10.1.0"
 }

@@ -698,7 +698,7 @@
                                 "reference": {
                                     "type": "number",
                                     "examples": [
-                                        5,
+                                        5.0,
                                         0.25
                                     ],
                                     "description": "The reference value of the feature.",
@@ -712,7 +712,7 @@
                                 "reported": {
                                     "type": "number",
                                     "examples": [
-                                        5,
+                                        5.0,
                                         0.25
                                     ],
                                     "description": "The reported value of the feature.",
@@ -726,7 +726,7 @@
                                 "uncertainty_estimate": {
                                     "type": "number",
                                     "examples": [
-                                        1,
+                                        1.0,
                                         -1.5
                                     ],
                                     "description": "The estimated uncertainty of the reported feature value.",
@@ -819,7 +819,8 @@
                 },
                 "additionalProperties": false,
                 "required": [
-                    "ordinal"
+                    "ordinal",
+                    "type"
                 ]
             },
             "minItems": 1,
@@ -1305,6 +1306,47 @@
             "minItems": 1,
             "uniqueItems": true
         },
+        "rcsb_latest_revision": {
+            "type": "object",
+            "properties": {
+                "major_revision": {
+                    "type": "integer",
+                    "description": "The major version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The major version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "minor_revision": {
+                    "type": "integer",
+                    "description": "The minor version number of the latest revision.",
+                    "rcsb_description": [
+                        {
+                            "text": "The minor version number of the latest revision.",
+                            "context": "dictionary"
+                        }
+                    ]
+                },
+                "revision_date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "examples": [
+                        "2020-02-11",
+                        "2018-10-23"
+                    ],
+                    "description": "The release date of the latest revision item.",
+                    "rcsb_description": [
+                        {
+                            "text": "The release date of the latest revision item.",
+                            "context": "dictionary"
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        },
         "rcsb_ligand_neighbors": {
             "type": "array",
             "items": {
@@ -1641,32 +1683,15 @@
                     "context": "dictionary"
                 }
             ]
-        },
-        "rcsb_latest_revision": {
-            "type": "object",
-            "properties": {
-                "major_revision": {
-                    "type": "integer",
-                    "description": "The major version number of the latest revision."
-                },
-                "minor_revision": {
-                    "type": "integer",
-                    "description": "The minor version number of the latest revision."
-                },
-                "revision_date": {
-                    "type": "string",
-                    "format": "date-time",
-                    "description": "The release date of the latest revision item."
-                }
-            }
         }
     },
     "additionalProperties": false,
     "required": [
         "rcsb_id"
     ],
+    "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_branched_entity_instance.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "Core Branched Entity Instance",
-    "description": "JSON schema for branched entity instance core data.",
-    "$comment": "schema_version: 9.0.0"
+    "title": "schema: pdbx_core collection: pdbx_core_branched_entity_instance version: 9.1.0",
+    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_branched_entity_instance version 9.1.0. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_branched_entity_instance.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 9.1.0"
 }
