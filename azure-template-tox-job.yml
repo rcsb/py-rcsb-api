@@ -66,6 +66,10 @@ jobs:
       - script: |
           ${{ format('python -m tox -e {0}', parameters.tox) }}
         displayName: 'Running tox task'
+    - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.14')) }}:
+      - script: |
+          ${{ format('python -m tox -e {0}-py314', parameters.tox) }}
+        displayName: 'Running tox task'
     - ${{ if and(not(startsWith(parameters.tox, 'py')), startsWith(parameters.python, '3.13')) }}:
       - script: |
           ${{ format('python -m tox -e {0}-py313', parameters.tox) }}
