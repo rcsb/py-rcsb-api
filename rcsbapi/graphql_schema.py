@@ -199,9 +199,9 @@ class GQLSchema(ABC):
             )
             return dict(response.json())
         except Exception as e:
-            logger.debug("Failed to perform schemna introspection query with Exception: %r", e)
+            logger.debug("Failed to perform schema introspection query with Exception: %r", e)
 
-        raise RuntimeError(f"Failed to perform schemna introspection query with URL {self.pdb_url}. Please check your internet connection and ability to access https://data.rcsb.org.")
+        raise RuntimeError(f"Failed to perform schema introspection query with URL {self.pdb_url}. Please check your internet connection and ability to access https://data.rcsb.org.")
 
     def _construct_root_dict(self) -> Dict[str, List[Dict[str, Any]]]:
         """Build a dictionary to organize information about schema root types.
