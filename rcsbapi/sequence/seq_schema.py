@@ -113,4 +113,4 @@ class SeqSchema(GQLSchema):
         Returns:
             Dict[str, Any]: JSON schema for Sequence Coordinates
         """
-        return super()._abstract_fetch_schema(const.SEQUENCE_API_SCHEMA_FILENAME)
+        return super()._abstract_fetch_schema()

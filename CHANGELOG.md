@@ -9,8 +9,11 @@
   - Deprecate `url` argumemt in favor of `file_url` (to be removed in version 2.0.0)
   - Deprecate `file_extension` argumemt in favor of `file_format` (to be removed in version 2.0.0)
 - Update Search API schema URL in `const.py` to use "https" (related to Issue [#90](https://github.com/rcsb/py-rcsb-api/issues/90))
+- Remove "fallback" mechanism to local schema files and replace with explicit error messages (i.e., likely network connection issues or API service unavailability)
 - Move package version and metadata from `__init__.py` to `pyproject.toml`
-- Adjust project build pipelines to publish wheels to PyPI
+- Adjust project build pipelines:
+  - Include wheels when publishing to PyPI
+  - Use `hatch` instead of `setuptools` for building
 
 ## v1.4.2 (2025-10-10)
 

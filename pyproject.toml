@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "rcsb-api"
@@ -23,6 +23,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Science/Research",
   "Topic :: Scientific/Engineering :: Bio-Informatics",
@@ -50,10 +51,39 @@ tests = ["tox", "pylint", "black>=21.5b1", "flake8", "coverage"]
 docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]  # should match docs/requirements.txt
 # dev = ["check-manifest"]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["rcsbapi*"]  # Only include `rcsbapi` package for installation here
-exclude = ["tests*", "docs*"]  # Not necessasry, but as an extra precaution to prevent their installation; however, these are added to MANIFEST for source distribution
+# ----------------  hatch configuration ----------------
+[tool.hatch.build.targets.sdist]
+include = [
+    "/rcsbapi/**",
+    "/README.md",
+    "/pyproject.toml",
+    "/LICENSE",
+    "/CHANGELOG.md",
+    "/codemeta.json",
+    "/NOTICE.md",
+    "/docs/**",
+    "/tests/**",
+]
+exclude = [
+    "/tests/test-output*",
+    "/tests/test-data*",
+]
 
-[tool.setuptools.package-data]
-"*" = ["*.md", "*.rst", "*.txt", "*.cfg", "*.json", "rcsbapi/*/resources/*"]
+[tool.hatch.build.targets.wheel]
+packages = ["rcsbapi"]
+exclude = [
+    "/rcsbapi/dev_tools*",
+    "/rcsbapi/*/resources/*.json",
+    "/tests/test-output*",
+    "/tests/test-data*",
+]
+
+[tool.hatch.envs.default]
+skip-install = true
+
+# ----------------  test configuration ----------------
+[tool.hatch.envs.hatch-test]
+dependencies = ["tox"]
+
+[tool.hatch.envs.hatch-test.scripts]
+run = ["tox"]
