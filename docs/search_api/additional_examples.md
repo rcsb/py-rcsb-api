@@ -60,7 +60,6 @@ from rcsbapi.search import StructSimilarityQuery
 q2 = StructSimilarityQuery(
     structure_search_type="entry_id",
     entry_id="4HHB",
-    structure_input_type="chain_id",
     chain_id="B",
     operator="relaxed_shape_match",
     target_search_space="polymer_entity_instance"

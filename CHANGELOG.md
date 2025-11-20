@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.5.0 (2025-11-20)
+
+- Updates to `StructSimilarityQuery` in `rcsbapi.search`:
+  - Add support for specifying `assembly_id` or `asym_id` for input file/URL-based structure similarity searches
+  - Deprecate `structure_input_type` parameter (to be removed in version 2.0.0)
+- Update Search API schema URL in `const.py` to use "https" (related to Issue [#90](https://github.com/rcsb/py-rcsb-api/issues/90))
+
 ## v1.4.2 (2025-10-10)
 
 - Fix issue with annotations evaluation during config setting override, arising in Python 3.14 (Issue [#86](https://github.com/rcsb/py-rcsb-api/issues/86))

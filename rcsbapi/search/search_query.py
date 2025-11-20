@@ -27,7 +27,7 @@ from typing import (
     Union,
     overload,
 )
-
+from warnings import warn
 import httpx
 from rcsbapi.const import const
 from rcsbapi.config import config
@@ -48,9 +48,9 @@ ReturnContentType = Literal["experimental", "computational"]  # results_content_
 SequenceType = Literal["dna", "rna", "protein"]  # possible sequence types for sequence searching
 SeqMode = Literal["simple", "prosite", "regex"]  # possible sequence motif formats
 StructEntryType = Literal["entry_id", "file_url", "file_upload"]  # possible entry types for structure similarity search
-StructSimInputType = Literal["assembly_id", "chain_id"]  # Possible ID choices for structure similarity search
-StructSimSearchSpace = Literal["polymer_entity_instance", "assembly"]  # target search spaces for structure similarity searchf
-StructSimOperator = Literal["strict_shape_match", "relaxed_shape_match"]  # possible operators for structure similarity searchf
+StructSimSearchSpace = Literal["polymer_entity_instance", "assembly"]  # target search spaces for structure similarity search
+StructSimOperator = Literal["strict_shape_match", "relaxed_shape_match"]  # possible operators for structure similarity search
+StructSimFormat = Literal["cif", "bcif", "pdb"]  # possible file formats for structure similarity search
 StructMotifExchanges = Literal[
     "ALA",
     "CYS",
@@ -790,42 +790,101 @@ class StructSimilarityQuery(Terminal):
         entry_id: Optional[str] = None,
         file_url: Optional[str] = None,
         file_path: Optional[str] = None,
-        structure_input_type: Optional[StructSimInputType] = "assembly_id",
-        assembly_id: Optional[str] = "1",
+        structure_input_type: Optional[str] = None,
+        assembly_id: Optional[str] = None,
         chain_id: Optional[str] = None,
         operator: StructSimOperator = "strict_shape_match",
-        target_search_space: StructSimSearchSpace = "assembly",
-        file_format: Optional[str] = None,
+        target_search_space: Optional[StructSimSearchSpace] = None,
+        file_format: Optional[StructSimFormat] = None,
     ):
         """
         Args:
-            structure_search_type (StructEntryType, optional): how to find given structure ("entry_id", "file_url", "file_path"). Defaults to "entry_id".
-            entry_id (Optional[str], optional): if "entry_id" specified, PDB ID or CSM ID. Defaults to None.
-            file_url (Optional[str], optional): if "file_url" specified, url to file . Defaults to None.
-            file_path (Optional[str], optional): if "file_path" specified, path to file. Defaults to None.
-            structure_input_type (Optional[StructSimInputType], optional): type of the given structure . Defaults to "assembly_id".
-            assembly_id (Optional[str], optional): if input_type is "assembly_id", the assembly id number. Defaults to "1".
-            chain_id (Optional[str], optional): if input_type is "chain_id", the chain id letter. Defaults to None.
-            operator (StructSimOperator, optional): search mode ("strict_shape_match" or "relaxed_shape_match"). Defaults to "strict_shape_match".
-            target_search_space (StructSimSearchSpace, optional): target objects against which the query will be compared for shape similarity. Defaults to "assembly".
-            file_format (Optional[str], optional): if "file_url" specified, type of file linked to (ex: "cif"). Defaults to None.
+            structure_search_type (StructEntryType, optional): Source of structure to use for structure similarity search.
+                                                               (Options are "entry_id", "file_url", "file_upload"). Defaults to "entry_id".
+            entry_id (Optional[str], optional): PDB ID or CSM ID (for structure_search_type="entry_id" only). Defaults to None.
+            file_url (Optional[str], optional): URL to structure file (for structure_search_type="file_url" only). Defaults to None.
+            file_path (Optional[str], optional): Local path to structure file (for structure_search_type="file_upload" only). Defaults to None.
+            structure_input_type (Optional[str], optional): DEPRECATED. This is controlled by provision of "assembly_id" or "chain_id".
+            assembly_id (Optional[str], optional): The assembly ID of the input structure to use for similarity searching.
+                                                   Defaults to "1" for structure_search_type="entry_id"; else defaults to None.
+            chain_id (Optional[str], optional): The chain (or "asym") ID of the input structure to use for similarity searching. Defaults to None.
+            file_format (StructSimFormat, optional): Format of input structure file (for structure_search_type of "file_url" or "file_upload" only).
+                                                     Options are "cif", "bcif", or "pdb".  Defaults to None.
+            operator (StructSimOperator, optional): Search mode ("strict_shape_match" or "relaxed_shape_match"). Defaults to "strict_shape_match".
+            target_search_space (StructSimSearchSpace, optional): Target objects against which the query will be compared for shape similarity.
+                                                                  Defaults to "assembly" for "assembly_id"-based search.
+                                                                  Defaults to "polymer_entity_instance" for "chain_id"-based search.
         """
 
-        parameters: Dict = {"operator": operator, "target_search_space": target_search_space}
+        parameters: Dict = {"operator": operator}
+
+        # Raise deprecation warning on usage of "structure_input_type". (Target for removal in version 2.0)
+        if structure_input_type:
+            warn(
+                "Usage of 'structure_input_type' is deprecated and no longer needed (input type is inferred based on 'assembly_id' or 'chain_id'). Will be removed in version 2.0.0.",
+                category=DeprecationWarning,
+                # Set stacklevel so the warning returns to the caller of the code
+                stacklevel=2,
+            )
+
+        # Check if both "assembly_id" and "chain_id" are provided
+        if assembly_id and chain_id:
+            raise ValueError("Cannot supply both 'assembly_id' and 'chain_id' for structure similarity search -- must provide one or the other.")
+
+        # Check if file format is provided for input file/URL-based search
+        if file_format is None and structure_search_type in ["file_url", "file_upload"]:
+            # First try to determine it automatically
+            fp = file_url if structure_search_type == "file_url" else file_path
+            if fp:
+                fp = fp.lower()
+                if fp.endswith(".cif") or fp.endswith(".cif.gz"):
+                    file_format = "cif"
+                if fp.endswith(".bcif") or fp.endswith(".bcif.gz"):
+                    file_format = "bcif"
+                if fp.endswith(".pdb") or fp.endswith(".pdb.gz"):
+                    file_format = "pdb"
+            # If it's still None, raise error
+            if file_format is None:
+                raise ValueError("Must supply 'file_format' for input file/URL-based structure similarity search.")
+
+        # If neither "assembly_id" nor "chain_id" is provided for "entry_id" input, use assembly-based search and set default to "1"
+        if not (assembly_id or chain_id):
+            if structure_search_type == "entry_id":
+                assembly_id = "1"
+            elif file_format != "pdb":
+                logger.warning("WARNING: Neither 'assembly_id' nor 'chain_id' was specified. Will use the entire input structure file for similarity search.")
+
+        # Check if user is attempting to specify 'assembly_id' or 'chain_id' using PDB-formatted files
+        if structure_search_type in ["file_url", "file_upload"] and (assembly_id or chain_id) and file_format == "pdb":
+            raise ValueError("Specifying 'assembly_id' or 'chain_id' for PDB formatted input files is not allowed. Can only do so with CIF or BCIF formatted files.")
+
+        # Ensure "assembly_id" is a string
+        if assembly_id and isinstance(assembly_id, int):
+            assembly_id = str(assembly_id)
+
+        # Set default "target_search_space" based on provision of "assembly_id" or "chain_id"
+        if not target_search_space:
+            if chain_id:
+                target_search_space = "polymer_entity_instance"
+            else:
+                target_search_space = "assembly"
+        parameters.update({"target_search_space": target_search_space})
 
         if structure_search_type == "entry_id":
-            if structure_input_type == "assembly_id":
-                parameters["value"] = {"entry_id": entry_id, "assembly_id": assembly_id}
-            elif structure_input_type == "chain_id":
-                parameters["value"] = {"entry_id": entry_id, "asym_id": chain_id}
-
+            parameters["value"] = {"entry_id": entry_id}
         elif structure_search_type == "file_url":
             parameters["value"] = {"url": file_url, "format": file_format}
-
         elif structure_search_type == "file_upload":
             assert isinstance(file_path, str)
             assert isinstance(file_format, str)
             parameters["value"] = {"url": fileUpload(file_path, file_format), "format": "bcif"}
+
+        if assembly_id:
+            parameters["value"].update({"assembly_id": assembly_id})
+        elif chain_id:
+            parameters["value"].update({"asym_id": chain_id})
+        else:
+            logger.debug("Neither 'assembly_id' nor 'chain_id' was specified. This is OK for 'structure_search_type' of 'file_url' or 'file_upload', but not OK for 'entry_id'")
 
         super().__init__(service=const.STRUCT_SIM_SEARCH_SERVICE, params=parameters)
 

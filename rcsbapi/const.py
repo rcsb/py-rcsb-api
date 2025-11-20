@@ -37,7 +37,7 @@ class Const:
     RETURN_UP_URL: str = "https://user-upload.rcsb.org/v1/download/"
 
     SEARCH_API_SCHEMA_DIR: str = "search/resources"
-    SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL: str = "http://search.rcsb.org/rcsbsearch/v2/metadata/schema"
+    SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL: str = "https://search.rcsb.org/rcsbsearch/v2/metadata/schema"
     SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME: str = "structure_schema.json"
     SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL: str = "https://search.rcsb.org/rcsbsearch/v2/metadata/chemical/schema"
     SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME: str = "chemical_schema.json"

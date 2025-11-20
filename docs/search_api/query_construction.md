@@ -478,7 +478,6 @@ q1 = StructSimilarityQuery(entry_id="4HHB")
 q1 = StructSimilarityQuery(
     structure_search_type="entry_id",
     entry_id="4HHB",
-    structure_input_type="assembly_id",
     assembly_id="1",
     operator="strict_shape_match",
     target_search_space="assembly"
@@ -487,21 +486,20 @@ for rid in q1("assembly"):
     print(rid)
 ```
 
-|Arguments                | Description                                                                |Default      |
-|-------------------------|----------------------------------------------------------------------------|-------------|
-|`structure_search_type`  |How to find given structure ("entry_id", "file_url", "file_path")           |"entry_id"   |
-|`entry_id`               |If "entry_id" specified, PDB ID or CSM ID                                   |             |
-|`file_url`               |If "file_url" specified, url to file                                        |             |
-|`file_path`              |If "file_path" specified, path to file                                      |             |
-|`file_format`            |If "file_url" or "file_path" specified, type of file (ex: "cif")            |             |
-|`structure_input_type`   |Type of the given structure                                                 |"assembly_id"|
-|`assembly_id`            |If input_type is "assembly_id", the assembly id number                      |"1"          |
-|`chain_id`               |If input_type is "chain_id", the chain id letter                            |             |
-|`operator`               |Search mode ("strict_shape_match" or "relaxed_shape_match")                 |"strict_shape_match"|
-|`target_search_space`    |Target objects against which the query will be compared for shape similarity|"assembly"   |
+|Arguments                | Description                                                                 |Default      |
+|-------------------------|-----------------------------------------------------------------------------|-------------|
+|`structure_search_type`  |Source of structure to use for similarity search (`"entry_id"`, `"file_url"`, `"file_upload"`)   |"entry_id"   |
+|`entry_id`               |PDB ID or CSM ID (for `structure_search_type="entry_id"` only)               |             |
+|`file_url`               |URL to structure file (for `structure_search_type="file_url"` only)          |             |
+|`file_path`              |Local path to structure file (for `structure_search_type="file_upload"` only)|             |
+|`file_format`            |Format of input `file_url` or `file_path` (`"cif"`, `"bcif"`, or `"pdb"`)    |             |
+|`assembly_id`            |The assembly ID of the input structure to use for similarity searching.      |"1" (if `structure_search_type="entry_id"`); else `None` (entire structure file)         |
+|`chain_id`               |The chain (or "asym") ID of the input structure to use for similarity searching. |             |
+|`operator`               |Search mode (`"strict_shape_match"` or `"relaxed_shape_match"`)              |"strict_shape_match"|
+|`target_search_space`    |Target objects against which the query will be compared for shape similarity |"assembly"   |
 
 
-If you provide an `entry_id`, you must provide either an `assembly_id` or `chain_id`
+If you provide an `entry_id`, you must provide either an `assembly_id` or `chain_id`.
 
 If you provide a `file_url` or `file_path`, you must also provide a `file_format`.
 
