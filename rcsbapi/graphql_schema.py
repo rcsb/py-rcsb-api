@@ -4,7 +4,6 @@ from enum import Enum
 from typing import Dict, List, Tuple, Any
 import json
 import logging
-from pathlib import Path
 import httpx
 from graphql import validate, parse, build_client_schema
 import rustworkx as rx
@@ -191,13 +190,18 @@ class GQLSchema(ABC):
         { name description type{ kind ofType{ name kind ofType{ inputFields {name type { kind ofType { name kind ofType { ofType { kind name ofType {kind name}} } } } }
         kind name ofType{name kind} } } } } } } } }"""
         }
-        response = httpx.post(
-            headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
-            json=root_query,
-            url=self.pdb_url,
-            timeout=self.timeout
-        )
-        return dict(response.json())
+        try:
+            response = httpx.post(
+                headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+                json=root_query,
+                url=self.pdb_url,
+                timeout=self.timeout
+            )
+            return dict(response.json())
+        except Exception as e:
+            logger.debug("Failed to perform schema introspection query with Exception: %r", e)
+
+        raise RuntimeError(f"Failed to perform schema introspection query with URL {self.pdb_url}. Please check your internet connection and ability to access https://data.rcsb.org.")
 
     def _construct_root_dict(self) -> Dict[str, List[Dict[str, Any]]]:
         """Build a dictionary to organize information about schema root types.
@@ -240,25 +244,26 @@ class GQLSchema(ABC):
         # call `_abstract_fetch_schema` here with the appropriate schema for the API
         pass
 
-    def _abstract_fetch_schema(self, fallback_file_name: str) -> Dict[str, Any]:
+    def _abstract_fetch_schema(self) -> Dict[str, Any]:
         """
         Make an introspection query to get full Data API schema. Also found in resources folder as "seq_api_schema.json".
 
         Returns:
             Dict: JSON response of introspection request
         """
-        schema_response = httpx.post(
-            headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
-            json=self.introspection_query,
-            url=self.pdb_url,
-            timeout=self.timeout
-        )
-        if schema_response.status_code == 200:
-            return dict(schema_response.json())
-        current_dir = Path(Path(__file__).resolve()).parent
-        json_file_path = Path(current_dir) / "resources" / fallback_file_name
-        with Path.open(json_file_path, encoding="utf-8") as schema_file:
-            return dict(json.load(schema_file))
+        try:
+            schema_response = httpx.post(
+                headers={"Content-Type": "application/json", "User-Agent": const.USER_AGENT},
+                json=self.introspection_query,
+                url=self.pdb_url,
+                timeout=self.timeout
+            )
+            if schema_response.status_code == 200:
+                return dict(schema_response.json())
+        except Exception as e:
+            logger.debug("Failed to fetch schema with exception: %r", e)
+
+        raise RuntimeError(f"Failed to fetch schema from {self.pdb_url}. Please check your internet connection and ability to access https://data.rcsb.org.")
 
     def _construct_type_dict(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         """Construct dictionary of GraphQL types and their associated fields.

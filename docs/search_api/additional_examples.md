@@ -60,7 +60,6 @@ from rcsbapi.search import StructSimilarityQuery
 q2 = StructSimilarityQuery(
     structure_search_type="entry_id",
     entry_id="4HHB",
-    structure_input_type="chain_id",
     chain_id="B",
     operator="relaxed_shape_match",
     target_search_space="polymer_entity_instance"
@@ -74,7 +73,7 @@ from rcsbapi.search import StructSimilarityQuery
 # Using file_url
 q3 = StructSimilarityQuery(
     structure_search_type="file_url",
-    file_url="https://files.rcsb.org/view/4HHB.cif",
+    file_url="https://files.rcsb.org/download/4HHB.cif",
     file_format="cif"
 )
 list(q3())
@@ -119,11 +118,10 @@ Res2 = StructMotifResidue(
 # they can be passed into a list for use in the query itself:
 ResList = [Res1, Res2]
 
-link = "https://files.rcsb.org/view/2MNR.cif"
 q2 = StructMotifQuery(
     structure_search_type="file_url",
-    url=link,
-    file_extension="cif",
+    file_url="https://files.rcsb.org/download/2MNR.cif",
+    file_format="cif",
     residue_ids=ResList
 )
 # structure_search_type MUST be provided. A mismatched query type will cause an error. 
@@ -138,7 +136,7 @@ file_path = "/absolute/path/to/file.cif"
 q3 = StructMotifQuery(
     structure_search_type="file_upload",
     file_path=file_path,
-    file_extension="cif",
+    file_format="cif",
     residue_ids=ResList
 )
 list(q3())

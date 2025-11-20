@@ -160,7 +160,7 @@ class SearchSchema:
         self,
         attr_type,
         refetch=True,
-        use_fallback=True,
+        use_fallback=False,
         reload=True,
         struct_attr_schema_url=const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL,
         struct_attr_schema_file=os.path.join(const.SEARCH_API_SCHEMA_DIR, const.SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME),
@@ -206,9 +206,20 @@ class SearchSchema:
     def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=True):
         sD = {}
         if refetch:
-            sD = self._fetch_schema(schema_url)
+            try:
+                sD = self._fetch_schema(schema_url)
+            except Exception as e:
+                logger.debug("Failed to fetch schema with exception: %r", e)
+                logger.error("ERROR: Failed to fetch schema from %r. Please check your internet connection and ability to access https://search.rcsb.org.", schema_url)
         if not sD and use_fallback:
-            sD = self._load_json_schema(schema_file)
+            logger.warning("WARNING: Attempting to load schema from fallback resource file: %r", schema_file)
+            try:
+                sD = self._load_json_schema(schema_file)
+            except Exception as e:
+                logger.debug("Failed to load fallback schema with exception: %r", e)
+                logger.error("ERROR: Failed to load fallback schema from %r", schema_file)
+        if not sD or len(sD) < 1:
+            raise RuntimeError("Failed to fetch and/or load search API schema. Please check your internet connection and ability to access https://search.rcsb.org.")
         return sD
 
     def _make_schema_group(self) -> SearchSchemaGroup:

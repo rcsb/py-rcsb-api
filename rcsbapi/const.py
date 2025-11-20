@@ -10,7 +10,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import List
-from rcsbapi import __version__
+from importlib.metadata import version as get_package_version
+
+__version__ = get_package_version("rcsb-api")
 
 
 @dataclass(frozen=True)
@@ -37,7 +39,7 @@ class Const:
     RETURN_UP_URL: str = "https://user-upload.rcsb.org/v1/download/"
 
     SEARCH_API_SCHEMA_DIR: str = "search/resources"
-    SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL: str = "http://search.rcsb.org/rcsbsearch/v2/metadata/schema"
+    SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_URL: str = "https://search.rcsb.org/rcsbsearch/v2/metadata/schema"
     SEARCH_API_STRUCTURE_ATTRIBUTE_SCHEMA_FILENAME: str = "structure_schema.json"
     SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_URL: str = "https://search.rcsb.org/rcsbsearch/v2/metadata/chemical/schema"
     SEARCH_API_CHEMICAL_ATTRIBUTE_SCHEMA_FILENAME: str = "chemical_schema.json"

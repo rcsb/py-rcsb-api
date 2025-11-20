@@ -201,4 +201,4 @@ class DataSchema(GQLSchema):
         Returns:
             Dict[str, Any]: JSON schema for Data API
         """
-        return super()._abstract_fetch_schema(const.DATA_API_SCHEMA_FILENAME)
+        return super()._abstract_fetch_schema()

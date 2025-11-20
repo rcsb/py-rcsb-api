@@ -478,7 +478,6 @@ q1 = StructSimilarityQuery(entry_id="4HHB")
 q1 = StructSimilarityQuery(
     structure_search_type="entry_id",
     entry_id="4HHB",
-    structure_input_type="assembly_id",
     assembly_id="1",
     operator="strict_shape_match",
     target_search_space="assembly"
@@ -487,21 +486,20 @@ for rid in q1("assembly"):
     print(rid)
 ```
 
-|Arguments                | Description                                                                |Default      |
-|-------------------------|----------------------------------------------------------------------------|-------------|
-|`structure_search_type`  |How to find given structure ("entry_id", "file_url", "file_path")           |"entry_id"   |
-|`entry_id`               |If "entry_id" specified, PDB ID or CSM ID                                   |             |
-|`file_url`               |If "file_url" specified, url to file                                        |             |
-|`file_path`              |If "file_path" specified, path to file                                      |             |
-|`file_format`            |If "file_url" or "file_path" specified, type of file (ex: "cif")            |             |
-|`structure_input_type`   |Type of the given structure                                                 |"assembly_id"|
-|`assembly_id`            |If input_type is "assembly_id", the assembly id number                      |"1"          |
-|`chain_id`               |If input_type is "chain_id", the chain id letter                            |             |
-|`operator`               |Search mode ("strict_shape_match" or "relaxed_shape_match")                 |"strict_shape_match"|
-|`target_search_space`    |Target objects against which the query will be compared for shape similarity|"assembly"   |
+|Arguments                | Description                                                                 |Default      |
+|-------------------------|-----------------------------------------------------------------------------|-------------|
+|`structure_search_type`  |Source of structure to use for similarity search (`"entry_id"`, `"file_url"`, `"file_upload"`)   |"entry_id"   |
+|`entry_id`               |PDB ID or CSM ID (for `structure_search_type="entry_id"` only)               |             |
+|`file_url`               |URL to structure file (for `structure_search_type="file_url"` only)          |             |
+|`file_path`              |Local path to structure file (for `structure_search_type="file_upload"` only)|             |
+|`file_format`            |Format of input `file_url` or `file_path` (`"cif"`, `"bcif"`, or `"pdb"`)    |             |
+|`assembly_id`            |The assembly ID of the input structure to use for similarity searching.      |"1" (if `structure_search_type="entry_id"`); else `None` (entire structure file)         |
+|`chain_id`               |The chain (or "asym") ID of the input structure to use for similarity searching. |             |
+|`operator`               |Search mode (`"strict_shape_match"` or `"relaxed_shape_match"`)              |"strict_shape_match"|
+|`target_search_space`    |Target objects against which the query will be compared for shape similarity |"assembly"   |
 
 
-If you provide an `entry_id`, you must provide either an `assembly_id` or `chain_id`
+If you provide an `entry_id`, you must provide either an `assembly_id` or `chain_id`.
 
 If you provide a `file_url` or `file_path`, you must also provide a `file_format`.
 
@@ -554,29 +552,29 @@ q1 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)
 list(q1())
 ```
 
-|Arguments                     | Description                                                      |Default      |
-|------------------------------|------------------------------------------------------------------|-------------|
-|`structure_search_type`       |How to find given structure ("entry_id", "url", "file_path")      |"entry_id"   |
-|`backbone_distance_tolerance` |Tolerance for distance between Cα atoms (in Å)                    |1            |
-|`side_chain_distance_tolerance`|Tolerance for distance between Cβ atoms (in Å)                   |1            |
-|`angle_tolerance`             |Angle between CαCβ vectors (in multiples of 20 degrees)           |1            |
-|`entry_id`                    |If "entry_id" specified, PDB ID or CSM ID                         |             |
-|`url`                         |If "file_url" specified, url to file                              |             |
-|`file_path`                   |If "file_path" specified, path to file                            |             |
-|`file_extension`              |If "file_url" specified, type of file linked to (ex: "cif")       |             |
-|`residue_ids`                 |List of StructMotifResidue objects                                |             |
-|`rmsd_cutoff`                 |Upper cutoff for root-mean-square deviation (RMSD) score          |2            |
-|`atom_pairing_scheme`         |Which atoms to consider to compute RMSD scores and transformations.|"SIDE_CHAIN" |
-|`motif_pruning_strategy`      |Specifies how query motifs are pruned (i.e. simplified)           |"KRUSKAL"    |
-|`allowed_structures`          |If the list of structure identifiers is specified, the search will only consider those structures (ex: ["HIS", "LYS"])||
-|`excluded_structures`         |If the list of structure identifiers is specified, the search will exclude those structures from the search space||
-|`limit`                       |Stop after accepting this many hits                               |             |
+|Arguments                      | Description                                                       |Default      |
+|-------------------------------|-------------------------------------------------------------------|-------------|
+|`structure_search_type`        |Source of structure to use for similarity search (`"entry_id"`, `"file_url"`, `"file_upload"`)   |"entry_id"   |
+|`backbone_distance_tolerance`  |Tolerance for distance between Cα atoms (in Å)                     |1            |
+|`side_chain_distance_tolerance`|Tolerance for distance between Cβ atoms (in Å)                     |1            |
+|`angle_tolerance`              |Angle between CαCβ vectors (in multiples of 20 degrees)            |1            |
+|`entry_id`                     |PDB ID or CSM ID (for `structure_search_type="entry_id"` only)     |             |
+|`file_url`                     |URL to structure file (for `structure_search_type="file_url"` only)|             |
+|`file_path`                    |Local path to structure file (for `structure_search_type="file_upload"` only)  |             |
+|`file_format`                  |Format of input `file_url` or `file_path` (`"cif"`, `"bcif"`, or `"pdb"`)      |             |
+|`residue_ids`                  |List of StructMotifResidue objects                                 |             |
+|`rmsd_cutoff`                  |Upper cutoff for root-mean-square deviation (RMSD) score           |2            |
+|`atom_pairing_scheme`          |Which atoms to consider to compute RMSD scores and transformations.|"SIDE_CHAIN" |
+|`motif_pruning_strategy`       |Specifies how query motifs are pruned (i.e. simplified)            |"KRUSKAL"    |
+|`allowed_structures`           |If the list of structure identifiers is specified, the search will only consider those structures (ex: ["HIS", "LYS"])||
+|`excluded_structures`          |If the list of structure identifiers is specified, the search will exclude those structures from the search space||
+|`limit`                        |Stop after accepting this many hits                                |             |
 
 If you provide an `entry_id`, the other optional parameters can be ignored.
 
-If you provide a `file_url`, you must also provide a `file_extension`.
+If you provide a `file_url`, you must also provide a `file_format`.
 
-If you provide a `file_path`, you must also provide a `file_extension`.
+If you provide a `file_path`, you must also provide a `file_format`.
 
 See [Structure Motif Search Examples](additional_examples.md#Structure-Motif-Search-Examples) for more use cases.
 

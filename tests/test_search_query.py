@@ -1016,7 +1016,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Basic Structure Similarity query results: result length : (%d), ok : (%r)", len(result), ok)
 
-        # Query with chain ID
+        # Query with chain ID (and expect deprecation warning for 'structure_input_type')
         q2 = StructSimilarityQuery(structure_search_type="entry_id",
                                    entry_id="4HHB",
                                    structure_input_type="chain_id",
@@ -1027,9 +1027,21 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Query with chain ID results: result length : (%d), ok : (%r)", len(result), ok)
 
+        # Query with chain ID
+        q2b = StructSimilarityQuery(
+            structure_search_type="entry_id",
+            entry_id="4HHB",
+            chain_id="A"
+        )
+        result_q2b = list(q2b())
+        ok = len(result_q2b) > 0
+        self.assertTrue(ok)
+        self.assertTrue(len(result_q2b) == len(result))
+        logger.info("Query with chain ID results using defaults: result length : (%d), ok : (%r)", len(result_q2b), ok)
+
         # Query with file url
         q3 = StructSimilarityQuery(structure_search_type="file_url",
-                                   file_url="https://files.rcsb.org/view/4HHB.cif",
+                                   file_url="https://files.rcsb.org/download/4HHB.cif",
                                    file_format="cif")
         result = list(q3())
         ok = len(result) > 0
@@ -1039,6 +1051,7 @@ class SearchTests(unittest.TestCase):
         # Query with file upload
         q4 = StructSimilarityQuery(structure_search_type="file_upload",
                                    file_path=self.__4hhbCif,
+                                   assembly_id="1",
                                    file_format="cif")
         result = list(q4())
         ok = len(result) > 0
@@ -1057,10 +1070,8 @@ class SearchTests(unittest.TestCase):
         # Query with specifically polymer entity instance search space
         q6 = StructSimilarityQuery(structure_search_type="entry_id",
                                    entry_id="4HHB",
-                                   structure_input_type="chain_id",
                                    chain_id="B",
-                                   operator="relaxed_shape_match",
-                                   target_search_space="polymer_entity_instance")
+                                   operator="relaxed_shape_match")
         result = list(q6())
         ok = len(result) > 0
         self.assertTrue(ok)
@@ -1087,7 +1098,8 @@ class SearchTests(unittest.TestCase):
         # File upload query using 4HHB bcif file
         q9 = StructSimilarityQuery(structure_search_type="file_upload",
                                    file_path=self.__4hhbBcif,
-                                   file_format="bcif")
+                                   file_format="bcif",
+                                   assembly_id="1")
         result = list(q9())
         ok = len(result) > 0
         self.assertTrue(ok)
@@ -1095,8 +1107,9 @@ class SearchTests(unittest.TestCase):
 
         # File url query with mmcif file format, relaxed operator, and chains target search space
         q10 = StructSimilarityQuery(structure_search_type="file_url",
-                                    file_url="https://files.rcsb.org/view/4HHB.cif",
+                                    file_url="https://files.rcsb.org/download/4HHB.cif",
                                     file_format="cif",
+                                    chain_id="A",
                                     operator="relaxed_shape_match",
                                     target_search_space="polymer_entity_instance")
         result = list(q10())
@@ -1104,27 +1117,67 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("File url query using mmcif file format, relaxed, and chains: result length : (%d), ok : (%r)", len(result), ok)
 
-        # File url query with wrong combination of fire url and format (should fail)
+        # Query for multi-assembly structure using "entry_id"-based search for assembly 1, and make sure it matches "file_url"-based search for assembly 1
+        q11a = StructSimilarityQuery(structure_search_type="entry_id", entry_id="2ZA4", assembly_id="1")
+        result_count_q11a = q11a(return_type="assembly", return_counts=True)
+        q11b = StructSimilarityQuery(
+            structure_search_type="file_url",
+            file_url="https://files.rcsb.org/download/2ZA4.cif.gz",
+            file_format="cif",
+            assembly_id="1",
+        )
+        result_count_q11b = q11b(return_type="assembly", return_counts=True)
+        ok = result_count_q11a == result_count_q11b
+        logger.info("Query for assembly 1 of multi-assembly structure using 'entry_id' (%r) vs 'file_url' (%r), ok : (%r)", result_count_q11a, result_count_q11b, ok)
+        self.assertTrue(ok)
+
+        # Query for multi-assembly structure using 'file_url'-based search with and without specifying 'assembly_id'
+        q11c = StructSimilarityQuery(
+            structure_search_type="file_url",
+            file_url="https://files.rcsb.org/download/2ZA4.cif.gz",
+            file_format="cif",
+        )
+        result_count_q11c = q11c(return_type="assembly", return_counts=True)
+        ok = result_count_q11b != result_count_q11c
+        logger.info(
+            "Query for multi-assembly structure using 'file_url'-based search with (%r) and without (%r) specifying 'assembly_id', ok : (%r)",
+            result_count_q11b,
+            result_count_q11c,
+            ok
+        )
+        self.assertTrue(ok)
+
+        # FAILURE CHECKING
+        # Failure check - File url query with wrong combination of fire url and format (should fail)
         ok = False
         try:
-            q11 = StructSimilarityQuery(structure_search_type="file_url",
-                                        file_url="https://files.rcsb.org/view/4HHB.cif",
+            q12 = StructSimilarityQuery(structure_search_type="file_url",
+                                        file_url="https://files.rcsb.org/download/4HHB.cif",
                                         file_format="pdb")
-            result = list(q11())
+            result = list(q12())
         except (httpx.RequestError, httpx.HTTPStatusError):
             ok = True
         self.assertTrue(ok)
-        logger.info("File url query with wrong file format failed successfully : (%r)", ok)
+        logger.info("Failure check - File url query with wrong file format : (%r)", ok)
+
+        # Failure check - provision of both 'assembly_id' and 'chain_id'
+        ok = False
+        try:
+            _ = StructSimilarityQuery(entry_id="2ZA4", assembly_id="1", chain_id="A")
+        except Exception as e:
+            logger.exception(e)
+            ok = True
+        self.assertTrue(ok)
+        logger.info("Failure check - provision of both 'assembly_id' and 'chain_id' : (%r)", ok)
 
     def testStructMotifQuery(self) -> None:
         # base example, entry ID, residues
         Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
-        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
-        Res3 = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
-        Res4 = StructMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
-        Res5 = StructMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
-        Res6 = StructMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
-        ResList = [Res1, Res2]
+        Res2 = StructMotifResidue("A", "1", 193)
+        Res3 = StructMotifResidue("A", "1", 219)
+        Res4 = StructMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
+        Res5 = StructMotifResidue("A", "1", 295, ["HIS", "LYS"])
+        ResList = [Res1, Res2, Res3, Res4, Res5]
 
         q1 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)  # Avoid positionals for StructMotifQuery... way too many things are optional in these queries
         result = list(q1())
@@ -1132,24 +1185,38 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Basic StructMotifQuery completed successfully: (%r)", ok)
 
-        # base example with file upload
-        MNR = self.__2mnr
-        q2 = StructMotifQuery(structure_search_type="file_upload", file_path=MNR, file_extension="cif", residue_ids=ResList)
+        # base example with file upload (and usage of deprecated "file_extension" argument)
+        q2 = StructMotifQuery(structure_search_type="file_upload", file_path=self.__2mnr, file_extension="cif", residue_ids=ResList)
         # You MUST specify structure_search_type for non entry_id queries.
         result = list(q2())
         ok = len(result) > 0  # Note that because of a bug where two queries don't return the same result, you can't compare results from this query and previous.
         self.assertTrue(ok)
-        logger.info("File Upload StructMotifQuery completed successfully: (%r)", ok)
+        logger.info("File Upload StructMotifQuery (deprecated args) completed successfully: %r (%r)", len(result), ok)
 
-        # base example with file link
-        link = "https://files.rcsb.org/view/2MNR.cif"
-        q3 = StructMotifQuery(structure_search_type="file_url", url=link, file_extension="cif", residue_ids=ResList)
+        # base example with file link (and usage of deprecated "url" argument)
+        flink = "https://files.rcsb.org/download/2MNR.cif"
+        q3 = StructMotifQuery(structure_search_type="file_url", url=flink, file_format="cif", residue_ids=ResList)
         result = list(q3())
         ok = len(result) > 0
         self.assertTrue(ok)
-        logger.info("File URL StructMotifQuery completed successfully: (%r)", ok)
+        logger.info("File URL StructMotifQuery (deprecated args) completed successfully: %r (%r)", len(result), ok)
 
+        # base example with file link
+        q3b = StructMotifQuery(structure_search_type="file_url", file_url=flink, file_format="cif", residue_ids=ResList)
+        result = list(q3b())
+        ok = len(result) > 0
+        self.assertTrue(ok)
+        logger.info("File URL StructMotifQuery completed successfully: %r (%r)", len(result), ok)
+
+        # FAILURE CHECKING
         # invalid queries
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
+        Res3 = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
+        Res4 = StructMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
+        Res5 = StructMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
+        Res6 = StructMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
+        ResList = [Res1, Res2]
 
         # no residues provided
         ok = False
@@ -1163,7 +1230,7 @@ class SearchTests(unittest.TestCase):
         # filepath missing for file upload
         ok = False
         try:
-            _ = StructMotifQuery(structure_search_type="file_upload", file_extension="cif", residue_ids=ResList)
+            _ = StructMotifQuery(structure_search_type="file_upload", file_format="cif", residue_ids=ResList)
         except AssertionError:
             ok = True
         self.assertTrue(ok)
@@ -1172,7 +1239,7 @@ class SearchTests(unittest.TestCase):
         # file url missing for file upload
         ok = False
         try:
-            _ = StructMotifQuery(structure_search_type="file_url", file_extension="cif", residue_ids=ResList)
+            _ = StructMotifQuery(structure_search_type="file_url", file_format="cif", residue_ids=ResList)
         except AssertionError:
             ok = True
         self.assertTrue(ok)
@@ -1349,7 +1416,6 @@ class SearchTests(unittest.TestCase):
         q6 = StructSimilarityQuery(
             structure_search_type="entry_id",
             entry_id="4HHB",  # Structure Similarity Query
-            structure_input_type="assembly_id",
             assembly_id="1",
             operator="strict_shape_match",
             target_search_space="assembly",
