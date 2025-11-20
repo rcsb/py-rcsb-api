@@ -12,9 +12,9 @@
 #
 import os
 import sys
+from importlib.metadata import version as get_package_version
 
 sys.path.insert(0, os.path.abspath(".."))
-import rcsbapi  # noqa: E402
 
 # -- Project information -----------------------------------------------------
 
@@ -27,9 +27,9 @@ author = "RCSB PDB"
 # built documents.
 #
 # The short X.Y version.
-version = rcsbapi.__version__.split("-")[0]
+version = get_package_version("rcsb-api").split("-")[0]
 # The full version, including alpha/beta/rc tags
-release = rcsbapi.__version__
+# release = get_package_version("rcsb-api")
 
 
 # -- General configuration ---------------------------------------------------

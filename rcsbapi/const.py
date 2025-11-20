@@ -10,7 +10,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import List
-from rcsbapi import __version__
+from importlib.metadata import version as get_package_version
+
+__version__ = get_package_version("rcsb-api")
 
 
 @dataclass(frozen=True)

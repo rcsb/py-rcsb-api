@@ -5,13 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rcsb-api"
 description = "Python package interface for RCSB.org API services"
-readme = "README.md"
+version = "1.5.0"
 requires-python = ">=3.9,<4.0"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE.md"]
 authors = [
   { name = "Dennis Piehl", email = "dennis.piehl@rcsb.org" }
 ]
+readme = "README.md"
 keywords = ["RCSB", "PDB", "bioinformatics", "API", "protein", "structure"]
 classifiers = [
   "Programming Language :: Python",
@@ -36,7 +37,6 @@ dependencies = [
     "graphql-core",
     "tqdm"
 ]
-dynamic = ["version"]  # Automatically extract version from __init__.py
 
 [project.urls]
 Homepage = "https://github.com/rcsb/py-rcsb-api"
@@ -57,6 +57,3 @@ exclude = ["tests*", "docs*"]  # Not necessasry, but as an extra precaution to p
 
 [tool.setuptools.package-data]
 "*" = ["*.md", "*.rst", "*.txt", "*.cfg", "*.json", "rcsbapi/*/resources/*"]
-
-[tool.setuptools.dynamic]
-version = { attr = "rcsbapi.__version__" }
