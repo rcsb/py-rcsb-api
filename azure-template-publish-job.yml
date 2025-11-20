@@ -34,7 +34,7 @@ jobs:
     - script: ls -lR $(Pipeline.Workspace)/${{ format('sw_{0}_{1}', parameters.tox, parameters.os) }}
       displayName: "Listing of downloaded artifacts"
     #
-    - script: python -m pip install --upgrade pip twine setuptools wheel
+    - script: python -m pip install --upgrade pip twine wheel hatch
       displayName: 'Install packaging tools'
     #
     - task: DownloadSecureFile@1

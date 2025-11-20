@@ -82,7 +82,7 @@ jobs:
     #  Build artifacts if this is a test target (i.e. labeled as py##)
     #
     - ${{ if startsWith(parameters.tox, 'py') }}:
-      - script: pip install --upgrade pip build twine
+      - script: pip install --upgrade pip build twine hatch
         displayName: "Acquire build tools"
       - script: python -m build --sdist --wheel --outdir "$(System.DefaultWorkingDirectory)/dist"
         displayName: "Build source and wheel distributions"
