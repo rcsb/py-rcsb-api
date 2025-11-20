@@ -210,14 +210,14 @@ class SearchSchema:
                 sD = self._fetch_schema(schema_url)
             except Exception as e:
                 logger.debug("Failed to fetch schema with exception: %r", e)
-                logger.error(f"ERROR: Failed to fetch schema from {schema_url}. Please check your internet connection and ability to access https://search.rcsb.org.")
+                logger.error("ERROR: Failed to fetch schema from %r. Please check your internet connection and ability to access https://search.rcsb.org.", schema_url)
         if not sD and use_fallback:
             logger.warning("WARNING: Attempting to load schema from fallback resource file: %r", schema_file)
             try:
                 sD = self._load_json_schema(schema_file)
             except Exception as e:
                 logger.debug("Failed to load fallback schema with exception: %r", e)
-                logger.error(f"ERROR: Failed to load fallback schema from {schema_file}")
+                logger.error("ERROR: Failed to load fallback schema from %r", schema_file)
         if not sD or len(sD) < 1:
             raise RuntimeError("Failed to fetch and/or load search API schema. Please check your internet connection and ability to access https://search.rcsb.org.")
         return sD
