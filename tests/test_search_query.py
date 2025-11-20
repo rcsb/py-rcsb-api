@@ -1041,7 +1041,7 @@ class SearchTests(unittest.TestCase):
 
         # Query with file url
         q3 = StructSimilarityQuery(structure_search_type="file_url",
-                                   file_url="https://files.rcsb.org/view/4HHB.cif",
+                                   file_url="https://files.rcsb.org/download/4HHB.cif",
                                    file_format="cif")
         result = list(q3())
         ok = len(result) > 0
@@ -1107,7 +1107,7 @@ class SearchTests(unittest.TestCase):
 
         # File url query with mmcif file format, relaxed operator, and chains target search space
         q10 = StructSimilarityQuery(structure_search_type="file_url",
-                                    file_url="https://files.rcsb.org/view/4HHB.cif",
+                                    file_url="https://files.rcsb.org/download/4HHB.cif",
                                     file_format="cif",
                                     chain_id="A",
                                     operator="relaxed_shape_match",
@@ -1122,7 +1122,7 @@ class SearchTests(unittest.TestCase):
         result_count_q11a = q11a(return_type="assembly", return_counts=True)
         q11b = StructSimilarityQuery(
             structure_search_type="file_url",
-            file_url="https://files.rcsb.org/view/2ZA4.cif.gz",
+            file_url="https://files.rcsb.org/download/2ZA4.cif.gz",
             file_format="cif",
             assembly_id="1",
         )
@@ -1134,7 +1134,7 @@ class SearchTests(unittest.TestCase):
         # Query for multi-assembly structure using 'file_url'-based search with and without specifying 'assembly_id'
         q11c = StructSimilarityQuery(
             structure_search_type="file_url",
-            file_url="https://files.rcsb.org/view/2ZA4.cif.gz",
+            file_url="https://files.rcsb.org/download/2ZA4.cif.gz",
             file_format="cif",
         )
         result_count_q11c = q11c(return_type="assembly", return_counts=True)
@@ -1152,7 +1152,7 @@ class SearchTests(unittest.TestCase):
         ok = False
         try:
             q12 = StructSimilarityQuery(structure_search_type="file_url",
-                                        file_url="https://files.rcsb.org/view/4HHB.cif",
+                                        file_url="https://files.rcsb.org/download/4HHB.cif",
                                         file_format="pdb")
             result = list(q12())
         except (httpx.RequestError, httpx.HTTPStatusError):
@@ -1173,12 +1173,11 @@ class SearchTests(unittest.TestCase):
     def testStructMotifQuery(self) -> None:
         # base example, entry ID, residues
         Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
-        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
-        Res3 = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
-        Res4 = StructMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
-        Res5 = StructMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
-        Res6 = StructMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
-        ResList = [Res1, Res2]
+        Res2 = StructMotifResidue("A", "1", 193)
+        Res3 = StructMotifResidue("A", "1", 219)
+        Res4 = StructMotifResidue("A", "1", 245, ["GLU", "ASP", "ASN"])
+        Res5 = StructMotifResidue("A", "1", 295, ["HIS", "LYS"])
+        ResList = [Res1, Res2, Res3, Res4, Res5]
 
         q1 = StructMotifQuery(entry_id="2MNR", residue_ids=ResList)  # Avoid positionals for StructMotifQuery... way too many things are optional in these queries
         result = list(q1())
@@ -1186,24 +1185,38 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Basic StructMotifQuery completed successfully: (%r)", ok)
 
-        # base example with file upload
-        MNR = self.__2mnr
-        q2 = StructMotifQuery(structure_search_type="file_upload", file_path=MNR, file_extension="cif", residue_ids=ResList)
+        # base example with file upload (and usage of deprecated "file_extension" argument)
+        q2 = StructMotifQuery(structure_search_type="file_upload", file_path=self.__2mnr, file_extension="cif", residue_ids=ResList)
         # You MUST specify structure_search_type for non entry_id queries.
         result = list(q2())
         ok = len(result) > 0  # Note that because of a bug where two queries don't return the same result, you can't compare results from this query and previous.
         self.assertTrue(ok)
-        logger.info("File Upload StructMotifQuery completed successfully: (%r)", ok)
+        logger.info("File Upload StructMotifQuery (deprecated args) completed successfully: %r (%r)", len(result), ok)
 
-        # base example with file link
-        link = "https://files.rcsb.org/view/2MNR.cif"
-        q3 = StructMotifQuery(structure_search_type="file_url", url=link, file_extension="cif", residue_ids=ResList)
+        # base example with file link (and usage of deprecated "url" argument)
+        flink = "https://files.rcsb.org/download/2MNR.cif"
+        q3 = StructMotifQuery(structure_search_type="file_url", url=flink, file_format="cif", residue_ids=ResList)
         result = list(q3())
         ok = len(result) > 0
         self.assertTrue(ok)
-        logger.info("File URL StructMotifQuery completed successfully: (%r)", ok)
+        logger.info("File URL StructMotifQuery (deprecated args) completed successfully: %r (%r)", len(result), ok)
 
+        # base example with file link
+        q3b = StructMotifQuery(structure_search_type="file_url", file_url=flink, file_format="cif", residue_ids=ResList)
+        result = list(q3b())
+        ok = len(result) > 0
+        self.assertTrue(ok)
+        logger.info("File URL StructMotifQuery completed successfully: %r (%r)", len(result), ok)
+
+        # FAILURE CHECKING
         # invalid queries
+        Res1 = StructMotifResidue("A", "1", 162, ["LYS", "HIS"])
+        Res2 = StructMotifResidue("A", "1", 193, ["ASP"])
+        Res3 = StructMotifResidue("A", "1", 192, ["LYS", "HIS", "ASP", "VAL"])
+        Res4 = StructMotifResidue("A", "1", 191, ["LYS", "HIS", "ASP", "VAL"])
+        Res5 = StructMotifResidue("A", "1", 190, ["LYS", "HIS", "ASP", "VAL"])
+        Res6 = StructMotifResidue("A", "1", 189, ["LYS", "HIS", "ASP", "VAL"])
+        ResList = [Res1, Res2]
 
         # no residues provided
         ok = False
@@ -1217,7 +1230,7 @@ class SearchTests(unittest.TestCase):
         # filepath missing for file upload
         ok = False
         try:
-            _ = StructMotifQuery(structure_search_type="file_upload", file_extension="cif", residue_ids=ResList)
+            _ = StructMotifQuery(structure_search_type="file_upload", file_format="cif", residue_ids=ResList)
         except AssertionError:
             ok = True
         self.assertTrue(ok)
@@ -1226,7 +1239,7 @@ class SearchTests(unittest.TestCase):
         # file url missing for file upload
         ok = False
         try:
-            _ = StructMotifQuery(structure_search_type="file_url", file_extension="cif", residue_ids=ResList)
+            _ = StructMotifQuery(structure_search_type="file_url", file_format="cif", residue_ids=ResList)
         except AssertionError:
             ok = True
         self.assertTrue(ok)

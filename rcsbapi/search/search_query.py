@@ -790,7 +790,7 @@ class StructSimilarityQuery(Terminal):
         entry_id: Optional[str] = None,
         file_url: Optional[str] = None,
         file_path: Optional[str] = None,
-        structure_input_type: Optional[str] = None,
+        structure_input_type: Optional[str] = None,  # DEPRECATED (to remove in version 2.0.0)
         assembly_id: Optional[str] = None,
         chain_id: Optional[str] = None,
         operator: StructSimOperator = "strict_shape_match",
@@ -804,13 +804,13 @@ class StructSimilarityQuery(Terminal):
             entry_id (Optional[str], optional): PDB ID or CSM ID (for structure_search_type="entry_id" only). Defaults to None.
             file_url (Optional[str], optional): URL to structure file (for structure_search_type="file_url" only). Defaults to None.
             file_path (Optional[str], optional): Local path to structure file (for structure_search_type="file_upload" only). Defaults to None.
-            structure_input_type (Optional[str], optional): DEPRECATED. This is controlled by provision of "assembly_id" or "chain_id".
-            assembly_id (Optional[str], optional): The assembly ID of the input structure to use for similarity searching.
-                                                   Defaults to "1" for structure_search_type="entry_id"; else defaults to None.
-            chain_id (Optional[str], optional): The chain (or "asym") ID of the input structure to use for similarity searching. Defaults to None.
             file_format (StructSimFormat, optional): Format of input structure file (for structure_search_type of "file_url" or "file_upload" only).
                                                      Options are "cif", "bcif", or "pdb".  Defaults to None.
             operator (StructSimOperator, optional): Search mode ("strict_shape_match" or "relaxed_shape_match"). Defaults to "strict_shape_match".
+            structure_input_type (Optional[str], optional): DEPRECATED: No longer needed. This is controlled by provision of "assembly_id" or "chain_id".
+            assembly_id (Optional[str], optional): The assembly ID of the input structure to use for similarity searching.
+                                                   Defaults to "1" for structure_search_type="entry_id"; else defaults to None.
+            chain_id (Optional[str], optional): The chain (or "asym") ID of the input structure to use for similarity searching. Defaults to None.
             target_search_space (StructSimSearchSpace, optional): Target objects against which the query will be compared for shape similarity.
                                                                   Defaults to "assembly" for "assembly_id"-based search.
                                                                   Defaults to "polymer_entity_instance" for "chain_id"-based search.
@@ -818,13 +818,12 @@ class StructSimilarityQuery(Terminal):
 
         parameters: Dict = {"operator": operator}
 
-        # Raise deprecation warning on usage of "structure_input_type". (Target for removal in version 2.0)
+        # Raise deprecation warning on usage of "structure_input_type" (targeted for removal in version 2.0.0)
         if structure_input_type:
             warn(
                 "Usage of 'structure_input_type' is deprecated and no longer needed (input type is inferred based on 'assembly_id' or 'chain_id'). Will be removed in version 2.0.0.",
                 category=DeprecationWarning,
-                # Set stacklevel so the warning returns to the caller of the code
-                stacklevel=2,
+                stacklevel=2,  # Set stacklevel so the warning returns to the caller of the code
             )
 
         # Check if both "assembly_id" and "chain_id" are provided
@@ -919,8 +918,8 @@ class StructMotifQuery(Terminal):
     """Special case of a terminal for structure motif queries.
 
     If you provide an entry_id, the other optional parameters can be ignored.
-    If you provide a file_url, you must also provide a file_extension.
-    If you provide a filepath, you must also provide a file_extension.
+    If you provide a file_url, you must also provide a file_format.
+    If you provide a file_upload, you must also provide a file_format.
 
     As is standard with Structure Motif Queries, you must include a list of residues.
 
@@ -933,9 +932,9 @@ class StructMotifQuery(Terminal):
         side_chain_distance_tolerance: StructMotifTolerance = 1,
         angle_tolerance: StructMotifTolerance = 1,
         entry_id: Optional[str] = None,
-        url: Optional[str] = None,
+        url: Optional[str] = None,  # DEPRECATED, in favor of 'file_url' (to remove in version 2.0.0)
         file_path: Optional[str] = None,
-        file_extension: Optional[str] = None,
+        file_extension: Optional[str] = None,  # DEPRECATED, in favor of 'file_format' (to remove in version 2.0.0)
         residue_ids: Optional[list] = None,  # List of StructMotifResidue objects
         rmsd_cutoff: int = 2,
         atom_pairing_scheme: StructMotifAtomPairing = "SIDE_CHAIN",
@@ -943,17 +942,23 @@ class StructMotifQuery(Terminal):
         allowed_structures: Optional[list] = None,  # List of strings
         excluded_structures: Optional[list] = None,  # List of strings
         limit: Optional[int] = None,
+        file_url: Optional[str] = None,  # TO REPLACE 'url'
+        file_format: Optional[StructSimFormat] = None,  # TO REPLACE 'file_extension'
     ):
         """
         Args:
-            structure_search_type (StructEntryType, optional): how to find given structure ("entry_id", "url", "file_path"). Defaults to "entry_id".
+            structure_search_type (StructEntryType, optional): Source of structure to use for structure similarity search.
+                                                               (Options are "entry_id", "file_url", "file_upload"). Defaults to "entry_id".
             backbone_distance_tolerance (StructMotifTolerance, optional): tolerance for distance between Cα atoms (in Å). Defaults to 1.
             side_chain_distance_tolerance (StructMotifTolerance, optional): tolerance for distance between Cβ atoms (in Å). Defaults to 1.
             angle_tolerance (StructMotifTolerance, optional): angle between CαCβ vectors (in multiples of 20 degrees). Defaults to 1.
-            entry_id (Optional[str], optional): if "entry_id" specified, PDB ID or CSM ID . Defaults to None.
-            url (Optional[str], optional): if "file_url" specified, url to file. Defaults to None.
-            file_path (Optional[str], optional): if "file_path" specified, path to file. Defaults to None.
-            file_extension (Optional[str], optional): if "file_url" specified, type of file linked to (ex: "cif"). Defaults to None.
+            entry_id (Optional[str], optional): PDB ID or CSM ID (for structure_search_type="entry_id" only). Defaults to None.
+            url (Optional[str], optional): DEPRECATED: Use 'file_url' instead. Defaults to None.
+            file_url (Optional[str], optional): URL to structure file (for structure_search_type="file_url" only). Defaults to None.
+            file_path (Optional[str], optional): Local path to structure file (for structure_search_type="file_upload" only). Defaults to None.
+            file_extension (Optional[str], optional): DEPRECATED: Use 'file_format' instead. Defaults to None.
+            file_format (StructSimFormat, optional): Format of input structure file (for structure_search_type of "file_url" or "file_upload" only).
+                                                     Options are "cif", "bcif", or "pdb".  Defaults to None.
             residue_ids (Optional[list], optional): list of StructMotifResidue objects . Defaults to None.
             rmsd_cutoff (int, optional): upper cutoff for root-mean-square deviation (RMSD) score. Defaults to 2.
             atom_pairing_scheme (StructMotifAtomPairing, optional): Which atoms to consider to compute RMSD scores and transformations. Defaults to "SIDE_CHAIN".
@@ -963,24 +968,55 @@ class StructMotifQuery(Terminal):
                 Defaults to None.
             limit (Optional[int], optional): stop after accepting this many hits. Defaults to None.
         """
-        # we will construct value, and then pass it through. That's like 95% of this lol
+        # construct the "value" query dictionary
+        value: Dict = {}
+
         if not residue_ids:
             raise ValueError("You must include residues in a Structure Motif Query")
         if len(residue_ids) > const.STRUCT_MOTIF_MAX_RESIDUES or len(residue_ids) < const.STRUCT_MOTIF_MIN_RESIDUES:
             raise ValueError("A Structure Motif Query Must contain 2-10 residues.")
-        value: Dict = {}
+
+        # Replace and raise warnings on deprecated arguments (targeted for removal in version 2.0.0)
+        if url is not None:
+            warn("Usage of 'url' parameter is deprecated and will be removed in version 2.0.0. Use 'file_url' instead.", category=DeprecationWarning, stacklevel=2)
+            if file_url is not None:
+                raise ValueError("Cannot specify both 'file_url' and 'url' arguments simultaneously. Only use 'file_url'.")
+            file_url = url
+
+        if file_extension is not None:
+            warn("Usage of 'file_extension' parameter is deprecated and will be removed in version 2.0.0. Use 'file_format' instead.", category=DeprecationWarning, stacklevel=2)
+            if file_format is not None:
+                raise ValueError("Cannot specify both 'file_format' and 'file_extension' arguments simultaneously. Only use 'file_format'.")
+            file_format = file_extension
+
+        # Check if file format is provided for input file/URL-based search
+        if file_format is None and structure_search_type in ["file_url", "file_upload"]:
+            # First try to determine it automatically
+            fp = file_url if structure_search_type == "file_url" else file_path
+            if fp:
+                fp = fp.lower()
+                if fp.endswith(".cif") or fp.endswith(".cif.gz"):
+                    file_format = "cif"
+                if fp.endswith(".bcif") or fp.endswith(".bcif.gz"):
+                    file_format = "bcif"
+                if fp.endswith(".pdb") or fp.endswith(".pdb.gz"):
+                    file_format = "pdb"
+            # If it's still None, raise error
+            if file_format is None:
+                raise ValueError("Must supply 'file_format' for input file/URL-based structure similarity search.")
+
         if structure_search_type == "entry_id":
             assert entry_id and isinstance(entry_id, str), "You must provide a valid entry_id for an entry_id query"
             value["entry_id"] = entry_id
         elif structure_search_type == "file_url":
-            assert url and isinstance(url, str), "You must provide a url for a file_url query"
-            assert file_extension and isinstance(file_extension, str), "you must provide a valid file extension"
-            value["url"] = url
-            value["format"] = file_extension
+            assert file_url and isinstance(file_url, str), "You must provide a url for a file_url query"
+            assert file_format and isinstance(file_format, str), "You must provide a valid file_format"
+            value["url"] = file_url
+            value["format"] = file_format
         elif structure_search_type == "file_upload":
-            assert file_path and isinstance(file_path, str), "you must provide a valid filepath"
-            assert file_extension and isinstance(file_extension, str), "you must provide a valid file_extension"
-            value["url"] = fileUpload(file_path, file_extension)
+            assert file_path and isinstance(file_path, str), "You must provide a valid file_path for a file_upload query"
+            assert file_format and isinstance(file_format, str), "You must provide a valid file_format"
+            value["url"] = fileUpload(file_path, file_format)
             value["format"] = "bcif"
         else:
             raise ValueError("Invalid Query Type Provided")

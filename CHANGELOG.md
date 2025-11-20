@@ -4,7 +4,10 @@
 
 - Updates to `StructSimilarityQuery` in `rcsbapi.search`:
   - Add support for specifying `assembly_id` or `asym_id` for input file/URL-based structure similarity searches
-  - Deprecate `structure_input_type` parameter (to be removed in version 2.0.0)
+  - Deprecate `structure_input_type` argument (to be removed in version 2.0.0)
+- Updates to `StructMotifQuery` in `rcsbapi.search`:
+  - Deprecate `url` argumemt in favor of `file_url` (to be removed in version 2.0.0)
+  - Deprecate `file_extension` argumemt in favor of `file_format` (to be removed in version 2.0.0)
 - Update Search API schema URL in `const.py` to use "https" (related to Issue [#90](https://github.com/rcsb/py-rcsb-api/issues/90))
 
 ## v1.4.2 (2025-10-10)
