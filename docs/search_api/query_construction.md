@@ -256,7 +256,7 @@ q3 = AttributeQuery(
     value="Escherichia coli"
 )
 
-# Using `group` ensures that `resource_name` and `accession_code` attributes are searched together
+# Using `group` ensures that `exptl.method` and `rcsb_id` attributes are searched together
 query = group(q1 & q2) & q3
 print(list(query()))
 print(query().get_editor_link())
@@ -464,7 +464,7 @@ for polyid in query("polymer_entity"):
 See [Sequence Motif Search Examples](additional_examples.md#Sequence-Motif-Search-Examples) for more use cases.
 
 ### Structure Similarity Search
-The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input, a `chain_id` or `assembly_id` must be specified, whether the input structure data should be compared to `assembly` or `polymer_entity_instance` (Chains) is required, and defining the search type as either `strict` or `relaxed` is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/structure-similarity-search) page.
+The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input, a `chain_id` or `assembly_id` must be specified, whether the input structure data should be compared to `assembly` or `polymer_entity_instance` (Chains) is required, and defining the search type as either `strict` or `relaxed` is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/3d-similarity-search) page.
 
 ```python
 from rcsbapi.search import StructSimilarityQuery
