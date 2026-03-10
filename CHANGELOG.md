@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.6.0 (2026-03-11)
+## v1.6.0 (2026-03-10)
 
 - Updated parameters for newly released embeddings-based structure similarity search ([`StructSimilarityQuery`](https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#structure-similarity-search))
   - Added `number_of_candidates`, `ptmscore_cutoff`, and `similarity_type` parameters
