@@ -77,7 +77,9 @@ class SearchSchemaGroup:
 
         def leaves(d):
             for v in d.values():
-                if "attribute" in v:
+                if isinstance(v, self.Attr) and "attribute" in v.__dict__:
+                    yield v
+                elif "attribute" in v:
                     yield v
                 else:
                     yield from leaves(v)

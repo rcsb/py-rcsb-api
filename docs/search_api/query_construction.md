@@ -256,7 +256,7 @@ q3 = AttributeQuery(
     value="Escherichia coli"
 )
 
-# Using `group` ensures that `resource_name` and `accession_code` attributes are searched together
+# Using `group` ensures that `exptl.method` and `rcsb_id` attributes are searched together
 query = group(q1 & q2) & q3
 print(list(query()))
 print(query().get_editor_link())
@@ -464,7 +464,7 @@ for polyid in query("polymer_entity"):
 See [Sequence Motif Search Examples](additional_examples.md#Sequence-Motif-Search-Examples) for more use cases.
 
 ### Structure Similarity Search
-The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input, a `chain_id` or `assembly_id` must be specified, whether the input structure data should be compared to `assembly` or `polymer_entity_instance` (Chains) is required, and defining the search type as either `strict` or `relaxed` is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/structure-similarity-search) page.
+The PDB archive can be queried using the 3D shape of a protein structure. To perform this query, 3D protein structure data must be provided as an input, a `chain_id` or `assembly_id` must be specified, whether the input structure data should be compared to `assembly` or `polymer_entity_instance` (Chains) is required, and defining the search type as either `strict` or `relaxed` is required. More information on how Structure Similarity Queries work can be found on the [RCSB PDB Structure Similarity Search](https://www.rcsb.org/docs/search-and-browse/advanced-search/3d-similarity-search) page.
 
 ```python
 from rcsbapi.search import StructSimilarityQuery
@@ -479,7 +479,7 @@ q1 = StructSimilarityQuery(
     structure_search_type="entry_id",
     entry_id="4HHB",
     assembly_id="1",
-    operator="strict_shape_match",
+    similarity_type="local",
     target_search_space="assembly"
 )
 for rid in q1("assembly"):
@@ -488,14 +488,16 @@ for rid in q1("assembly"):
 
 |Arguments                | Description                                                                 |Default      |
 |-------------------------|-----------------------------------------------------------------------------|-------------|
-|`structure_search_type`  |Source of structure to use for similarity search (`"entry_id"`, `"file_url"`, `"file_upload"`)   |"entry_id"   |
+|`structure_search_type`  |Source of structure to use for similarity search (`"entry_id"`, `"file_url"`, `"file_upload"`)   |`"entry_id"`   |
 |`entry_id`               |PDB ID or CSM ID (for `structure_search_type="entry_id"` only)               |             |
 |`file_url`               |URL to structure file (for `structure_search_type="file_url"` only)          |             |
 |`file_path`              |Local path to structure file (for `structure_search_type="file_upload"` only)|             |
 |`file_format`            |Format of input `file_url` or `file_path` (`"cif"`, `"bcif"`, or `"pdb"`)    |             |
 |`assembly_id`            |The assembly ID of the input structure to use for similarity searching.      |"1" (if `structure_search_type="entry_id"`); else `None` (entire structure file)         |
 |`chain_id`               |The chain (or "asym") ID of the input structure to use for similarity searching. |             |
-|`operator`               |Search mode (`"strict_shape_match"` or `"relaxed_shape_match"`)              |"strict_shape_match"|
+|`number_of_candidates`        |Controls the number of the most similar matches to return (`0` to `15000`) |`10000`|
+|`ptmscore_cutoff`        |Minimum predicted TM-score threshold above which hits will be returned (`0.0` to `1.0`) |`0.8`|
+|`similarity_type`        |Search mode (`"local"` or `"global"`). LOCAL favors local matches; GLOBAL applies length normalization to favor global similarity.              |`"local"`|
 |`target_search_space`    |Target objects against which the query will be compared for shape similarity |"assembly"   |
 
 

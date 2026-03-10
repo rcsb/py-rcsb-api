@@ -50,18 +50,17 @@ for polyid in rna("polymer_entity"):
     print(polyid)
 ```
 ## Structure Similarity Search Examples
-This is a more complex example that utilizes `chain_id`, the `relaxed_shape_match` operator, and a `target_search_space` of `polymer_entity_instance`. Specifying whether the input structure type is `chain_id` or `assembly_id` is very important. For example, specifying `chain_id` as the input structure type but inputting an assembly ID can lead to
-an error.
+This is a more complex example that utilizes `chain_id`, the `global` similarity type, and a `target_search_space` of `polymer_entity_instance`. Specifying whether the input structure type is `chain_id` or `assembly_id` is very important. For example, specifying `chain_id` as the input structure type but inputting an assembly ID can lead to an error.
 ```python
 from rcsbapi.search import StructSimilarityQuery
 
 # More complex query:
-# Entry ID value "4HHB", chain ID "B", operator "relaxed", and target search space "Chains"
+# Entry ID value "4HHB", chain ID "B", similarity type "global", and target search space "Chains"
 q2 = StructSimilarityQuery(
     structure_search_type="entry_id",
     entry_id="4HHB",
     chain_id="B",
-    operator="relaxed_shape_match",
+    similarity_type="global",
     target_search_space="polymer_entity_instance"
 )
 list(q2())
@@ -86,6 +85,24 @@ q4 = StructSimilarityQuery(
 )
 list(q4())
 ```
+
+Last, structure similarity queries allow users to specify the number of candidates to return as well as the predicted template modeling (pTM) score cutoff, which will affect the number of possible returned results. You can apply these settings as follows:
+```python
+from rcsbapi.search import StructSimilarityQuery
+
+# Specify number of candidates and pTM cutoff:
+q5 = StructSimilarityQuery(
+    structure_search_type="entry_id",
+    entry_id="4HHB",
+    assembly_id="1",
+    similarity_type="global",
+    target_search_space="assembly",
+    number_of_candidates=100,
+    ptmscore_cutoff=0.9,
+)
+list(q5())
+```
+
 
 ## Structure Motif Search Examples
 

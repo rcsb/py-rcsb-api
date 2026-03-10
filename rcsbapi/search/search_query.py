@@ -49,7 +49,7 @@ SequenceType = Literal["dna", "rna", "protein"]  # possible sequence types for s
 SeqMode = Literal["simple", "prosite", "regex"]  # possible sequence motif formats
 StructEntryType = Literal["entry_id", "file_url", "file_upload"]  # possible entry types for structure similarity search
 StructSimSearchSpace = Literal["polymer_entity_instance", "assembly"]  # target search spaces for structure similarity search
-StructSimOperator = Literal["strict_shape_match", "relaxed_shape_match"]  # possible operators for structure similarity search
+StructSimSearchType = Literal["local", "global"]  # target search spaces for structure similarity search
 StructSimFormat = Literal["cif", "bcif", "pdb"]  # possible file formats for structure similarity search
 StructMotifExchanges = Literal[
     "ALA",
@@ -788,37 +788,52 @@ class StructSimilarityQuery(Terminal):
         self,
         structure_search_type: StructEntryType = "entry_id",
         entry_id: Optional[str] = None,
-        file_url: Optional[str] = None,
-        file_path: Optional[str] = None,
-        structure_input_type: Optional[str] = None,  # DEPRECATED (to remove in version 2.0.0)
         assembly_id: Optional[str] = None,
         chain_id: Optional[str] = None,
-        operator: StructSimOperator = "strict_shape_match",
-        target_search_space: Optional[StructSimSearchSpace] = None,
+        file_url: Optional[str] = None,
+        file_path: Optional[str] = None,
         file_format: Optional[StructSimFormat] = None,
+        target_search_space: Optional[StructSimSearchSpace] = None,
+        number_of_candidates: int = 10000,
+        ptmscore_cutoff: float = 0.8,
+        similarity_type: Optional[StructSimSearchType] = "local",
+        operator: Optional[str] = None,  # DEPRECATED (to remove in version 2.0.0)
+        structure_input_type: Optional[str] = None,  # DEPRECATED (to remove in version 2.0.0)
     ):
         """
         Args:
             structure_search_type (StructEntryType, optional): Source of structure to use for structure similarity search.
                                                                (Options are "entry_id", "file_url", "file_upload"). Defaults to "entry_id".
-            entry_id (Optional[str], optional): PDB ID or CSM ID (for structure_search_type="entry_id" only). Defaults to None.
-            file_url (Optional[str], optional): URL to structure file (for structure_search_type="file_url" only). Defaults to None.
-            file_path (Optional[str], optional): Local path to structure file (for structure_search_type="file_upload" only). Defaults to None.
+            entry_id (str, optional): PDB ID or CSM ID (for structure_search_type="entry_id" only). Defaults to None.
+            assembly_id (str, optional): The assembly ID of the input structure to use for similarity searching.
+                                         Defaults to "1" for structure_search_type="entry_id"; else defaults to None.
+            chain_id (str, optional): The chain (or "asym") ID of the input structure to use for similarity searching. Defaults to None.
+            file_url (str, optional): URL to structure file (for structure_search_type="file_url" only). Defaults to None.
+            file_path (str, optional): Local path to structure file (for structure_search_type="file_upload" only). Defaults to None.
             file_format (StructSimFormat, optional): Format of input structure file (for structure_search_type of "file_url" or "file_upload" only).
                                                      Options are "cif", "bcif", or "pdb".  Defaults to None.
-            operator (StructSimOperator, optional): Search mode ("strict_shape_match" or "relaxed_shape_match"). Defaults to "strict_shape_match".
-            structure_input_type (Optional[str], optional): DEPRECATED: No longer needed. This is controlled by provision of "assembly_id" or "chain_id".
-            assembly_id (Optional[str], optional): The assembly ID of the input structure to use for similarity searching.
-                                                   Defaults to "1" for structure_search_type="entry_id"; else defaults to None.
-            chain_id (Optional[str], optional): The chain (or "asym") ID of the input structure to use for similarity searching. Defaults to None.
             target_search_space (StructSimSearchSpace, optional): Target objects against which the query will be compared for shape similarity.
                                                                   Defaults to "assembly" for "assembly_id"-based search.
                                                                   Defaults to "polymer_entity_instance" for "chain_id"-based search.
+            number_of_candidates (int): Controls the number of the most similar matches to return. The first item is the closest match,
+                                        with subsequent items decreasing in similarity. Lower values make searches faster but may exclude
+                                        relevant results, while higher values provide a more exhaustive search at the cost of increased
+                                        computation time. Must be between [0-15,000]. Default 10,000.
+            ptmscore_cutoff (float): Minimum predicted TM-score threshold above which hits will be returned. Must be between [0.0-1.0]. Default 0.8.
+            similarity_type (str): Structural matching mode: LOCAL favors local matches; GLOBAL applies length normalization to favor global similarity.
+                                   Must be either "local" or "global". Default "local".
+            operator (str, optional): DEPRECATED: No longer used. Use "number_of_candidates" and "ptmscore_cutoff" instead.
+            structure_input_type (str, optional): DEPRECATED: No longer needed. This is controlled by provision of "assembly_id" or "chain_id".
         """
-
-        parameters: Dict = {"operator": operator}
+        parameters: Dict = {"number_of_candidates": number_of_candidates, "ptmscore_cutoff": ptmscore_cutoff, "similarity_type": similarity_type}
 
         # Raise deprecation warning on usage of "structure_input_type" (targeted for removal in version 2.0.0)
+        if operator:
+            warn(
+                "Usage of 'operator' is deprecated and no longer used. Instead, use 'number_of_candidates' and 'ptmscore_cutoff'. Will be removed in version 2.0.0.",
+                category=DeprecationWarning,
+                stacklevel=2,  # Set stacklevel so the warning returns to the caller of the code
+            )
         if structure_input_type:
             warn(
                 "Usage of 'structure_input_type' is deprecated and no longer needed (input type is inferred based on 'assembly_id' or 'chain_id'). Will be removed in version 2.0.0.",
