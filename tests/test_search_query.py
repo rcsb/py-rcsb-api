@@ -1063,7 +1063,7 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("Query with file upload results: result length : (%d), ok : (%r)", len(result), ok)
 
-        # Query with relaxed operator
+        # Query with relaxed operator (deprecated)
         q5 = StructSimilarityQuery(
             structure_search_type="entry_id",
             entry_id="4HHB",
@@ -1072,7 +1072,7 @@ class SearchTests(unittest.TestCase):
         result = list(q5())
         ok = len(result) > 0
         self.assertTrue(ok)
-        logger.info("Query with relaxed operator results: result length : (%d), ok : (%r)", len(result), ok)
+        logger.info("Query with deprecated relaxed operator results: result length : (%d), ok : (%r)", len(result), ok)
 
         # Query with specifically polymer entity instance search space
         q6 = StructSimilarityQuery(
