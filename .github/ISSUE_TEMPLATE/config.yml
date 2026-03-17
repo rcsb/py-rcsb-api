@@ -1,0 +1,9 @@
+# Prevent users from creating blank issues
+blank_issues_enabled: false
+
+contact_links:
+  - name: General RCSB PDB questions
+    url: mailto:info@rcsb.org
+    about: |
+      If your question is not specific to Python or `rcsb-api`, but concerns RCSB.org APIs or data fields,
+      please email info@rcsb.org instead of opening an issue.

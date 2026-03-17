@@ -33,7 +33,9 @@ class SeqTests(unittest.TestCase):
         logger.info("Completed %s at %s (%.4f seconds)", self.id(), time.strftime("%Y %m %d %H:%M:%S", time.localtime()), endTime - self.__startTime)
 
     def testAnnotations(self) -> None:
-        with self.subTest(msg="1. Annotations query with filter"):
+        msg = "1. Annotations query with filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Annotations(
                     reference="NCBI_GENOME",
@@ -54,7 +56,9 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testAlignments(self) -> None:
-        with self.subTest(msg="1. Alignments query without filter"):
+        msg = "1. Alignments query without filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Alignments(
                     db_from="NCBI_PROTEIN",
@@ -66,7 +70,9 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="2. Alignments query with range"):
+        msg = "2. Alignments query with range"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Alignments(
                     db_from="NCBI_PROTEIN",
@@ -79,7 +85,9 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="3. Alignments query with target_alignments args"):
+        msg = "3. Alignments query with target_alignments args"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Alignments(
                     db_from="NCBI_PROTEIN",
@@ -99,7 +107,9 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testGroupAlignments(self) -> None:
-        with self.subTest(msg="1. group_alignments query without filter"):
+        msg = "1. group_alignments query without filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
@@ -109,7 +119,9 @@ class SeqTests(unittest.TestCase):
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="2. group_alignments query with filter"):
+        msg = "2. group_alignments query with filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = GroupAlignments(
                     group="MATCHING_UNIPROT_ACCESSION",
@@ -122,7 +134,9 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testGroupAnnotations(self) -> None:
-        with self.subTest(msg="1. group_annotations query without filter"):
+        msg = "1. group_annotations query without filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = GroupAnnotations(
                     group="MATCHING_UNIPROT_ACCESSION",
@@ -133,7 +147,9 @@ class SeqTests(unittest.TestCase):
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="2. group_annotations query with filter"):
+        msg = "2. group_annotations query with filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = GroupAnnotations(
                     group="MATCHING_UNIPROT_ACCESSION",
@@ -154,7 +170,9 @@ class SeqTests(unittest.TestCase):
                 self.fail(f"Failed unexpectedly: {error}")
 
     def testGroupAnnotationsSummary(self) -> None:
-        with self.subTest(msg="1. group_annotations_summary query without filter"):
+        msg = "1. group_annotations_summary query without filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = GroupAnnotationsSummary(
                     group="MATCHING_UNIPROT_ACCESSION",
@@ -165,7 +183,9 @@ class SeqTests(unittest.TestCase):
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
-        with self.subTest(msg="2. group_annotations_summary query with filter"):
+        msg = "2. group_annotations_summary query with filter"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = GroupAnnotationsSummary(
                     group="MATCHING_UNIPROT_ACCESSION",
@@ -189,7 +209,9 @@ class SeqTests(unittest.TestCase):
         # These examples come from:
         # https://sequence-coordinates.rcsb.org/#examples
 
-        with self.subTest(msg="1. UniProt - PDB Entity alignment"):
+        msg = "1. UniProt - PDB Entity alignment"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Alignments(
                     db_from="UNIPROT",
@@ -201,7 +223,9 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="2. Computed Structure Model - NCBI protein alignment"):
+        msg = "2. Computed Structure Model - NCBI protein alignment"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Alignments(
                     db_from="PDB_ENTITY",
@@ -213,7 +237,9 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="3. Mapping UniProt annotations to a PDB Instance"):
+        msg = "3. Mapping UniProt annotations to a PDB Instance"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Annotations(  # type: ignore
                     reference="PDB_INSTANCE",
@@ -225,28 +251,34 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="4. Human Chromosome 1 - PDB Entity alignment"):
+        msg = "4. Human Chromosome 1 - PDB Entity alignment"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Alignments(
                     db_from="NCBI_GENOME",
                     db_to="PDB_ENTITY",
-                    query_id="NC_000001",
+                    query_id="NC_000001",  # human chromosome 1
+                    range=[0, 10000000],  # query over only the first 10 million nucleotides (query is too heavy for full chromosome)
                     return_data_list=[
                         "target_alignments.target_id",
                         "target_alignments.orientation",
                         "target_alignments.aligned_regions"
-                    ]
+                    ],
                 )
                 query_obj.exec()
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="5. Mapping PDB Instance ligands binding sites to Human Chromosome 1"):
+        msg = "5. Mapping PDB Instance ligands binding sites to Human Chromosome 1"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Annotations(  # type: ignore
                     reference="NCBI_GENOME",
                     sources=["PDB_INSTANCE"],
-                    query_id="NC_000001",
+                    query_id="NC_000001",  # human chromosome 1
+                    range=[0, 10000000],  # query over only the first 10 million nucleotides (query is too heavy for full chromosome)
                     filters=[
                         AnnotationFilterInput(
                             field="TYPE",
@@ -260,7 +292,9 @@ class SeqTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
-        with self.subTest(msg="6. Mapping a PDB Instance to NCBI RefSeq proteins"):
+        msg = "6. Mapping a PDB Instance to NCBI RefSeq proteins"
+        logger.info("Running subtest %s", msg)
+        with self.subTest(msg=msg):
             try:
                 query_obj = Alignments(
                     db_from="PDB_INSTANCE",

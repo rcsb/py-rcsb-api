@@ -27545,6 +27545,18 @@
                     "description": "",
                     "fields": [
                         {
+                            "name": "Q_score",
+                            "description": "The Q-score for the non-polymer instance.\n\nExamples:\nnull, null\n",
+                            "args": [],
+                            "type": {
+                                "kind": "SCALAR",
+                                "name": "Float",
+                                "ofType": null
+                            },
+                            "isDeprecated": false,
+                            "deprecationReason": null
+                        },
+                        {
                             "name": "RSCC",
                             "description": "The real space correlation coefficient (RSCC) for the non-polymer entity instance.\n\nExamples:\nnull, null\n",
                             "args": [],

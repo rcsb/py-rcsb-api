@@ -20,7 +20,7 @@ To generate a query in this package, you would create a `DataQuery` object. The 
 
 The package is able to automatically build queries based on the "input_type" and path segment passed into "return_data_list". If using this package in code intended for long-term use, it's recommended to use the fully qualified path (a complete path from input type to the final data field). When autocompletion is being used, a WARNING message will be printed out as a reminder.
 
-To suppress the warning, either use the fully qualified path (as in the below example) or set the `suppress_autocomplete_warning` argument to True. To suppress the warning for all queries, change the SUPPRESS_AUTOCOMPLETE_WARNING flag in config.py.
+To suppress the warning, either use the fully qualified path (as in the below example) or set the `suppress_autocomplete_warning` argument to True. To suppress the warning for all queries, set the `SUPPRESS_AUTOCOMPLETE_WARNING` flag to `True` (see [custom configuration](custom_configuration.md)).
 
 
 ```python
@@ -86,6 +86,23 @@ print(result_dict)
 This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose, requesting all scalar fields under "exptl" (see [return_data_list](query_construction.md#return-data-list)).
 
 ## Jupyter Notebooks
+### Important changes to Jupyter behavior in Python 3.14+
+>
+> ***Warning:*** Usage of the Data API module in Jupyter environments has changed starting in **Python 3.14+**.
+>
+> When working in Jupyter with Python 3.14+, calls to `.exec()` must be **explicitly awaited**, for example:
+>
+> ```python
+> from rcsbapi.data import DataQuery
+>
+> query = DataQuery(input_type="entries", input_ids=[...], return_data_list=[...])
+>
+> results = await query.exec()
+> ```
+>
+> This change **does not** impact code run in standard Python scripts (of any Python version); it only affects code run in Jupyter that uses Python 3.14 or greater.
+
+
 A notebook briefly summarizing the [readthedocs](https://rcsbapi.readthedocs.io/en/latest/index.html) is available in [notebooks/data_quickstart.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/data_quickstart.ipynb) or online through Google Colab <a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/data_quickstart.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 Another notebook using both Search and Data API packages for a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](https://github.com/rcsb/py-rcsb-api/blob/master/notebooks/search_data_workflow.ipynb) or online through Google Colab <a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/search_data_workflow.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.

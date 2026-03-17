@@ -3,8 +3,9 @@ import time
 import sys
 import urllib.parse
 import re
-from typing import Any, Union, List, Dict, Optional, Tuple
+from typing import Any, Union, List, Dict, Optional, Tuple, Coroutine
 import json
+from warnings import warn
 import asyncio
 import httpx
 from tqdm import tqdm
@@ -12,13 +13,24 @@ from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import config
 from rcsbapi.const import const
 
-try:
-    # Detect if running inside IPython/Jupyter
-    if "ipykernel" in sys.modules:
-        import nest_asyncio
-        nest_asyncio.apply()
-except ImportError:
-    pass
+# Detect if running inside Jupyter
+if "ipykernel" in sys.modules:
+    if sys.version_info < (3, 14, 0):
+        try:
+            import nest_asyncio
+            nest_asyncio.apply()
+        except ImportError:
+            pass
+    else:  # if Python 3.14+
+        warn(
+            f'\nWARNING: Usage of the Data API module in Jupyter environments has changed starting in Python 3.14+ (you are using {sys.version.split()[0]}).\n'
+            'When working in Jupyter with Python 3.14+, `.exec()` calls must be explicitly awaited, e.g.:\n'
+            '    from rcsbapi.data import DataQuery\n'
+            '    query = DataQuery(input_type="entries", input_ids=[...], return_data_list=[...])\n'
+            '    results = await query.exec()\n',
+            category=RuntimeWarning,
+            stacklevel=0,
+        )
 
 logger = logging.getLogger(__name__)
 
@@ -184,8 +196,15 @@ class DataQuery:
         editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
         return str(editor_base_link + urllib.parse.quote(str(self._query["query"])))
 
-    def exec(self, batch_size: int = None, progress_bar: bool = False, max_retries: int = None, retry_backoff: int = None, max_concurrency: int = None) -> Dict[str, Any]:
-        """POST a GraphQL query and get response concurrently using httpx
+    def exec(
+        self,
+        batch_size: int = None,
+        progress_bar: bool = False,
+        max_retries: int = None,
+        retry_backoff: int = None,
+        max_concurrency: int = None
+    ) -> Union[Dict[str, Any], Coroutine[Any, Any, Dict[str, Any]]]:
+        """POST a GraphQL query and get response concurrently using httpx.
 
         Args:
             batch_size (int, optional): size of ID batches to split up input ID list into and perform sub-requests. Defaults to `config.DATA_API_BATCH_ID_SIZE`.
@@ -196,10 +215,16 @@ class DataQuery:
 
         Returns:
             Dict[str, Any]: JSON object containing the compiled query result (aggregated across all sub-requests)
+            OR:
+            Coroutine: If this is run via Jupyter with Python 3.14+, a coroutine is returned which must be awaited
         """
-        result = asyncio.run(self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_backoff=retry_backoff, max_concurrency=max_concurrency))
+        coro = self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_backoff=retry_backoff, max_concurrency=max_concurrency)
 
-        return result
+        if "ipykernel" in sys.modules and sys.version_info >= (3, 14, 0):
+            return coro
+        else:
+            result = asyncio.run(coro)
+            return result
 
     async def _async_exec(self, batch_size: int = None, progress_bar: bool = False, max_concurrency: int = None, max_retries: int = None, retry_backoff: int = None) -> Dict[str, Any]:
         """Run the asynchronous batch of requests.

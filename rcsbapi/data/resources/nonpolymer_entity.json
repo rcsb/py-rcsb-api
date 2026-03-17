@@ -531,6 +531,16 @@
                         {
                             "text": "The BIRD identifier for the entity in this container.",
                             "context": "dictionary"
+                        },
+                        {
+                            "text": "Ligand BIRD ID",
+                            "context": "brief"
+                        }
+                    ],
+                    "rcsb_search_group": [
+                        {
+                            "group_name": "Nonpolymer Molecular Features",
+                            "priority_order": 30
                         }
                     ]
                 },

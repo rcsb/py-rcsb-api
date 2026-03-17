@@ -87,6 +87,16 @@
                             {
                                 "text": "The calculated average Q-score.",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "Polymer Instance Average Q-Score",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Polymer Instance (Chain) Features",
+                                "priority_order": 25
                             }
                         ]
                     },
@@ -1160,6 +1170,33 @@
             "items": {
                 "type": "object",
                 "properties": {
+                    "Q_score": {
+                        "type": "number",
+                        "examples": [
+                            0.528,
+                            0.712
+                        ],
+                        "description": "The Q-score for the non-polymer instance.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The Q-score for the non-polymer instance.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Ligand Q-Score",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Nonpolymer Molecular Features",
+                                "priority_order": 20
+                            }
+                        ]
+                    },
                     "RSCC": {
                         "type": "number",
                         "examples": [
@@ -2206,7 +2243,7 @@
     ],
     "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_nonpolymer_entity_instance.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "schema: pdbx_core collection: pdbx_core_nonpolymer_entity_instance version: 10.1.0",
-    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_nonpolymer_entity_instance version 10.1.0. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_nonpolymer_entity_instance.json and follows JSON schema specification version 4",
-    "$comment": "schema_version: 10.1.0"
+    "title": "schema: pdbx_core collection: pdbx_core_nonpolymer_entity_instance version: 10.1.2",
+    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_nonpolymer_entity_instance version 10.1.2. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_nonpolymer_entity_instance.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 10.1.2"
 }

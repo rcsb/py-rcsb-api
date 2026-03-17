@@ -561,8 +561,14 @@
                             "context": "dictionary"
                         },
                         {
-                            "text": "Prd Id (Nonpolymer Entity Container Identifiers)",
+                            "text": "Ligand BIRD ID",
                             "context": "brief"
+                        }
+                    ],
+                    "rcsb_search_group": [
+                        {
+                            "group_name": "Nonpolymer Molecular Features",
+                            "priority_order": 30
                         }
                     ]
                 },
@@ -4761,7 +4767,7 @@
                             "context": "brief"
                         }
                     ],
-                    "rcsb_current_maximum_value": 1757635200000.0,
+                    "rcsb_current_maximum_value": 1772496000000.0,
                     "rcsb_current_minimum_value": 931305600000.0
                 },
                 "initial_release_date": {
@@ -4790,7 +4796,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1759881600000.0,
+                    "rcsb_current_maximum_value": 1773187200000.0,
                     "rcsb_current_minimum_value": 105235200000.0
                 },
                 "release_status": {
@@ -6752,7 +6758,7 @@
                             "priority_order": 10
                         }
                     ],
-                    "rcsb_current_maximum_value": 5795340.0,
+                    "rcsb_current_maximum_value": 5812500.0,
                     "rcsb_current_minimum_value": 0.0
                 },
                 "modeled_polymer_monomer_count": {
@@ -7844,8 +7850,8 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 4.0,
-                        "rcsb_current_minimum_value": 1.0
+                        "rcsb_current_maximum_value": 3.0,
+                        "rcsb_current_minimum_value": 0.0
                     },
                     "id": {
                         "type": "string",
@@ -8128,8 +8134,23 @@
                             {
                                 "text": "The calculated average Q-score.",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "Polymer Instance Average Q-Score",
+                                "context": "brief"
                             }
-                        ]
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Polymer Instance (Chain) Features",
+                                "priority_order": 25
+                            }
+                        ],
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_current_maximum_value": 0.99,
+                        "rcsb_current_minimum_value": -0.238
                     },
                     "average_residue_inclusion": {
                         "type": "number",
@@ -9184,6 +9205,35 @@
             "items": {
                 "type": "object",
                 "properties": {
+                    "Q_score": {
+                        "type": "number",
+                        "examples": [
+                            0.528,
+                            0.712
+                        ],
+                        "description": "The Q-score for the non-polymer instance.",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
+                        "rcsb_description": [
+                            {
+                                "text": "The Q-score for the non-polymer instance.",
+                                "context": "dictionary"
+                            },
+                            {
+                                "text": "Ligand Q-Score",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Nonpolymer Molecular Features",
+                                "priority_order": 20
+                            }
+                        ],
+                        "rcsb_current_maximum_value": 0.985,
+                        "rcsb_current_minimum_value": -0.763
+                    },
                     "RSCC": {
                         "type": "number",
                         "examples": [
@@ -9284,7 +9334,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 140.0,
+                        "rcsb_current_maximum_value": 168.0,
                         "rcsb_current_minimum_value": 0.0
                     },
                     "is_best_instance": {
@@ -10930,7 +10980,7 @@
                                             "context": "brief"
                                         }
                                     ],
-                                    "rcsb_current_maximum_value": 5.0,
+                                    "rcsb_current_maximum_value": 4.0,
                                     "rcsb_current_minimum_value": 1.0
                                 },
                                 "id": {
@@ -13418,8 +13468,14 @@
                             "context": "dictionary"
                         },
                         {
-                            "text": "Prd Id (Branched Entity Container Identifiers)",
+                            "text": "Branched BIRD ID",
                             "context": "brief"
+                        }
+                    ],
+                    "rcsb_search_group": [
+                        {
+                            "group_name": "Oligosaccharide/Branched Molecular Features",
+                            "priority_order": 35
                         }
                     ]
                 },
@@ -16145,7 +16201,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 40
+                                "priority_order": 45
                             }
                         ]
                     },
@@ -17155,7 +17211,7 @@
                                 "priority_order": 20
                             }
                         ],
-                        "rcsb_current_maximum_value": 2025.0,
+                        "rcsb_current_maximum_value": 2026.0,
                         "rcsb_current_minimum_value": 1947.0
                     }
                 },
@@ -17607,7 +17663,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1754697600000.0,
+                        "rcsb_current_maximum_value": 1770681600000.0,
                         "rcsb_current_minimum_value": -30047587200000.0
                     },
                     "pdbx_frequency": {
@@ -18895,7 +18951,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 340465.0,
+                        "rcsb_current_maximum_value": 1246669.0,
                         "rcsb_current_minimum_value": 1.0
                     },
                     "num_particles": {
@@ -19822,7 +19878,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "EM Method Details",
-                            "priority_order": 10
+                            "priority_order": 15
                         }
                     ]
                 },
@@ -19873,7 +19929,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "EM Method Details",
-                            "priority_order": 15
+                            "priority_order": 20
                         }
                     ]
                 }
@@ -20106,7 +20162,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 40
+                                "priority_order": 45
                             }
                         ]
                     },
@@ -20165,7 +20221,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 13833.0,
+                        "rcsb_current_maximum_value": 16184.0,
                         "rcsb_current_minimum_value": 1.0
                     },
                     "num_real_images": {
@@ -20222,7 +20278,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 35
+                                "priority_order": 40
                             }
                         ],
                         "rcsb_current_maximum_value": 300300.0,
@@ -20571,7 +20627,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 30
+                                "priority_order": 35
                             }
                         ]
                     },
@@ -20997,7 +21053,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 45
+                                "priority_order": 50
                             }
                         ]
                     }
@@ -21136,7 +21192,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 20
+                                "priority_order": 25
                             }
                         ]
                     },
@@ -21377,7 +21433,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 50
+                                "priority_order": 55
                             }
                         ]
                     },
@@ -21558,7 +21614,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 25
+                                "priority_order": 30
                             }
                         ]
                     },
@@ -28281,12 +28337,27 @@
                     "Q_score": {
                         "type": "number",
                         "description": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
                         "rcsb_description": [
                             {
                                 "text": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "Entry Average Q-Score",
+                                "context": "brief"
                             }
-                        ]
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "EM Method Details",
+                                "priority_order": 10
+                            }
+                        ],
+                        "rcsb_current_maximum_value": 0.99,
+                        "rcsb_current_minimum_value": -0.107
                     },
                     "atom_inclusion_all_atoms": {
                         "type": "number",
@@ -28811,7 +28882,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 1759190400000.0,
+                    "rcsb_current_maximum_value": 1771977600000.0,
                     "rcsb_current_minimum_value": 82339200000.0
                 },
                 "has_released_experimental_data": {
@@ -28873,7 +28944,7 @@
                             "priority_order": 25
                         }
                     ],
-                    "rcsb_current_maximum_value": 1759881600000.0,
+                    "rcsb_current_maximum_value": 1773187200000.0,
                     "rcsb_current_minimum_value": 201312000000.0
                 },
                 "major_revision": {
@@ -28923,7 +28994,7 @@
                             "priority_order": 30
                         }
                     ],
-                    "rcsb_current_maximum_value": 1759881600000.0,
+                    "rcsb_current_maximum_value": 1773187200000.0,
                     "rcsb_current_minimum_value": 1472601600000.0
                 },
                 "status_code": {
@@ -29154,7 +29225,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Nonpolymer Molecular Features",
-                                "priority_order": 20
+                                "priority_order": 25
                             }
                         ]
                     }
@@ -29187,7 +29258,7 @@
                                     ],
                                     "path": "rcsb_binding_affinity.value",
                                     "rcsb_current_minimum_value": 0.0,
-                                    "rcsb_current_maximum_value": 660693440.0
+                                    "rcsb_current_maximum_value": 500000000.0
                                 }
                             ]
                         },
@@ -29200,7 +29271,7 @@
                                         23000.0
                                     ],
                                     "path": "rcsb_binding_affinity.value",
-                                    "rcsb_current_minimum_value": 0.004000000189989805,
+                                    "rcsb_current_minimum_value": 0.006000000052154064,
                                     "rcsb_current_maximum_value": 50000000.0
                                 }
                             ]
@@ -29240,7 +29311,7 @@
                                         390000.0
                                     ],
                                     "path": "rcsb_binding_affinity.value",
-                                    "rcsb_current_minimum_value": 0.0,
+                                    "rcsb_current_minimum_value": 0.0007999999797903001,
                                     "rcsb_current_maximum_value": 300000000.0
                                 }
                             ]
@@ -29254,8 +29325,8 @@
                                         21.4
                                     ],
                                     "path": "rcsb_binding_affinity.value",
-                                    "rcsb_current_minimum_value": -64.9000015258789,
-                                    "rcsb_current_maximum_value": 30.137800216674805
+                                    "rcsb_current_minimum_value": -123.00959777832031,
+                                    "rcsb_current_maximum_value": 1683.699951171875
                                 }
                             ]
                         },
@@ -29267,9 +29338,7 @@
                                         66.9,
                                         123.0
                                     ],
-                                    "path": "rcsb_binding_affinity.value",
-                                    "rcsb_current_minimum_value": -131.6999969482422,
-                                    "rcsb_current_maximum_value": 73.1500015258789
+                                    "path": "rcsb_binding_affinity.value"
                                 }
                             ]
                         },
@@ -29281,9 +29350,7 @@
                                         18.1,
                                         47.2
                                     ],
-                                    "path": "rcsb_binding_affinity.value",
-                                    "rcsb_current_minimum_value": -102.05674743652344,
-                                    "rcsb_current_maximum_value": 1683.699951171875
+                                    "path": "rcsb_binding_affinity.value"
                                 }
                             ]
                         }
@@ -30005,7 +30072,7 @@
                             "priority_order": 80
                         }
                     ],
-                    "rcsb_current_maximum_value": 21394.0,
+                    "rcsb_current_maximum_value": 21388.0,
                     "rcsb_current_minimum_value": 0.0
                 },
                 "deposited_unmodeled_polymer_monomer_count": {
@@ -30050,7 +30117,7 @@
                             "priority_order": 65
                         }
                     ],
-                    "rcsb_current_maximum_value": 979257.0,
+                    "rcsb_current_maximum_value": 12.812,
                     "rcsb_current_minimum_value": 0.0
                 },
                 "diffrn_radiation_wavelength_minimum": {
@@ -30076,7 +30143,7 @@
                             "priority_order": 60
                         }
                     ],
-                    "rcsb_current_maximum_value": 97627.0,
+                    "rcsb_current_maximum_value": 12.812,
                     "rcsb_current_minimum_value": 0.0
                 },
                 "disulfide_bond_count": {
@@ -30843,7 +30910,7 @@
                         }
                     ],
                     "rcsb_current_maximum_value": 13596.14,
-                    "rcsb_current_minimum_value": 0.39
+                    "rcsb_current_minimum_value": 0.18
                 },
                 "polymer_molecular_weight_minimum": {
                     "type": "number",
@@ -32417,7 +32484,7 @@
                             "priority_order": 20
                         }
                     ],
-                    "rcsb_current_maximum_value": 2025.0,
+                    "rcsb_current_maximum_value": 2026.0,
                     "rcsb_current_minimum_value": 1969.0
                 }
             },
@@ -35567,7 +35634,7 @@
                             "priority_order": 18
                         }
                     ],
-                    "rcsb_current_maximum_value": 41034579.0,
+                    "rcsb_current_maximum_value": 41781612.0,
                     "rcsb_current_minimum_value": 5.0
                 }
             },
@@ -36117,10 +36184,25 @@
                             "BMH 71-18"
                         ],
                         "description": "The strain of the natural organism from which the gene was\n obtained, if relevant.",
+                        "rcsb_search_context": [
+                            "exact-match",
+                            "full-text"
+                        ],
+                        "rcsb_full_text_priority": 10,
                         "rcsb_description": [
                             {
                                 "text": "The strain of the natural organism from which the gene was\n obtained, if relevant.",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "Source Organism Strain",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Polymer Molecular Features",
+                                "priority_order": 80
                             }
                         ]
                     },
@@ -37432,7 +37514,7 @@
                                 "context": "brief"
                             }
                         ],
-                        "rcsb_current_maximum_value": 1045342.0,
+                        "rcsb_current_maximum_value": 1048437.0,
                         "rcsb_current_minimum_value": 1.0
                     },
                     "identity": {
@@ -37671,7 +37753,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 90
+                                            "priority_order": 105
                                         }
                                     ]
                                 },
@@ -37701,7 +37783,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 85
+                                            "priority_order": 100
                                         }
                                     ]
                                 }
@@ -37821,7 +37903,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 65
+                                "priority_order": 70
                             }
                         ]
                     },
@@ -37846,7 +37928,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 60
+                                "priority_order": 65
                             }
                         ]
                     },
@@ -37929,7 +38011,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 70
+                                "priority_order": 75
                             }
                         ]
                     },
@@ -37981,7 +38063,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 55
+                                            "priority_order": 60
                                         }
                                     ]
                                 },
@@ -38011,7 +38093,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 50
+                                            "priority_order": 55
                                         }
                                     ]
                                 }
@@ -38066,7 +38148,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 45
+                                            "priority_order": 50
                                         }
                                     ]
                                 }
@@ -38124,7 +38206,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 145
+                                "priority_order": 160
                             }
                         ]
                     },
@@ -38387,7 +38469,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 75
+                            "priority_order": 85
                         }
                     ],
                     "rcsb_current_maximum_value": 21.0,
@@ -38412,7 +38494,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "Polymer Molecular Features",
-                            "priority_order": 80
+                            "priority_order": 90
                         }
                     ],
                     "rcsb_current_maximum_value": 5.0,
@@ -38499,7 +38581,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 95
+                                        "priority_order": 110
                                     }
                                 ]
                             },
@@ -38527,7 +38609,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 100
+                                        "priority_order": 115
                                     }
                                 ]
                             }
@@ -38884,7 +38966,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 105
+                                "priority_order": 120
                             }
                         ]
                     },
@@ -38945,7 +39027,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 110
+                                "priority_order": 125
                             }
                         ]
                     },
@@ -39074,7 +39156,7 @@
                                             "context": "brief"
                                         }
                                     ],
-                                    "rcsb_current_maximum_value": 5.0,
+                                    "rcsb_current_maximum_value": 4.0,
                                     "rcsb_current_minimum_value": 0.0
                                 },
                                 "id": {
@@ -39097,7 +39179,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 115
+                                            "priority_order": 130
                                         }
                                     ]
                                 },
@@ -39122,7 +39204,7 @@
                                     "rcsb_search_group": [
                                         {
                                             "group_name": "Polymer Molecular Features",
-                                            "priority_order": 120
+                                            "priority_order": 135
                                         }
                                     ]
                                 }
@@ -39354,8 +39436,14 @@
                                 "context": "dictionary"
                             },
                             {
-                                "text": "Chem Comp Monomers (Polymer Entity Container Identifiers)",
+                                "text": "Monomer Component ID",
                                 "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "Polymer Molecular Features",
+                                "priority_order": 40
                             }
                         ]
                     },
@@ -39452,8 +39540,14 @@
                             "context": "dictionary"
                         },
                         {
-                            "text": "Prd Id (Polymer Entity Container Identifiers)",
+                            "text": "Polymer BIRD ID",
                             "context": "brief"
+                        }
+                    ],
+                    "rcsb_search_group": [
+                        {
+                            "group_name": "Polymer Molecular Features",
+                            "priority_order": 95
                         }
                     ]
                 },
@@ -39650,7 +39744,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 140
+                                        "priority_order": 155
                                     }
                                 ]
                             },
@@ -39697,7 +39791,7 @@
                                 "rcsb_search_group": [
                                     {
                                         "group_name": "Polymer Molecular Features",
-                                        "priority_order": 135
+                                        "priority_order": 150
                                     }
                                 ]
                             }
@@ -40200,7 +40294,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 125
+                                "priority_order": 140
                             }
                         ]
                     },
@@ -40227,7 +40321,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Polymer Molecular Features",
-                                "priority_order": 130
+                                "priority_order": 145
                             }
                         ]
                     },
@@ -41857,5 +41951,5 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Text Service Metadata",
     "description": "",
-    "$comment": "Schema version: 1.53.0"
+    "$comment": "Schema version: 1.55.0"
 }

@@ -1,0 +1,138 @@
+name: Issue report
+description: Report an issue
+title: "[ISSUE]: "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue with **rcsb-api**.
+        Please fill out the fields below to help us diagnose the issue.
+
+  - type: input
+    id: py_rcsb_api_version
+    attributes:
+      label: rcsb-api version
+      description: |
+        Please provide the installed version of rcsb-api.
+
+        Run:
+        `pip show rcsb-api`
+      placeholder: "e.g., 0.10.2"
+    validations:
+      required: true
+
+  - type: input
+    id: python_version
+    attributes:
+      label: Python version
+      description: |
+        Run:
+        `python --version`
+      placeholder: "e.g., Python 3.11.7"
+    validations:
+      required: true
+
+  - type: input
+    id: os_info
+    attributes:
+      label: Operating System
+      description: |
+        Please run the command for your OS and paste the result:
+
+        macOS:
+        `sw_vers`
+
+        Linux:
+        `cat /etc/os-release | grep PRETTY_NAME`
+
+        Windows:
+        `systeminfo | findstr /B /C:"OS Name" /C:"OS Version"`
+      placeholder: "e.g., macOS 14.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: interactive_env
+    attributes:
+      label: Execution environment
+      description: |
+        Please indicate where you are running the code.
+        This helps us diagnose environment-specific issues.
+      options:
+        - Standard Python script / terminal
+        - Jupyter Notebook
+        - Jupyter Lab
+        - Google Colab
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the issue
+      description: Provide a clear and concise description of the issue.
+      placeholder: |
+        A clear and concise description of what the issue is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal example that reproduces the issue.
+      placeholder: |
+        1. Import library
+        2. Run query
+        3. Observe error
+    validations:
+      required: true
+
+  - type: textarea
+    id: code_example
+    attributes:
+      label: Example code
+      description: Provide a minimal reproducible code example if possible.
+      render: python
+      placeholder: |
+        from rcsbapi.search import TextQuery
+
+        query = TextQuery("hemoglobin")
+        results = list(query.exec())
+
+  - type: input
+    id: pdb_id
+    attributes:
+      label: Example structure ID (if applicable)
+      description: Provide an example PDB ID or entry ID involved in the issue.
+      placeholder: "e.g., 4HHB"
+
+  - type: textarea
+    id: traceback
+    attributes:
+      label: Error traceback
+      description: Paste the full Python traceback here.
+      render: shell
+      placeholder: |
+        Traceback (most recent call last):
+          File "example.py", line 10, in <module>
+            ...
+        Exception: ...
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context about the problem here.
+        Screenshots, logs, or links can be helpful.

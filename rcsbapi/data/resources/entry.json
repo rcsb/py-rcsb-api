@@ -3099,7 +3099,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "EM Method Details",
-                            "priority_order": 10
+                            "priority_order": 15
                         }
                     ]
                 },
@@ -3150,7 +3150,7 @@
                     "rcsb_search_group": [
                         {
                             "group_name": "EM Method Details",
-                            "priority_order": 15
+                            "priority_order": 20
                         }
                     ]
                 }
@@ -3351,7 +3351,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 40
+                                "priority_order": 45
                             }
                         ]
                     },
@@ -3449,7 +3449,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 35
+                                "priority_order": 40
                             }
                         ]
                     },
@@ -3748,7 +3748,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 30
+                                "priority_order": 35
                             }
                         ]
                     },
@@ -4100,7 +4100,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 45
+                                "priority_order": 50
                             }
                         ]
                     }
@@ -4235,7 +4235,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 20
+                                "priority_order": 25
                             }
                         ]
                     },
@@ -4458,7 +4458,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 50
+                                "priority_order": 55
                             }
                         ]
                     },
@@ -4623,7 +4623,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "EM Method Details",
-                                "priority_order": 25
+                                "priority_order": 30
                             }
                         ]
                     },
@@ -11158,10 +11158,23 @@
                     "Q_score": {
                         "type": "number",
                         "description": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
+                        "rcsb_search_context": [
+                            "default-match"
+                        ],
                         "rcsb_description": [
                             {
                                 "text": "The overall Q-score of the fit of coordinates to the electron map.\nThe Q-score is defined in Pintilie, GH. et al., Nature Methods, 17, 328-334 (2020)",
                                 "context": "dictionary"
+                            },
+                            {
+                                "text": "Entry Average Q-Score",
+                                "context": "brief"
+                            }
+                        ],
+                        "rcsb_search_group": [
+                            {
+                                "group_name": "EM Method Details",
+                                "priority_order": 10
                             }
                         ]
                     },
@@ -12011,7 +12024,7 @@
                         "rcsb_search_group": [
                             {
                                 "group_name": "Nonpolymer Molecular Features",
-                                "priority_order": 20
+                                "priority_order": 25
                             }
                         ]
                     }
@@ -18162,7 +18175,7 @@
     ],
     "$id": "https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_entry.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "schema: pdbx_core collection: pdbx_core_entry version: 9.1.0",
-    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_entry version 9.1.0. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_entry.json and follows JSON schema specification version 4",
-    "$comment": "schema_version: 9.1.0"
+    "title": "schema: pdbx_core collection: pdbx_core_entry version: 9.1.1",
+    "description": "RCSB Exchange Database JSON schema derived from the pdbx_core content type schema. This schema supports collection pdbx_core_entry version 9.1.1. This schema is hosted in repository https://github.com/rcsb/py-rcsb_exdb_assets/tree/master/json_schema_definitions/json-min-db-pdbx_core-col-pdbx_core_entry.json and follows JSON schema specification version 4",
+    "$comment": "schema_version: 9.1.1"
 }

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "rcsb-api"
 description = "Python package interface for RCSB.org API services"
-version = "1.6.0"
+version = "1.7.0"
 requires-python = ">=3.9,<4.0"
 license = "MIT"
 license-files = ["LICENSE", "NOTICE.md"]
