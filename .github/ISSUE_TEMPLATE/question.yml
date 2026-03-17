@@ -1,0 +1,80 @@
+name: Question
+description: Ask a question about rcsb-api
+title: "[QUESTION]: "
+labels: ["question"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your question!
+
+        Please provide enough detail so we can give you a helpful answer.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: |
+        What are you trying to do? What is unclear?
+      placeholder: |
+        I'm trying to use the Search API to find structures matching...
+    validations:
+      required: true
+
+  - type: textarea
+    id: code_example
+    attributes:
+      label: Example code (if applicable)
+      description: |
+        Provide a code snippet showing what you've tried.
+      render: python
+      placeholder: |
+        from rcsbapi.search import TextQuery
+
+        query = TextQuery("kinase")
+        results = list(query.exec())
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected to happen
+      description: |
+        Describe what you thought would happen or what you're trying to achieve.
+      placeholder: |
+        I expected to get a list of structure IDs...
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened
+      description: |
+        What result or error did you encounter?
+      placeholder: |
+        I received an empty result / error message...
+
+  - type: input
+    id: python_version
+    attributes:
+      label: Python version (optional)
+      description: |
+        Run:
+        `python --version`
+      placeholder: "e.g., Python 3.11.7"
+
+  - type: input
+    id: library_version
+    attributes:
+      label: rcsb-api version (optional)
+      description: |
+        Run:
+        `pip show rcsb-api`
+      placeholder: "e.g., 0.10.2"
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: |
+        Add any extra details, links, or screenshots that may help.
