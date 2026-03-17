@@ -216,7 +216,7 @@ class DataQuery:
         Returns:
             Dict[str, Any]: JSON object containing the compiled query result (aggregated across all sub-requests)
             OR:
-            Coroutine: If this is run via Jupyter/IPython with Python 3.14+, a coroutine is returned which must be awaited 
+            Coroutine: If this is run via Jupyter/IPython with Python 3.14+, a coroutine is returned which must be awaited
         """
         coro = self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_backoff=retry_backoff, max_concurrency=max_concurrency)
 

@@ -54,6 +54,22 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: interactive_env
+    attributes:
+      label: Execution environment
+      description: |
+        Please indicate where you are running the code.
+        This helps us diagnose environment-specific issues.
+      options:
+        - Standard Python script / terminal
+        - Jupyter Notebook
+        - Google Colab
+        - IPython
+        - Other
+    validations:
+      required: true
+
   - type: textarea
     id: description
     attributes:
