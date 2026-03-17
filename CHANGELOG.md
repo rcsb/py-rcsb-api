@@ -2,8 +2,8 @@
 
 ## v1.7.0 (2026-03-16)
 
-- When working in Jupyter/IPython environments *with* Python 3.14+, execution of Data API queries (`DataQuery`) must be explicitly `awaited` ([see details](https://rcsbapi.readthedocs.io/en/latest/data_api/quickstart.html#important-changes-to-jupyter-ipython-behavior-in-python-3-14))
-  - This addresses an issue with the async behavior of Jupyter/IPython environments due to the kernel already having an active asyncio event loop running, coupled with changes to `asyncio` in Python 3.14 (Issue [#98](https://github.com/rcsb/py-rcsb-api/issues/98))
+- When working in Jupyter environments *with* Python 3.14+, execution of Data API queries (`DataQuery`) must be explicitly `awaited` ([see details](https://rcsbapi.readthedocs.io/en/latest/data_api/quickstart.html#important-changes-to-jupyter-behavior-in-python-3-14))
+  - This addresses an issue with the async behavior of Jupyter environments due to the kernel already having an active asyncio event loop running, coupled with changes to `asyncio` in Python 3.14 (Issue [#98](https://github.com/rcsb/py-rcsb-api/issues/98))
   - This change **does not** impact code run in standard Python scripts (of any Python version); it only affects code run in Jupyter that uses Python 3.14 or greater
 - Updates to documentation and notebooks
 - Add GitHub issue form templates

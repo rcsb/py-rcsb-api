@@ -13,7 +13,7 @@ from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import config
 from rcsbapi.const import const
 
-# Detect if running inside IPython/Jupyter
+# Detect if running inside Jupyter
 if "ipykernel" in sys.modules:
     if sys.version_info < (3, 14, 0):
         try:
@@ -23,8 +23,8 @@ if "ipykernel" in sys.modules:
             pass
     else:  # if Python 3.14+
         warn(
-            f'\nWARNING: Usage of the Data API module in Jupyter/IPython environments has changed starting in Python 3.14+ (you are using {sys.version.split()[0]}).\n'
-            'When working in Jupyter/IPython with Python 3.14+, `.exec()` calls must be explicitly awaited, e.g.:\n'
+            f'\nWARNING: Usage of the Data API module in Jupyter environments has changed starting in Python 3.14+ (you are using {sys.version.split()[0]}).\n'
+            'When working in Jupyter with Python 3.14+, `.exec()` calls must be explicitly awaited, e.g.:\n'
             '    from rcsbapi.data import DataQuery\n'
             '    query = DataQuery(input_type="entries", input_ids=[...], return_data_list=[...])\n'
             '    results = await query.exec()\n',
@@ -216,7 +216,7 @@ class DataQuery:
         Returns:
             Dict[str, Any]: JSON object containing the compiled query result (aggregated across all sub-requests)
             OR:
-            Coroutine: If this is run via Jupyter/IPython with Python 3.14+, a coroutine is returned which must be awaited
+            Coroutine: If this is run via Jupyter with Python 3.14+, a coroutine is returned which must be awaited
         """
         coro = self._async_exec(batch_size=batch_size, progress_bar=progress_bar, max_retries=max_retries, retry_backoff=retry_backoff, max_concurrency=max_concurrency)
 

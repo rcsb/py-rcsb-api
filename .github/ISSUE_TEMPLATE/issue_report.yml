@@ -64,8 +64,8 @@ body:
       options:
         - Standard Python script / terminal
         - Jupyter Notebook
+        - Jupyter Lab
         - Google Colab
-        - IPython
         - Other
     validations:
       required: true

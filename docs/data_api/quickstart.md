@@ -86,11 +86,11 @@ print(result_dict)
 This creates a valid query even though "exptl" doesn't return a scalar. However, the resulting query will be more verbose, requesting all scalar fields under "exptl" (see [return_data_list](query_construction.md#return-data-list)).
 
 ## Jupyter Notebooks
-### Important changes to Jupyter/IPython behavior in Python 3.14+
+### Important changes to Jupyter behavior in Python 3.14+
 >
-> ***Warning:*** Usage of the Data API module in Jupyter/IPython environments has changed starting in **Python 3.14+**.
+> ***Warning:*** Usage of the Data API module in Jupyter environments has changed starting in **Python 3.14+**.
 >
-> When working in Jupyter/IPython with Python 3.14+, calls to `.exec()` must be **explicitly awaited**, for example:
+> When working in Jupyter with Python 3.14+, calls to `.exec()` must be **explicitly awaited**, for example:
 >
 > ```python
 > from rcsbapi.data import DataQuery
