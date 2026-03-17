@@ -625,6 +625,16 @@
                         {
                             "text": "The BIRD identifier for the entity in this container.",
                             "context": "dictionary"
+                        },
+                        {
+                            "text": "Branched BIRD ID",
+                            "context": "brief"
+                        }
+                    ],
+                    "rcsb_search_group": [
+                        {
+                            "group_name": "Oligosaccharide/Branched Molecular Features",
+                            "priority_order": 35
                         }
                     ]
                 },
