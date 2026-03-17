@@ -18,16 +18,16 @@ body:
       label: Problem description
       description: |
         Is your feature request related to a problem or limitation?
-        Describe the problem clearly.
+        Describe the problem and/or real-world use case clearly.
       placeholder: |
         I'm trying to do X but the API currently only supports Y.
     validations:
       required: true
 
   - type: textarea
-    id: proposed_solution
+    id: proposed_feature
     attributes:
-      label: Proposed solution
+      label: Proposed feature
       description: |
         Describe the feature or improvement you would like to see.
       placeholder: |
@@ -46,44 +46,6 @@ body:
         from rcsbapi.search import NewFeature
 
         result = NewFeature(...)
-
-  - type: dropdown
-    id: api_component
-    attributes:
-      label: API component
-      description: Which part of rcsb-api would this affect?
-      options:
-        - Search API
-        - Data API
-        - Model API
-        - Sequence Coordinates API
-        - Documentation
-        - Installation / Packaging
-        - Performance
-        - Other
-    validations:
-      required: true
-
-  - type: textarea
-    id: use_case
-    attributes:
-      label: Use case
-      description: |
-        Describe the real-world use case for this feature.
-      placeholder: |
-        This feature would help when performing large-scale structure searches
-        for datasets involving...
-    validations:
-      required: true
-
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Alternatives considered
-      description: |
-        Have you considered alternative approaches or workarounds?
-      placeholder: |
-        Currently I work around this by...
 
   - type: textarea
     id: additional_context

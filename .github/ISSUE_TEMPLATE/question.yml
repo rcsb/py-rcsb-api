@@ -8,9 +8,12 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for your question!
+        Thank you for your question.
 
-        Please provide enough detail so we can give you a helpful answer.
+        If your question is concerned with RCSB.org APIs or data fields in general rather than specifically `rcsb-api` usage,
+        **please email us at info@rcsb.org instead** of opening an issue for a quicker response.
+
+        Otherwise, please provide as much detail as possible below.
 
   - type: textarea
     id: question
@@ -19,7 +22,7 @@ body:
       description: |
         What are you trying to do? What is unclear?
       placeholder: |
-        I'm trying to use the Search API to find structures matching...
+        I'm trying to use the Search API module to perform a sequence similarity search, but I can't form my query properly...
     validations:
       required: true
 

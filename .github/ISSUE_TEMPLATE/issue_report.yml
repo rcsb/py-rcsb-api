@@ -103,25 +103,24 @@ body:
 
         query = TextQuery("hemoglobin")
         results = list(query.exec())
-
-  - type: input
-    id: pdb_id
-    attributes:
-      label: Example structure ID (if applicable)
-      description: Provide an example PDB ID or entry ID involved in the issue.
-      placeholder: "e.g., 4HHB"
+    validations:
+      required: true
 
   - type: textarea
     id: traceback
     attributes:
       label: Error traceback
-      description: Paste the full Python traceback here.
+      description: |
+        Paste the full Python traceback here (type "N/A" if there is no output).
+        If the output is excessively long, type "Attached" and attach to "Additional context" as a text file.
       render: shell
       placeholder: |
         Traceback (most recent call last):
           File "example.py", line 10, in <module>
             ...
         Exception: ...
+    validations:
+      required: true
 
   - type: textarea
     id: expected
