@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.6.1 (2026-03-16)
+
+- When working in Jupyter/IPython environments *with* Python 3.14+, execution of Data API queries (`DataQuery`) must be explicitly `awaited` (Issue [#98](https://github.com/rcsb/py-rcsb-api/issues/98))
+  - This addresses an issue with the async behavior of Jupyter/IPython environments, which run within an active asyncio event loop
+  - This change **does not** impact code run in standard Python scripts (of any Python version); it only affects code run in Jupyter that uses Python 3.14 or greater.
+- Documentation fixes
+
 ## v1.6.0 (2026-03-10)
 
 - Updated parameters for newly released embeddings-based structure similarity search ([`StructSimilarityQuery`](https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#structure-similarity-search))
