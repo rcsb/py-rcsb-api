@@ -111,7 +111,7 @@ print(len(result_dict["data"]["entries"]))
 ```
 
 #### Batching large queries
-When executing large queries, the package will automatically batch the `input_ids` before requesting and merge the responses into one JSON object. The default batch size is 300 (as defined by `config.DATA_API_BATCH_ID_SIZE`), but this value can be adjusted in the `exec` method as shown below (or overwriting the [configuration value](custom_configuration.md)). Additionally, to see a progress bar that tracks which batches have been completed, you can set `progress_bar` to `True` as done below.
+When executing large queries, the package will automatically batch the `input_ids` before requesting and merge the responses into one JSON object. The default batch size is 300 (as defined by `config.DATA_API_BATCH_ID_SIZE`), but this value can be adjusted in the `exec` method as shown below (or overwriting the [configuration value](../config/custom_configuration.md)). Additionally, to see a progress bar that tracks which batches have been completed, you can set `progress_bar` to `True` as done below.
 
 ```python
 from rcsbapi.data import DataQuery as Query

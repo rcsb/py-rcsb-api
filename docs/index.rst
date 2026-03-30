@@ -64,7 +64,6 @@ Contents
    :maxdepth: 2
 
    config/custom_configuration.md
-   config/custom_configuration_2.md
 
 
 License

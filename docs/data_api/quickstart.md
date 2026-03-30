@@ -20,7 +20,7 @@ To generate a query in this package, you would create a `DataQuery` object. The 
 
 The package is able to automatically build queries based on the "input_type" and path segment passed into "return_data_list". If using this package in code intended for long-term use, it's recommended to use the fully qualified path (a complete path from input type to the final data field). When autocompletion is being used, a WARNING message will be printed out as a reminder.
 
-To suppress the warning, either use the fully qualified path (as in the below example) or set the `suppress_autocomplete_warning` argument to True. To suppress the warning for all queries, set the `SUPPRESS_AUTOCOMPLETE_WARNING` flag to `True` (see [custom configuration](custom_configuration.md)).
+To suppress the warning, either use the fully qualified path (as in the below example) or set the `suppress_autocomplete_warning` argument to True. To suppress the warning for all queries, set the `SUPPRESS_AUTOCOMPLETE_WARNING` flag to `True` (see [custom configuration](../config/custom_configuration.md)).
 
 
 ```python
