@@ -145,7 +145,7 @@ class SeqQuery(ABC):
                         e
                     )
                     raise
-                logger.info("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
+                logger.warning("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
                 time.sleep(retry_backoff)
                 retry_backoff *= 2  # exponential backoff
 
