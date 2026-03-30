@@ -20,7 +20,7 @@ from rcsbapi.search import search_attributes as attrs
 from rcsbapi.search import SEARCH_SCHEMA
 from rcsbapi.const import const
 
-logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -82,11 +82,15 @@ class SchemaTests(unittest.TestCase):
         ok = fetchSchema is not None
         logger.info("ok is %r", ok)
         self.assertTrue(ok)
+        # Ensure failure on 404
         errorURL = "https://httpbin.org/status/404"
-        fetchSchema = SEARCH_SCHEMA._fetch_schema(errorURL)
-        ok = fetchSchema is None
+        try:
+            fetchSchema = SEARCH_SCHEMA._fetch_schema(errorURL)
+        except (Exception, RuntimeError):
+            logger.exception("Failed as expected with:")
+            ok = False
         logger.info("ok is %r", ok)
-        self.assertTrue(ok)
+        self.assertFalse(ok)
 
     def testRcsbAttrs(self) -> None:
         with self.subTest(msg="1. Check type and descriptions exist for attributes"):

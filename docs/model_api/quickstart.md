@@ -162,7 +162,7 @@ print(result)
 
 ## Residue Interaction
 
-Use the `.get_residue_interaction()` method to fetch data (metadata and coordinates) on the surrounding residues of a given ligand or residue. If you only provide the `label_comp_id`, the server will return the interaction data for *all* occurrences of the component. This method takes crystal symmetry into account (returned data includes `_molstar_atom_site_operator_mapping`).
+Use the `.get_residue_interaction()` method to fetch data (metadata and coordinates) on the surrounding residues and ligands of a given ligand or residue. If you only provide the `label_comp_id`, the server will return the interaction data for *all* occurrences of the component. This method takes crystal symmetry into account (returned data includes `_molstar_atom_site_operator_mapping`).
 
 ```python
 from rcsbapi.model import ModelQuery
@@ -215,7 +215,7 @@ print(result)
 
 ## Residue Surroundings
 
-Use the `.get_residue_surroundings()` method to fetch data (metadata and coordinates) on the surrounding residues of a given ligand or residue. If you only provide the `label_comp_id`, the server will return the interaction data for *all* occurrences of the component. Similar to [Residue Interaction](#residue-interaction), but doesn't take crystal symmetry into account (returned data does *not* include `_molstar_atom_site_operator_mapping`).
+Use the `.get_residue_surroundings()` method to fetch data (metadata and coordinates) on the surrounding residues and ligands of a given ligand or residue. If you only provide the `label_comp_id`, the server will return the interaction data for *all* occurrences of the component. Similar to [Residue Interaction](#residue-interaction), but doesn't take crystal symmetry into account (returned data does *not* include `_molstar_atom_site_operator_mapping`).
 
 ```python
 from rcsbapi.model import ModelQuery
@@ -295,18 +295,18 @@ print(result)
 | `label_atom_id`       | The label for the ligand atom                                                    |
 | `auth_atom_id`        | The author atom ID for the ligand                                                |
 | `type_symbol`         | The chemical type symbol for the ligand                                          |
-| `omit_water`          | Whether to exclude water molecules from the surrounding ligands (default: False). (*Note: this does not appear to be functional on the ModelServer API yet*) |
+| `omit_water`          | Whether to exclude water molecules from the surrounding ligands (default: `False`). (*Note: this does not appear to be functional on the ModelServer API yet*) |
 | `radius`              | The interaction radius for surrounding ligands (default: 5.0)                    |
 | `assembly_name`       | The assembly name (optional)                                                     |
 | `model_nums`          | The model numbers to fetch (optional)                                            |
 | `encoding`            | The encoding format for the response (`cif`, `bcif`)                             |
-| `copy_all_categories` | Whether to copy all categories (default: False)                                  |
+| `copy_all_categories` | Whether to copy all categories (default: `False`)                                  |
 | `data_source`         | The data source for the surrounding ligands                                      |
 | `transform`           | Apply any transformations (optional)                                             |
 | `download`            | Whether to download the file (True/False)                                        |
 | `filename`            | The name of the file to save                                                     |
 | `file_directory`      | Directory to save the file                                                       |
-| `compress_gzip`       | Whether to compress the file (default: False)                                    |
+| `compress_gzip`       | Whether to compress the file (default: `False`)                                    |
 
 
 ## Symmetry Mates

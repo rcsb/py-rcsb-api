@@ -297,7 +297,6 @@ class DataQuery:
                     return response_json
 
                 except (httpx.RequestError, httpx.HTTPStatusError) as e:
-                    logger.debug("Retry attempt %r failed with exception:\n    %r\n", attempt, e)
                     if attempt == max_retries:
                         logger.error(
                             "Final retry attempt %r failed with exception:\n    %r\n"
@@ -306,7 +305,7 @@ class DataQuery:
                             e
                         )
                         raise
-                    logger.debug("Retrying in %r seconds...", retry_backoff)
+                    logger.info("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
                     await asyncio.sleep(retry_backoff)
                     retry_backoff *= 2  # exponential backoff
 

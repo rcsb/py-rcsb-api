@@ -205,14 +205,10 @@ class SearchSchema:
             self.nested_attribute_schema = self._extract_nested_indexing_contexts()
         self.search_attributes = self._make_schema_group()
 
-    def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=True):
+    def _reload_schema(self, schema_url: str, schema_file: str, refetch=True, use_fallback=False):
         sD = {}
         if refetch:
-            try:
-                sD = self._fetch_schema(schema_url)
-            except Exception as e:
-                logger.debug("Failed to fetch schema with exception: %r", e)
-                logger.error("ERROR: Failed to fetch schema from %r. Please check your internet connection and ability to access https://search.rcsb.org.", schema_url)
+            sD = self._fetch_schema(schema_url)
         if not sD and use_fallback:
             logger.warning("WARNING: Attempting to load schema from fallback resource file: %r", schema_file)
             try:
@@ -221,7 +217,10 @@ class SearchSchema:
                 logger.debug("Failed to load fallback schema with exception: %r", e)
                 logger.error("ERROR: Failed to load fallback schema from %r", schema_file)
         if not sD or len(sD) < 1:
-            raise RuntimeError("Failed to fetch and/or load search API schema. Please check your internet connection and ability to access https://search.rcsb.org.")
+            raise RuntimeError(
+                "Failed to fetch and/or load search API schema. Please check your internet connection and ability to access https://search.rcsb.org. "
+                "If problem persists, please contact us at info@rcsb.org."
+            )
         return sD
 
     def _make_schema_group(self) -> SearchSchemaGroup:
@@ -233,12 +232,20 @@ class SearchSchema:
     def _fetch_schema(self, url: str):
         "Request the current schema from the web"
         logger.info("Requesting %s", url)
-        response = httpx.get(url, timeout=None, headers={"User-Agent": const.USER_AGENT}, follow_redirects=True)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            logger.debug("HTTP response status code %r", response.status_code)
-            return None
+        try:
+            response = httpx.get(url, timeout=20, headers={"User-Agent": const.USER_AGENT}, follow_redirects=True)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error("Failed to fetch schema from url (%r) with status code: %r", url, response.status_code)
+        except Exception:
+            logger.exception("Failed to fetch schema from url (%r) with exception:", url)
+        logger.error("ERROR: Failed to fetch search API schema from url (%r).", url)
+        logger.error("       Please check your internet connection and ability to access https://search.rcsb.org. If problem persists, please contact us at info@rcsb.org.")
+        raise RuntimeError(
+            "Failed to fetch search API schema. Please check your internet connection and ability to access https://search.rcsb.org. "
+            "If problem persists, please contact us at info@rcsb.org."
+        )
 
     def _load_json_schema(self, schema_file):
         logger.info("Loading attribute schema from file")

@@ -17,7 +17,7 @@ import unittest
 
 from rcsbapi.sequence.seq_query import Alignments, GroupAlignments, Annotations, GroupAnnotations, GroupAnnotationsSummary, AnnotationFilterInput
 
-logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -41,6 +41,7 @@ class SeqTests(unittest.TestCase):
                     reference="NCBI_GENOME",
                     sources=["PDB_INSTANCE"],
                     query_id="NC_000001",
+                    range=[0, 10000000],  # query over only the first 10 million nucleotides (query is too heavy for full chromosome)
                     filters=[
                         AnnotationFilterInput(
                             field="TYPE",

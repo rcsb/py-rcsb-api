@@ -59,6 +59,13 @@ Contents
    model_api/quickstart.md
    model_api/api.rst
 
+.. toctree::
+   :caption: Configuration
+   :maxdepth: 2
+
+   config/custom_configuration.md
+
+
 License
 -------
 
