@@ -215,12 +215,12 @@ class ModelQuery:
                 if attempt == self._max_retries:
                     logger.error(
                         "Final retry attempt %r failed with exception:\n    %r\n"
-                        "Check query and parameters. If issue persists, try reducing 'config.MODEL_API_REQUESTS_PER_SECOND'.",
+                        "Check query and parameters. If issue persists, try reducing 'config.MODEL_API_REQUESTS_PER_SECOND' or increasing 'config.API_TIMEOUT'.",
                         attempt,
                         e
                     )
                     raise
-                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
+                logger.warning("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
                 time.sleep(retry_backoff)
                 retry_backoff *= 2  # exponential backoff
 

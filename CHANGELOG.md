@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.7.1 (2026-03-30)
+
+- Fix issue with `retry_backoff` usage in `rcsbapi.sequence` module
+- Move "Custom Configuration" readthedocs page to its own [section](https://rcsbapi.readthedocs.io/en/latest/config/custom_configuration.html)
+- Update search API schema fetching to include `timeout` (20 seconds) and more informative logging message
+- Various other logging updates
+
 ## v1.7.0 (2026-03-16)
 
 - When working in Jupyter environments *with* Python 3.14+, execution of Data API queries (`DataQuery`) must be explicitly `awaited` ([see details](https://rcsbapi.readthedocs.io/en/latest/data_api/quickstart.html#important-changes-to-jupyter-behavior-in-python-3-14))

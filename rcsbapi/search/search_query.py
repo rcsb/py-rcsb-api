@@ -2068,7 +2068,7 @@ class Session(Iterable[str]):
                         e
                     )
                     raise
-                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
+                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
                 time.sleep(retry_backoff)
                 retry_backoff *= 2  # exponential backoff
 

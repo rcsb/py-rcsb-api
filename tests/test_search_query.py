@@ -25,7 +25,7 @@ from rcsbapi.search import TextQuery, Attr, AttributeQuery, ChemSimilarityQuery,
 from rcsbapi.search import Facet, FacetRange, TerminalFilter, GroupFilter, FilterFacet, Sort, GroupBy, RankingCriteriaType
 from rcsbapi.search.search_query import PartialQuery, fileUpload, Session, Value, Terminal, Group, NestedAttributeQuery, NestedAttributeQueryChecker
 
-logging.basicConfig(level=logging.WARN, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -1132,28 +1132,28 @@ class SearchTests(unittest.TestCase):
         self.assertTrue(ok)
         logger.info("File url query using mmcif file format, relaxed, and chains: result length : (%d), ok : (%r)", len(result), ok)
 
-        # # Query for multi-assembly structure using "entry_id"-based search for assembly 1, and make sure it matches "file_url"-based search for assembly 1
-        # q11a = StructSimilarityQuery(
-        #     structure_search_type="entry_id",
-        #     entry_id="2ZA4",
-        #     assembly_id="1",
-        #     similarity_type="global",
-        #     target_search_space="assembly",
-        # )
-        # result_count_q11a = q11a(return_type="assembly", return_counts=True)
-        # q11b = StructSimilarityQuery(
-        #     structure_search_type="file_url",
-        #     file_url="https://files.rcsb.org/download/2ZA4.cif.gz",
-        #     file_format="cif",
-        #     assembly_id="1",
-        #     similarity_type="global",
-        #     target_search_space="assembly",
-        # )
-        # result_count_q11b = q11b(return_type="assembly", return_counts=True)
-        # logger.info("result count for q11a (%r) and q11b (%r)", result_count_q11a, result_count_q11b)
-        # ok = result_count_q11a == result_count_q11b
-        # logger.info("Query for assembly 1 of multi-assembly structure using 'entry_id' (%r) vs 'file_url' (%r), ok : (%r)", result_count_q11a, result_count_q11b, ok)
-        # self.assertTrue(ok)
+        # Query for multi-assembly structure using "entry_id"-based search for assembly 1, and make sure it matches "file_url"-based search for assembly 1
+        q11a = StructSimilarityQuery(
+            structure_search_type="entry_id",
+            entry_id="2ZA4",
+            assembly_id="1",
+            similarity_type="global",
+            target_search_space="assembly",
+        )
+        result_count_q11a = q11a(return_type="assembly", return_counts=True)
+        q11b = StructSimilarityQuery(
+            structure_search_type="file_url",
+            file_url="https://files.rcsb.org/download/2ZA4.cif.gz",
+            file_format="cif",
+            assembly_id="1",
+            similarity_type="global",
+            target_search_space="assembly",
+        )
+        result_count_q11b = q11b(return_type="assembly", return_counts=True)
+        logger.info("result count for q11a (%r) and q11b (%r)", result_count_q11a, result_count_q11b)
+        ok = result_count_q11a == result_count_q11b
+        logger.info("Query for assembly 1 of multi-assembly structure using 'entry_id' (%r) vs 'file_url' (%r), ok : (%r)", result_count_q11a, result_count_q11b, ok)
+        self.assertTrue(ok)
 
         # # Query for multi-assembly structure using 'file_url'-based search with and without specifying 'assembly_id'
         # q11c = StructSimilarityQuery(

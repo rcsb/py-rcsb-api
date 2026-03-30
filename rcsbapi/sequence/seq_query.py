@@ -140,12 +140,12 @@ class SeqQuery(ABC):
                 if attempt == max_retries:
                     logger.error(
                         "Final retry attempt %r failed with exception:\n    %r\n"
-                        "Check query and parameters.",
+                        "Check query and parameters. If issue persists, try limiting your query using the 'range' option, or increasing 'config.API_TIMEOUT'.",
                         attempt,
                         e
                     )
                     raise
-                logger.debug("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, self._retry_backoff)
+                logger.warning("Attempt %r failed: %r. Retrying in %r seconds...", attempt, e, retry_backoff)
                 time.sleep(retry_backoff)
                 retry_backoff *= 2  # exponential backoff
 
