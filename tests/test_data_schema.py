@@ -22,10 +22,9 @@ from rcsbapi.data import DATA_SCHEMA
 from rcsbapi.config import config
 from rcsbapi.const import const
 
-logging.basicConfig(level=logging.WARNING, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]-%(module)s.%(funcName)s: %(message)s")
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 class SchemaTests(unittest.TestCase):
