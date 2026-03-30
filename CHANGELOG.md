@@ -4,7 +4,7 @@
 
 - Fix issue with `retry_backoff` usage in `rcsbapi.sequence` module
 - Move "Custom Configuration" readthedocs page to its own [section](https://rcsbapi.readthedocs.io/en/latest/config/custom_configuration.html)
-- Update search API schema fetching to include `timeout` (20 seconds) and more informative logging message
+- Update search API schema fetching to include `timeout` (20 seconds) and more informative logging message (Issue [#90](https://github.com/rcsb/py-rcsb-api/issues/90))
 - Various other logging updates
 
 ## v1.7.0 (2026-03-16)
