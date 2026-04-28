@@ -35,17 +35,17 @@ The [_rcsb-api_](https://rcsbapi.readthedocs.io/en/latest/index.html) package pr
   - Upload custom structure files for structure similarity searches
   - Include computed structure models (CSMs) in search results
 
-- [Data API module](https://rcsbapi.readthedocs.io/en/latest/data_api/quickstart.html) (`rcsbapi.data`): 
-  - Retrieve any subset of metadata, features, and/or annotations for a given list of PDB IDs (e.g., experimental method details, structural annotations, binding sites, etc.) 
+- [Data API module](https://rcsbapi.readthedocs.io/en/latest/data_api/quickstart.html) (`rcsbapi.data`):
+  - Retrieve any subset of metadata, features, and/or annotations for a given list of PDB IDs (e.g., experimental method details, structural annotations, binding sites, etc.)
   - Easily fetch data for all structures across the archive
-  - Simplified GraphQL query construction using a Python syntax 
+  - Simplified GraphQL query construction using a Python syntax
 
-- [Sequence Coordinate API module](https://rcsbapi.readthedocs.io/en/latest/seq_api/quickstart.html) (`rcsbapi.sequence`): 
+- [Sequence Coordinate API module](https://rcsbapi.readthedocs.io/en/latest/seq_api/quickstart.html) (`rcsbapi.sequence`):
   - Query alignments between structural and sequence databases as well as protein positional annotations/features integrated from multiple resources
-  - Alignment data is available for NCBI RefSeq (including protein and genomic sequences), UniProt and PDB sequences
-  - Protein positional features are integrated from UniProt, CATH, SCOPe and RCSB PDB and collected from the RCSB PDB Data Warehouse 
+  - Alignment data is available for NCBI RefSeq (including protein and genomic sequences), UniProt and PDB sequences
+  - Protein positional features are integrated from UniProt, CATH, SCOPe and RCSB PDB and collected from the RCSB PDB Data Warehouse
 
-- [Model API module](https://rcsbapi.readthedocs.io/en/latest/model_api/quickstart.html) (`rcsbapi.model`): 
+- [Model API module](https://rcsbapi.readthedocs.io/en/latest/model_api/quickstart.html) (`rcsbapi.model`):
   - Provides access to molecular structure data (e.g., atomic coordinates) and related information (in mmCIF or BCIF formats)
   - Query for various structural data types, such as full structure, ligands, atoms, residue interactions, and more
   - Valuable for extracting out specific slices of a structure data file (not for bulk downloads, in which case see our [download services](https://www.rcsb.org/docs/programmatic-access/file-download-services))
@@ -55,7 +55,7 @@ Full package documentation is available at [readthedocs](https://rcsbapi.readthe
 ### Training Materials
 
 - Example usage for each module is available at [readthedocs](https://rcsbapi.readthedocs.io/en/latest/).
-- Several Jupyter notebooks with example use cases and workflows for all package modules are provided under [notebooks](notebooks/), which can be opened in Google Colab via the "Open in Colab" badge at the top of each notebook.
+- Several Jupyter notebooks with example use cases and workflows for all supported API services are provided under [notebooks](notebooks/), which can be opened in Google Colab via the "Open in Colab" badge at the top of each notebook.
 - Watch our webinar, [Streamlining Access to RCSB PDB APIs with Python](https://pdb101.rcsb.org/train/training-events/apis-python), which provides an introduction to our Search and Data APIs along with hands-on tutorials.
 
 ## Citing
