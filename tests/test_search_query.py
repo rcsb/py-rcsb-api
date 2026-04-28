@@ -1486,8 +1486,7 @@ class SearchTests(unittest.TestCase):
             structure_search_type="entry_id",
             entry_id="4HHB",  # Structure Similarity Query
             assembly_id="1",
-            operator="strict_shape_match",
-            target_search_space="assembly",
+            similarity_type="global",
         )
         result = q6(return_counts=True)
         ok = result == len(list(q6()))
