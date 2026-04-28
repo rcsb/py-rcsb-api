@@ -562,6 +562,35 @@ class QueryTests(unittest.TestCase):
             except Exception as error:
                 self.fail(f"Failed unexpectedly: {error}")
 
+    def testConfigChange(self) -> None:
+        msg = "1. Test correct changing of config settings"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
+            try:
+                logger.info("Current config.DATA_API_BATCH_ID_SIZE %s", config.DATA_API_BATCH_ID_SIZE)
+                config.DATA_API_BATCH_ID_SIZE = 100
+                logger.info("New config.DATA_API_BATCH_ID_SIZE %s", config.DATA_API_BATCH_ID_SIZE)
+                data_query = DataQuery(
+                    input_type="entries",
+                    input_ids=["4HHB", "2LGI"],
+                    return_data_list=["exptl.method"],
+                )
+                resD = data_query.exec()
+                logger.info("len(resD['data']['entries']): %r", len(resD["data"]["entries"]))
+            except Exception as error:
+                self.fail(f"Failed unexpectedly: {error}")
+
+        msg = "2. Test bad setting of config"
+        with self.subTest(msg=msg):
+            logger.info("Running subtest %s", msg)
+            try:
+                logger.info("Current config.DATA_API_BATCH_ID_SIZE %s", config.DATA_API_BATCH_ID_SIZE)
+                config.DATA_API_BATCH_ID_SIZE = 1001
+                self.fail(f"Passed unexpectedly - should have failed")
+            except Exception as error:
+                logger.info(f"Failed expectedly with: {error}")
+                logger.info("Final config.DATA_API_BATCH_ID_SIZE %s", config.DATA_API_BATCH_ID_SIZE)
+
     def testAllStructures(self) -> None:
         from rcsbapi.data import ALL_STRUCTURES
 
@@ -605,6 +634,7 @@ def buildQuery() -> unittest.TestSuite:
     suiteSelect.addTest(QueryTests("testQuickstartNotebook"))
     suiteSelect.addTest(QueryTests("testDifferentPathsToRedundantTarget"))
     suiteSelect.addTest(QueryTests("testSearchDataNotebook"))
+    suiteSelect.addTest(QueryTests("testConfigChange"))
     suiteSelect.addTest(QueryTests("testAllStructures"))
     return suiteSelect
 

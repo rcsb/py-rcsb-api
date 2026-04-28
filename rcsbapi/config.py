@@ -12,11 +12,9 @@ Example:
     # Override the default warning suppression flag
     config.SUPPRESS_AUTOCOMPLETE_WARNING = True
 """
-from __future__ import annotations
 
 import logging
-from pydoc import locate
-from typing import Any
+from typing import Any, get_type_hints
 from rcsbapi.const import const
 
 logger = logging.getLogger(__name__)
@@ -34,19 +32,31 @@ class Config:
     MODEL_API_REQUESTS_PER_SECOND: int = 10      # Requests per second limit for the Model API
     SUPPRESS_AUTOCOMPLETE_WARNING: bool = False  # Turn off autocompletion warnings from being raised for Data API queries
 
+    # Cache resolved type hints at class level (avoids recomputing)
+    _TYPE_HINTS = None
+
+    @classmethod
+    def _get_type_hints(cls):
+        if cls._TYPE_HINTS is None:
+            cls._TYPE_HINTS = get_type_hints(cls)
+        return cls._TYPE_HINTS
+
     def __setattr__(self, name: str, value: Any) -> None:
-        """Verify attribute exists when a user tries to set a configuration parameter, and ensure proper typing.
-        Raises an error if user accidentally tries to create a new, unused attribute (e.g., due to a typo or misspelling),
-        or sets it to an unexpected type.
-        """
+        """Validate attribute existence, type, and constraints."""
         # Verify attribute exists
         if not hasattr(self, name):
             raise AttributeError(f"'{name}' is not a valid attribute of Config class")
 
+        # Resolve type hints safely
+        type_hints = self._get_type_hints()
+        expected_type = type_hints.get(name)
+
         # Enforce consistent typing
-        expected_type = locate(self.__annotations__.get(name, None))
         if expected_type and not isinstance(value, expected_type):
-            raise TypeError(f"Expected type '{expected_type.__name__}' for attribute '{name}', but got '{type(value).__name__}'")
+            raise TypeError(
+                f"Expected type '{expected_type.__name__}' for attribute '{name}', "
+                f"but got '{type(value).__name__}'"
+            )
 
         # Enforce value constraints
         if name == "DATA_API_BATCH_ID_SIZE":

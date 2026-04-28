@@ -230,8 +230,8 @@ class DataQuery:
         """Run the asynchronous batch of requests.
         """
         batch_size = batch_size if batch_size else config.DATA_API_BATCH_ID_SIZE
-        if batch_size > 1000:
-            raise ValueError(f"Max value for Data API `batch_size` is 1000 (currently set to {batch_size})")
+        if batch_size > const.DATA_API_MAX_BATCH_ID_SIZE:
+            raise ValueError(f"Max value for Data API `batch_size` is {const.DATA_API_MAX_BATCH_ID_SIZE} (currently set to {batch_size})")
         max_concurrency = max_concurrency if max_concurrency else config.DATA_API_MAX_CONCURRENT_REQUESTS
         max_retries = max_retries if max_retries else config.MAX_RETRIES
         retry_backoff = retry_backoff if retry_backoff else config.RETRY_BACKOFF
