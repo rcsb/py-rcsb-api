@@ -7,7 +7,7 @@
 [![fair-software.eu](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F%20%20%E2%97%8F-green)](https://fair-software.eu)
 
 
-# <img src="https://github.com/user-attachments/assets/248d3e32-7644-46b2-bf18-b5248c9e6305" height="160"/> &nbsp;&nbsp; *rcsb-api*: Python Toolkit for Accessing RCSB.org APIs
+# <img src="https://github.com/user-attachments/assets/248d3e32-7644-46b2-bf18-b5248c9e6305" height="160"/><br>*rcsb-api*: Python Toolkit for Accessing RCSB.org APIs
 Python interface for RCSB Protein Data Bank API services at [RCSB.org](https://www.rcsb.org/).
 
 ## Installation
@@ -26,122 +26,37 @@ Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api/) and install loc
     cd py-rcsb-api
     pip install .
 
-## Getting Started
-Full documentation available at [readthedocs](https://rcsbapi.readthedocs.io/en/latest/).
+## Overview
+The [_rcsb-api_](https://rcsbapi.readthedocs.io/en/latest/index.html) package provides a simple Pythonic interface to the suite of [RCSB PDB APIs](https://www.rcsb.org/docs/programmatic-access/web-apis-overview) for querying and fetching data in the PDB. Specifically, each API service is provided as a separate "module" (or sub-package) within the Python client, and offers the following set of key functionalities:
 
-The [RCSB PDB Search API](https://search.rcsb.org) supports RESTful requests according to a defined [schema](https://search.rcsb.org/redoc/index.html). This package provides an `rcsbapi.search` module that simplifies generating complex search queries.
+- [Search API module](https://rcsbapi.readthedocs.io/en/latest/search_api/quickstart.html) (`rcsbapi.search`):
+  - Perform all search types available through the RCSB.org Advanced Search builder (e.g., full-text, attribute-based, sequence and structure similarity, sequence and structure motif)
+  - Use simple Boolean logic to intuitively construct complex or nested queries
+  - Upload custom structure files for structure similarity searches
+  - Include computed structure models (CSMs) in search results
 
-The [RCSB PDB Data API](https://data.rcsb.org) supports requests using [GraphQL](https://graphql.org/), a language for API queries. This package provides an `rcsbapi.data` module that simplifies generating queries in GraphQL syntax.
+- [Data API module](https://rcsbapi.readthedocs.io/en/latest/data_api/quickstart.html) (`rcsbapi.data`): 
+  - Retrieve any subset of metadata, features, and/or annotations for a given list of PDB IDs (e.g., experimental method details, structural annotations, binding sites, etc.) 
+  - Easily fetch data for all structures across the archive
+  - Simplified GraphQL query construction using a Python syntax 
 
-### Search API
-The `rcsbapi.search` module supports all available [Advanced Search](https://www.rcsb.org/search/advanced) services, as listed below. For more details on their usage, see [Search Service Types](https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#search-service-types).
+- [Sequence Coordinate API module](https://rcsbapi.readthedocs.io/en/latest/seq_api/quickstart.html) (`rcsbapi.sequence`): 
+  - Query alignments between structural and sequence databases as well as protein positional annotations/features integrated from multiple resources
+  - Alignment data is available for NCBI RefSeq (including protein and genomic sequences), UniProt and PDB sequences
+  - Protein positional features are integrated from UniProt, CATH, SCOPe and RCSB PDB and collected from the RCSB PDB Data Warehouse 
 
-|Search service                    |QueryType                 |
-|----------------------------------|--------------------------|
-|Full-text                         |`TextQuery()`             |
-|Attribute (structure or chemical) |`AttributeQuery()`        |
-|Sequence similarity               |`SeqSimilarityQuery()`    |
-|Sequence motif                    |`SeqMotifQuery()`         |
-|Structure similarity              |`StructSimilarityQuery()` |
-|Structure motif                   |`StructMotifQuery()`      |
-|Chemical similarity               |`ChemSimilarityQuery()`   |
+- [Model API module](https://rcsbapi.readthedocs.io/en/latest/model_api/quickstart.html) (`rcsbapi.model`): 
+  - Provides access to molecular structure data (e.g., atomic coordinates) and related information (in mmCIF or BCIF formats)
+  - Query for various structural data types, such as full structure, ligands, atoms, residue interactions, and more
+  - Valuable for extracting out specific slices of a structure data file (not for bulk downloads, in which case see our [download services](https://www.rcsb.org/docs/programmatic-access/file-download-services))
 
-#### Search API Examples
-To perform a search for all structures from humans associated with the term "Hemoglobin", you can combine a "full-text" query (`TextQuery`) with an "attribute" query (`AttributeQuery`):
+Full package documentation is available at [readthedocs](https://rcsbapi.readthedocs.io/en/latest/).
 
-```python
-from rcsbapi.search import AttributeQuery, TextQuery
-from rcsbapi.search import search_attributes as attrs
+### Training Materials
 
-# Construct a "full-text" sub-query for structures associated with the term "Hemoglobin"
-q1 = TextQuery(value="Hemoglobin")
-
-# Construct an "attribute" sub-query to search for structures from humans
-q2 = AttributeQuery(
-    attribute="rcsb_entity_source_organism.scientific_name",
-    operator="exact_match",  # Other operators include "contains_phrase", "exists", and more
-    value="Homo sapiens"
-)
-# OR, do so by using Python bitwise operators:
-q2 = attrs.rcsb_entity_source_organism.scientific_name == "Homo sapiens"
-
-# Combine the sub-queries (can sub-group using parentheses and standard operators, "&", "|", etc.)
-query = q1 & q2
-
-# Fetch the results by iterating over the query execution
-for rId in query():
-    print(rId)
-
-# OR, capture them into a variable
-results = list(query())
-```
-
-These examples are in `operator` syntax. You can also make queries in `fluent` syntax. Learn more about both syntaxes and implementation details in [Query Syntax and Execution](https://rcsbapi.readthedocs.io/en/latest/search_api/query_construction.html#query-syntax-and-execution).
-
-
-### Data API
-The `rcsbapi.data` module allows you to easily construct GraphQL queries to the RCSB.org Data API.
-
-This is done by specifying the following input:
-- "input_type": the data hierarchy level you are starting from (e.g., "entry", "polymer_entity", etc.) (See full list [here](https://rcsbapi.readthedocs.io/en/latest/data_api/query_construction.html#input-type)).
-- "input_ids": the list of IDs for which to fetch data (corresponding to the specified "input_type")
-- "return_data_list": the list of data items ("fields") to retrieve. (Available fields can be explored [here](https://data.rcsb.org/data-attributes.html) or via  the [GraphiQL editor's Documentation Explorer panel](https://data.rcsb.org/graphql/index.html).)
-
-#### Data API Examples
-This is a [simple query](https://data.rcsb.org/graphql/index.html?query=%7B%0A%20%20entry(entry_id%3A%20%224HHB%22)%20%7B%0A%20%20%20%20exptl%20%7B%0A%20%20%20%20%20%20method%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D) requesting the experimental method of a structure with PDB ID 4HHB (Hemoglobin).
-
-The query must be executed using the `.exec()` method, which will return the JSON response as well as store the response as an attribute of the `DataQuery` object. From the object, you can access the Data API response, get an interactive editor link, or access the arguments used to create the query.
-The package is able to automatically build queries based on the "input_type" and path segment passed into "return_data_list". If using this package in code intended for long-term use, it's recommended to use fully qualified paths. When autocompletion is being used, an WARNING message will be printed out as a reminder.
-
-```python
-from rcsbapi.data import DataQuery as Query
-query = Query(
-    input_type="entries",
-    input_ids=["4HHB"],
-    return_data_list=["exptl.method"]
-)
-print(query.exec())
-```
-Data is returned in JSON format
-```json
-{
-  "data": {
-    "entries": [
-      {
-        "rcsb_id": "4HHB",
-        "exptl": [
-          {
-            "method": "X-RAY DIFFRACTION"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-Here is a [more complex query](https://data.rcsb.org/graphql/index.html?query=%7B%0A%20%20polymer_entities(entity_ids%3A%5B%222CPK_1%22%2C%223WHM_1%22%2C%222D5Z_1%22%5D)%20%7B%0A%20%20%20%20rcsb_id%0A%20%20%20%20rcsb_entity_source_organism%20%7B%0A%20%20%20%20%20%20ncbi_taxonomy_id%0A%20%20%20%20%20%20ncbi_scientific_name%0A%20%20%20%20%7D%0A%20%20%20%20rcsb_cluster_membership%20%7B%0A%20%20%20%20%20%20cluster_id%0A%20%20%20%20%20%20identity%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D). Note that periods can be used to further specify requested data in return_data_list. Also note multiple return data items and ids can be requested in one query.
-```python
-from rcsbapi.data import DataQuery as Query
-query = Query(
-    input_type="polymer_entities",
-    input_ids=["2CPK_1", "3WHM_1", "2D5Z_1"],
-    return_data_list=[
-        "polymer_entities.rcsb_id",
-        "rcsb_entity_source_organism.ncbi_taxonomy_id",
-        "rcsb_entity_source_organism.ncbi_scientific_name",
-        "cluster_id",
-        "identity"
-    ]
-)
-print(query.exec())
-```
-
-## Jupyter Notebooks
-Several Jupyter notebooks with example use cases and workflows for all package modules are provided under [notebooks](notebooks/).
-
-For example, one notebook using both Search and Data API packages for a COVID-19 related example is available in [notebooks/search_data_workflow.ipynb](notebooks/search_data_workflow.ipynb) or online through Google Colab <a href="https://colab.research.google.com/github/rcsb/py-rcsb-api/blob/master/notebooks/search_data_workflow.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>.
-
+- Example usage for each module is available at [readthedocs](https://rcsbapi.readthedocs.io/en/latest/).
+- Several Jupyter notebooks with example use cases and workflows for all package modules are provided under [notebooks](notebooks/), which can be opened in Google Colab via the "Open in Colab" badge at the top of each notebook.
+- Watch our webinar, [Streamlining Access to RCSB PDB APIs with Python](https://pdb101.rcsb.org/train/training-events/apis-python), which provides an introduction to our Search and Data APIs along with hands-on tutorials.
 
 ## Citing
 Please cite the ``rcsb-api`` package with the following reference:

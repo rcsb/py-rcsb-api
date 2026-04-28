@@ -3,6 +3,9 @@
 ## v1.7.2 (2026-04-28)
 
 - Set maximum possible value for `DATA_API_BATCH_ID_SIZE` to be 1000
+- Use `typing.get_type_hints` in `config.py` instead of `annotations` (Issue [#86](https://github.com/rcsb/py-rcsb-api/issues/86))
+- Remove `from __future__ import annotations` statements, as this is [now deprecated](https://docs.python.org/3/whatsnew/3.14.html#from-future-import-annotations) starting in Python 3.14
+- Update `README.md`
 
 ## v1.7.1 (2026-03-30)
 
