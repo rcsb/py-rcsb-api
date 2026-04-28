@@ -125,7 +125,7 @@ query = Query(
 
 # Executing query with larger batch size and progress bar
 result_dict = query.exec(
-  batch_size=7000,
+  batch_size=500,
   progress_bar=True
 )
 

@@ -63,6 +63,7 @@ class Const:
         "uniprot": "uniprot.json",
         "drugbank": "drugbank.json",
     }))
+    DATA_API_MAX_BATCH_ID_SIZE: int = 1000
 
     SEQUENCE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
     SEQUENCE_API_GRAPHQL_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"

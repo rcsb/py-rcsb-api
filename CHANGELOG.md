@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.2 (2026-04-28)
+
+- Set maximum possible value for `DATA_API_BATCH_ID_SIZE` to be 1000
+
 ## v1.7.1 (2026-03-30)
 
 - Fix issue with `retry_backoff` usage in `rcsbapi.sequence` module
