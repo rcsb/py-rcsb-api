@@ -1,5 +1,6 @@
 """Fetching and Parsing API's GraphQL schema."""
 
+from __future__ import annotations
 from typing import Any, List, Dict, Union
 import re
 

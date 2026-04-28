@@ -1,6 +1,7 @@
 """Interact with the [RCSB PDB Search API](https://search.rcsb.org/#search-api).
 """
 
+from __future__ import annotations
 import functools
 import json
 import logging
