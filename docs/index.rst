@@ -1,5 +1,5 @@
-rcsb-api - Query RCSB PDB data from Python
-===============================================
+rcsb-api - Access RCSB PDB APIs and data from Python
+====================================================
 
 The ``rcsb-api`` package provides a Python interface to 
 `RCSB PDB API services <https://www.rcsb.org/docs/programmatic-access/web-apis-overview>`_. 
@@ -19,6 +19,42 @@ Install it from PyPI via ``pip`` or ``uv``:
 
 Or, download from `GitHub <https://github.com/rcsb/py-rcsb-api>`_
 
+Overview
+--------
+
+The ``rcsb-api`` package provides a simple Pythonic interface to the suite of `RCSB PDB APIs <https://www.rcsb.org/docs/programmatic-access/web-apis-overview>`_ for querying and fetching data in the PDB. Specifically, each API service is provided as a separate "module" (or sub-package) within the Python client, and offers the following set of key functionalities:
+
+- `Search API module <search_api/quickstart.html>`_ (``rcsbapi.search``):
+
+  - Perform all search types available through the RCSB.org Advanced Search builder (e.g., full-text, attribute-based, sequence and structure similarity, sequence and structure motif)
+  - Use simple Boolean logic to intuitively construct complex or nested queries
+  - Upload custom structure files for structure similarity searches
+  - Include computed structure models (CSMs) in search results
+
+- `Data API module <data_api/quickstart.html>`_ (``rcsbapi.data``):
+
+  - Retrieve any subset of metadata, features, and/or annotations for a given list of PDB IDs (e.g., experimental method details, structural annotations, binding sites, etc.)
+  - Easily fetch data for all structures across the archive
+  - Simplified GraphQL query construction using a Python syntax
+
+- `Sequence Coordinate API module <seq_api/quickstart.html>`_ (``rcsbapi.sequence``):
+
+  - Query alignments between structural and sequence databases as well as protein positional annotations/features integrated from multiple resources
+  - Alignment data is available for NCBI RefSeq (including protein and genomic sequences), UniProt and PDB sequences
+  - Protein positional features are integrated from UniProt, CATH, SCOPe and RCSB PDB and collected from the RCSB PDB Data Warehouse
+
+- `Model API module <model_api/quickstart.html>`_ (``rcsbapi.model``):
+
+  - Provides access to molecular structure data (e.g., atomic coordinates) and related information (in mmCIF or BCIF formats)
+  - Query for various structural data types, such as full structure, ligands, atoms, residue interactions, and more
+  - Valuable for extracting out specific slices of a structure data file (not for bulk downloads, in which case see our `download services <https://www.rcsb.org/docs/programmatic-access/file-download-services>`_)
+
+Training Materials
+------------------
+
+- Example usage for each module is available throughout these documentation pages (see sidebar menu navigation)
+- The project source code is available on `GitHub <https://github.com/rcsb/py-rcsb-api>`_, which also contains several example `Jupyter notebooks <https://github.com/rcsb/py-rcsb-api/tree/master/notebooks>`_ for all supported API services.
+- Watch our webinar, `Streamlining Access to RCSB PDB APIs with Python <https://pdb101.rcsb.org/train/training-events/apis-python>`_, which provides an introduction to our Search and Data APIs along with hands-on tutorials.
 
 Contents
 --------

@@ -6,7 +6,6 @@ including API endpoints, search services, and schema URLs. The values are
 immutable and protected from modification during runtime.
 """
 
-from __future__ import annotations
 from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import List
@@ -63,6 +62,7 @@ class Const:
         "uniprot": "uniprot.json",
         "drugbank": "drugbank.json",
     }))
+    DATA_API_MAX_BATCH_ID_SIZE: int = 1000
 
     SEQUENCE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
     SEQUENCE_API_GRAPHQL_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
