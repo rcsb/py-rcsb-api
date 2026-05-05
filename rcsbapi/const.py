@@ -45,6 +45,7 @@ class Const:
 
     # Data API constants
     DATA_API_ENDPOINT: str = "https://data.rcsb.org/graphql"
+    DATA_API_GRAPHIQL_ENDPOINT: str = "https://data.rcsb.org/graphiql/index.html"
     DATA_API_SCHEMA_DIR: str = "data/resources"
     DATA_API_SCHEMA_FILENAME: str = "data_api_schema.json"
     DATA_API_SCHEMA_BASE_URL: str = "https://data.rcsb.org/rest/v1/schema/"
@@ -66,6 +67,7 @@ class Const:
 
     SEQUENCE_API_ENDPOINT: str = "https://sequence-coordinates.rcsb.org"
     SEQUENCE_API_GRAPHQL_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphql"
+    SEQUENCE_API_GRAPHIQL_ENDPOINT: str = "https://sequence-coordinates.rcsb.org/graphiql/index.html"
     SEQUENCE_API_SCHEMA_DIR: str = "sequence/resources"
     SEQUENCE_API_SCHEMA_FILENAME: str = "seq_api_schema.json"
 

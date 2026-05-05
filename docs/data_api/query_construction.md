@@ -61,7 +61,7 @@ Also called "root fields", these represent designated points from which you can 
 ### input_ids
 Specifies which entries, entities, etc you would like to request data for.
 
-This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.md#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphql/index.html) Docs menu. Lists must be passed in PDB identifier format.
+This can be a dictionary or a list. Dictionaries must be passed with specific keys corresponding to the input_type. You can find the key names by using the `get_input_id_dict(input_type)` method (see [Helpful Methods](query_construction.md#get-input-id-dict)) or by looking in the [GraphiQL editor](https://data.rcsb.org/graphiql/index.html) Docs menu. Lists must be passed in PDB identifier format.
 
 <div style="width:750px">
 
@@ -202,7 +202,7 @@ print(result_dict)
 There are several methods included to make working with query objects easier. These methods can help you refine your queries to request exactly and only what you want, as well as further understand the GraphQL syntax.
 
 ### get_editor_link()
-This method returns the link to a [GraphiQL](https://data.rcsb.org/graphql/index.html) window with the query. From the window, you can use the user interface to explore other fields and refine your query. Method of the `DataQuery` class.
+This method returns the link to a [GraphiQL](https://data.rcsb.org/graphiql/index.html) window with the query. From the window, you can use the user interface to explore other fields and refine your query. Method of the `DataQuery` class.
 
 ```python
 from rcsbapi.data import DataQuery as Query

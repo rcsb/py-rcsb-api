@@ -151,7 +151,7 @@ class SeqQuery(ABC):
 
     def get_editor_link(self) -> str:
         """Get link to GraphiQL editor with given query populated"""
-        editor_base_link = str(const.SEQUENCE_API_ENDPOINT) + "/graphiql" + "/index.html?query="
+        editor_base_link = str(const.SEQUENCE_API_GRAPHIQL_ENDPOINT) + "?query="
         assert hasattr(self, "_query")  # for mypy
         return editor_base_link + urllib.parse.quote(str(self._query["query"]))
 

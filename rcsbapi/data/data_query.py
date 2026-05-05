@@ -193,7 +193,7 @@ class DataQuery:
         Returns:
             str: GraphiQL url
         """
-        editor_base_link = str(const.DATA_API_ENDPOINT) + "/index.html?query="
+        editor_base_link = str(const.DATA_API_GRAPHIQL_ENDPOINT) + "?query="
         return str(editor_base_link + urllib.parse.quote(str(self._query["query"])))
 
     def exec(
