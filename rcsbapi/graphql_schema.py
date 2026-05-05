@@ -575,7 +575,7 @@ class GQLSchema(ABC):
                         "Given path not specific enough. Use one or more of these paths in return_data_list argument:\n\n"
                         f"{path_choice_msg}\n"
                         "Please note that this list may not be complete. "
-                        "If looking for a different path, you can search the interactive editor's documentation explorer: https://data.rcsb.org/graphql/index.html"
+                        f"If looking for a different path, you can search the interactive editor's documentation explorer: {const.DATA_API_GRAPHIQL_ENDPOINT}"
                     )
                     raise ValueError(error_msg)
                 idx_paths = shortest_full_paths

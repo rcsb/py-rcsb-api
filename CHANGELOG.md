@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.7.3 (2026-05-05)
+
+- Update base GraphiQL query editor links for Data and Sequence API modules
+
 ## v1.7.2 (2026-04-28)
 
 - Set maximum possible value for `DATA_API_BATCH_ID_SIZE` to be 1000
