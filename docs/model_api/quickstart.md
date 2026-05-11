@@ -11,76 +11,57 @@ Or, download from [GitHub](https://github.com/rcsb/py-rcsb-api)
 ## Import
 To import this module, use:
 ```python
-import rcsbapi.model
+from rcsbapi.model import ModelQuery
 ```
 
 ## Getting Started
-The RCSB [ModelServer API](https://models.rcsb.org/) provides access to molecular structure data (e.g., atomic coordinates) and related information. The Model Server API allows you to query for various structural data types, such as full structure, ligands, atoms, residue interactions, and more.
-
-Key Features
-- Full Structure Data: Access complete structural information about biomolecules in different formats (e.g., CIF, BCIF).
-- Ligand Information: Retrieve detailed data about ligands, including their chemical structure and interactions with other components.
-- Atoms and Residue Data: Query for atom-level or residue-level data, including surrounding residues, interactions, and symmetries.
-- Symmetry Mates and Assemblies: Obtain symmetry mates or assembly data, important for understanding molecular structures in different environments.
+The RCSB [ModelServer API](https://models.rcsb.org/) provides access to molecular structure data (e.g., atomic coordinates) and related information from PDB structures. The Model Server API allows you to extract out specific structural components of a given structure, such as the full structure coordinates or the coordinates of particular chains, ligands, or surrounding/interacting residues or ligands, and more.
 
 The API supports queries for Experimental Structures. (Support for Computed Structure Models (CSMs) is not yet available.)
 
-### Query Types
+## Model API Query Construction
 
-The Model Server API supports multiple query types, including:
+### Query Methods
 
-- `full`: Fetches the full structure for a given entry.
-- `ligand`: Retrieves ligand-related information, including components and interactions.
-- `atoms`: Fetches atom-level details.
-- `residue_interaction`: Retrieves data on interactions between residues.
-- `residue_surroundings`: Provides information about residues surrounding a given structure.
-- `surrounding_ligands`: Provides information about ligands surrounding a given structure.
-- `symmetry_mates`: Retrieves symmetry-related data.
-- `assembly`: Fetches information about molecular assemblies.
+The `ModelQuery` object supports the following types of queries/methods:
 
-This package provides an interface to the Model Server API, making it easy to send requests and retrieve data in various formats.
+| Method                        | Description                                                                                                                                           |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.get_ligand()`               | Retrieve ligand coordinates from a given structure                                                                                                    |
+| `.get_atoms()`                | Fetch the coordinates of any part of a given structure (e.g., a particular entity, chain, or ligand)                                                  |
+| `.get_residue_interaction()`  | Retrieve the coordinates of all residues and ligands within a specified distance from a given residue or ligand (takes crystal symmetry into account) |
+| `.get_residue_surroundings()` | Retrieve the coordinates of all residues and ligands within a specified distance from a given residue or ligand (ignores crystal symmetry)            |
+| `.get_surrounding_ligands()`  | Retrieve the coordinates of all ligands within a specified distance from a given residue or ligand (taking crystal symmetry into account)             |
+| `.get_assembly()`             | Extract the coordinates of a structural assembly (selected group of instances or “chains”) from an entry                                              |
+| `.get_full_structure()`       | Fetch the full structure coordinates for a given entry                                                                                                |
+| `.get_symmetry_mates()`       | Compute crystal symmetry mates for a given structure                                                                                                  |
+| `.get_multiple_structures()`  | Fetch data for multiple structures                                                                                                                    |
 
+### Query Arguments
 
-### API Usage
-The API is based on standard HTTP requests, and you can specify different parameters depending on the query type. For example, you can query specific structures, specify encoding formats (like CIF or BCIF), request data downloads, or even compress data using GZIP.
+The specific set of arguments available depend on the particular `ModelQuery` method being used above. However, in general, most methods will accept the following common arguments:
 
-You can use this API to automate data retrieval and integrate it into your bioinformatics or structural biology workflow.
+| Argument              | Description                                                           | Default                                       |
+| --------------------- | --------------------------------------------------------------------- | --------------------------------------------- |
+| `entry_id`            | Structure identifier (e.g., `"2HHB"`)                                 | —                                             |
+| `encoding`            | Response encoding format. Supported values: `"cif"` and `"bcif"`      | `"cif"`                                       |
+| `download`            | Whether to download the response to a file                            | `False`                                       |
+| `filename`            | Output filename for downloaded data                                   | `None` (auto-generated from query parameters) |
+| `file_directory`      | Directory where downloaded files will be saved                        | `None` (current working directory)            |
+| `compress_gzip`       | Whether to gzip-compress the downloaded file                          | `False`                                       |
+| `copy_all_categories` | Whether to include all metadata categories from the source entry file | `False`                                       |
 
+Depending on the particular method being used and the level of granularity of the structure you want to fetch, one or more of the following can be specified:
 
-## Full Structure
-
-Use the `.get_full_structure()` method to fetch complete structural data for a given entry.
-
-```python
-from rcsbapi.model import ModelQuery
-
-# Fetch the full structure for the entry "2HHB" and store content in `result` variable
-query = ModelQuery()
-result = query.get_full_structure(entry_id="2HHB")
-print(result[:500])
-
-# Or, download the structure:
-result = query.get_full_structure(
-    entry_id="2HHB",
-    encoding="cif",
-    download=True,
-    file_directory="model-output"
-)
-print(result)
-```
-
-| Argument              | Description                                                |
-| --------------------- | ---------------------------------------------------------- |
-| `entry_id`            | The ID of the structure (e.g., "2HHB")                     |
-| `model_nums`          | The model numbers to fetch (optional). If set, only include atoms with the corresponding `_atom_site.pdbx_PDB_model_num` field.                    |
-| `encoding`            | The encoding format for the response (`cif` (default), `bcif`) |
-| `copy_all_categories` | Whether to copy all categories (default: False)            |
-| `data_source`         | The data source for the structure                          |
-| `transform`           | Apply any transformations (optional)                       |
-| `download`            | Whether to download the file (True/False)                  |
-| `filename`            | The name of the file to save                               |
-| `file_directory`      | Directory to save the file                                 |
-| `compress_gzip`       | Whether to compress the file (default: False)              |
+| Argument          | Description                                                 | Default | Example                         |
+| ----------------- | ----------------------------------------------------------- | ------- | ------------------------------- |
+| `label_entity_id` | PDB-assigned entity ID for the structural component         | `None`  | `"1"` (as in entity `4HHB_1`)   |
+| `label_asym_id`   | PDB-assigned asymmetric (chain) ID                          | `None`  | `"A"` (as in instance `4HHB.A`) |
+| `auth_asym_id`    | Author-assigned asymmetric (chain) ID                       | `None`  | `"A"`                           |
+| `label_comp_id`   | PDB-assigned chemical component or ligand ID                | `None`  | `"HEM"`                         |
+| `auth_comp_id`    | Author-assigned chemical component or ligand ID             | `None`  | `"HEM"`                         |
+| `label_seq_id`    | PDB-assigned sequence number of the residue of interest     | `None`  | `123` (as in residue `A123`)    |
+| `auth_seq_id`     | Author-assigned sequence number of the residue of interest  | `None`  | `123`                           |
 
 
 ## Ligand Data
@@ -115,7 +96,7 @@ print(result)
 | `model_nums`          | The model numbers to fetch (optional)                                      |
 | `encoding`            | The encoding format for the response (`cif`, `sdf`, `mol`, `mol2`, `bcif`) |
 | `copy_all_categories` | Whether to copy all categories (default: False)                            |
-| `data_source`         | The data source for the ligand                                             |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
 | `transform`           | Apply any transformations (optional)                                       |
 | `download`            | Whether to download the file (True/False)                                  |
 | `filename`            | The name of the file to save                                               |
@@ -152,7 +133,7 @@ print(result)
 | `model_nums`          | The model numbers to fetch (optional)                |
 | `encoding`            | The encoding format for the response (`cif`, `bcif`) |
 | `copy_all_categories` | Whether to copy all categories (default: False)      |
-| `data_source`         | The data source for the atom                         |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
 | `transform`           | Apply any transformations (optional)                 |
 | `download`            | Whether to download the file (True/False)            |
 | `filename`            | The name of the file to save                         |
@@ -205,7 +186,7 @@ print(result)
 | `model_nums`          | The model numbers to fetch (optional)                         |
 | `encoding`            | The encoding format for the response (`cif`, `bcif`)          |
 | `copy_all_categories` | Whether to copy all categories (default: False)               |
-| `data_source`         | The data source for the residue interaction                   |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
 | `transform`           | Apply any transformations (optional)                          |
 | `download`            | Whether to download the file (True/False)                     |
 | `filename`            | The name of the file to save                                  |
@@ -253,7 +234,7 @@ print(result)
 | `model_nums`          | The model numbers to fetch (optional)                          |
 | `encoding`            | The encoding format for the response (`cif`, `bcif`)           |
 | `copy_all_categories` | Whether to copy all categories (default: False)                |
-| `data_source`         | The data source for the residue surroundings                   |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
 | `transform`           | Apply any transformations (optional)                           |
 | `download`            | Whether to download the file (True/False)                      |
 | `filename`            | The name of the file to save                                   |
@@ -301,40 +282,12 @@ print(result)
 | `model_nums`          | The model numbers to fetch (optional)                                            |
 | `encoding`            | The encoding format for the response (`cif`, `bcif`)                             |
 | `copy_all_categories` | Whether to copy all categories (default: `False`)                                  |
-| `data_source`         | The data source for the surrounding ligands                                      |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
 | `transform`           | Apply any transformations (optional)                                             |
 | `download`            | Whether to download the file (True/False)                                        |
 | `filename`            | The name of the file to save                                                     |
 | `file_directory`      | Directory to save the file                                                       |
 | `compress_gzip`       | Whether to compress the file (default: `False`)                                    |
-
-
-## Symmetry Mates
-
-Use the `.get_symmetry_mates()` method to compute crystal symmetry mates within a specified radius.
-
-```python
-from rcsbapi.model import ModelQuery
-
-# Generate the symmetry mates (unit cell replications) for the entry "1TQN"
-query = ModelQuery()
-result = query.get_symmetry_mates(entry_id="1TQN", download=True, file_directory="model-output")
-print(result)
-```
-
-| Argument              | Description                                              |
-| --------------------- | -------------------------------------------------------- |
-| `entry_id`            | The ID of the structure (e.g., "2HHB")                   |
-| `radius`              | The interaction radius for symmetry mates (default: 5.0) |
-| `model_nums`          | The model numbers to fetch (optional)                    |
-| `encoding`            | The encoding format for the response (`cif`, `bcif`)     |
-| `copy_all_categories` | Whether to copy all categories (default: False)          |
-| `data_source`         | The data source for the symmetry mates                   |
-| `transform`           | Apply any transformations (optional)                     |
-| `download`            | Whether to download the file (True/False)                |
-| `filename`            | The name of the file to save                             |
-| `file_directory`      | Directory to save the file                               |
-| `compress_gzip`       | Whether to compress the file (default: False)            |
 
 
 ## Assembly Data
@@ -357,12 +310,76 @@ print(result)
 | `model_nums`          | The model numbers to fetch (optional)                |
 | `encoding`            | The encoding format for the response (`cif`, `bcif`) |
 | `copy_all_categories` | Whether to copy all categories (default: False)      |
-| `data_source`         | The data source for the assembly                     |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
 | `transform`           | Apply any transformations (optional)                 |
 | `download`            | Whether to download the file (True/False)            |
 | `filename`            | The name of the file to save                         |
 | `file_directory`      | Directory to save the file                           |
 | `compress_gzip`       | Whether to compress the file (default: False)        |
+
+
+## Full Structure
+
+Use the `.get_full_structure()` method to fetch complete structural data for a given entry.
+
+```python
+from rcsbapi.model import ModelQuery
+
+# Fetch the full structure for the entry "2HHB" and store content in `result` variable
+query = ModelQuery()
+result = query.get_full_structure(entry_id="2HHB")
+print(result[:500])
+
+# Or, download the structure:
+result = query.get_full_structure(
+    entry_id="2HHB",
+    encoding="cif",
+    download=True,
+    file_directory="model-output"
+)
+print(result)
+```
+
+| Argument              | Description                                                |
+| --------------------- | ---------------------------------------------------------- |
+| `entry_id`            | The ID of the structure (e.g., "2HHB")                     |
+| `model_nums`          | The model numbers to fetch (optional). If set, only include atoms with the corresponding `_atom_site.pdbx_PDB_model_num` field.                    |
+| `encoding`            | The encoding format for the response (`cif` (default), `bcif`) |
+| `copy_all_categories` | Whether to copy all categories (default: False)            |
+| `transform`           | Apply any transformations (optional)                       |
+| `download`            | Whether to download the file (True/False)                  |
+| `filename`            | The name of the file to save                               |
+| `file_directory`      | Directory to save the file                                 |
+| `compress_gzip`       | Whether to compress the file (default: False)              |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
+
+
+## Symmetry Mates
+
+Use the `.get_symmetry_mates()` method to compute crystal symmetry mates within a specified radius.
+
+```python
+from rcsbapi.model import ModelQuery
+
+# Generate the symmetry mates (unit cell replications) for the entry "1TQN"
+query = ModelQuery()
+result = query.get_symmetry_mates(entry_id="1TQN", download=True, file_directory="model-output")
+print(result)
+```
+
+| Argument              | Description                                              |
+| --------------------- | -------------------------------------------------------- |
+| `entry_id`            | The ID of the structure (e.g., "2HHB")                   |
+| `radius`              | The interaction radius for symmetry mates (default: 5.0) |
+| `model_nums`          | The model numbers to fetch (optional)                    |
+| `encoding`            | The encoding format for the response (`cif`, `bcif`)     |
+| `copy_all_categories` | Whether to copy all categories (default: False)          |
+| `data_source`         | Allows to control how the provided data source ID maps to input file (as specified by the server instance config)  (default: None)                     |
+| `transform`           | Apply any transformations (optional)                     |
+| `download`            | Whether to download the file (True/False)                |
+| `filename`            | The name of the file to save                             |
+| `file_directory`      | Directory to save the file                               |
+| `compress_gzip`       | Whether to compress the file (default: False)            |
 
 
 ## Working with Multiple Structures
