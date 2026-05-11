@@ -1,5 +1,5 @@
 # Quickstart
-This is a quickstart guide to interacting with the RCSB PDB [ModelServer Coordinates API](https://models.rcsb.org/) using the *rcsb-api* Python package.
+This is a quickstart guide to interacting with the RCSB PDB [ModelServer API](https://models.rcsb.org/) using the *rcsb-api* Python package.
 
 ## Installation
 Get it from PyPI:
