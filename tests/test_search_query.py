@@ -570,7 +570,7 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(len(query_4.nodes[1].nodes), 2)
 
     def testSeqSimilarityGroups(self):
-        q1 = TextQuery("heat-shock transcription factor")
+        q1 = TextQuery("GTPase HRas")
         q2 = AttributeQuery("rcsb_entity_source_organism.taxonomy_lineage.name", "exact_match", "Homo sapiens")
         q3 = SeqSimilarityQuery(
             "MTEYKLVVVGAGGVGKSALTIQLIQNHFVDEYDPTIEDSYRKQVVIDGET"
