@@ -276,7 +276,7 @@ print(result)
 | `label_atom_id`       | The label for the ligand atom                                                    |
 | `auth_atom_id`        | The author atom ID for the ligand                                                |
 | `type_symbol`         | The chemical type symbol for the ligand                                          |
-| `omit_water`          | Whether to exclude water molecules from the surrounding ligands (default: `False`). (*Note: this does not appear to be functional on the ModelServer API yet*) |
+| `omit_water`          | Whether to exclude water molecules from the surrounding ligands (default: `False`). |
 | `radius`              | The interaction radius for surrounding ligands (default: 5.0)                    |
 | `assembly_name`       | The assembly name (optional)                                                     |
 | `model_nums`          | The model numbers to fetch (optional)                                            |
