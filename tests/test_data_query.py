@@ -521,7 +521,7 @@ class QueryTests(unittest.TestCase):
                     attribute="rcsb_nonpolymer_entity_annotation.comp_id",
                     operator="exists",
                 )
-                q3 = attrs.rcsb_polymer_entity_feature_summary.type == "modified_monomer"
+                q3 = attrs.rcsb_polymer_entity_feature_summary.type == "non_standard_monomer"
                 q4 = attrs.rcsb_polymer_entity_feature_summary.count > 1
                 query = q1 & NestedAttributeQuery(q2a, q2b) & NestedAttributeQuery(q3, q4)
                 result_list = list(query())
